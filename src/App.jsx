@@ -2,11 +2,12 @@ import {Routes, Route} from "react-router-dom"
 import Home from "./pages/Home"
 import LookUp from "./pages/LookUp"
 import MemorizeGame from "./pages/MemorizeGame"
+import NavBar from "./components/NavBar"
 
 export default function SanskritVibeApp() {
   return (
     <div>
-        {/* <NavBar /> */}
+        <NavBar />
         <main className=''>
             <Routes>
                 <Route path='/' element = {<Home/>}/>

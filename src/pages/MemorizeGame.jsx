@@ -1,7 +1,7 @@
 // !! This page is secondary for now, dont need to touch it, focus on the LookUp page
 
 
-export function MemorizeGame () {
+export default function MemorizeGame () {
     // -    -- Sample dataset (expandable) ---
   // Each noun includes forms for cases x numbers. For verbs include conjugations.
   
@@ -280,4 +280,3 @@ export function MemorizeGame () {
   );
 }
 
-export default MemorizeGame

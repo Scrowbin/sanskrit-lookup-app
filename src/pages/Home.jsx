@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
 
-
 export default function Home() {
     const navigate = useNavigate();
 
@@ -9,20 +8,21 @@ export default function Home() {
         <div className="min-h-screen flex flex-col bg-neutral-950 text-neutral-100">
         
         {/* Top section (1/3 height) */}
-        <div className="h-[33vh] flex flex-row items-center justify-center gap-6 px-4">
-            <button onClick={() => navigate("/LookUp")} className="w-full max-w-md py-4 text-lg font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 transition">
-                Look up declension and other stuff
+        <div className="h-[20vh] flex flex-row items-center justify-center gap-20 px-20">
+            <button onClick={() => navigate("/LookUp")} className="h-[10vh] w-full max-w-md py-4 text-lg font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 transition">
+                Look up declension
             </button>
 
-            <button onClick={() => navigate("/MemorizeGame")} className="w-full max-w-md py-4 text-lg font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-500 transition">
+            <button onClick={() => navigate("/MemorizeGame")} className="h-[10vh] w-full max-w-md py-4 text-lg font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-500 transition">
                 Memorize With Game
             </button>
         </div>
+        <hr className="w-full border-t border-neutral-700" />
 
         {/* Bottom section (info) */}
-        <div className="px-16 py-8 text-sm text-neutral-300 space-y-4 mt-auto">
-                    <hr className="w-full border-t border-neutral-700 my-6" />
+        <hr className=" w-full border-t border-neutral-700 mt-auto" />
 
+        <div className="px-16 py-8 text-sm text-neutral-300 space-y-4">
             <p>
                 This app helps students explore Sanskrit declensions, word forms,
                 and grammar rules quickly and offline.
