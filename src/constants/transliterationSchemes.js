@@ -1,6 +1,6 @@
 export const INPUT_SCHEMES = {
   "hk": "Harvard-Kyoto",
-  "iast": "International Alphabet of Sanskrit Transliteration",
+  "iast": "IAST (International Alphabet of Sanskrit Transliteration)",
   "iso": "ISO 15919",
   "itrans": "ITRANS",
   "itrans_dravidian": "ITRANS (Dravidian e/o support)",
