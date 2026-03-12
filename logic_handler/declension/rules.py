@@ -1,5 +1,6 @@
 import pynini as pn
-
+# TODO Ruki rule
+#
 
 ALPHA = pn.union(*"abcdefghijklmnopqrstuvwxyzāīūṛṝḷḹeaiouḥṃṅñṇnṃśṣs") # UNFINISHED, DIS DA ALPHABET
 '''
@@ -66,3 +67,22 @@ all_consonants = pn.union(
     semivowels, sibilants, aspirate
 )
 all_sounds = pn.union(vowels, all_consonants)
+
+
+
+'''
+Retroflextion fixes
+'''
+triggers = pn.union("r", "ṛ", "ṝ", "ṣ")
+allowed_vowels = pn.union(*"aāiīuūṛṝḷḹeoaiou")
+velars = pn.union("k", "kh", "g", "gh", "ṅ")
+others = pn.union("y", "v", "h", "ṃ") # Semivowels and anusvara
+allowed_interveners = pn.union(vowels, velars, labial, others).closure()
+right_context = pn.union(vowels, "m", "v", "y")
+apply_nati = pn.cdrewrite(
+    pn.cross("n", "ṇ"),               
+    triggers + allowed_interveners,  
+    right_context,                  
+    ALPHA
+)
+

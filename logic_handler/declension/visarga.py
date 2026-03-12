@@ -1,6 +1,5 @@
 import pynini as pn
 from rules import *
-
 visarga_sigma = pn.closure(pn.union(ALPHA, "ḥ"))
 visarga = "ḥ"
 '''
@@ -83,7 +82,15 @@ visarga_before_t_th = pn.cdrewrite(
 )
 
 
+# s_to_visarga
+s_to_visarga = pn.cdrewrite(
+    pn.cross("s", visarga),
+    "",
+    "<EOS>",
+    visarga_sigma
+)
 
+# r_to_visarga
 '''
 UNIMPLEMENTED STUFF
 
