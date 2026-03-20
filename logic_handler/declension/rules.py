@@ -1,6 +1,14 @@
 import pynini as pn
 # TODO Ruki rule
-#
+'''
+TODO : ruki rule
+check if all the sandhi rules are correct
+check for visarga as well 
+Hardcode kinship/agent words
+s to ṣ : go -> goṣu 
+rewrite the codebase to accept anygenders, D.R.Y methodology.
+verify ant_mant_vant_stems 
+'''
 
 ALPHA = pn.union(*"abcdefghijklmnopqrstuvwxyzāīūṛṝḷḹeaiouḥṃṅñṇnṃśṣs") # UNFINISHED, DIS DA ALPHABET
 '''
@@ -85,4 +93,4 @@ apply_nati = pn.cdrewrite(
     right_context,                  
     ALPHA
 )
-
+any_gender = pn.union("[Masc]", "[Fem]", "[Neut]")

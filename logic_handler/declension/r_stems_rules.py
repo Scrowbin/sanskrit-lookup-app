@@ -69,6 +69,7 @@ loc_du_kin = pn.cross("ṛ[R_STEM][Kin][Loc][Du]", "ros")
 voc_du_kin = pn.cross("ṛ[R_STEM][Kin][Voc][Du]", "arau")
 
 # Plural
+# solution for this: scans if the string includes acc + plural, if has the tag then add the gendered tag
 nom_pl_kin = pn.cross("ṛ[R_STEM][Kin][Nom][Pl]", "aras")
 acc_pl_m_kin = pn.cross("ṛ[R_STEM][Kin][Masc][Acc][Pl]", "ṝn")
 acc_pl_f_kin = pn.cross("ṛ[R_STEM][Kin][Fem][Acc][Pl]", "ṝs")

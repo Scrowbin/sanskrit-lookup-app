@@ -66,9 +66,54 @@ voc_pl_m_u = pn.cross("u[U_STEM][Masc][Voc][Pl]", "avas")   # śátru + as -> ś
 # Feminine
 nom_pl_f_u = pn.cross("u[U_STEM][Fem][Nom][Pl]", "avas")    # dhenú + as -> dhenávas
 acc_pl_f_u = pn.cross("u[U_STEM][Fem][Acc][Pl]", "ūs")      # dhenú + as -> dhenús (u -> ūs)
+voc_pl_f_u = pn.cross("u[U_STEM][Fem][Voc][Pl]", "avas")
 ins_pl_f_u = pn.cross("[U_STEM][Fem][Ins][Pl]", "bhis")     
 dat_pl_f_u = pn.cross("[U_STEM][Fem][Dat][Pl]", "bhyas")    
 abl_pl_f_u = pn.cross("[U_STEM][Fem][Abl][Pl]", "bhyas")    
 gen_pl_f_u = pn.cross("u[U_STEM][Fem][Gen][Pl]", "ūnām")    
 loc_pl_f_u = pn.cross("[U_STEM][Fem][Loc][Pl]", "su")       
-voc_pl_f_u = pn.cross("u[U_STEM][Fem][Voc][Pl]", "avas")
+
+
+'''
+Feminine Ū-STEM (e.g., vadhū)
+'''
+# Singular
+nom_sg_f_uu = pn.cross("ū[Ū_STEM][Fem][Nom][Sg]", "ūs")      # vadhū -> vadhūs (Keeps the 's'!)
+acc_sg_f_uu = pn.cross("ū[Ū_STEM][Fem][Acc][Sg]", "ūm")      # vadhū -> vadhūm
+ins_sg_f_uu = pn.cross("ū[Ū_STEM][Fem][Ins][Sg]", "vā")      # vadhū -> vadhvā (ū -> vā)
+dat_sg_f_uu = pn.cross("ū[Ū_STEM][Fem][Dat][Sg]", "vai")     # vadhū -> vadhvai
+abl_sg_f_uu = pn.cross("ū[Ū_STEM][Fem][Abl][Sg]", "vās")     # vadhū -> vadhvās
+gen_sg_f_uu = pn.cross("ū[Ū_STEM][Fem][Gen][Sg]", "vās")     # vadhū -> vadhvās
+loc_sg_f_uu = pn.cross("ū[Ū_STEM][Fem][Loc][Sg]", "vām")     # vadhū -> vadhvām
+voc_sg_f_uu = pn.cross("ū[Ū_STEM][Fem][Voc][Sg]", "u")       # vadhū -> vadhu (Shortens to u!)
+
+# Dual
+nom_du_f_uu = pn.cross("ū[Ū_STEM][Fem][Nom][Du]", "vau")     # vadhū -> vadhvau
+acc_du_f_uu = pn.cross("ū[Ū_STEM][Fem][Acc][Du]", "vau")     
+voc_du_f_uu = pn.cross("ū[Ū_STEM][Fem][Voc][Du]", "vau")     
+
+ins_du_f_uu = pn.cross("[Ū_STEM][Fem][Ins][Du]", "bhyām")    # vadhū + bhyām
+dat_du_f_uu = pn.cross("[Ū_STEM][Fem][Dat][Du]", "bhyām")    
+abl_du_f_uu = pn.cross("[Ū_STEM][Fem][Abl][Du]", "bhyām")    
+
+gen_du_f_uu = pn.cross("ū[Ū_STEM][Fem][Gen][Du]", "vos")     # vadhū -> vadhvos
+loc_du_f_uu = pn.cross("ū[Ū_STEM][Fem][Loc][Du]", "vos")     
+
+# Plural
+nom_pl_f_uu = pn.cross("ū[Ū_STEM][Fem][Nom][Pl]", "vas")     # vadhū -> vadhvas
+acc_pl_f_uu = pn.cross("ū[Ū_STEM][Fem][Acc][Pl]", "ūs")      # vadhū -> vadhūs
+voc_pl_f_uu = pn.cross("ū[Ū_STEM][Fem][Voc][Pl]", "vas")     
+
+ins_pl_f_uu = pn.cross("[Ū_STEM][Fem][Ins][Pl]", "bhis")     # vadhū + bhis
+dat_pl_f_uu = pn.cross("[Ū_STEM][Fem][Dat][Pl]", "bhyas")    
+abl_pl_f_uu = pn.cross("[Ū_STEM][Fem][Abl][Pl]", "bhyas")    
+
+gen_pl_f_uu = pn.cross("ū[Ū_STEM][Fem][Gen][Pl]", "ūnām")    # vadhū -> vadhūnām
+loc_pl_f_uu = pn.cross("[Ū_STEM][Fem][Loc][Pl]", "su")       # vadhū + su (Strict underlying)
+
+# Union Compiler
+fem_uu_paradigm = pn.union(
+    nom_sg_f_uu, acc_sg_f_uu, ins_sg_f_uu, dat_sg_f_uu, abl_sg_f_uu, gen_sg_f_uu, loc_sg_f_uu, voc_sg_f_uu,
+    nom_du_f_uu, acc_du_f_uu, voc_du_f_uu, ins_du_f_uu, dat_du_f_uu, abl_du_f_uu, gen_du_f_uu, loc_du_f_uu,
+    nom_pl_f_uu, acc_pl_f_uu, voc_pl_f_uu, ins_pl_f_uu, dat_pl_f_uu, abl_pl_f_uu, gen_pl_f_uu, loc_pl_f_uu
+).optimize()
