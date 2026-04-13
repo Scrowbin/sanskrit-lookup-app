@@ -289,7 +289,7 @@ export default function LookUp() {
                   onClick={() => {
                     setInputType("Roman");
                     setInputValue("");
-                    setInputScheme("itrans");
+                    setInputScheme("iast");
                   }}
                 >
                   Reset
