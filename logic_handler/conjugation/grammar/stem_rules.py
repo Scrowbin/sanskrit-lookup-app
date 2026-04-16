@@ -1,11 +1,14 @@
 import pynini as pn
 from irregulars import * 
 from alphabet import ALPHABET
+import vowel_strength
 class StemBuilder:
     """Builds the verbal stem based on the Present Class (Gaṇa)."""
 
-    def __init__(self, guna_transducer):
-        self.guna = guna_transducer
+    def __init__(self, strength_engine):
+        self.guna = strength_engine.get_guna()
+        self.vriddhi = strength_engine.get_vriddhi()
+
         self.vikaranas = {
             1: "a",   # Guna + a
             4: "ya",  # No Guna + ya
@@ -14,7 +17,6 @@ class StemBuilder:
         }
         self.sigma = ALPHABET.sigma_star
         self.consonants = ALPHABET.consonants
-        lengthen_map = pn.string_map([("i", "ī"), ("u", "ū")])
         self.tags = pn.union("[STRONG]", "[WEAK]")
         self.set_roots = set_roots
         self.class_4_lengthen = pn.cdrewrite(
@@ -23,6 +25,23 @@ class StemBuilder:
             "v" + self.tags, 
             self.sigma
         )
+
+        # table for the tenses
+        self.tense_dispatch = {
+            "present": self._build_present_system,
+            "imperfect": self._build_present_system,
+            "imperative": self._build_present_system,
+            "optative": self._build_present_system,
+            
+            "perfect": self._build_perfect_system,
+            
+            "future": self._build_future_system,
+            "conditional": self._build_future_system,
+            "periphrastic_future": self._build_future_system,
+            
+            "aorist": self._build_aorist_system,
+            "benedictive": self._build_aorist_system
+        }
 
     def get_abhyasa(self, root_str):
         """
@@ -33,7 +52,7 @@ class StemBuilder:
         3. Vowels are usually shortened.
         """
         # Basic mapping for common Class 3 roots
-        # For a full FST, this would be a pynini transducer
+        # will be its seperate thing late, now a simple function first
         redup_map = {
             "bhū": "ba",  # (Actually bhū is class 1, but if it were 3)
             "hu": "ju",   # h -> j (velar to palatal)
@@ -43,19 +62,25 @@ class StemBuilder:
         }
         return redup_map.get(root_str, root_str[0])
     
-    def build(self, root_str, root_fst, class_num, strength, tense="present"):
-        """Logic for stem formation."""
-        # --- TENSE: FUTURE (Lṛṭ) ---
-        if tense == "future":
-            # 1. Future always takes Guṇa
-            stem = root_fst @ self.guna
-            # 2. Add 'i' augment if it's a 'set' root
-            if root_str in self.set_roots:
-                stem = stem + pn.accep("i")
-            # 3. Add 'sya' infix (Sandhi will turn s->ṣ later)
-            return stem + pn.accep("sya")
+    def build(self, root_str, root_fst, class_num, strength, tense="present", derivative=None):
+        """Routes the stem building request to the correct system function."""
+        
+        # If we handle secondary derivatives later, we intercept them here
+        if derivative:
+            return self._build_derivative_system(root_str, root_fst, derivative)
 
-        # --- TENSE: PRESENT SYSTEM (Laṭ, Laṅ, Loṭ, Vidhi Liṅ) ---
+        # 1. Look up the correct function based on tense
+        builder_func = self.tense_dispatch.get(tense)
+        
+        if not builder_func:
+            raise ValueError(f"StemBuilder does not yet support the tense: '{tense}'")
+            
+        # 2. Execute the specific function
+        return builder_func(root_str, root_fst, class_num, strength, tense)
+
+
+    # --- TENSE: PRESENT SYSTEM (Laṭ, Laṅ, Loṭ, Vidhi Liṅ) ---
+    def _build_present_system(self, root_str, root_fst, class_num, strength, tense):
         vikarana_str = self.vikaranas.get(class_num, "")
         vikarana_fst = pn.accep(vikarana_str)
         
@@ -101,7 +126,7 @@ class StemBuilder:
                 infix = "na" if strength == "[STRONG]" else "n"
                 
                 # Define what the final consonant looks like
-                consonant_fst = pn.union(*self.consonants)
+                consonant_fst = pn.union(self.consonants)
                 
                 # The Rewrite Rule: 
                 # Use pn.cross("", infix) to effectively "insert"
@@ -127,3 +152,41 @@ class StemBuilder:
                 return root_fst + vik
 
             return root_fst
+    
+    def _build_future_system(self, root_str, root_fst, class_num, strength, tense):
+        """Handles Lṛṭ, Lṛṅ (Conditional), and Luṭ (Periphrastic)."""
+
+        # --- TENSE: FUTURE (Lṛṭ) ---
+        # not accounting for Grassmann's Law yet
+        stem = root_fst @ self.guna
+
+        # passing the aniṭ stems (like yoj + sya) instead of doing it in sandhi
+        # 2. Add 'i' augment for set roots
+        if root_str in self.set_roots:
+            stem = stem + pn.accep("i")
+            
+        # 3. Apply the Augment for Conditional
+        if tense == "conditional":
+            # Add the past-tense 'a' prefix
+            stem = pn.accep("a") + stem
+
+        # 4. Attach appropriate suffix
+        if tense in ["future", "conditional"]:
+            return stem + pn.accep("sya")
+        else:
+            # Periphrastic future uses 'tā'
+            return stem + pn.accep("tā")
+
+        
+        
+    def _build_perfect_system(self, root_str, root_fst, class_num, strength, tense):
+        """Handles Liṭ using Universal Reduplication."""
+        pass # TODO: We will build this out next!
+
+    def _build_aorist_system(self, root_str, root_fst, class_num, strength, tense):
+        """Handles Luṅ and Āśīr Liṅ."""
+        pass # TODO: Aorist logic goes here
+        
+    def _build_derivative_system(self, root_str, root_fst, derivative):
+        """Handles Secondary Conjugations (Causative, Desiderative, etc.)."""
+        pass # TODO: Derivative wrappers go here

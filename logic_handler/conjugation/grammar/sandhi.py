@@ -17,31 +17,28 @@ class SandhiEngine:
         """Rules handling vowel contact and mergers."""
         
         # A. Savarna Dirgha (Homogeneous Merger): a+a -> ā, i+i -> ī, etc.
-        # Fixes: a + ad -> ād | krīṇā + āni -> krīṇāni
         self.savarna = pn.cdrewrite(
-            pn.string_map([("aa", "ā"), ("aā", "ā"), ("āa", "ā"), ("āā", "ā")]),
+            pn.string_map([
+                # a-family
+                ("aa", "ā"), ("aā", "ā"), ("āa", "ā"), ("āā", "ā"),
+                # i-family
+                ("ii", "ī"), ("iī", "ī"), ("īi", "ī"), ("īī", "ī"),
+                # u-family
+                ("uu", "ū"), ("uū", "ū"), ("ūu", "ū"), ("ūū", "ū"),
+                # ṛ-family
+                ("ṛṛ", "ṝ"), ("ṛṝ", "ṝ"), ("ṝṛ", "ṝ"), ("ṝṝ", "ṝ")
+            ]),
             "", 
             "", 
             self.sig
         )
 
-        self.vowel_cleanup = pn.cdrewrite(
-            pn.union(
-                pn.cross("āā", "ā"),
-                pn.cross("īī", "ī"),
-                pn.cross("ūū", "ū")
-            ),
-            "",
-            "",
-            self.sig
-        )
-
-        # B. Ayadi Sandhi: e/o before ANY vowel becomes ay/av
+        # B. Ayadi Sandhi: e/o before ANY vowel becomes ay/av (131)
         # Fixes: bho + iṣyati -> bhaviṣyati
         self.ayadi = pn.cdrewrite(
-            pn.string_map([("e", "ay"), ("o", "av")]), 
+            pn.string_map([("e", "ay"), ("o", "av"),("ai", "āy"),("au", "āv")]), 
             "", 
-            pn.union(*ALPHABET.vowels), 
+            pn.union(ALPHABET.vowels), 
             self.sig
         )
 
@@ -59,12 +56,13 @@ class SandhiEngine:
         self.yan_sandhi = pn.cdrewrite(
             pn.string_map([
                 ("i", "y"),
+                ("ī", "y"),
                 ("u", "v"),
                 ("ū", "v"),
                 ("ṛ", "r")
             ]),
             "",
-            pn.union(*ALPHABET.vowels),
+            pn.union(ALPHABET.vowels),
             self.sig
         )
 
@@ -82,8 +80,36 @@ class SandhiEngine:
             pn.string_map([("j", "k"), ("c", "k")]), "", pn.union("t", "th", "s"), self.sig
         )
         self.devoicing = pn.cdrewrite(
-            pn.string_map([("d", "t")]), "", pn.union("t", "th", "s"), self.sig
+            pn.string_map([
+                ("d", "t"), ("dh", "t"), 
+                ("g", "k"), ("gh", "k"),
+                ("b", "p"), ("bh", "p"),
+                ("ḍ", "ṭ"), ("ḍh", "ṭ")]),
+                "",
+                pn.union("t", "th", "s"),
+                self.sig
         )
+        # Aspiration Throwback
+        throwback_map = pn.string_map([("b", "bh"), ("d", "dh"), ("g", "gh")])
+        root_vowels = ALPHABET.vowels
+        final_aspirates = pn.union("gh", "dh", "bh", "h")
+        throwback_triggers = pn.union("s", "t", "th", "[EOS]")
+        
+        self.grassmann_throwback = pn.cdrewrite(
+            throwback_map,
+            "", # Targets the initial b/d/g
+            root_vowels + final_aspirates + throwback_triggers, # Looks ahead
+            self.sig
+        )
+        
+        # H-Sandhi: 'h' hardens to 'k' before 's' (Needed for roots like duh/guh)
+        self.h_to_k = pn.cdrewrite(
+            pn.cross("h", "k"), 
+            pn.union(ALPHABET.vowels, "r", "l", "y", "v"), 
+            "s", 
+            self.sig
+        )
+
         # B. Nasal Assimilation (n -> ñ/ṅ)
         self.nasal_assimilation = pn.cdrewrite(
             pn.string_map([("n", "ñ")]), "", pn.union("j", "c"), self.sig
@@ -105,20 +131,24 @@ class SandhiEngine:
         self.ruki = pn.cdrewrite(pn.cross("s", "ṣ"), ruki_triggers, "", self.sig)
 
         # B. Nati: n -> ṇ
-        # Trigger: r, ṛ, ṣ
-        # Interveners: Vowels, Gutturals, Labials, y, v, h, AND retroflexes (like ṇ)
-        triggers = pn.union("r", "ṛ", "ṣ")
-        allowed = pn.union(
-            *ALPHABET.vowels, 
-            pn.union("k", "kh", "g", "gh", "ṅ", "h"), 
-            pn.union("p", "ph", "b", "bh", "m", "v", "y"),
-            pn.union("ṭ", "ṭh", "ḍ", "ḍh", "ṇ") # Added retroflexes to allowed list
-        ).optimize()
+        triggers = pn.union("r", "ṛ", "ṣ", "ṝ")
+        others = pn.union("y", "v", "h", "ṃ")
         
+        # Using the clean global groups from ALPHABET
+        allowed_interveners = pn.union(
+            ALPHABET.vowels, 
+            ALPHABET.gutturals, 
+            ALPHABET.labials, 
+            ALPHABET.retroflexes, 
+            others
+        ).star.optimize()
+        
+        right_context = pn.union(ALPHABET.vowels, "n", "m", "y", "v")
+
         self.nati = pn.cdrewrite(
             pn.cross("n", "ṇ"), 
-            triggers + allowed.star, 
-            pn.union(*ALPHABET.vowels, "n", "m", "y", "v"), 
+            triggers + allowed_interveners, 
+            right_context, 
             self.sig
         )
 
@@ -133,16 +163,22 @@ class SandhiEngine:
         return (fst @ 
             self.thematic_merger @ 
             self.ayadi @ 
-            self.yan_sandhi @
             self.class9_special @
+            self.yan_sandhi @
             self.savarna @
-            self.vowel_cleanup @
-            self.palatal_sandhi @ 
-            self.devoicing @ 
+            
+            # --- CONSONANT SANDHI ---
+            self.grassmann_throwback @    # 1. Throwback first! (bodhsya -> bhodhsya)
+            self.h_to_k @                 # 2. Harden H (dhohsya -> dhoksya)
+            self.palatal_sandhi @         # 3. Revert Palatals 
+            self.devoicing @              # 4. Devoice (bhodhsya -> bhotsya)
             self.nasal_assimilation @ 
             self.velar_nasal @
+            # ------------------------
+            
             self.drop_a @ 
-            self.ruki @ 
+            self.optative_cleanup @
+            self.ruki @                   # 5. Ruki catches the new K! (dhoksya -> dhokṣya)
             self.nati @ 
             self.visarga              
         )

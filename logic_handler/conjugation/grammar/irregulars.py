@@ -23,4 +23,4 @@ nasal_roots = {
     "lip": "limpa"
 }
 #set roots for future tense
-set_roots = ["bhū", "div", "cur", "tud"]
+set_roots = ["bhū", "div", "cur", "tud","kṛ"]

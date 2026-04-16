@@ -1,6 +1,6 @@
 import pynini as pn
 from alphabet import ALPHABET
-from guna import GunaEngine
+from vowel_strength import VowelStrengthEngine
 from sandhi import SandhiEngine
 from stem_rules import StemBuilder
 from endings import SuffixProvider
@@ -9,9 +9,9 @@ class SanskritConjugator:
     """The main engine orchestrating the conjugation pipeline."""
 
     def __init__(self):
-        self.guna = GunaEngine()
+        self.guna = VowelStrengthEngine()
         self.sandhi = SandhiEngine()
-        self.stems = StemBuilder(self.guna.get_transducer())
+        self.stems = StemBuilder(self.guna)
         self.sigma = ALPHABET.sigma_star
 
     def conjugate(self, root_str, class_num, person, number, voice="P", tense="present"):
@@ -62,10 +62,14 @@ class SanskritConjugator:
             endings_map = SuffixProvider.get_present_active(class_num=class_num)
         elif tense == "imperfect":
             endings_map = SuffixProvider.get_secondary_active(class_num=class_num)
+        elif tense == "conditional":     
+            # Conditional uses Class 1 secondary endings
+            endings_map = SuffixProvider.get_secondary_active(class_num=1)
         elif tense == "imperative":
             endings_map = SuffixProvider.get_imperative_active(class_num=class_num)
         elif tense == "optative":
             endings_map = SuffixProvider.get_optative_active(class_num=class_num)
+        
         else:
              raise ValueError(f"Tense '{tense}' is not supported yet.")
 
@@ -76,7 +80,7 @@ class SanskritConjugator:
 
         # 7. Metadata Cleanup
         # Remove tags after phonetics have fired so the final string is clean.
-        cleanup_regex = pn.union("[STRONG]", "[WEAK]")
+        cleanup_regex = pn.union("[STRONG]", "[WEAK]","[VRIDDHI]")
         cleanup = pn.cdrewrite(pn.cross(cleanup_regex, ""), "", "", self.sigma)
 
         # Now clean_string is purely phonetic (e.g., "bhav a āni")
