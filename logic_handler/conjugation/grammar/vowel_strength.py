@@ -2,41 +2,61 @@ import pynini as pn
 from alphabet import ALPHABET
 
 class VowelStrengthEngine:
-    """Handles Guna (strengthening) and Vriddhi (protraction) rules."""
+    """Handles Guna (strengthening) and Vriddhi (protraction) rules.
+
+    Design note
+    -----------
+    The FST works on strings of the form:
+
+        <consonants*> <vowel> <consonants*> [STRONG]
+        e.g.  "kṛ[STRONG]"   →  "kar[STRONG]"   (ṛ → ar via guna)
+              "hu[STRONG]"   →  "ho[STRONG]"    (u → o)
+
+    The rewrite fires on the last vowel before the [STRONG] tag so that
+    polysyllabic roots (rare but present) are handled correctly.
+
+    [STRONG] / [WEAK] / [CLASS8] tags are consumed later by MorphologyEngine,
+    so they must remain in the string until that stage.
+    """
 
     def __init__(self):
-        # Mapping for Guna: i -> e, u -> o, ṛ -> ar
-        self.guna_map = pn.string_map([
+        sig = ALPHABET.sigma_star
+
+        # ── Guna map: short/long vowel → Guna equivalent ─────────────────────
+        guna_map = pn.string_map([
             ("i", "e"), ("ī", "e"),
             ("u", "o"), ("ū", "o"),
-            ("ṛ", "ar"), ("ṝ", "ar")
+            ("ṛ", "ar"), ("ṝ", "ar"),
+            # 'a' and 'ā' are unchanged by Guna (they ARE Guna)
         ])
-        
-        # Rule: Apply Guna only if [STRONG] exists later in the string
+
+        # Apply guna to the vowel that immediately precedes [STRONG].
+        # The lookahead is: zero or more consonants (no other vowels) then [STRONG].
+        # This correctly handles CV roots like "kṛ[STRONG]" → "kar[STRONG]".
         self.apply_guna = pn.cdrewrite(
-            self.guna_map, 
-            "", 
-            ALPHABET.sigma_star + "[STRONG]", 
-            ALPHABET.sigma_star
+            guna_map,
+            "",
+            ALPHABET.consonants.closure() + "[STRONG]",
+            sig
         )
 
-        #vriddhi (Step 2 Strengthening))
-        self.vriddhi_map = pn.string_map([
-            ("a", "ā"),              # Crucial difference: 'a' actually changes here
+        # ── Vriddhi map ───────────────────────────────────────────────────────
+        vriddhi_map = pn.string_map([
+            ("a", "ā"),
             ("i", "ai"), ("ī", "ai"),
             ("u", "au"), ("ū", "au"),
-            ("ṛ", "ār"), ("ṝ", "ār")
+            ("ṛ", "ār"), ("ṝ", "ār"),
         ])
 
         self.apply_vriddhi = pn.cdrewrite(
-            self.vriddhi_map, 
-            "", 
-            ALPHABET.sigma_star + "[VRIDDHI]", # Looks for the specific Vriddhi tag
-            ALPHABET.sigma_star
+            vriddhi_map,
+            "",
+            ALPHABET.consonants.closure() + "[VRIDDHI]",
+            sig
         )
 
     def get_guna(self):
         return self.apply_guna
-    
+
     def get_vriddhi(self):
         return self.apply_vriddhi

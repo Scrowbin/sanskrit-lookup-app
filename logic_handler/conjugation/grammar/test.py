@@ -1,169 +1,206 @@
+import sys, io
+# Force UTF-8 output so IAST characters render on Windows consoles
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+
 from conjugate import SanskritConjugator
+import csv
 
-def test_1():
-    api = SanskritConjugator()
+def normalize_for_comparison(word):
+    """Fixes INRIA's underlying 's' and 'r' to surface 'ḥ'."""
+    if not word: return word
+    if word.endswith('s') or word.endswith('r'):
+        return word[:-1] + 'ḥ'
+    return word
+
+def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_failures.csv"):
+    print("Loading INRIA database...")
+
+    # ── INRIA lookup key includes derivation so primary and causative rows for
+    # the same root don't overwrite each other.
+    # Key: (stem_iast, tense, voice, person, number, derivation)
+    # NOTE: INRIA uses "du" for dual, not "d".
+    inria_db = {}
+    with open(csv_file, mode='r', encoding='utf-8') as f:
+        for row in csv.DictReader(f):
+            key = (
+                row['stem_iast'],
+                row['tense'],
+                row['voice'],
+                row['person'],
+                row['number'],        # "sg" / "du" / "pl"
+                row['derivation'],    # "primary" / "causative" / "desiderative" / "intensive"
+            )
+            normalized = normalize_for_comparison(row['form_iast'])
+            bucket = inria_db.setdefault(key, [])
+            if normalized not in bucket:
+                bucket.append(normalized)
+
+    # ── Test suite ────────────────────────────────────────────────────────────
+    # Each entry: (root_iast, primary_class, description)
+    # The root_iast must match INRIA's stem_iast exactly.
     test_suite = [
-        ("bhū", 1, "Thematic Guṇa"),
-        ("ad",  2, "Consonant Devoicing"),
-        ("hu",  3, "Reduplication/Yan"),
-        ("su",  5, "nu/no Vikaraṇa"),
-        ("yuj", 7, "Nasal Infix")
+        ("bhū",  1,  "Guna + Thematic / Standard Seṭ Future"),
+        ("ad",   2,  "Athematic + Devoicing (atti / atsyati)"),
+        ("hu",   3,  "Reduplication + Special 3pl (juhvati)"),
+        ("div",  4,  "Internal Lengthening (dīvyati)"),
+        ("su",   5,  "Athematic Sign (-nu/-no-)"),
+        ("tud",  6,  "Thematic + No Guna"),
+        ("yuj",  7,  "Infix + Palatal Sandhi (yunakti / yokṣyati)"),
+        ("tan",  8,  "Athematic Sign (-u/-o-)"),
+        ("krī",  9,  "Athematic Sign (-nā/-nī-) + Nati (krīṇāti)"),
+        ("cur",  10, "Causative-style (-aya-)"),
+        ("kṛ",   8,  "Guṇa of ṛ + Ruki (kariṣyati)"),
+        ("budh", 1,  "Grassmann Throwback + Devoicing (bhotsyati)"),
+        ("duh",  2,  "Grassmann Throwback + H-Sandhi + Ruki (dhokṣyati)"),
     ]
 
-    for root, cls, desc in test_suite:
-        print(f"\n--- CLASS {cls}: √{root} ---")
-        for p in ['1', '2', '3']:
-            row = [api.conjugate(root, cls, p, n) for n in ['sg', 'd', 'pl']]
-            print(f"{p}: {row[0]:<12} {row[1]:<12} {row[2]:<12}")
+    # ── Derivation → how to call the FST ─────────────────────────────────────
+    # "primary"     → api.conjugate(root, primary_class, ...)
+    # "causative"   → api.conjugate(root, 10, ...) — causatives behave like cl10
+    # "desiderative"→ not yet implemented; counted as UNSUPPORTED
+    # "intensive"   → not yet implemented; counted as UNSUPPORTED
+    UNSUPPORTED_DERIVATIONS = {"desiderative", "intensive"}
 
-def run_hu_stress_test():
+    # ── Grammar space to iterate ──────────────────────────────────────────────
+    ALL_TENSES  = ["present", "imperfect", "imperative", "optative",
+                   "future", "conditional", "perfect"]
+    ALL_VOICES  = ["active", "middle", "passive"]
+    ALL_PERSONS = ["1", "2", "3"]
+    ALL_NUMBERS = ["sg", "du", "pl"]   # INRIA uses "du", not "d"
+
     api = SanskritConjugator()
-    root = "hu"
-    cls = 3
-    
-    # We test the three tenses currently supported by your logic
-    tenses = [
-        ("present", "Present (Laṭ)"),
-        ("imperfect", "Imperfect (Laṅ)"),
-        ("imperative", "Imperative (Loṭ)")
-    ]
 
-    for tense_key, tense_name in tenses:
-        print(f"\n=== ROOT: √{root} | {tense_name} ===")
-        print("-" * 65)
-        print(f"{'':<12} | {'Singular':<15} | {'Dual':<15} | {'Plural':<15}")
-        print("-" * 65)
-        
-        for p in ['1', '2', '3']:
-            row = []
-            for n in ['sg', 'd', 'pl']:
-                try:
-                    res = api.conjugate(root, cls, p, n, tense=tense_key)
-                    row.append(res)
-                except Exception as e:
-                    row.append("ERROR")
-            
-            p_label = {"1": "First", "2": "Second", "3": "Third"}[p]
-            print(f"{p_label:<12} | {row[0]:<15} | {row[1]:<15} | {row[2]:<15}")
-        print("-" * 65)
+    # ── Counters ──────────────────────────────────────────────────────────────
+    totals      = {"pass": 0, "fail": 0, "error": 0, "skip_inria": 0, "unsupported": 0}
+    per_root    = {}   # root → same dict as totals
+    failed_rows = []
 
-def test_op():
-    api = SanskritConjugator()
-    root= "ad"
-    class_num=2
-    tense="optative"
-    for p in ['1', '2', '3']:
-            row = []
-            for n in ['sg', 'd', 'pl']:
-                try:
-                    res = api.conjugate(root, class_num=class_num, person=p, number=n, tense=tense)
-                    row.append(res)
-                except Exception as e:
-                    row.append("ERROR")
-            p_label = {"1": "First", "2": "Second", "3": "Third"}[p]
-            print(f"{p_label:<12} | {row[0]:<15} | {row[1]:<15} | {row[2]:<15}")
+    print("Running tests...")
 
-def test_class_5():
-    api = SanskritConjugator()
-    root= "kṛ"
-    class_num=5
-    tense="present"
-    for p in ['1', '2', '3']:
-            row = []
-            for n in ['sg', 'd', 'pl']:
-                # try:
-                res = api.conjugate(root, class_num=class_num, person=p, number=n, tense=tense)
-                row.append(res)
-                # except Exception as e:
-                #     row.append("ERROR")
-            p_label = {"1": "First", "2": "Second", "3": "Third"}[p]
-            print(f"{p_label:<12} | {row[0]:<15} | {row[1]:<15} | {row[2]:<15}")
-    
-def run_comprehensive_test(filename="res2.txt"):
-    api = SanskritConjugator()
-    
-    # Root, Class, Description of what it tests
-    test_suite = [
-        ("bhū", 1, "Guna + Thematic"),
-        ("ad", 2, "Athematic + Devoicing (atti)"),
-        ("hu", 3, "Reduplication + Special 3pl (juhvati)"),
-        ("div", 4, "Internal Lengthening (dīvyati)"),
-        ("su", 5, "Athematic Sign (-nu/-no-)"),
-        ("tud", 6, "Thematic + No Guna"),
-        ("yuj", 7, "Infix + Palatal Sandhi (yunakti)"),
-        ("tan", 8, "Athematic Sign (-u/-o-)"),
-        ("krī", 9, "Athematic Sign (-nā/-nī-) + Nati (krīṇāti)"),
-        ("cur", 10, "Causative-style (-aya-)")
-    ]
+    for root, primary_class, desc in test_suite:
+        per_root[root] = {"pass": 0, "fail": 0, "error": 0,
+                          "skip_inria": 0, "unsupported": 0}
+        counts = per_root[root]
 
-    tenses = ["present", "imperfect", "imperative", "optative", "future"]
-    
-    # ... (test_suite and tenses definitions as before) ...
+        # Iterate over BOTH primary and secondary derivations
+        for derivation in ["primary", "causative", "desiderative", "intensive"]:
 
-    # Open the file in write mode ('w')
-    with open(filename, "w+", encoding="utf-8") as f:
-        for root, cls, desc in test_suite:
-            # Create a header string
-            header = f"\n{'='*80}\nTESTING: √{root} (Class {cls}) | {desc}\n{'='*80}\n"
-            
-            # Print to terminal AND write to file
-            print(header)
-            f.write(header)
+            # Map derivation → effective class for FST call
+            if derivation == "primary":
+                effective_class = primary_class
+            elif derivation == "causative":
+                effective_class = 10   # causative always behaves like cl10 (-aya-)
+            else:
+                # desiderative / intensive: FST doesn't support these yet
+                pass  # handled below with UNSUPPORTED check
 
-            for tense in tenses:
-                f.write(f"\n--- Tense: {tense.upper()} ---\n")
-                f.write(f"{'Person':<10} | {'Singular':<15} | {'Dual':<15} | {'Plural':<15}\n")
-                f.write("-" * 65 + "\n")
-                
-                for p in ["3", "2", "1"]:
-                    row = []
-                    for n in ["sg", "d", "pl"]:
-                        try:
-                            res = api.conjugate(root, cls, p, n, tense=tense)
-                            row.append(res)
-                        except:
-                            row.append("ERR")
-                    
-                    line = f"{p + 'rd':<10} | {row[0]:<15} | {row[1]:<15} | {row[2]:<15}\n"
-                    f.write(line)
-            f.write("\n" + "*"*80 + "\n")
+            for tense in ALL_TENSES:
+                for voice in ALL_VOICES:
+                    # Perfect passive doesn't exist in Sanskrit
+                    if tense == "perfect" and voice == "passive":
+                        continue
 
-    print(f"\nDone! Results exported to {filename}")
+                    for person in ALL_PERSONS:
+                        for number in ALL_NUMBERS:
 
-def test_future_tense():
-    api = SanskritConjugator()
-    
-    # Root, Class, Expected 3sg, Notes
-    future_cases = [
-        ("bhū", 1, "bhaviṣyati", "Tests: Guna + 'i' augment + Ruki (s -> ṣ)"),
-        ("ad",  2, "atsyati",    "Tests: Guna + No 'i' + Devoicing (d -> t)"),
-        ("su",  5, "soṣyati",    "Tests: Guna + Ruki (o + sya -> oṣya)"),
-        ("yuj", 7, "yokṣyati",   "Tests: Guna + Palatal Sandhi (j -> k) + Devoicing"),
-        ("krī", 9, "kreṣyati",   "Tests: Guna (ī -> ē) + Ruki"),
-    ]
+                            inria_key = (root, tense, voice, person, number, derivation)
+                            if inria_key not in inria_db:
+                                counts["skip_inria"] += 1
+                                totals["skip_inria"] += 1
+                                continue
 
-    print(f"\n{'='*85}")
-    print(f"{'Root':<6} | {'Class':<6} | {'Result':<15} | {'Expected':<15} | {'Status'}")
-    print(f"{'='*85}")
+                            expected_forms = inria_db[inria_key]
 
-    for root, cls, expected, notes in future_cases:
-        try:
-            # We only need 3rd person singular for the logic check
-            res = api.conjugate(root, cls, "3", "sg", tense="future")
-            status = "✅ PASS" if res == expected else "❌ FAIL"
-            print(f"{root:<6} | {cls:<6} | {res:<15} | {expected:<15} | {status}")
-            if res != expected:
-                print(f"       └─ Logic Note: {notes}")
-        except Exception as e:
-            print(f"{root:<6} | {cls:<6} | {'ERR':<15} | {expected:<15} | ❌ CRASH")
-            print(f"       └─ Error: {e}")
+                            # --- Unsupported derivation: record and skip FST call ---
+                            if derivation in UNSUPPORTED_DERIVATIONS:
+                                counts["unsupported"] += 1
+                                totals["unsupported"] += 1
+                                failed_rows.append({
+                                    "Root":             root,
+                                    "Class":            f"{primary_class} ({derivation})",
+                                    "Derivation":       derivation,
+                                    "Tense":            tense,
+                                    "Voice":            voice,
+                                    "Person":           person,
+                                    "Number":           number,
+                                    "Expected (INRIA)": " OR ".join(expected_forms),
+                                    "Actual (FST)":     "UNSUPPORTED",
+                                    "Error_Type":       f"Unsupported derivation: {derivation}",
+                                })
+                                continue
 
-    print("="*85)
+                            # --- Supported: call the FST ---
+                            try:
+                                actual = api.conjugate(
+                                    root, effective_class, person, number,
+                                    voice=voice, tense=tense
+                                )
+
+                                if actual in expected_forms:
+                                    counts["pass"] += 1
+                                    totals["pass"] += 1
+                                else:
+                                    counts["fail"] += 1
+                                    totals["fail"] += 1
+                                    failed_rows.append({
+                                        "Root":             root,
+                                        "Class":            f"{effective_class} ({derivation})",
+                                        "Derivation":       derivation,
+                                        "Tense":            tense,
+                                        "Voice":            voice,
+                                        "Person":           person,
+                                        "Number":           number,
+                                        "Expected (INRIA)": " OR ".join(expected_forms),
+                                        "Actual (FST)":     actual,
+                                        "Error_Type":       "Mismatch",
+                                    })
+
+                            except Exception as e:
+                                counts["error"] += 1
+                                totals["error"] += 1
+                                failed_rows.append({
+                                    "Root":             root,
+                                    "Class":            f"{effective_class} ({derivation})",
+                                    "Derivation":       derivation,
+                                    "Tense":            tense,
+                                    "Voice":            voice,
+                                    "Person":           person,
+                                    "Number":           number,
+                                    "Expected (INRIA)": " OR ".join(expected_forms),
+                                    "Actual (FST)":     "CRASHED",
+                                    "Error_Type":       f"Exception: {e}",
+                                })
+
+    # ── Write failure CSV ──────────────────────────────────────────────────────
+    if failed_rows:
+        fieldnames = ["Root", "Class", "Derivation", "Tense", "Voice", "Person",
+                      "Number", "Expected (INRIA)", "Actual (FST)", "Error_Type"]
+        with open(output_report, mode='w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(failed_rows)
+        print(f"\n📄 Failure report → {output_report}  ({len(failed_rows)} rows)")
+
+    # ── Terminal summary ───────────────────────────────────────────────────────
+    tested = totals["pass"] + totals["fail"] + totals["error"]
+    pct    = f"{100 * totals['pass'] / tested:.1f}%" if tested else "n/a"
+
+    print("\n" + "="*52)
+    print("          FOCUSED BENCHMARK RESULTS")
+    print("="*52)
+    print(f"  ✅ Pass:          {totals['pass']:>6}  ({pct})")
+    print(f"  ❌ Fail:          {totals['fail']:>6}")
+    print(f"  💥 Crash:         {totals['error']:>6}")
+    print(f"  🚧 Unsupported:   {totals['unsupported']:>6}  (desid / intens)")
+    print(f"  👻 Not in INRIA:  {totals['skip_inria']:>6}  (valid skips)")
+    print("="*52)
+
+    print("\n  Per-root breakdown:")
+    print(f"  {'Root':<8} {'✅':>6} {'❌':>6} {'💥':>6} {'🚧':>6}")
+    print("  " + "-"*34)
+    for root, _, desc in test_suite:
+        c = per_root[root]
+        print(f"  {root:<8} {c['pass']:>6} {c['fail']:>6} {c['error']:>6} {c['unsupported']:>6}  {desc}")
 
 if __name__ == "__main__":
-    # test_future_tense()
-    # test_1()
-    # run_hu_stress_test()
-    # test_op()
-    # test_class_5()
-    run_comprehensive_test()
+    run_focused_benchmark("verbs_clean.csv", "benchmark_failures.csv")
