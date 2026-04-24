@@ -20,9 +20,15 @@ _STRENGTH_RULES = [
     (lambda c, p, n, v, t: v == "passive",
      "[WEAK]"),
 
-    # 2. Future / Conditional always use strong (Guna) grade
-    (lambda c, p, n, v, t: t in ("future", "conditional"),
+    # 2. Future / Conditional / Periphrastic Future always use strong (Guna) grade
+    (lambda c, p, n, v, t: t in ("future", "conditional", "periphrastic_future"),
      "[STRONG]"),
+
+    # 3. Aorist / Injunctive: active uses strong stem override, middle uses weak
+    (lambda c, p, n, v, t: t in ("aorist", "injunctive") and v == "active",
+     "[STRONG]"),
+    (lambda c, p, n, v, t: t in ("aorist", "injunctive") and v == "middle",
+     "[WEAK]"),
 
     # 3. Perfect: sg active = strong; everything else = weak
     #    Must come BEFORE thematic-class checks (thematic classes 1/10 would
@@ -141,18 +147,26 @@ class SanskritConjugator:
             ("conditional","middle"):  SuffixProvider.get_secondary_middle,
             ("perfect",    "active"):  SuffixProvider.get_perfect_active,
             ("perfect",    "middle"):  SuffixProvider.get_perfect_middle,
+            ("periphrastic_future", "active"): SuffixProvider.get_periphrastic_future_active,
+            ("periphrastic_future", "middle"): SuffixProvider.get_periphrastic_future_middle,
+            ("aorist",     "active"):  SuffixProvider.get_aorist_active,
+            ("aorist",     "middle"):  SuffixProvider.get_aorist_middle,
+            ("aorist",     "passive"): SuffixProvider.get_aorist_middle,
+            ("injunctive", "active"):  SuffixProvider.get_aorist_active,
+            ("injunctive", "middle"):  SuffixProvider.get_aorist_middle,
+            ("injunctive", "passive"): SuffixProvider.get_aorist_middle,
         }
 
     # ──────────────────────────────────────────────────────────────────────────
     # Stem FST caching
     # ──────────────────────────────────────────────────────────────────────────
 
-    def _get_stem(self, root_str, class_num, strength, tense, derivative):
-        """Return the stem FST, building and caching it on first access."""
-        key = (root_str, class_num, strength, tense, derivative)
+    def _get_stem(self, root_str, class_num, strength, tense, derivative=None, person=None, number=None):
+        """Build the stem FST using StemBuilder."""
+        key = (root_str, class_num, strength, tense, derivative, person, number)
         if key not in self._stem_cache:
             self._stem_cache[key] = self.stems.build(
-                root_str, class_num, strength, tense=tense, derivative=derivative
+                root_str, class_num, strength, tense=tense, derivative=derivative, person=person, number=number
             )
         return self._stem_cache[key]
 
@@ -163,6 +177,8 @@ class SanskritConjugator:
     def _fetch_endings(self, class_num, voice, tense, root_str=None):
         """Return the endings dict for the given tense/voice/class."""
         if voice == "passive":
+            if tense in ("aorist", "injunctive"):
+                return SuffixProvider.get_aorist_passive(class_num=class_num, root_str=root_str)
             return SuffixProvider.get_passive_endings(tense)
 
         key = (tense, voice)
@@ -170,25 +186,7 @@ class SanskritConjugator:
         if provider is None:
             raise ValueError(f"No ending table for tense='{tense}' voice='{voice}'.")
 
-        if tense == "perfect":
-            endings = provider()
-            # ṛ-final roots in the perfect take bare 'va/vahe/ma/mahe' du/pl endings
-            # (no connecting 'i') because the ṛ-final root doesn't undergo yan/savarna.
-            # cakṛ+va = cakṛva  ✓  (not cakriva via cakṛ+iva → yan ṛ+→r)
-            if root_str and root_str[-1] == "ṛ":
-                endings = dict(endings)
-                if voice == "active":
-                    endings["[1du]"] = "va"
-                    endings["[1pl]"] = "ma"
-                    endings["[2du]"] = "vathuḥ"
-                else:  # middle
-                    endings["[1du]"] = "vahe"
-                    endings["[1pl]"] = "mahe"
-            return endings
-        # Future/Conditional reuse thematic (class 1) endings
-        if tense in ("future", "conditional"):
-            return provider(class_num=1)
-        return provider(class_num=class_num)
+        return provider(class_num=class_num, root_str=root_str, tense=tense)
 
 
     # ──────────────────────────────────────────────────────────────────────────
@@ -196,55 +194,86 @@ class SanskritConjugator:
     # ──────────────────────────────────────────────────────────────────────────
 
     @lru_cache(maxsize=4096)
-    def conjugate(self, root_str, class_num, person, number,
-                  voice="active", tense="present"):
-        """Return the fully inflected IAST string for the given parameters.
+    def conjugate(self, root_str, class_num, person, number, voice="active", tense="present", derivative=None):
+        """Conjugate a Sanskrit root.
 
-        Parameters
-        ----------
-        root_str  : IAST root, e.g. "bhū", "kṛ", "hu"
-        class_num : verbal class (int, 1–10)
-        person    : "1", "2", or "3"
-        number    : "sg", "du", or "pl"
-        voice     : "active", "middle", or "passive"
-        tense     : "present", "imperfect", "imperative", "optative",
-                    "future", "conditional", or "perfect"
-
-        Returns
-        -------
-        str – inflected word in IAST
+        Args:
+            root_str: IAST string (e.g., "bhū")
+            class_num: 1-10
+            person: "1", "2", "3"
+            number: "sg", "du", "pl"
+            voice: "active", "middle", "passive"
+            tense: "present", "imperfect", "imperative", "optative", "future",
+                   "conditional", "perfect", "periphrastic_future", "aorist", "injunctive"
+            derivative: None, "causative"
         """
-        strength   = _evaluate_strength(class_num, person, number, voice, tense)
-        derivative = "passive" if voice == "passive" else None
+        # Block morphologically impossible combinations
+        if voice == "passive" and tense in ("perfect", "future", "periphrastic_future", "conditional"):
+            raise ValueError(f"Impossible combination: voice='{voice}' and tense='{tense}'. These tenses do not have a distinct passive morphological paradigm.")
+
+        # 1. Evaluate stem strength based on grammar rules
+        if tense == "perfect":
+            # Periphrastic perfect conditions
+            is_periphrastic = False
+            if derivative in ("causative", "desiderative", "intensive") or class_num == 10:
+                is_periphrastic = True
+            
+            # Roots starting with a long vowel (except ā) also use periphrastic
+            # e.g. īṣ, edh, etc.
+            phonemes = ALPHABET.parse_phonemes(root_str)
+            if phonemes and phonemes[0] in ("ī", "ū", "ṛ", "ṝ", "e", "ai", "o", "au"):
+                is_periphrastic = True
+            
+            if is_periphrastic:
+                return self._conjugate_periphrastic_perfect(root_str, class_num, voice, person, number, derivative)
+
+        if derivative == "desiderative":
+            # Desiderative bases end in thematic 'a' and conjugate like Class 1
+            strength = "[STRONG]"
+            effective_class = 1
+            if voice == "passive":
+                effective_derivative = "desiderative_passive"
+            else:
+                effective_derivative = "desiderative"
+        elif derivative == "intensive":
+            # Intensive middle is thematic (Cl 1), active is athematic (Cl 2)
+            if voice == "middle":
+                strength = "[WEAK]"
+                effective_class = 1
+                effective_derivative = "intensive_middle"
+            else:
+                strength = _evaluate_strength(2, person, number, voice, tense)
+                effective_class = 3 # Use Class 3 endings for intensive active (e.g. 3pl -ati)
+                effective_derivative = "intensive_active"
+        elif voice == "passive":
+            # Passive 'ya' stem is only for the present system (present, imperfect, imperative, optative)
+            # Aorist passive 3sg is a special form (Vriddhi + -i), others use standard aorist middle.
+            strength = "[WEAK]"
+            effective_class = class_num
+            if tense in ("present", "imperfect", "imperative", "optative"):
+                effective_derivative = "passive"
+            elif tense in ("aorist", "injunctive") and person == "3" and number == "sg":
+                effective_derivative = "aorist_passive_3sg"
+            else:
+                effective_derivative = None
+        else:
+            strength = _evaluate_strength(class_num, person, number, voice, tense)
+            effective_class = class_num
+            effective_derivative = derivative
 
         # ── 1. Build / fetch stem ─────────────────────────────────────────────
-        stem = self._get_stem(root_str, class_num, strength, tense, derivative)
+        stem = self._get_stem(root_str, effective_class, strength, tense, effective_derivative, person, number)
 
         # ── 2. Augmentation (a- prefix for past tenses) ───────────────────────
-        if tense in ("imperfect", "conditional"):
+        if tense in ("imperfect", "conditional", "aorist"):
             stem = pn.accep("a+") + stem
 
-        # ── 3. Attach ending ──────────────────────────────────────────────────
-        # Special case: √ad cl-2 imperfect active uses connecting-vowel endings
-        if root_str == "ad" and tense == "imperfect" and voice == "active":
-            tag      = f"[{person}{number}]"
-            override = ad_imperfect_active_overrides.get(tag)
-        else:
-            override = None
-
-        endings = self._fetch_endings(class_num, voice, tense, root_str=root_str)
+        endings = self._fetch_endings(effective_class, voice, tense, root_str=root_str)
         tag     = f"[{person}{number}]"
         if tag not in endings:
             raise ValueError(f"No ending for {tag} in {tense} {voice}.")
 
-        # Perfect 2sg bare-tha override
-        if (tense == "perfect" and voice == "active" and person == "2"
-                and number == "sg" and root_str in perfect_bare_tha_roots):
-            ending = "tha"
-        elif override is not None:
-            ending = override
-        else:
-            ending = endings[tag]
+        ending = endings[tag]
 
         if ending:
             combined = stem + pn.accep("+") + pn.accep(ending)
@@ -254,9 +283,45 @@ class SanskritConjugator:
         # ── 4. FST post-processing ────────────────────────────────────────────
         morph_fst  = self.morphology.apply_all(combined)
         sandhi_fst = self.sandhi.apply_all(morph_fst)
-        result     = sandhi_fst.optimize()
+        result = sandhi_fst.optimize()
 
-        return result.string()
+        try:
+            # Extract all possible surface forms
+            forms = list(result.ostrings())
+            if not forms:
+                return "CRASHED: No valid path"
+            return " OR ".join(forms)
+        except Exception as e:
+            # Fallback for complex FSTs or errors
+            try:
+                return pn.shortestpath(result).string()
+            except:
+                return f"CRASHED: {str(e)}"
+
+    def _conjugate_periphrastic_perfect(self, root_str, class_num, voice, person, number, derivative=None):
+        """Build the periphrastic perfect (stem + ā + aux)."""
+        base_fst = self.stem_builder._build_periphrastic_base(root_str, class_num, derivative)
+        # Clean tags from base
+        base_fst = (base_fst @ self.morphology.clean_tags).optimize()
+        
+        # Auxiliary choices: kṛ, bhū, as. kṛ is most common.
+        aux_voice = voice
+        aux_tense = "perfect"
+        # We'll use 'kṛ' (Class 8) as the primary auxiliary
+        aux_forms_str = self.conjugate("kṛ", 8, person, number, aux_voice, aux_tense)
+        aux_forms = aux_forms_str.split(" OR ")
+        
+        results = []
+        for aux in aux_forms:
+            # Join base and aux with a boundary for sandhi
+            combined = base_fst + pn.accep("+") + pn.accep(aux)
+            final_fst = self.sandhi.apply_all(combined).optimize()
+            for form in final_fst.ostrings():
+                results.append(form)
+        
+        if not results:
+            return "CRASHED: No periphrastic forms"
+        return " OR ".join(sorted(list(set(results))))
 
     # ──────────────────────────────────────────────────────────────────────────
     # Debug helper

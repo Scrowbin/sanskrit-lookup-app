@@ -60,15 +60,21 @@ class SandhiEngine:
             "", "", self.sig
         )
 
-        # 4. Ayadi (diphthong before vowel): e+V → ay+V, o+V → av+V, etc.
+        # 4. Ayadi (diphthong before vowel or y): e+V → ay+V, o+V → av+V, etc.
         self.ayadi = pn.cdrewrite(
             pn.string_map([
                 ("e+", "ay"), ("o+", "av"), ("ai+", "āy"), ("au+", "āv"),
             ]),
+            "", pn.union(ALPHABET.vowels, "y"), self.sig
+        )
+
+        # 5. Uvan/Iyan (for monosyllabic roots like hu/su)
+        self.uvan_iyan = pn.cdrewrite(
+            pn.string_map([("i+", "iy"), ("ī+", "iy"), ("u+", "uv"), ("ū+", "uv")]),
             "", ALPHABET.vowels, self.sig
         )
 
-        # 5. Yan sandhi (semi-vowelisation before vowel)
+        # 6. Yan sandhi (semi-vowelisation before vowel)
         self.yan_sandhi = pn.cdrewrite(
             pn.string_map([
                 ("i+", "y"), ("ī+", "y"),
@@ -87,9 +93,6 @@ class SandhiEngine:
         # Fires before ALL vowels (previously only a/ā).
         self.class9_special = pn.cdrewrite(
             pn.cross("ī+", ""), "", ALPHABET.vowels, self.sig
-        )
-        self.class9_strong_special = pn.cdrewrite(
-            pn.cross("ā+", ""), "", ALPHABET.vowels, self.sig
         )
 
     # ──────────────────────────────────────────────────────────────────────────
@@ -143,6 +146,13 @@ class SandhiEngine:
             pn.cross("n", "ñ"), "", pn.union("+j", "+c", "j", "c"), self.sig
         )
 
+        # Retroflex assimilation (ṣ + t/th/dhv, and ṣ+s -> kṣ)
+        # Written as separate rules to avoid string_map prefix ambiguity (ṣ+t vs ṣ+th)
+        self.retro_th = pn.cdrewrite(pn.cross("ṣ+th", "ṣṭh"), "", "", self.sig)
+        self.retro_t  = pn.cdrewrite(pn.cross("ṣ+t", "ṣṭ"), "", "", self.sig)
+        self.retro_dhv = pn.cdrewrite(pn.cross("ṣ+dhv", "ḍhv"), "", "", self.sig)
+        self.retro_s = pn.cdrewrite(pn.cross("ṣ+s", "kṣ"), "", "", self.sig)
+
         # Velar nasal: n/ñ → ṅ before velar stops.
         # Bug 6 fix: also converts ñ (which nasal_assimilation produced) → ṅ.
         # Must run AFTER palatal_sandhi so j→k is already done.
@@ -169,7 +179,7 @@ class SandhiEngine:
         triggers = pn.union("r", "ṛ", "ṣ", "ṝ")
         allowed_interveners = pn.union(
             ALPHABET.vowels, ALPHABET.gutturals, ALPHABET.labials,
-            ALPHABET.retroflexes, "y", "v", "h", "ṃ", "+"
+            "y", "v", "h", "ṃ", "+"
         ).star.optimize()
         self.nati = pn.cdrewrite(
             pn.cross("n", "ṇ"),
@@ -181,6 +191,12 @@ class SandhiEngine:
         # Visarga: word-final s/ṣ → ḥ
         self.visarga = pn.cdrewrite(
             pn.string_map([("s", "ḥ"), ("ṣ", "ḥ")]),
+            "", pn.union("[EOS]", "+[EOS]"), self.sig
+        )
+
+        # Word-final cluster reduction: ṣṭ → ṭ
+        self.cluster_reduction = pn.cdrewrite(
+            pn.cross("ṣṭ", "ṭ"),
             "", pn.union("[EOS]", "+[EOS]"), self.sig
         )
 
@@ -198,17 +214,13 @@ class SandhiEngine:
         #    (e.g. nī+ī → nī, not nyī)
         # 5. yan: remaining i/ī/u/ū/ṛ before vowel → semivowel
         # 6. guna_sandhi: a+i→e, a+u→o (last, after other vowel changes)
-        return (fst
-                @ self.thematic_merger
-                @ self.class9_special        # nī suffix ī+ → ε before any vowel
-                @ self.class9_strong_special # nā suffix ā+ → ε before any vowel
-                @ self.ayadi
-                @ self.savarna
-                @ self.yan_sandhi
-                @ self.guna_sandhi)
-
-
-
+        vowel_done = (fst @ self.thematic_merger @ self.class9_special)
+        vowel_done = self.ayadi(vowel_done)
+        vowel_done = self.savarna(vowel_done)
+        vowel_done = self.uvan_iyan(vowel_done)
+        vowel_done = self.yan_sandhi(vowel_done)
+        vowel_done = self.guna_sandhi(vowel_done)
+        return vowel_done
 
     def consonant_phase(self, fst):
         # Order matters: Bartholomae → Grassmann → h_to_k → palatal/devoicing
@@ -220,12 +232,16 @@ class SandhiEngine:
                 @ self.grassmann_throwback
                 @ self.h_to_k
                 @ self.palatal_sandhi
+                @ self.retro_th
+                @ self.retro_t
+                @ self.retro_dhv
+                @ self.retro_s
                 @ self.devoicing
                 @ self.nasal_assimilation
                 @ self.velar_nasal)
 
     def long_distance_phase(self, fst):
-        return (fst @ self.ruki @ self.nati @ self.visarga @ self.clean_boundaries)
+        return (fst @ self.ruki @ self.nati @ self.visarga @ self.cluster_reduction @ self.clean_boundaries)
 
     def apply_all(self, fst):
         return self.long_distance_phase(

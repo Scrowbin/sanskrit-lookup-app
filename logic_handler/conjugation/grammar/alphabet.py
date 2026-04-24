@@ -46,6 +46,7 @@ class SanskritAlphabet:
         self.tags_list = [
             "[STRONG]", "[WEAK]", "[VRIDDHI]",
             "[CLASS4]", "[CLASS8]", "[PASSIVE]", "[CAUS_PASS]",
+            "[ROOT_AORIST]", "[AORIST]", "[AORIST_PASS_3SG]", "[INTENSIVE_ACTIVE]"
         ]
 
         # ── Pynini FST atoms ─────────────────────────────────────────────────
@@ -70,5 +71,26 @@ class SanskritAlphabet:
         self.alpha      = pn.union(*all_chars)
         self.sigma_star = self.alpha.closure()
 
+    def parse_phonemes(self, s: str) -> list:
+        """Tokenize an IAST string into Sanskrit phonemes."""
+        valid_phonemes = set(self.vowels_list + self.consonants_list + self.modifiers_list)
+        result = []
+        i = 0
+        while i < len(s):
+            # Check 2-character phonemes first (like 'kh', 'ai')
+            if i < len(s) - 1 and s[i:i+2] in valid_phonemes:
+                result.append(s[i:i+2])
+                i += 2
+            elif s[i] in valid_phonemes:
+                result.append(s[i])
+                i += 1
+            else:
+                # Keep abstract tags or unknown characters as-is
+                # Since tags are formatted like [STRONG], we can let them be
+                # or we can handle them manually if needed.
+                # For basic stem_rules usage on clean roots, simple iteration works.
+                result.append(s[i])
+                i += 1
+        return result
 
 ALPHABET = SanskritAlphabet()

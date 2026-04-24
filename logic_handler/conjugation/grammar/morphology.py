@@ -76,11 +76,41 @@ class MorphologyEngine:
             pn.union("y", "v", "m"),
             sig
         )
+        # ── 5. Root Aorist exceptions ─────────────────────────────────────────
+        # √bhū + [ROOT_AORIST] + vowel → bhūv + vowel (e.g. abhūvam)
+        self.root_aorist_bhuv = pn.cdrewrite(
+            pn.cross("[ROOT_AORIST]+", "v+"),
+            "bhū",
+            ALPHABET.vowels,
+            sig
+        )
 
         # ── 6. Erase all abstract tags ─────────────────────────────────────────
+        # Aorist Passive 3sg Vriddhi (e.g. bhū → bhāv before [AORIST_PASS_3SG])
+        vriddhi_map = pn.string_map([
+            ("a", "ā"), ("i", "ai"), ("ī", "ai"), ("u", "au"), ("ū", "au"), ("ṛ", "ār")
+        ])
+        # Lookahead allows any structural tags or boundaries before the 3sg marker
+        tag_or_boundary = pn.union(*ALPHABET.tags_list, "+")
+        self.aorist_pass_vriddhi = pn.cdrewrite(
+            vriddhi_map,
+            "",
+            ALPHABET.consonants.closure() + tag_or_boundary.star + "[AORIST_PASS_3SG]",
+            sig
+        )
+
+        # Intensive Active: optional ī before consonants (except y)
+        self.intensive_i_it = pn.cdrewrite(
+            pn.union("", pn.cross("", "ī")),
+            pn.accep("[INTENSIVE_ACTIVE]") + pn.accep("+"),
+            ALPHABET.consonants - pn.accep("y"),
+            sig
+        )
+
         all_tags = pn.union(
             "[PASSIVE]", "[CLASS4]", "[CLASS8]", "[CAUS_PASS]",
-            "[STRONG]",  "[WEAK]",   "[VRIDDHI]"
+            "[STRONG]",  "[WEAK]",   "[VRIDDHI]",
+            "[ROOT_AORIST]", "[AORIST]", "[AORIST_PASS_3SG]", "[INTENSIVE_ACTIVE]"
         )
         self.clean_tags = pn.cdrewrite(pn.cross(all_tags, ""), "", "", sig)
 
@@ -94,5 +124,8 @@ class MorphologyEngine:
             @ self.caus_pass_erase          # Case A: erase bare [CAUS_PASS]
             @ self.class8_suppletion
             @ self.class8_u_drop
+            @ self.root_aorist_bhuv
+            @ self.aorist_pass_vriddhi
+            @ self.intensive_i_it
             @ self.clean_tags
         )

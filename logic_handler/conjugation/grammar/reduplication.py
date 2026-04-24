@@ -74,13 +74,49 @@ class ReduplicationEngine:
     # ── Public API ────────────────────────────────────────────────────────────
 
     def generate_prefix(self, root_str: str) -> str:
-        """Return the reduplication prefix for *root_str*.
-
-        Checks ``irregulars.perfect_redupe_overrides`` first; falls back to the
-        general FST reduction pipeline.
-        """
+        """Return the reduplication prefix for *root_str* (Perfect/Class-3)."""
         if root_str in perfect_redupe_overrides:
             return perfect_redupe_overrides[root_str]
 
         syllable = self._extract_initial_syllable(root_str)
         return self._reduce_via_fst(syllable)
+
+    def generate_desiderative_prefix(self, root_str: str) -> str:
+        """Return the reduplication prefix for Desiderative.
+        Rule: prefix vowel is 'u' if root has 'u/ū', else 'i'."""
+        syllable = self._extract_initial_syllable(root_str)
+        
+        # Vowel mapping for Desiderative
+        vowels = set(ALPHABET.vowels_list)
+        consonants = ""
+        root_vowel = ""
+        for ch in syllable:
+            if ch in vowels:
+                root_vowel = ch
+                break
+            consonants += ch
+        
+        target_vowel = "u" if root_vowel in ("u", "ū") else "i"
+        new_syllable = consonants + target_vowel
+        
+        return self._reduce_via_fst(new_syllable)
+
+    def generate_intensive_prefix(self, root_str: str) -> str:
+        """Return the reduplication prefix for Intensive.
+        Rule: prefix vowel is the guna of the root vowel (or lengthened 'a')."""
+        syllable = self._extract_initial_syllable(root_str)
+        vowels = set(ALPHABET.vowels_list)
+        consonants = ""
+        root_vowel = ""
+        for ch in syllable:
+            if ch in vowels:
+                root_vowel = ch
+                break
+            consonants += ch
+        
+        # Intensive prefix vowels are strong:
+        # a -> ā, i/ī -> e, u/ū -> o, ṛ -> ar
+        guna_map = {"a": "ā", "ā": "ā", "i": "e", "ī": "e", "u": "o", "ū": "o", "ṛ": "ar", "ṝ": "ar"}
+        target_vowel = guna_map.get(root_vowel, root_vowel)
+        
+        return self._reduce_via_fst(consonants + target_vowel)

@@ -41,17 +41,22 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
     test_suite = [
         ("bhū",  1,  "Guna + Thematic / Standard Seṭ Future"),
         ("ad",   2,  "Athematic + Devoicing (atti / atsyati)"),
-        ("hu",   3,  "Reduplication + Special 3pl (juhvati)"),
+        ("hu",   3,  "Reduplication / a-Aorist / ṣ+dhv→ḍhv Sandhi (ahoḍhvam)"),
         ("div",  4,  "Internal Lengthening (dīvyati)"),
         ("su",   5,  "Athematic Sign (-nu/-no-)"),
-        ("tud",  6,  "Thematic + No Guna"),
+        ("tud",  6,  "Thematic + No Guna / Aniṭ Luṭ (tottā)"),
         ("yuj",  7,  "Infix + Palatal Sandhi (yunakti / yokṣyati)"),
         ("tan",  8,  "Athematic Sign (-u/-o-)"),
         ("krī",  9,  "Athematic Sign (-nā/-nī-) + Nati (krīṇāti)"),
         ("cur",  10, "Causative-style (-aya-)"),
-        ("kṛ",   8,  "Guṇa of ṛ + Ruki (kariṣyati)"),
-        ("budh", 1,  "Grassmann Throwback + Devoicing (bhotsyati)"),
+        ("kṛ",   8,  "Guṇa of ṛ + Ruki / ṣṭ Sandhi (akārṣṭam)"),
+        ("budh", 1,  "Grassmann Throwback + Devoicing / iṣ-Aorist (abodhiṣam)"),
         ("duh",  2,  "Grassmann Throwback + H-Sandhi + Ruki (dhokṣyati)"),
+        
+        # --- New Edge Cases Added for Extended Coverage ---
+        ("gam",  1,  "Suppletive Present (gaccha) / Root Aorist (agamat)"),
+        ("dviṣ", 2,  "Aniṭ S-Aorist / Palatal Sandhi (adikṣat)"),
+        ("muc",  6,  "Nasal Infix (muñca) / a-Aorist (amucat)"),
     ]
 
     # ── Derivation → how to call the FST ─────────────────────────────────────
@@ -59,11 +64,11 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
     # "causative"   → api.conjugate(root, 10, ...) — causatives behave like cl10
     # "desiderative"→ not yet implemented; counted as UNSUPPORTED
     # "intensive"   → not yet implemented; counted as UNSUPPORTED
-    UNSUPPORTED_DERIVATIONS = {"desiderative", "intensive"}
+    UNSUPPORTED_DERIVATIONS = set()
 
     # ── Grammar space to iterate ──────────────────────────────────────────────
     ALL_TENSES  = ["present", "imperfect", "imperative", "optative",
-                   "future", "conditional", "perfect"]
+                   "future", "conditional", "perfect", "periphrastic_future", "aorist", "injunctive"]
     ALL_VOICES  = ["active", "middle", "passive"]
     ALL_PERSONS = ["1", "2", "3"]
     ALL_NUMBERS = ["sg", "du", "pl"]   # INRIA uses "du", not "d"
@@ -71,7 +76,7 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
     api = SanskritConjugator()
 
     # ── Counters ──────────────────────────────────────────────────────────────
-    totals      = {"pass": 0, "fail": 0, "error": 0, "skip_inria": 0, "unsupported": 0}
+    totals      = {"pass": 0, "fail": 0, "error": 0, "skip_inria": 0, "unsupported": 0, "impossible": 0}
     per_root    = {}   # root → same dict as totals
     failed_rows = []
 
@@ -79,7 +84,7 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
 
     for root, primary_class, desc in test_suite:
         per_root[root] = {"pass": 0, "fail": 0, "error": 0,
-                          "skip_inria": 0, "unsupported": 0}
+                          "skip_inria": 0, "unsupported": 0, "impossible": 0}
         counts = per_root[root]
 
         # Iterate over BOTH primary and secondary derivations
@@ -88,25 +93,33 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
             # Map derivation → effective class for FST call
             if derivation == "primary":
                 effective_class = primary_class
+                fst_derivative = None
             elif derivation == "causative":
                 effective_class = 10   # causative always behaves like cl10 (-aya-)
+                fst_derivative = None
+            elif derivation == "desiderative":
+                effective_class = 1
+                fst_derivative = "desiderative"
             else:
-                # desiderative / intensive: FST doesn't support these yet
-                pass  # handled below with UNSUPPORTED check
+                effective_class = primary_class
+                fst_derivative = derivation
 
             for tense in ALL_TENSES:
                 for voice in ALL_VOICES:
-                    # Perfect passive doesn't exist in Sanskrit
-                    if tense == "perfect" and voice == "passive":
-                        continue
-
                     for person in ALL_PERSONS:
                         for number in ALL_NUMBERS:
 
+                            # Check for impossible combinations first
+                            is_impossible = (voice == "passive" and tense in ("perfect", "future", "periphrastic_future", "conditional"))
+                            
                             inria_key = (root, tense, voice, person, number, derivation)
                             if inria_key not in inria_db:
-                                counts["skip_inria"] += 1
-                                totals["skip_inria"] += 1
+                                if is_impossible:
+                                    counts["impossible"] += 1
+                                    totals["impossible"] += 1
+                                else:
+                                    counts["skip_inria"] += 1
+                                    totals["skip_inria"] += 1
                                 continue
 
                             expected_forms = inria_db[inria_key]
@@ -133,10 +146,11 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
                             try:
                                 actual = api.conjugate(
                                     root, effective_class, person, number,
-                                    voice=voice, tense=tense
+                                    voice=voice, tense=tense, derivative=fst_derivative
                                 )
 
-                                if actual in expected_forms:
+                                actual_list = actual.split(" OR ")
+                                if any(a in expected_forms for a in actual_list):
                                     counts["pass"] += 1
                                     totals["pass"] += 1
                                 else:
@@ -192,6 +206,7 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
     print(f"  ❌ Fail:          {totals['fail']:>6}")
     print(f"  💥 Crash:         {totals['error']:>6}")
     print(f"  🚧 Unsupported:   {totals['unsupported']:>6}  (desid / intens)")
+    print(f"  🛑 Impossible:    {totals['impossible']:>6}  (e.g., passive perfect)")
     print(f"  👻 Not in INRIA:  {totals['skip_inria']:>6}  (valid skips)")
     print("="*52)
 
@@ -203,4 +218,4 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
         print(f"  {root:<8} {c['pass']:>6} {c['fail']:>6} {c['error']:>6} {c['unsupported']:>6}  {desc}")
 
 if __name__ == "__main__":
-    run_focused_benchmark("verbs_clean.csv", "benchmark_failures.csv")
+    run_focused_benchmark("../data/verbs_clean.csv", "benchmark_failures.csv")
