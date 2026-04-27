@@ -68,13 +68,7 @@ class SandhiEngine:
             "", pn.union(ALPHABET.vowels, "y"), self.sig
         )
 
-        # 5. Uvan/Iyan (for monosyllabic roots like hu/su)
-        self.uvan_iyan = pn.cdrewrite(
-            pn.string_map([("i+", "iy"), ("ī+", "iy"), ("u+", "uv"), ("ū+", "uv")]),
-            "", ALPHABET.vowels, self.sig
-        )
-
-        # 6. Yan sandhi (semi-vowelisation before vowel)
+        # 5. Yan sandhi (semi-vowelisation before vowel)
         self.yan_sandhi = pn.cdrewrite(
             pn.string_map([
                 ("i+", "y"), ("ī+", "y"),
@@ -84,13 +78,7 @@ class SandhiEngine:
             "", ALPHABET.vowels, self.sig
         )
 
-        # 6. Class-9 suffix vowel-drop: ī/ā erased before ANY vowel-initial ending
-        # Sanskrit rule: the class-9 infix nā (strong) / nī (weak) loses its
-        # final vowel before any vowel-initial ending:
-        #   krī+nā+anti  → krī+n+anti  = krīṇanti (strong, 3pl)
-        #   krī+nī+e     → krī+n+e     = krīṇe    (weak middle 1sg)
-        #   krī+nī+īya   → krī+n+īya   = krīṇīya  (optative weak)
-        # Fires before ALL vowels (previously only a/ā).
+        # 6. Class-9 suffix vowel-drop: ī+ erased before any vowel-initial ending
         self.class9_special = pn.cdrewrite(
             pn.cross("ī+", ""), "", ALPHABET.vowels, self.sig
         )
@@ -146,10 +134,10 @@ class SandhiEngine:
             pn.cross("n", "ñ"), "", pn.union("+j", "+c", "j", "c"), self.sig
         )
 
-        # Retroflex assimilation (ṣ + t/th/dhv, and ṣ+s -> kṣ)
+        # Retroflex assimilation (Panini 8.4.41)
         # Written as separate rules to avoid string_map prefix ambiguity (ṣ+t vs ṣ+th)
         self.retro_th = pn.cdrewrite(pn.cross("ṣ+th", "ṣṭh"), "", "", self.sig)
-        self.retro_t  = pn.cdrewrite(pn.cross("ṣ+t", "ṣṭ"), "", "", self.sig)
+        self.retro_t  = pn.cdrewrite(pn.cross("ṣ+t",  "ṣṭ"),  "", "", self.sig)
         self.retro_dhv = pn.cdrewrite(pn.cross("ṣ+dhv", "ḍhv"), "", "", self.sig)
         self.retro_s = pn.cdrewrite(pn.cross("ṣ+s", "kṣ"), "", "", self.sig)
 
@@ -188,6 +176,12 @@ class SandhiEngine:
             self.sig
         )
 
+        # Post-RUKI retroflex assimilation: new ṣ from RUKI needs to assimilate
+        # following dentals just like existing ṣ (Panini 8.4.41 still applies).
+        self.retro_post_ruki_th  = pn.cdrewrite(pn.cross("ṣ+th",  "ṣṭh"), "", "", self.sig)
+        self.retro_post_ruki_t   = pn.cdrewrite(pn.cross("ṣ+t",   "ṣṭ"),  "", "", self.sig)
+        self.retro_post_ruki_dhv = pn.cdrewrite(pn.cross("ṣ+dhv", "ḍhv"), "", "", self.sig)
+
         # Visarga: word-final s/ṣ → ḥ
         self.visarga = pn.cdrewrite(
             pn.string_map([("s", "ḥ"), ("ṣ", "ḥ")]),
@@ -214,13 +208,13 @@ class SandhiEngine:
         #    (e.g. nī+ī → nī, not nyī)
         # 5. yan: remaining i/ī/u/ū/ṛ before vowel → semivowel
         # 6. guna_sandhi: a+i→e, a+u→o (last, after other vowel changes)
-        vowel_done = (fst @ self.thematic_merger @ self.class9_special)
-        vowel_done = self.ayadi(vowel_done)
-        vowel_done = self.savarna(vowel_done)
-        vowel_done = self.uvan_iyan(vowel_done)
-        vowel_done = self.yan_sandhi(vowel_done)
-        vowel_done = self.guna_sandhi(vowel_done)
-        return vowel_done
+        return (fst
+                @ self.thematic_merger
+                @ self.class9_special
+                @ self.ayadi
+                @ self.savarna
+                @ self.yan_sandhi
+                @ self.guna_sandhi)
 
     def consonant_phase(self, fst):
         # Order matters: Bartholomae → Grassmann → h_to_k → palatal/devoicing
@@ -241,7 +235,15 @@ class SandhiEngine:
                 @ self.velar_nasal)
 
     def long_distance_phase(self, fst):
-        return (fst @ self.ruki @ self.nati @ self.visarga @ self.cluster_reduction @ self.clean_boundaries)
+        return (fst
+                @ self.ruki
+                @ self.retro_post_ruki_th
+                @ self.retro_post_ruki_t
+                @ self.retro_post_ruki_dhv
+                @ self.nati
+                @ self.visarga
+                @ self.cluster_reduction
+                @ self.clean_boundaries)
 
     def apply_all(self, fst):
         return self.long_distance_phase(

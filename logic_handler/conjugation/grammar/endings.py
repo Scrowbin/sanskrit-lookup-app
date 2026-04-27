@@ -68,9 +68,9 @@ class SuffixProvider:
         # √ad cl-2 imperfect/aorist/injunctive active uses connecting-vowel endings
         if root_str == "ad":
             return {
-                "[3sg]": "t OR at",  "[3du]": "tām",  "[3pl]": "an",
-                "[2sg]": "s OR as",  "[2du]": "tam",  "[2pl]": "ta",
-                "[1sg]": "am",       "[1du]": "va",   "[1pl]": "ma"
+                "[3sg]": "at",  "[3du]": "tām",  "[3pl]": "an",
+                "[2sg]": "as",  "[2du]": "tam",  "[2pl]": "ta",
+                "[1sg]": "am",  "[1du]": "va",   "[1pl]": "ma"
             }
 
         return {
@@ -107,17 +107,16 @@ class SuffixProvider:
                 "[1sg]": "āni",  "[1du]": "āva",  "[1pl]": "āma"
             }
         if class_num == 3:
-            # Pāṇini 6.4.101: hu-śnu-vas-orm-asūnaṃ (dhi after hu and others)
+            # Panini 6.4.101: dhi after hu/ad; hi elsewhere for athematic cl3
             return {
                 "[3sg]": "tu",  "[3du]": "tām", "[3pl]": "atu",
                 "[2sg]": "dhi" if root_str in ("hu", "ad") else "hi",
                 "[2du]": "tam", "[2pl]": "ta",
                 "[1sg]": "āni", "[1du]": "āva", "[1pl]": "āma"
             }
-        # Athematic: 3pl = "atu" for cl3 (juhavatu), "antu" otherwise
-        third_pl = "atu" if class_num == 3 else "antu"
+        # Generic athematic
         return {
-            "[3sg]": "tu",   "[3du]": "tām",  "[3pl]": third_pl,
+            "[3sg]": "tu",   "[3du]": "tām",  "[3pl]": "antu",
             "[2sg]": "hi",   "[2du]": "tam",  "[2pl]": "ta",
             "[1sg]": "āni",  "[1du]": "āva",  "[1pl]": "āma"
         }
@@ -258,7 +257,7 @@ class SuffixProvider:
     def get_aorist_middle(class_num=1, root_str=None, **kwargs):
         from irregulars import aorist_overrides
         info = aorist_overrides.get(root_str)
-        aorist_type = info["type"] if info else "s"
+        aorist_type = (info.get("middle_type") or info["type"]) if info else "s"
         
         if aorist_type in ("a", "reduplicated", "sa"):
             return SuffixProvider.get_secondary_middle(class_num=1)
@@ -280,11 +279,9 @@ class SuffixProvider:
         }
     @staticmethod
     def get_aorist_passive(class_num=1, root_str=None, **kwargs):
-        """Passive aorist endings. 3sg is always -i (ciṇ), others use middle."""
+        """Passive aorist endings. 3sg ciṇ uses bare -i (Vriddhi on the stem side)."""
         endings = SuffixProvider.get_aorist_middle(class_num=class_num, root_str=root_str)
-        # Override 3sg with the special -i ending
-        # Note: the root also needs Vriddhi, which we'll handle in MorphologyEngine via a tag
-        endings["[3sg]"] = "[AORIST_PASS_3SG]i"
+        endings["[3sg]"] = "i"   # ciṇ ending; stem carries [AORIST_PASS_3SG] for Vriddhi
         return endings
 
 

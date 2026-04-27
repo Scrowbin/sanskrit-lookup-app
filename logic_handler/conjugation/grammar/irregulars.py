@@ -19,11 +19,12 @@ aset_roots = {
     "vah",   # vakṣyati
     "dviṣ",  # dvekṣyati
     "duh",   # dhokṣyati
-    "yuj",   # yokṣyati  (yoj+sya → yok+sya → yokṣya)
-    "ad",    # atsyati   (d+sya → tsya by devoicing)
-    "hu",    # hoṣyati   (ho+sya → hoṣya by ruki)
-    "krī",   # kreṣyāmi  (krī guna=kre; kre+sya → kreṣya by ruki)
-    "tud",   # totsyati  (tud is Aniṭ)
+    "yuj",   # yokṣyati
+    "ad",    # atsyati
+    "hu",    # hoṣyati
+    "krī",   # kreṣyāmi
+    "tud",   # totsyati
+    "gam",   # gantā (periphrastic future is aniṭ)
 }
 
 
@@ -32,13 +33,12 @@ aset_roots = {
 # Key: root IAST → Value: causative BASE (without the +aya suffix).
 # _build_class_10 appends "+aya" after this base.
 causative_stem_irregulars = {
-    "krī": "krāp",   # krāpayati (NOT krāyayati; -p- from Pāṇ. 7.3.36 ṇic)
+    "krī": "krāp",   # krāpayati
+    "div": "dev",    # devayati (guna of div — no vriddhi since i is short penultimate)
+    "gam": "gam",    # gamayati (a-vowel root: no change)
 }
 
-# ── Class-2 irregulars ────────────────────────────────────────────────────────
-class_2_irregulars = {
-    "brū": "bravī",
-}
+
 
 # ── Class-7: Nasal roots ──────────────────────────────────────────────────────
 nasal_roots = {
@@ -65,7 +65,7 @@ perfect_bare_tha_roots = set()  # none confirmed by INRIA data
 # giving a connecting 'av'/'ay':
 #   hu  → weak guna 'ho' → ayadi → 'hav' → 'juhaviva'  (not 'juhviva')
 #   su  → weak guna 'so' → ayadi → 'sav' → 'suṣaviva'  (not 'suṣviva')
-perfect_weak_guna_roots = set()
+perfect_weak_guna_roots = set()  # hu/su now fully handled by perfect_stem_overrides
 
 # ── Perfect suppletive stems ──────────────────────────────────────────────────
 # Roots with completely irregular perfect stems (not derivable by rule).
@@ -74,34 +74,51 @@ perfect_weak_guna_roots = set()
 perfect_stem_overrides = {
     "tan": {"strong": "tatan", "weak": "ten"},
     "bhū": {"strong": "babhūv", "weak": "babhūv"},
+    # hu: weak before vowels (juhav+iva) vs zero-grade before consonants (juhuv+thaḥ)
+    "hu":  {"strong": "juhāv", "weak": "juhav", "weak2": "juhuv"},
+    # su: weak before vowels (suṣav+iva) vs zero-grade before consonants (suṣuv+thaḥ)
+    "su":  {"strong": "suṣāv", "weak": "suṣav", "weak2": "suṣuv"},
+    "gam": {"strong": "jagām", "weak": "jagm"},
+    "div": {"strong": "didev", "weak": "didiv"},  # didev+a=dideva / didiviva
 }
 
-# ── Imperfect active overrides: √ad (class 2) ────────────────────────────────
-ad_imperfect_active_overrides = {
-    "[3sg]": "at",
-    "[2sg]": "as",
-}
+
 
 # ── Aorist overrides for benchmark roots ─────────────────────────────────────
 # Maps root_str -> dict of {"type": aorist_type, "active": stem, "middle": stem}
 # Types: "root", "a", "reduplicated", "s", "is", "sa"
 aorist_overrides = {
     "bhū":  {"type": "root"},
-    "ad":   {"type": "a", "active": "ghasa", "middle": "ghasa"}, # Suppletive
-    "hu":   {"type": "s"},
-    "div":  {"type": "is"},
-    "su":   {"type": "s"},
-    "tud":  {"type": "a"},
+    "ad":   {"type": "a", "active": "ghasa", "middle": "ghasa"},  # Suppletive a-aorist
+    "hu":   {"type": "s"},                                         # s-aorist
+    "div":  {"type": "is", "active": "dīv", "middle": "dīv"},     # is-aorist; iṣ is in endings
+    "su":   {"type": "s"},                                         # s-aorist
+    "tud":  {"type": "s"},                                         # s-aorist aniṭ (tut+s)
     "yuj":  {"type": "root"},
     "tan":  {"type": "s"},
     "krī":  {"type": "s"},
-    "cur":  {"type": "is"},
-    "kṛ":   {"type": "s", "middle": "kṛ"}, # Middle is root aorist akṛta
-    "budh": {"type": "s", "active": "bodhiṣ", "middle": "budh"}, # Middle is s aorist abudhat
-    "duh":  {"type": "s", "middle": "duh"},
+    "cur":  {"type": "a", "active": "cūcur+a", "middle": "cūcur+a"},  # reduplicated a-aorist
+    "kṛ":   {"type": "s", "middle": "kṛ", "middle_type": "root"}, # middle root: akṛta
+    "budh": {"type": "is"},                                        # is-aorist both voices: abodhiṣam/abodhiṣṭa
+    "duh":  {"type": "sa", "active": "dhuṣ", "middle": "dhuṣ"},   # sa-aorist: adhukṣat / adhukṣata
     "gam":  {"type": "root"},
-    "dviṣ": {"type": "s", "active": "dvikṣ", "middle": "dvikṣ"},
+    "dviṣ": {"type": "sa", "active": "dvikṣ", "middle": "dvikṣ"}, # sa-aorist: advikṣat / advikṣata
     "muc":  {"type": "a"}
+}
+
+
+# ── Future stem overrides ─────────────────────────────────────────────────────
+# Roots whose future stem is NOT guna(root) + sya/iṣya.
+# Maps root_str → {"stem": bare_stem, "anit": bool}
+future_stem_overrides = {
+    "div": {"stem": "dīv"},  # dīviṣyati — future uses class-4 lengthened stem, no guna
+    "gam": {"stem": "gam"},  # gamiṣyati (Seṭ)
+}
+
+# Periphrastic-future stem overrides (where stem ≠ guna + i)
+periphrastic_stem_overrides = {
+    "gam": "gan",    # gantā: the 'tā' ending provides the t; n comes from nasal insertion
+    "div": "dīv",    # dīvitā (uses lengthened class-4 stem + i from builder)
 }
 
 # ── Desiderative stem overrides ──────────────────────────────────────────────
@@ -117,5 +134,16 @@ desiderative_stem_overrides = {
     "budh": ["bubhutsa", "bubhodhiṣa"],
     "bhū":  ["bubhūṣa"],
     "muc":  ["mumukṣa"],
-    "yuj":  ["yuyukṣa"]
+    "yuj":  ["yuyukṣa"],
+    "div":  ["dideviṣa"],   # desid of div: redupl di + guna dev + iṣa
+}
+
+# ── Intensive (yaṅ) stem overrides ───────────────────────────────────────────
+# Maps root_str → complete intensive stem base (prefix + root, no suffix).
+# Used when generate_intensive_prefix() gives wrong prefix.
+# Middle voice: stem + ya; Active voice: stem + [INTENSIVE_ACTIVE]
+intensive_stem_overrides = {
+    "gam":  "jaṅgam",  # nasal insertion: ga+gam → jaṅgam (not jagam)
+    "dviṣ": "dedviṣ",  # prefix drops 'v': di + dviṣ → dedviṣ (not dvedveṣ)
+    "budh": "bobhodh", # Grassmann throwback: bo + bodh → bobhodh
 }

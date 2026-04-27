@@ -6,7 +6,12 @@ from sandhi import SandhiEngine
 from stem_rules import StemBuilder
 from endings import SuffixProvider
 from morphology import MorphologyEngine
-from irregulars import ad_imperfect_active_overrides, perfect_bare_tha_roots
+
+# Derivatives that always use the periphrastic perfect (kṛ auxiliary)
+_PERIPHRASTIC_DERIVATIVES = frozenset({"causative", "desiderative", "intensive"})
+
+# Long-vowel phonemes at root-initial position that also force periphrastic perfect
+_LONG_VOWEL_INITIALS = frozenset({"ī", "ū", "ṛ", "ṝ", "e", "ai", "o", "au"})
 
 
 # ── Strength evaluation rule table ───────────────────────────────────────────
@@ -213,19 +218,15 @@ class SanskritConjugator:
 
         # 1. Evaluate stem strength based on grammar rules
         if tense == "perfect":
-            # Periphrastic perfect conditions
-            is_periphrastic = False
-            if derivative in ("causative", "desiderative", "intensive") or class_num == 10:
-                is_periphrastic = True
-            
-            # Roots starting with a long vowel (except ā) also use periphrastic
-            # e.g. īṣ, edh, etc.
-            phonemes = ALPHABET.parse_phonemes(root_str)
-            if phonemes and phonemes[0] in ("ī", "ū", "ṛ", "ṝ", "e", "ai", "o", "au"):
-                is_periphrastic = True
-            
+            is_periphrastic = derivative in _PERIPHRASTIC_DERIVATIVES or class_num == 10
+            if not is_periphrastic:
+                phonemes = ALPHABET.parse_phonemes(root_str)
+                if phonemes and phonemes[0] in _LONG_VOWEL_INITIALS:
+                    is_periphrastic = True
             if is_periphrastic:
-                return self._conjugate_periphrastic_perfect(root_str, class_num, voice, person, number, derivative)
+                return self._conjugate_periphrastic_perfect(
+                    root_str, class_num, voice, person, number, derivative
+                )
 
         if derivative == "desiderative":
             # Desiderative bases end in thematic 'a' and conjugate like Class 1
@@ -286,8 +287,7 @@ class SanskritConjugator:
         result = sandhi_fst.optimize()
 
         try:
-            # Extract all possible surface forms
-            forms = list(result.ostrings())
+            forms = list(result.paths().ostrings())
             if not forms:
                 return "CRASHED: No valid path"
             return " OR ".join(forms)
@@ -299,29 +299,20 @@ class SanskritConjugator:
                 return f"CRASHED: {str(e)}"
 
     def _conjugate_periphrastic_perfect(self, root_str, class_num, voice, person, number, derivative=None):
-        """Build the periphrastic perfect (stem + ā + aux)."""
-        base_fst = self.stem_builder._build_periphrastic_base(root_str, class_num, derivative)
-        # Clean tags from base
+        """Periphrastic perfect: base-stem + \u0101m + auxiliary (kr, bhu, or as)."""
+        base_fst = self.stems._build_periphrastic_base(root_str, class_num, derivative)
+        # Apply morphology tags then erase boundaries within the base
         base_fst = (base_fst @ self.morphology.clean_tags).optimize()
-        
-        # Auxiliary choices: kṛ, bhū, as. kṛ is most common.
-        aux_voice = voice
-        aux_tense = "perfect"
-        # We'll use 'kṛ' (Class 8) as the primary auxiliary
-        aux_forms_str = self.conjugate("kṛ", 8, person, number, aux_voice, aux_tense)
-        aux_forms = aux_forms_str.split(" OR ")
-        
+
+        # kṛ (Class 8) is the standard auxiliary for periphrastic perfect
+        aux_str = self.conjugate("kṛ", 8, person, number, voice, "perfect")
         results = []
-        for aux in aux_forms:
-            # Join base and aux with a boundary for sandhi
+        for aux in aux_str.split(" OR "):
             combined = base_fst + pn.accep("+") + pn.accep(aux)
-            final_fst = self.sandhi.apply_all(combined).optimize()
-            for form in final_fst.ostrings():
+            for form in self.sandhi.apply_all(combined).optimize().paths().ostrings():
                 results.append(form)
-        
-        if not results:
-            return "CRASHED: No periphrastic forms"
-        return " OR ".join(sorted(list(set(results))))
+
+        return " OR ".join(sorted(set(results))) if results else "CRASHED: No periphrastic forms"
 
     # ──────────────────────────────────────────────────────────────────────────
     # Debug helper

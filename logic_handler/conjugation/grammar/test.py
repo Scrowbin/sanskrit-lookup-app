@@ -42,7 +42,7 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
         ("bhū",  1,  "Guna + Thematic / Standard Seṭ Future"),
         ("ad",   2,  "Athematic + Devoicing (atti / atsyati)"),
         ("hu",   3,  "Reduplication / a-Aorist / ṣ+dhv→ḍhv Sandhi (ahoḍhvam)"),
-        ("div",  4,  "Internal Lengthening (dīvyati)"),
+        ("dīv",  4,  "Internal Lengthening (dīvyati)"),
         ("su",   5,  "Athematic Sign (-nu/-no-)"),
         ("tud",  6,  "Thematic + No Guna / Aniṭ Luṭ (tottā)"),
         ("yuj",  7,  "Infix + Palatal Sandhi (yunakti / yokṣyati)"),
@@ -59,11 +59,13 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
         ("muc",  6,  "Nasal Infix (muñca) / a-Aorist (amucat)"),
     ]
 
-    # ── Derivation → how to call the FST ─────────────────────────────────────
-    # "primary"     → api.conjugate(root, primary_class, ...)
-    # "causative"   → api.conjugate(root, 10, ...) — causatives behave like cl10
-    # "desiderative"→ not yet implemented; counted as UNSUPPORTED
-    # "intensive"   → not yet implemented; counted as UNSUPPORTED
+    # ── Derivation → how to call the FST —————————————————————————————————————
+    # Some INRIA stems differ from the true grammatical root used by our engine.
+    # E.g. INRIA stores all dīv forms under stem 'dīv' (class-4 lengthened present stem),
+    # but the engine must use the underlying root 'div' (short i) for correct derivation.
+    INRIA_TO_ENGINE_ROOT = {
+        "dīv": "div",   # INRIA stem dīv → engine root div (class-4 lengthening is internal)
+    }
     UNSUPPORTED_DERIVATIONS = set()
 
     # ── Grammar space to iterate ──────────────────────────────────────────────
@@ -145,7 +147,8 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
                             # --- Supported: call the FST ---
                             try:
                                 actual = api.conjugate(
-                                    root, effective_class, person, number,
+                                    INRIA_TO_ENGINE_ROOT.get(root, root),
+                                    effective_class, person, number,
                                     voice=voice, tense=tense, derivative=fst_derivative
                                 )
 

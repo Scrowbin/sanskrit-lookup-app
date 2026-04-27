@@ -3,19 +3,22 @@ from irregulars import (
     class_1_irregulars,
     causative_stem_irregulars,
     perfect_weak_guna_roots, perfect_stem_overrides,
-    aorist_overrides, nasal_roots, desiderative_stem_overrides
+    aorist_overrides, nasal_roots, desiderative_stem_overrides,
+    future_stem_overrides, periphrastic_stem_overrides,
+    intensive_stem_overrides,
 )
 from dhatupatha_analyzer import DHATUPATHA_ANALYZER
 from alphabet import ALPHABET
 from reduplication import ReduplicationEngine
 
-# Pure short/long monophthongs — diphthongs (e, o, ai, au) are intentionally
-# excluded so that diphthong-final guna forms count as "consonant-ending" for
-# the Seṭ/Aniṭ decision (they become consonants via ayadi before -iṣya-).
+# Pure short/long monophthongs
 _PURE_VOWELS = {"a", "ā", "i", "ī", "u", "ū", "ṛ", "ṝ", "ḷ", "ḹ"}
 
-# Ayadi resolution table: diphthong → semivowel form (before a following vowel)
+# Ayadi resolution table
 _AYADI_MAP = {"au": "āv", "ai": "āy", "o": "av", "e": "ay"}
+
+# Perfect weak vowel-shortening table (module-level constant)
+_PERFECT_SHORTEN = {"ī": "i", "ū": "u", "ṝ": "ṛ", "ā": "a"}
 
 
 def _ends_in_consonant(s: str) -> bool:
@@ -47,8 +50,7 @@ class StemBuilder:
         self.guna         = strength_engine.get_guna()
         self.vriddhi      = strength_engine.get_vriddhi()
         self.reduplicator = ReduplicationEngine()
-        self.sigma        = ALPHABET.sigma_star
-        self.sig          = self.sigma
+        self.sig          = ALPHABET.sigma_star
 
         # Ayadi resolver for derived bases (e.g. bhau → bhāv)
         self.ayadi = pn.cdrewrite(
@@ -106,7 +108,7 @@ class StemBuilder:
             builder = self.tense_dispatch.get(tense)
             if builder is None:
                 raise ValueError(f"Tense '{tense}' not supported.")
-            fst = builder(root_str, class_num, strength, tense, person=person, number=number) @ self.guna @ self.vriddhi
+            fst = builder(root_str, class_num, strength, tense, person=person, number=number)
 
         return (fst @ self._clean()).optimize()
 
@@ -165,54 +167,64 @@ class StemBuilder:
         return handler(root_str, strength)
 
     def _build_future_system(self, root_str, class_num, strength, tense, **kwargs):
-        """Future (Lṛṭ and Luṭ) and Conditional (Lṛṅ)."""
-        is_anit = DHATUPATHA_ANALYZER.is_anit(root_str, class_num)
-        
-        # Exceptions to Seṭ/Aniṭ baseline in Future
-        if root_str in ("gam", "kṛ"):
-            is_anit = False # gam and kṛ are Seṭ in simple future
-        if root_str == "krī":
-            is_anit = True  # krī is Aniṭ in future (kreṣyati)
-
+        """Future (Lṛṭ) and Conditional (Lṛṅ)."""
         if class_num == 10:
             base = self._build_causative_base(root_str)
             return base + pn.accep("ayiṣya")
+
+        # Root-specific future stem override (e.g. div uses dīv+iṣya, not guna)
+        if root_str in future_stem_overrides:
+            info = future_stem_overrides[root_str]
+            stem = pn.accep(info["stem"])
+            is_anit = info.get("anit", False)
+            suffix = "+sya" if is_anit else "+iṣya"
+            return stem + pn.accep(suffix)
+
+        is_anit = DHATUPATHA_ANALYZER.is_anit(root_str, class_num)
+        if root_str in ("gam", "kṛ"):
+            is_anit = False
+        if root_str == "krī":
+            is_anit = True
 
         stem = self._apply_guna(root_str, "[STRONG]")
         suffix = "+sya" if is_anit else "+iṣya"
         return stem + pn.accep(suffix)
 
+
     def _build_periphrastic_future_system(self, root_str, class_num, strength, tense, **kwargs):
-        """Periphrastic Future (Luṭ) stem = Guna root + (i) + tā/tār/tās endings."""
-        is_anit = DHATUPATHA_ANALYZER.is_anit(root_str, class_num)
-        
-        # Exceptions to Seṭ/Aniṭ baseline in Future
-        if root_str == "gam":
-            is_anit = False
-        if root_str == "krī":
-            is_anit = True
-        
+        """Periphrastic Future (Luṭ): stem + (i) + tā/tār/tās endings."""
         if class_num == 10:
             base = self._build_causative_base(root_str)
             return base + pn.accep("ayi")
 
-        stem = self._apply_guna(root_str, "[STRONG]")
-        # kṛ is Seṭ for simple future (kariṣyati) but Aniṭ for periphrastic future (kartā)
-        if root_str == "kṛ":
-            suffix = ""
-        else:
+        # Root-specific override: returns the bare stem (gant, dīv, etc.)
+        if root_str in periphrastic_stem_overrides:
+            bare = periphrastic_stem_overrides[root_str]
+            # gam → gant (aniṭ, no connecting i): gantā
+            # div → dīv (seṭ, needs +i):           dīvitā
+            is_anit = root_str in ("gam",)
             suffix = "" if is_anit else "+i"
+            return pn.accep(bare) + pn.accep(suffix)
+
+        is_anit = DHATUPATHA_ANALYZER.is_anit(root_str, class_num)
+        if root_str == "krī":
+            is_anit = True
+
+        stem = self._apply_guna(root_str, "[STRONG]")
+        # kṛ: Aniṭ periphrastic (kartā) despite Seṭ simple future
+        if root_str == "kṛ":
+            return stem
+        suffix = "" if is_anit else "+i"
         return stem + pn.accep(suffix)
 
     def _build_aorist_system(self, root_str, class_num, strength, tense, **kwargs):
         """Aorist stem (used by Aorist and Injunctive)."""
         if root_str in aorist_overrides:
             info = aorist_overrides[root_str]
-            # Use explicit override if provided (e.g. ad -> ghasa)
-            if strength == "[STRONG]" and "active" in info:
-                return pn.accep(info["active"])
-            if strength == "[WEAK]" and "middle" in info:
-                return pn.accep(info["middle"])
+            # Explicit active/middle stems are complete bases — return as-is, no suffix
+            voice_key = "active" if strength == "[STRONG]" else "middle"
+            if voice_key in info:
+                return pn.accep(info[voice_key])
             a_type = info["type"]
         else:
             a_type = DHATUPATHA_ANALYZER.get_aorist_type(root_str, class_num)
@@ -227,7 +239,7 @@ class StemBuilder:
                 fst = self._apply_vriddhi(root_str)
             else:
                 fst = self._apply_guna(root_str, "[STRONG]") if ends_in_vowel else pn.accep(root_str)
-            
+
             if is_anit:
                 return fst + pn.accep("+s")
             return fst + pn.accep("+is")
@@ -239,14 +251,11 @@ class StemBuilder:
             return pn.accep(root_str) + pn.accep("+a")
                 
         elif a_type == "is":
+            # The iṣ/is is embedded in the endings (iṣam, iṣṭām, etc.)
+            # so the stem is just the guna/bare root with no extra suffix.
             if strength == "[STRONG]":
-                fst = self._apply_guna(root_str, "[STRONG]")
-            else:
-                fst = pn.accep(root_str)
-            
-            if is_anit:
-                return fst + pn.accep("+s")
-            return fst + pn.accep("+iṣ")
+                return self._apply_guna(root_str, "[STRONG]")
+            return pn.accep(root_str)
                     
         elif a_type == "root":
             return pn.accep(root_str + "[ROOT_AORIST]")
@@ -256,56 +265,57 @@ class StemBuilder:
     def _build_perfect_system(self, root_str, class_num, strength, tense, **kwargs):
         """Perfect stem = reduplication prefix + (guna | shortened) root."""
         prefix = self.reduplicator.generate_prefix(root_str)
-        person = kwargs.get("person")
-        number = kwargs.get("number")
         
         if strength == "[STRONG]":
-            # Strong: guna or vriddhi grade
-            if root_str in perfect_stem_overrides:
+            person = kwargs.get("person")
+            number = kwargs.get("number")
+            # For 3sg active: use override strong stem (Vriddhi) if available
+            if person == "3" and number == "sg" and root_str in perfect_stem_overrides:
                 stem_str = perfect_stem_overrides[root_str]["strong"]
                 return pn.accep(stem_str)
-            
-            # Pāṇini 7.2.115: Vriddhi of final vowel in perfect active 1/3sg.
-            # (Note: 1sg is optionally Guna, but Vriddhi is standard).
-            if (person in ("1", "3") and number == "sg"):
-                # Use Vriddhi if it ends in a vowel, else Guna
-                if root_str[-1] in ALPHABET.vowels_list:
-                    root_fst = self._apply_vriddhi(root_str)
-                else:
-                    root_fst = self._apply_guna(root_str, "[STRONG]")
-            else:
-                # 2sg active or other strong forms take Guna
-                root_fst = self._apply_guna(root_str, "[STRONG]")
+            # For non-3sg (1sg Guna, 2sg Guna): use algorithmic Guna
+            if root_str in perfect_stem_overrides and person not in ("3",):
+                # Use Guna (drop the Vriddhi override; let _apply_guna handle it)
+                pass
+            elif root_str in perfect_stem_overrides:
+                stem_str = perfect_stem_overrides[root_str]["strong"]
+                return pn.accep(stem_str)
+            root_fst = self._apply_guna(root_str, "[STRONG]")
         else:
             # Weak: priority table
             if root_str in perfect_stem_overrides:
-                # Suppletive: full stem already encoded — no prefix
-                stem_str = perfect_stem_overrides[root_str]["weak"]
-                return pn.accep(stem_str)
+                # Suppletive: full stem already encoded — no prefix.
+                # hu/su have two weak alternants: guna+ayadi form (before vowels)
+                # and zero-grade (before consonants). Encode as union so sandhi
+                # selects the phonotactically correct one.
+                info = perfect_stem_overrides[root_str]
+                if "weak2" in info:
+                    return pn.union(pn.accep(info["weak"]), pn.accep(info["weak2"]))
+                return pn.accep(info["weak"])
             if root_str in perfect_weak_guna_roots:
                 root_fst = self._apply_guna(root_str, "[STRONG]")
             else:
-                _SHORTEN = {"ī": "i", "ū": "u", "ṝ": "ṛ", "ā": "a"}
-                if root_str and root_str[-1] in _SHORTEN:
-                    short_root = root_str[:-1] + _SHORTEN[root_str[-1]]
+                if root_str and root_str[-1] in _PERFECT_SHORTEN:
+                    short_root = root_str[:-1] + _PERFECT_SHORTEN[root_str[-1]]
                 else:
                     short_root = root_str
                 root_fst = pn.accep(short_root)
         return pn.accep(prefix + "+") + root_fst
 
     def _build_desiderative(self, root_str, strength):
-        """Build the desiderative (Sanādi) stem.
-        Uses overrides from irregulars.py for the complex benchmark roots."""
+        """Build the desiderative (Sanadi) stem."""
         if root_str in desiderative_stem_overrides:
             bases = desiderative_stem_overrides[root_str]
-            # Use union for roots with multiple valid bases (e.g. gam -> jigāṃsa/jigamiṣa)
             return pn.union(*[pn.accep(b) for b in bases])
-        
-        # Algorithmic fallback
         prefix = self.reduplicator.generate_desiderative_prefix(root_str)
         is_anit = DHATUPATHA_ANALYZER.is_anit(root_str, 1)
         suffix = "sa" if is_anit else "iṣa"
         return pn.accep(prefix) + pn.accep(root_str) + pn.accep(suffix)
+
+    def _build_desiderative_passive(self, root_str, strength):
+        """Build the desiderative passive stem (e.g. bubhūṣya)."""
+        base = self._build_desiderative(root_str, strength)
+        return (base + pn.accep("+")) @ pn.cdrewrite(pn.cross("a+", ""), "", "", self.sig) + pn.accep("ya")
 
     def _build_passive(self, root_str, class_num=None):
         """Passive stem."""
@@ -339,11 +349,6 @@ class StemBuilder:
     def _build_class_5(self, root_str, strength):
         affix = "+no" if strength == "[STRONG]" else "+nu"
         return pn.accep(root_str) + pn.accep(affix)
-    def _build_desiderative_passive(self, root_str, strength):
-        """Build the desiderative passive stem (e.g. bubhūṣya)."""
-        base = self._build_desiderative(root_str, strength)
-        # Remove the 'a' of bubhūṣa before adding 'ya'
-        return (base + pn.accep("+")) @ pn.cdrewrite(pn.cross("a+", ""), "", "", self.sig) + pn.accep("ya")
 
     def _build_class_6(self, root_str, strength):
         if root_str in nasal_roots:
@@ -384,18 +389,29 @@ class StemBuilder:
 
     def _build_intensive(self, root_str, strength, voice="middle"):
         """Intensive (yaṅ) stem."""
-        prefix = self.reduplicator.generate_intensive_prefix(root_str)
+        if root_str in intensive_stem_overrides:
+            stem_base = intensive_stem_overrides[root_str]
+        else:
+            prefix = self.reduplicator.generate_intensive_prefix(root_str)
+            stem_base = prefix + root_str if voice == "middle" else None
+            if voice != "middle":
+                prefix = self.reduplicator.generate_intensive_prefix(root_str)
+                stem_base = prefix  # will be used below
+
         if voice == "middle":
+            if root_str in intensive_stem_overrides:
+                return pn.accep(stem_base) + pn.accep("+ya")
+            prefix = self.reduplicator.generate_intensive_prefix(root_str)
             return pn.accep(prefix) + pn.accep(root_str) + pn.accep("+ya")
         else:
-            # Active takes Guna in strong grade.
-            # In weak grade, it also takes Guna if ending in a vowel.
-            if strength == "[STRONG]" or root_str[-1] in ALPHABET.vowels_list:
-                stem = pn.accep(prefix) + self._apply_guna(root_str, "[STRONG]")
-            else:
-                stem = pn.accep(prefix) + pn.accep(root_str)
+            # Active: Guna grade + [INTENSIVE_ACTIVE] tag.
+            # Morphology erases [INTENSIVE_ACTIVE]+ → +, then sandhi's ayadi fires:
+            # joho[INTENSIVE_ACTIVE]+vaḥ → joho+vaḥ → johavaḥ
+            if root_str in intensive_stem_overrides:
+                return pn.accep(stem_base) + pn.accep("[INTENSIVE_ACTIVE]")
+            prefix = self.reduplicator.generate_intensive_prefix(root_str)
+            stem = pn.accep(prefix) + self._apply_guna(root_str, "[STRONG]")
             return stem + pn.accep("[INTENSIVE_ACTIVE]")
-
 
     def _build_class_10(self, root_str, strength):
         """Curādi / Causative."""

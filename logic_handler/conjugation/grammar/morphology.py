@@ -34,11 +34,22 @@ class MorphologyEngine:
         )
 
         # ── 2. Class-4 (Divyādi) internal lengthening ─────────────────────────
-        # "div[CLASS4]+ya" → "dīv+ya"
+        # The stem is built as root + [CLASS4] + +ya, e.g. "div[CLASS4]+ya".
+        # We want to lengthen the LAST short i/u in the root before [CLASS4].
+        # Strategy: use two rules —
+        #   (a) shorten_tag: cross "i[CLASS4]" → "ī" (fires if vowel directly before tag)
+        #   (b) lengthen_via_tag: cross "i" → "ī" in leftward context up to [CLASS4]
+        # Simplest correct approach: apply guna/lengthening on the whole root string
+        # by replacing i→ī when [CLASS4] is somewhere to the right.
+        # cdrewrite left-context "" / right-context: any consonants then [CLASS4]
+        _any_cons = ALPHABET.consonants.closure()
         self.class4_lengthening = pn.cdrewrite(
-            pn.cross("i[CLASS4]", "ī"),
-            "", "", sig
+            pn.string_map([("i", "ī"), ("u", "ū")]),
+            "",
+            _any_cons + pn.accep("[CLASS4]"),
+            sig
         )
+
 
         # ── 3. Causative passive: erase the ayadi-trigger 'a' and the tag ─────
         # The cl10 passive stem is: vriddhi(root) + "+a[CAUS_PASS]+ya"
@@ -99,12 +110,11 @@ class MorphologyEngine:
             sig
         )
 
-        # Intensive Active: optional ī before consonants (except y)
+        # Intensive Active: erase [INTENSIVE_ACTIVE] tag before the boundary
+        # (the ī connecting vowel is rare and root-specific; handled via irregulars)
         self.intensive_i_it = pn.cdrewrite(
-            pn.union("", pn.cross("", "ī")),
-            pn.accep("[INTENSIVE_ACTIVE]") + pn.accep("+"),
-            ALPHABET.consonants - pn.accep("y"),
-            sig
+            pn.cross("[INTENSIVE_ACTIVE]+", "+"),
+            "", "", sig
         )
 
         all_tags = pn.union(
@@ -120,8 +130,8 @@ class MorphologyEngine:
             fst
             @ self.passive_vowels
             @ self.class4_lengthening
-            @ self.caus_pass_erase_with_a   # Case B: erase +a[CAUS_PASS]
-            @ self.caus_pass_erase          # Case A: erase bare [CAUS_PASS]
+            @ self.caus_pass_erase_with_a
+            @ self.caus_pass_erase
             @ self.class8_suppletion
             @ self.class8_u_drop
             @ self.root_aorist_bhuv
