@@ -1,0 +1,609 @@
+first,second,result,type,first_IAST,second_IAST,result_IAST
+a,a,A,common,a,a,ā
+a,A,A,common,a,ā,ā
+a,i,e,common,a,i,e
+a,I,e,common,a,ī,e
+a,u,o,common,a,u,o
+a,U,o,common,a,ū,o
+a,f,ar,common,a,ṛ,ar
+a,F,ar,common,a,ṝ,ar
+a,x,al,common,a,ḷ,al
+a,X,al,common,a,ḹ,al
+a,e,E,common,a,e,ai
+a,E,E,common,a,ai,ai
+a,o,O,common,a,o,au
+a,O,O,common,a,au,au
+A,a,A,common,ā,a,ā
+A,A,A,common,ā,ā,ā
+A,i,e,common,ā,i,e
+A,I,e,common,ā,ī,e
+A,u,o,common,ā,u,o
+A,U,o,common,ā,ū,o
+A,f,ar,common,ā,ṛ,ar
+A,F,ar,common,ā,ṝ,ar
+A,x,al,common,ā,ḷ,al
+A,X,al,common,ā,ḹ,al
+A,e,E,common,ā,e,ai
+A,E,E,common,ā,ai,ai
+A,o,O,common,ā,o,au
+A,O,O,common,ā,au,au
+i,a,y a,common,i,a,y a
+i,A,y A,common,i,ā,y ā
+i,i,I,common,i,i,ī
+i,I,I,common,i,ī,ī
+i,u,y u,common,i,u,y u
+i,U,y U,common,i,ū,y ū
+i,f,y f,common,i,ṛ,y ṛ
+i,F,y F,common,i,ṝ,y ṝ
+i,x,y x,common,i,ḷ,y ḷ
+i,X,y X,common,i,ḹ,y ḹ
+i,e,y e,common,i,e,y e
+i,E,y E,common,i,ai,y ai
+i,o,y o,common,i,o,y o
+i,O,y O,common,i,au,y au
+is,a,ir a,common,is,a,ir a
+is,A,ir A,common,is,ā,ir ā
+is,i,ir i,common,is,i,ir i
+is,I,ir I,common,is,ī,ir ī
+is,u,ir u,common,is,u,ir u
+is,U,ir U,common,is,ū,ir ū
+is,f,ir f,common,is,ṛ,ir ṛ
+is,F,ir F,common,is,ṝ,ir ṝ
+is,x,ir x,common,is,ḷ,ir ḷ
+is,X,ir X,common,is,ḹ,ir ḹ
+is,e,ir e,common,is,e,ir e
+is,E,ir E,common,is,ai,ir ai
+is,o,ir o,common,is,o,ir o
+is,O,ir O,common,is,au,ir au
+I,a,y a,common,ī,a,y a
+I,A,y A,common,ī,ā,y ā
+I,i,I,common,ī,i,ī
+I,I,I,common,ī,ī,ī
+I,u,y u,common,ī,u,y u
+I,U,y U,common,ī,ū,y ū
+I,f,y f,common,ī,ṛ,y ṛ
+I,F,y F,common,ī,ṝ,y ṝ
+I,x,y x,common,ī,ḷ,y ḷ
+I,X,y X,common,ī,ḹ,y ḹ
+I,e,y e,common,ī,e,y e
+I,E,y E,common,ī,ai,y ai
+I,o,y o,common,ī,o,y o
+I,O,y O,common,ī,au,y au
+u,a,v a,common,u,a,v a
+u,A,v A,common,u,ā,v ā
+u,i,v i,common,u,i,v i
+u,I,v I,common,u,ī,v ī
+u,u,U,common,u,u,ū
+u,U,U,common,u,ū,ū
+u,f,v f,common,u,ṛ,v ṛ
+u,F,v F,common,u,ṝ,v ṝ
+u,x,v x,common,u,ḷ,v ḷ
+u,X,v X,common,u,ḹ,v ḹ
+u,e,v e,common,u,e,v e
+u,E,v E,common,u,ai,v ai
+u,o,v o,common,u,o,v o
+u,O,v O,common,u,au,v au
+us,a,ur a,common,us,a,ur a
+us,A,ur A,common,us,ā,ur ā
+us,i,ur i,common,us,i,ur i
+us,I,ur I,common,us,ī,ur ī
+us,u,ur u,common,us,u,ur u
+us,U,ur U,common,us,ū,ur ū
+us,f,ur f,common,us,ṛ,ur ṛ
+us,F,ur F,common,us,ṝ,ur ṝ
+us,x,ur x,common,us,ḷ,ur ḷ
+us,X,ur X,common,us,ḹ,ur ḹ
+us,e,ur e,common,us,e,ur e
+us,E,ur E,common,us,ai,ur ai
+us,o,ur o,common,us,o,ur o
+us,O,ur O,common,us,au,ur au
+U,a,v a,common,ū,a,v a
+U,A,v A,common,ū,ā,v ā
+U,i,v i,common,ū,i,v i
+U,I,v I,common,ū,ī,v ī
+U,u,U,common,ū,u,ū
+U,U,U,common,ū,ū,ū
+U,f,v f,common,ū,ṛ,v ṛ
+U,F,v F,common,ū,ṝ,v ṝ
+U,x,v x,common,ū,ḷ,v ḷ
+U,X,v X,common,ū,ḹ,v ḹ
+U,e,v e,common,ū,e,v e
+U,E,v E,common,ū,ai,v ai
+U,o,v o,common,ū,o,v o
+U,O,v O,common,ū,au,v au
+f,a,r a,common,ṛ,a,r a
+f,A,r A,common,ṛ,ā,r ā
+f,i,r i,common,ṛ,i,r i
+f,I,r I,common,ṛ,ī,r ī
+f,u,r u,common,ṛ,u,r u
+f,U,r U,common,ṛ,ū,r ū
+f,f,F,common,ṛ,ṛ,ṝ
+f,F,F,common,ṛ,ṝ,ṝ
+f,x,r x,common,ṛ,ḷ,r ḷ
+f,X,r X,common,ṛ,ḹ,r ḹ
+f,e,r e,common,ṛ,e,r e
+f,E,r E,common,ṛ,ai,r ai
+f,o,r o,common,ṛ,o,r o
+f,O,r O,common,ṛ,au,r au
+F,a,r a,common,ṝ,a,r a
+F,A,r A,common,ṝ,ā,r ā
+F,i,r i,common,ṝ,i,r i
+F,I,r I,common,ṝ,ī,r ī
+F,u,r u,common,ṝ,u,r u
+F,U,r U,common,ṝ,ū,r ū
+F,f,F,common,ṝ,ṛ,ṝ
+F,F,F,common,ṝ,ṝ,ṝ
+F,x,r x,common,ṝ,ḷ,r ḷ
+F,X,r X,common,ṝ,ḹ,r ḹ
+F,e,r e,common,ṝ,e,r e
+F,E,r E,common,ṝ,ai,r ai
+F,o,r o,common,ṝ,o,r o
+F,O,r O,common,ṝ,au,r au
+O,a,Av a,common,au,a,āv a
+O,Av,Av A,common,au,āv,āv ā
+O,i,Av i,common,au,i,āv i
+O,I,Av I,common,au,ī,āv ī
+O,u,Av u,common,au,u,āv u
+O,U,Av U,common,au,ū,āv ū
+O,f,Av f,common,au,ṛ,āv ṛ
+O,F,Av F,common,au,ṝ,āv ṝ
+O,x,Av x,common,au,ḷ,āv ḷ
+O,X,Av X,common,au,ḹ,āv ḹ
+O,e,Av e,common,au,e,āv e
+O,E,Av E,common,au,ai,āv ai
+O,o,Av o,common,au,o,āv o
+O,O,Av O,common,au,au,āv au
+r,a,r a,common,r,a,r a
+r,A,r A,common,r,ā,r ā
+r,i,r i,common,r,i,r i
+r,I,r I,common,r,ī,r ī
+r,u,r u,common,r,u,r u
+r,U,r U,common,r,ū,r ū
+r,f,r f,common,r,ṛ,r ṛ
+r,F,r F,common,r,ṝ,r ṝ
+r,x,r x,common,r,ḷ,r ḷ
+r,X,r X,common,r,ḹ,r ḹ
+r,e,r e,common,r,e,r e
+r,E,r E,common,r,ai,r ai
+r,o,r o,common,r,o,r o
+r,O,r O,common,r,au,r au
+r,g,r g,common,r,g,r g
+r,G,r G,common,r,gh,r gh
+r,N,r N,common,r,ṅ,r ṅ
+r,j,r j,common,r,j,r j
+r,J,r J,common,r,jh,r jh
+r,Y,r Y,common,r,ñ,r ñ
+r,q,r q,common,r,ḍ,r ḍ
+r,Q,r Q,common,r,ḍh,r ḍh
+r,R,r R,common,r,ṇ,r ṇ
+r,d,r d,common,r,d,r d
+r,D,r D,common,r,dh,r dh
+r,n,r n,common,r,n,r n
+r,b,r b,common,r,b,r b
+r,B,r B,common,r,bh,r bh
+r,m,r m,common,r,m,r m
+r,y,r y,common,r,y,r y
+r,r,r r,common,r,r,r r
+r,l,r l,common,r,l,r l
+r,v,r v,common,r,v,r v
+r,h,r h,common,r,h,r h
+ar,r,A r,common,ar,r,ā r
+Ar,r,A r,common,ār,r,ā r
+ir,r,I r,common,ir,r,ī r
+Ir,r,I r,common,īr,r,ī r
+ur,r,U r,common,ur,r,ū r
+Ur,r,U r,common,ūr,r,ū r
+m,k,M k,common,m,k,ṃ k
+m,K,M K,common,m,kh,ṃ kh
+m,g,M g,common,m,g,ṃ g
+m,G,M G,common,m,gh,ṃ gh
+m,N,M N,common,m,ṅ,ṃ ṅ
+m,c,M c,common,m,c,ṃ c
+m,C,M C,common,m,ch,ṃ ch
+m,j,M j,common,m,j,ṃ j
+m,J,M J,common,m,jh,ṃ jh
+m,Y,M Y,common,m,ñ,ṃ ñ
+m,w,M w,common,m,ṭ,ṃ ṭ
+m,W,M W,common,m,ṭh,ṃ ṭh
+m,q,M q,common,m,ḍ,ṃ ḍ
+m,Q,M Q,common,m,ḍh,ṃ ḍh
+m,R,M R,common,m,ṇ,ṃ ṇ
+m,t,M t,common,m,t,ṃ t
+m,T,M T,common,m,th,ṃ th
+m,d,M d,common,m,d,ṃ d
+m,D,M D,common,m,dh,ṃ dh
+m,n,M n,common,m,n,ṃ n
+m,p,M p,common,m,p,ṃ p
+m,P,M P,common,m,ph,ṃ ph
+m,b,M b,common,m,b,ṃ b
+m,B,M B,common,m,bh,ṃ bh
+m,m,M m,common,m,m,ṃ m
+m,y,M y,common,m,y,ṃ y
+m,r,M r,common,m,r,ṃ r
+m,l,M l,common,m,l,ṃ l
+m,v,M v,common,m,v,ṃ v
+m,S,M S,common,m,ś,ṃ ś
+m,z,M z,common,m,ṣ,ṃ ṣ
+m,s,M s,common,m,s,ṃ s
+m,h,M h,common,m,h,ṃ h
+n,j,Y j,common,n,j,ñ j
+n,J,Y J,common,n,jh,ñ jh
+n,S,Y S,common,n,ś,ñ ś
+n,q,R q,common,n,ḍ,ṇ ḍ
+n,Q,R Q,common,n,ḍh,ṇ ḍh
+n,l,~l l,common,n,l,̃l l
+t,g,d g,common,t,g,d g
+t,G,d G,common,t,gh,d gh
+t,N,d N,common,t,ṅ,d ṅ
+t,Y,d Y,common,t,ñ,d ñ
+t,R,d R,common,t,ṇ,d ṇ
+t,d,d d,common,t,d,d d
+t,D,d D,common,t,dh,d dh
+t,b,d b,common,t,b,d b
+t,B,d B,common,t,bh,d bh
+t,h,d h,common,t,h,d h
+t,c,c c,common,t,c,c c
+t,C,c C,common,t,ch,c ch
+t,j,j j,common,t,j,j j
+t,J,j J,common,t,jh,j jh
+t,w,w w,common,t,ṭ,ṭ ṭ
+t,W,w W,common,t,ṭh,ṭ ṭh
+t,q,q q,common,t,ḍ,ḍ ḍ
+t,Q,q Q,common,t,ḍh,ḍ ḍh
+t,n,n n,common,t,n,n n
+t,m,n m,common,t,m,n m
+t,l,l l,common,t,l,l l
+t,v,d v,common,t,v,d v
+t,n,n n,common,t,n,n n
+t,m,n m,common,t,m,n m
+t,S,c C,common,t,ś,c ch
+t,h,d D,common,t,h,d dh
+k,n,N n,common,k,n,ṅ n
+k,m,N m,common,k,m,ṅ m
+a,C,a cC,common,a,ch,a cch
+i,C,i cC,common,i,ch,i cch
+u,C,u cC,common,u,ch,u cch
+f,C,f cC,common,ṛ,ch,ṛ cch
+x,C,x cC,common,ḷ,ch,ḷ cch
+k,h,g G,common,k,h,g gh
+t,h,d D,common,t,h,d dh
+e,a,e ',external,e,a,e '
+e,A,a A,external,e,ā,a ā
+e,i,a i,external,e,i,a i
+e,I,a I,external,e,ī,a ī
+e,u,a u,external,e,u,a u
+e,U,a U,external,e,ū,a ū
+e,f,a f,external,e,ṛ,a ṛ
+e,F,a F,external,e,ṝ,a ṝ
+e,e,a e,external,e,e,a e
+e,E,a E,external,e,ai,a ai
+e,o,a o,external,e,o,a o
+e,O,a O,external,e,au,a au
+E,a,A a,external,ai,a,ā a
+E,A,A A,external,ai,ā,ā ā
+E,i,A i,external,ai,i,ā i
+E,I,A I,external,ai,ī,ā ī
+E,u,A u,external,ai,u,ā u
+E,U,A U,external,ai,ū,ā ū
+E,f,A f,external,ai,ṛ,ā ṛ
+E,F,A F,external,ai,ṝ,ā ṝ
+E,x,A x,external,ai,ḷ,ā ḷ
+E,X,A X,external,ai,ḹ,ā ḹ
+E,e,A e,external,ai,e,ā e
+E,E,A E,external,ai,ai,ā ai
+E,o,A o,external,ai,o,ā o
+E,O,A O,external,ai,au,ā au
+as,a,o ',external,as,a,o '
+as,aM,o M,external,as,aṃ,o ṃ
+as,A,a A,external,as,ā,a ā
+as,i,a i,external,as,i,a i
+as,I,a I,external,as,ī,a ī
+as,u,a u,external,as,u,a u
+as,U,a U,external,as,ū,a ū
+as,f,a f,external,as,ṛ,a ṛ
+as,F,a F,external,as,ṝ,a ṝ
+as,e,a e,external,as,e,a e
+as,E,a E,external,as,ai,a ai
+as,o,a o,external,as,o,a o
+as,O,a O,external,as,au,a au
+as,g,o g,external,as,g,o g
+as,G,o G,external,as,gh,o gh
+as,N,o N,external,as,ṅ,o ṅ
+as,j,o j,external,as,j,o j
+as,J,o J,external,as,jh,o jh
+as,Y,o Y,external,as,ñ,o ñ
+as,q,o q,external,as,ḍ,o ḍ
+as,Q,o Q,external,as,ḍh,o ḍh
+as,R,o R,external,as,ṇ,o ṇ
+as,d,o d,external,as,d,o d
+as,D,o D,external,as,dh,o dh
+as,n,o n,external,as,n,o n
+as,b,o b,external,as,b,o b
+as,B,o B,external,as,bh,o bh
+as,m,o m,external,as,m,o m
+as,y,o y,external,as,y,o y
+as,r,o r,external,as,r,o r
+as,l,o l,external,as,l,o l
+as,v,o v,external,as,v,o v
+as,h,o h,external,as,h,o h
+s,k,H k,external,s,k,ḥ k
+s,K,H K,external,s,kh,ḥ kh
+s,p,H p,external,s,p,ḥ p
+s,P,H P,external,s,ph,ḥ ph
+s,S,h S,external,s,ś,h ś
+s,z,h z,external,s,ṣ,h ṣ
+s,s,h s,external,s,s,h s
+s,c,S c,external,s,c,ś c
+s,C,S C,external,s,ch,ś ch
+s,w,z w,external,s,ṭ,ṣ ṭ
+s,W,z W,external,s,ṭh,ṣ ṭh
+s,t,s t,external,s,t,s t
+s,T,s T,external,s,th,s th
+s,,H,external,s,,ḥ
+r,k,H k,external,r,k,ḥ k
+r,K,H K,external,r,kh,ḥ kh
+r,p,H p,external,r,p,ḥ p
+r,P,H P,external,r,ph,ḥ ph
+r,S,H S,external,r,ś,ḥ ś
+r,z,H z,external,r,ṣ,ḥ ṣ
+r,s,H s,external,r,s,ḥ s
+r,c,S c,external,r,c,ś c
+r,C,S C,external,r,ch,ś ch
+r,w,z w,external,r,ṭ,ṣ ṭ
+r,W,z W,external,r,ṭh,ṣ ṭh
+r,t,s t,external,r,t,s t
+r,T,s T,external,r,th,s th
+r,,H,external,r,,ḥ
+As,a,A a,external,ās,a,ā a
+As,A,A A,external,ās,ā,ā ā
+As,i,A i,external,ās,i,ā i
+As,I,A I,external,ās,ī,ā ī
+As,u,A u,external,ās,u,ā u
+As,U,A U,external,ās,ū,ā ū
+As,f,A f,external,ās,ṛ,ā ṛ
+As,F,A F,external,ās,ṝ,ā ṝ
+As,x,A x,external,ās,ḷ,ā ḷ
+As,X,A X,external,ās,ḹ,ā ḹ
+As,e,A e,external,ās,e,ā e
+As,E,A E,external,ās,ai,ā ai
+As,o,A o,external,ās,o,ā o
+As,O,A O,external,ās,au,ā au
+As,g,A g,external,ās,g,ā g
+As,G,A G,external,ās,gh,ā gh
+As,N,A N,external,ās,ṅ,ā ṅ
+As,j,A j,external,ās,j,ā j
+As,J,A J,external,ās,jh,ā jh
+As,Y,A Y,external,ās,ñ,ā ñ
+As,q,A q,external,ās,ḍ,ā ḍ
+As,Q,A Q,external,ās,ḍh,ā ḍh
+As,R,A R,external,ās,ṇ,ā ṇ
+As,d,A d,external,ās,d,ā d
+As,D,A D,external,ās,dh,ā dh
+As,n,A n,external,ās,n,ā n
+As,b,A b,external,ās,b,ā b
+As,B,A B,external,ās,bh,ā bh
+As,m,A m,external,ās,m,ā m
+As,y,A y,external,ās,y,ā y
+As,r,A r,external,ās,r,ā r
+As,l,A l,external,ās,l,ā l
+As,v,A v,external,ās,v,ā v
+As,h,A h,external,ās,h,ā h
+is,g,ir g,external,is,g,ir g
+is,G,ir G,external,is,gh,ir gh
+is,N,ir N,external,is,ṅ,ir ṅ
+is,j,ir j,external,is,j,ir j
+is,J,ir J,external,is,jh,ir jh
+is,Y,ir Y,external,is,ñ,ir ñ
+is,q,ir q,external,is,ḍ,ir ḍ
+is,Q,ir Q,external,is,ḍh,ir ḍh
+is,R,ir R,external,is,ṇ,ir ṇ
+is,d,ir d,external,is,d,ir d
+is,D,ir D,external,is,dh,ir dh
+is,n,ir n,external,is,n,ir n
+is,b,ir b,external,is,b,ir b
+is,B,ir B,external,is,bh,ir bh
+is,m,ir m,external,is,m,ir m
+is,y,ir y,external,is,y,ir y
+is,r,I r,external,is,r,ī r
+is,l,ir l,external,is,l,ir l
+is,v,ir v,external,is,v,ir v
+is,h,ir h,external,is,h,ir h
+Is,g,Ir g,external,īs,g,īr g
+Is,G,Ir G,external,īs,gh,īr gh
+Is,N,Ir N,external,īs,ṅ,īr ṅ
+Is,j,Ir j,external,īs,j,īr j
+Is,J,Ir J,external,īs,jh,īr jh
+Is,Y,Ir Y,external,īs,ñ,īr ñ
+Is,q,Ir q,external,īs,ḍ,īr ḍ
+Is,Q,Ir Q,external,īs,ḍh,īr ḍh
+Is,R,Ir R,external,īs,ṇ,īr ṇ
+Is,d,Ir d,external,īs,d,īr d
+Is,D,Ir D,external,īs,dh,īr dh
+Is,n,Ir n,external,īs,n,īr n
+Is,b,Ir b,external,īs,b,īr b
+Is,B,Ir B,external,īs,bh,īr bh
+Is,m,Ir m,external,īs,m,īr m
+Is,y,Ir y,external,īs,y,īr y
+Is,r,I r,external,īs,r,ī r
+Is,l,Ir l,external,īs,l,īr l
+Is,v,Ir v,external,īs,v,īr v
+Is,h,Ir h,external,īs,h,īr h
+us,g,ur g,external,us,g,ur g
+us,G,ur G,external,us,gh,ur gh
+us,N,ur N,external,us,ṅ,ur ṅ
+us,j,ur j,external,us,j,ur j
+us,J,ur J,external,us,jh,ur jh
+us,Y,ur Y,external,us,ñ,ur ñ
+us,q,ur q,external,us,ḍ,ur ḍ
+us,Q,ur Q,external,us,ḍh,ur ḍh
+us,R,ur R,external,us,ṇ,ur ṇ
+us,d,ur d,external,us,d,ur d
+us,D,ur D,external,us,dh,ur dh
+us,n,ur n,external,us,n,ur n
+us,b,ur b,external,us,b,ur b
+us,B,ur B,external,us,bh,ur bh
+us,m,ur m,external,us,m,ur m
+us,y,ur y,external,us,y,ur y
+us,r,U r,external,us,r,ū r
+us,l,ur l,external,us,l,ur l
+us,v,ur v,external,us,v,ur v
+us,h,ur h,external,us,h,ur h
+Us,g,Ur g,external,ūs,g,ūr g
+Us,G,Ur G,external,ūs,gh,ūr gh
+Us,N,Ur N,external,ūs,ṅ,ūr ṅ
+Us,j,Ur j,external,ūs,j,ūr j
+Us,J,Ur J,external,ūs,jh,ūr jh
+Us,Y,Ur Y,external,ūs,ñ,ūr ñ
+Us,q,Ur q,external,ūs,ḍ,ūr ḍ
+Us,Q,Ur Q,external,ūs,ḍh,ūr ḍh
+Us,R,Ur R,external,ūs,ṇ,ūr ṇ
+Us,d,Ur d,external,ūs,d,ūr d
+Us,D,Ur D,external,ūs,dh,ūr dh
+Us,n,Ur n,external,ūs,n,ūr n
+Us,b,Ur b,external,ūs,b,ūr b
+Us,B,Ur B,external,ūs,bh,ūr bh
+Us,m,Ur m,external,ūs,m,ūr m
+Us,y,Ur y,external,ūs,y,ūr y
+Us,r,U r,external,ūs,r,ū r
+Us,l,Ur l,external,ūs,l,ūr l
+Us,v,Ur v,external,ūs,v,ūr v
+Us,h,Ur h,external,ūs,h,ūr h
+es,g,er g,external,es,g,er g
+es,G,er G,external,es,gh,er gh
+es,N,er N,external,es,ṅ,er ṅ
+es,j,er j,external,es,j,er j
+es,J,er J,external,es,jh,er jh
+es,Y,er Y,external,es,ñ,er ñ
+es,q,er q,external,es,ḍ,er ḍ
+es,Q,er Q,external,es,ḍh,er ḍh
+es,R,er R,external,es,ṇ,er ṇ
+es,d,er d,external,es,d,er d
+es,D,er D,external,es,dh,er dh
+es,n,er n,external,es,n,er n
+es,b,er b,external,es,b,er b
+es,B,er B,external,es,bh,er bh
+es,m,er m,external,es,m,er m
+es,y,er y,external,es,y,er y
+es,r,e r,external,es,r,e r
+es,l,er l,external,es,l,er l
+es,v,er v,external,es,v,er v
+es,h,er h,external,es,h,er h
+Es,g,Er g,external,ais,g,air g
+Es,G,Er G,external,ais,gh,air gh
+Es,N,Er N,external,ais,ṅ,air ṅ
+Es,j,Er j,external,ais,j,air j
+Es,J,Er J,external,ais,jh,air jh
+Es,Y,Er Y,external,ais,ñ,air ñ
+Es,q,Er q,external,ais,ḍ,air ḍ
+Es,Q,Er Q,external,ais,ḍh,air ḍh
+Es,R,Er R,external,ais,ṇ,air ṇ
+Es,d,Er d,external,ais,d,air d
+Es,D,Er D,external,ais,dh,air dh
+Es,n,Er n,external,ais,n,air n
+Es,b,Er b,external,ais,b,air b
+Es,B,Er B,external,ais,bh,air bh
+Es,m,Er m,external,ais,m,air m
+Es,y,Er y,external,ais,y,air y
+Es,r,E r,external,ais,r,ai r
+Es,l,Er l,external,ais,l,air l
+Es,v,Er v,external,ais,v,air v
+Es,h,Er h,external,ais,h,air h
+os,g,or g,external,os,g,or g
+os,G,or G,external,os,gh,or gh
+os,N,or N,external,os,ṅ,or ṅ
+os,j,or j,external,os,j,or j
+os,J,or J,external,os,jh,or jh
+os,Y,or Y,external,os,ñ,or ñ
+os,q,or q,external,os,ḍ,or ḍ
+os,Q,or Q,external,os,ḍh,or ḍh
+os,R,or R,external,os,ṇ,or ṇ
+os,d,or d,external,os,d,or d
+os,D,or D,external,os,dh,or dh
+os,n,or n,external,os,n,or n
+os,b,or b,external,os,b,or b
+os,B,or B,external,os,bh,or bh
+os,m,or m,external,os,m,or m
+os,y,or y,external,os,y,or y
+os,r,o r,external,os,r,o r
+os,l,or l,external,os,l,or l
+os,v,or v,external,os,v,or v
+os,h,or h,external,os,h,or h
+Os,g,Or g,external,aus,g,aur g
+Os,G,Or G,external,aus,gh,aur gh
+Os,N,Or N,external,aus,ṅ,aur ṅ
+Os,j,Or j,external,aus,j,aur j
+Os,J,Or J,external,aus,jh,aur jh
+Os,Y,Or Y,external,aus,ñ,aur ñ
+Os,q,Or q,external,aus,ḍ,aur ḍ
+Os,Q,Or Q,external,aus,ḍh,aur ḍh
+Os,R,Or R,external,aus,ṇ,aur ṇ
+Os,d,Or d,external,aus,d,aur d
+Os,D,Or D,external,aus,dh,aur dh
+Os,n,Or n,external,aus,n,aur n
+Os,b,Or b,external,aus,b,aur b
+Os,B,Or B,external,aus,bh,aur bh
+Os,m,Or m,external,aus,m,aur m
+Os,y,Or y,external,aus,y,aur y
+Os,r,O r,external,aus,r,au r
+Os,l,Or l,external,aus,l,aur l
+Os,v,Or v,external,aus,v,aur v
+Os,h,Or h,external,aus,h,aur h
+n,c,MS c,external,n,c,ṃś c
+n,C,MS C,external,n,ch,ṃś ch
+n,w,Mz w,external,n,ṭ,ṃṣ ṭ
+n,W,Mz W,external,n,ṭh,ṃṣ ṭh
+n,t,Ms t,external,n,t,ṃs t
+n,T,Ms T,external,n,th,ṃs th
+t,a,d a,external,t,a,d a
+t,A,d A,external,t,ā,d ā
+t,i,d i,external,t,i,d i
+t,I,d I,external,t,ī,d ī
+t,u,d u,external,t,u,d u
+t,U,d U,external,t,ū,d ū
+t,f,d f,external,t,ṛ,d ṛ
+t,F,d F,external,t,ṝ,d ṝ
+t,x,d x,external,t,ḷ,d ḷ
+t,X,d X,external,t,ḹ,d ḹ
+t,e,d e,external,t,e,d e
+t,E,d E,external,t,ai,d ai
+t,o,d o,external,t,o,d o
+t,O,d O,external,t,au,d au
+t,y,d y,external,t,y,d y
+t,r,d r,external,t,r,d r
+an,a,ann a,external,an,a,ann a
+an,i,ann i,external,an,i,ann i
+an,u,ann u,external,an,u,ann u
+an,f,ann f,external,an,ṛ,ann ṛ
+an,x,ann x,external,an,ḷ,ann ḷ
+in,a,inn a,external,in,a,inn a
+in,i,inn i,external,in,i,inn i
+in,u,inn u,external,in,u,inn u
+in,f,inn f,external,in,ṛ,inn ṛ
+in,x,inn x,external,in,ḷ,inn ḷ
+e,a,aya,internal,e,a,aya
+e,A,ayA,internal,e,ā,ayā
+e,i,ayi,internal,e,i,ayi
+e,I,ayI,internal,e,ī,ayī
+e,u,ayu,internal,e,u,ayu
+e,U,ayU,internal,e,ū,ayū
+o,a,ava,internal,o,a,ava
+o,A,avA,internal,o,ā,avā
+o,i,avi,internal,o,i,avi
+o,I,avI,internal,o,ī,avī
+o,u,avu,internal,o,u,avu
+o,U,avU,internal,o,ū,avū
+E,a,Aya,internal,ai,a,āya
+E,A,AyA,internal,ai,ā,āyā
+O,a,Ava,internal,au,a,āva
+O,A,AvA,internal,au,ā,āvā
+G,t,gD,internal,gh,t,gdh
+G,T,gD,internal,gh,th,gdh
+D,t,dD,internal,dh,t,ddh
+D,T,dD,internal,dh,th,ddh
+B,t,bD,internal,bh,t,bdh
+B,T,bD,internal,bh,th,bdh
+S,t,zw,internal,ś,t,ṣṭ
+S,T,zW,internal,ś,th,ṣṭh
+S,s,kz,internal,ś,s,kṣ
+h,t,dD,internal,h,t,ddh
+h,T,dD,internal,h,th,ddh

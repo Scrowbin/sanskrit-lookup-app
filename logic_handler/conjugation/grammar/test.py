@@ -57,6 +57,18 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
         ("gam",  1,  "Suppletive Present (gaccha) / Root Aorist (agamat)"),
         ("dviṣ", 2,  "Aniṭ S-Aorist / Palatal Sandhi (adikṣat)"),
         ("muc",  6,  "Nasal Infix (muñca) / a-Aorist (amucat)"),
+        
+        # --- Expanded Classical Suite ---
+        ("vac",  2,  "Suppletive strong stem (vakti/ucyate)"),
+        ("han",  2,  "gh-deletion (hanti/jighāṃsati)"),
+        ("pā",   1,  "Long-vowel root + yan sandhi (pāti/pātum)"),
+        ("nī",   1,  "Long-vowel root + periphrastic perfect"),
+        ("śru",  5,  "u-final + Benedictive (śrūyāt)"),
+        ("dā",   3,  "Reduplicating class, long-ā (dadāti)"),
+        ("sthā", 1,  "Long-ā root, suppletive aorist (asthāt)"),
+        ("bhid", 7,  "Class-7 nasal infix, s-aorist (abhaiṭsīt)"),
+        ("kṣip", 6,  "Thematic no-guna, veṭ future"),
+        ("vṛ",   9,  "Veṭ root with both future forms (variṣyati / varīṣyati)"),
     ]
 
     # ── Derivation → how to call the FST —————————————————————————————————————
@@ -69,7 +81,7 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
     UNSUPPORTED_DERIVATIONS = set()
 
     # ── Grammar space to iterate ──────────────────────────────────────────────
-    ALL_TENSES  = ["present", "imperfect", "imperative", "optative",
+    ALL_TENSES  = ["present", "imperfect", "imperative", "optative", "benedictive",
                    "future", "conditional", "perfect", "periphrastic_future", "aorist", "injunctive"]
     ALL_VOICES  = ["active", "middle", "passive"]
     ALL_PERSONS = ["1", "2", "3"]
@@ -92,19 +104,9 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
         # Iterate over BOTH primary and secondary derivations
         for derivation in ["primary", "causative", "desiderative", "intensive"]:
 
-            # Map derivation → effective class for FST call
-            if derivation == "primary":
-                effective_class = primary_class
-                fst_derivative = None
-            elif derivation == "causative":
-                effective_class = 10   # causative always behaves like cl10 (-aya-)
-                fst_derivative = None
-            elif derivation == "desiderative":
-                effective_class = 1
-                fst_derivative = "desiderative"
-            else:
-                effective_class = primary_class
-                fst_derivative = derivation
+            # feature_resolver.py now handles "causative", "desiderative", "intensive" natively
+            effective_class = primary_class
+            fst_derivative = derivation
 
             for tense in ALL_TENSES:
                 for voice in ALL_VOICES:
@@ -149,7 +151,8 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
                                 actual = api.conjugate(
                                     INRIA_TO_ENGINE_ROOT.get(root, root),
                                     effective_class, person, number,
-                                    voice=voice, tense=tense, derivative=fst_derivative
+                                    voice=voice, tense=tense, derivative=fst_derivative,
+                                    use_db=False
                                 )
 
                                 actual_list = actual.split(" OR ")

@@ -1,124 +1,50 @@
+"""conjugate.py — Sanskrit conjugation pipeline orchestrator.
+
+This module is intentionally kept as a *dumb pipe*: it receives raw arguments,
+delegates all morphological decision-making to ``MorphologicalFeatureResolver``,
+assembles FSTs in the canonical order, and returns the final IAST string.
+
+Pipeline
+--------
+    root string
+        │
+        ▼ MorphologicalFeatureResolver.resolve() → ResolvedFeatures
+        │
+        ▼ StemBuilder.build()       – class/tense-specific stem FST
+        │
+        ▼ augment prefix (a+)       – imperfect / conditional / aorist
+        │
+        ▼ Suffix.to_fst()           – endings table lookup; FST carries tags
+        │
+        ▼ MorphologyEngine.apply_all() – passive lengthening, class-4/8 etc.
+        │
+        ▼ SandhiEngine.apply_all()  – vowel → consonant → long-distance → clean
+        │
+        ▼ optimised IAST string
+"""
+from __future__ import annotations
+
 import pynini as pn
 from functools import lru_cache
+
 from alphabet import ALPHABET
 from vowel_strength import VowelStrengthEngine
 from sandhi import SandhiEngine
 from stem_rules import StemBuilder
-from endings import SuffixProvider
+from endings import SuffixProvider, Suffix
 from morphology import MorphologyEngine
-
-# Derivatives that always use the periphrastic perfect (kṛ auxiliary)
-_PERIPHRASTIC_DERIVATIVES = frozenset({"causative", "desiderative", "intensive"})
-
-# Long-vowel phonemes at root-initial position that also force periphrastic perfect
-_LONG_VOWEL_INITIALS = frozenset({"ī", "ū", "ṛ", "ṝ", "e", "ai", "o", "au"})
-
-
-# ── Strength evaluation rule table ───────────────────────────────────────────
-# Priority-ordered list of (predicate, strength_tag).
-# Each predicate is a callable (class_num, person, number, voice, tense) → bool.
-# The first matching rule wins.  Written as a module-level constant so it is
-# constructed once and never rebuilt per-call.
-
-_STRENGTH_RULES = [
-    # 1. Passives always use a weak root
-    (lambda c, p, n, v, t: v == "passive",
-     "[WEAK]"),
-
-    # 2. Future / Conditional / Periphrastic Future always use strong (Guna) grade
-    (lambda c, p, n, v, t: t in ("future", "conditional", "periphrastic_future"),
-     "[STRONG]"),
-
-    # 3. Aorist / Injunctive: active uses strong stem override, middle uses weak
-    (lambda c, p, n, v, t: t in ("aorist", "injunctive") and v == "active",
-     "[STRONG]"),
-    (lambda c, p, n, v, t: t in ("aorist", "injunctive") and v == "middle",
-     "[WEAK]"),
-
-    # 3. Perfect: sg active = strong; everything else = weak
-    #    Must come BEFORE thematic-class checks (thematic classes 1/10 would
-    #    otherwise always return STRONG, breaking perfect du/pl weak forms).
-    (lambda c, p, n, v, t: t == "perfect" and v == "active" and n == "sg",
-     "[STRONG]"),
-    (lambda c, p, n, v, t: t == "perfect",
-     "[WEAK]"),
-
-    # 4. Thematic classes: always strong root (cl4/6 stem_rules ignores grade)
-    (lambda c, p, n, v, t: c in (1, 10),
-     "[STRONG]"),
-    (lambda c, p, n, v, t: c in (4, 6),
-     "[WEAK]"),
-
-    # 5. Imperative 1st person: STRONG regardless of voice
-    #    Must come BEFORE the middle-voice check so that imperative middle 1sg
-    #    gets the strong (guna) stem (karavai, not kurai).
-    (lambda c, p, n, v, t: t == "imperative" and p == "1",
-     "[STRONG]"),
-
-    # 6. Optative: always weak root grade
-    (lambda c, p, n, v, t: t == "optative",
-     "[WEAK]"),
-
-    # 7. Middle voice: always weak (applies only after imperative-1 check above)
-    (lambda c, p, n, v, t: v == "middle",
-     "[WEAK]"),
-
-    # 8. Remaining imperative exceptions
-    (lambda c, p, n, v, t: t == "imperative" and p == "2" and n == "sg",
-     "[WEAK]"),
-
-    # 8. Singular active = strong (main athematic rule)
-    (lambda c, p, n, v, t: n == "sg",
-     "[STRONG]"),
-
-    # 9. cl3 imperfect 3pl is exceptionally strong (ajuhavuḥ)
-    (lambda c, p, n, v, t: c == 3 and t == "imperfect" and p == "3" and n == "pl",
-     "[STRONG]"),
-
-    # 10. Default: weak
-    (lambda c, p, n, v, t: True,
-     "[WEAK]"),
-]
-
-
-def _evaluate_strength(class_num, person, number, voice, tense):
-    """Return '[STRONG]' or '[WEAK]' by scanning the priority rule table."""
-    for predicate, tag in _STRENGTH_RULES:
-        if predicate(class_num, person, number, voice, tense):
-            return tag
-    return "[WEAK]"   # unreachable; last rule always matches
+from feature_resolver import MorphologicalFeatureResolver
+from inria_lookup import INRIA_LOOKUP
 
 
 class SanskritConjugator:
     """Orchestrates the conjugation pipeline from root to inflected form.
 
-    Pipeline
-    --------
-        root string
-            │
-            ▼
-        StemBuilder.build()          – class/tense-specific stem FST
-            │
-            ▼
-        augment prefix (a+)          – for imperfect / conditional
-            │
-            ▼
-        + ending (from SuffixProvider)
-            │
-            ▼
-        MorphologyEngine.apply_all() – passive lengthening, class-4/8 suppletion,
-            │                          erase abstract tags
-            ▼
-        SandhiEngine.apply_all()     – vowel sandhi → consonant sandhi →
-            │                          long-distance rules → erase boundaries
-            ▼
-        optimized string
-
     Caching
     -------
     Stem FSTs are expensive to build.  ``_stem_cache`` stores them keyed on
-    ``(root_str, class_num, strength, tense, derivative)`` so repeated calls
-    with the same parameters reuse the compiled FST.
+    ``(root_str, class_num, strength, tense, derivative, person, number)``
+    so repeated calls reuse the compiled FST.
 
     ``conjugate()`` is additionally wrapped with ``lru_cache`` so the final
     IAST string is returned immediately for warm calls without any FST work.
@@ -126,17 +52,16 @@ class SanskritConjugator:
 
     def __init__(self):
         self.strength_engine = VowelStrengthEngine()
-        self.sandhi    = SandhiEngine()
-        self.morphology= MorphologyEngine()
-        self.stems     = StemBuilder(self.strength_engine)
-        self.sigma     = ALPHABET.sigma_star
+        self.sandhi     = SandhiEngine()
+        self.morphology = MorphologyEngine()
+        self.stems      = StemBuilder(self.strength_engine)
+        self.resolver   = MorphologicalFeatureResolver()
 
-        # FST stem cache: (root, class, strength, tense, derivative) → FST
+        # FST stem cache: (root, class, strength, tense, derivative, person, number) → FST
         self._stem_cache: dict = {}
 
         # ── Ending provider dispatch ──────────────────────────────────────────
-        # Maps (tense, voice) → SuffixProvider static method.
-        self._ending_dispatch = {
+        self._ending_dispatch: dict = {
             ("present",    "active"):  SuffixProvider.get_present_active,
             ("present",    "middle"):  SuffixProvider.get_present_middle,
             ("imperfect",  "active"):  SuffixProvider.get_secondary_active,
@@ -156,229 +81,268 @@ class SanskritConjugator:
             ("periphrastic_future", "middle"): SuffixProvider.get_periphrastic_future_middle,
             ("aorist",     "active"):  SuffixProvider.get_aorist_active,
             ("aorist",     "middle"):  SuffixProvider.get_aorist_middle,
-            ("aorist",     "passive"): SuffixProvider.get_aorist_middle,
+            ("aorist",     "passive"): SuffixProvider.get_aorist_passive,
             ("injunctive", "active"):  SuffixProvider.get_aorist_active,
             ("injunctive", "middle"):  SuffixProvider.get_aorist_middle,
-            ("injunctive", "passive"): SuffixProvider.get_aorist_middle,
+            ("injunctive", "passive"): SuffixProvider.get_aorist_passive,
+            ("benedictive","active"):  SuffixProvider.get_benedictive_active,
+            ("benedictive","middle"):  SuffixProvider.get_benedictive_middle,
+            ("subjunctive","active"):  SuffixProvider.get_subjunctive_active,
+            ("subjunctive","middle"):  SuffixProvider.get_subjunctive_middle,
         }
 
     # ──────────────────────────────────────────────────────────────────────────
-    # Stem FST caching
+    # Internal helpers
     # ──────────────────────────────────────────────────────────────────────────
 
-    def _get_stem(self, root_str, class_num, strength, tense, derivative=None, person=None, number=None):
-        """Build the stem FST using StemBuilder."""
+    def _get_stem(
+        self,
+        root_str: str,
+        class_num: int,
+        strength: str,
+        tense: str,
+        derivative: str | None,
+        person: str | None = None,
+        number: str | None = None,
+    ) -> pn.Fst:
         key = (root_str, class_num, strength, tense, derivative, person, number)
         if key not in self._stem_cache:
             self._stem_cache[key] = self.stems.build(
-                root_str, class_num, strength, tense=tense, derivative=derivative, person=person, number=number
+                root_str, class_num, strength,
+                tense=tense, derivative=derivative,
+                person=person, number=number,
             )
         return self._stem_cache[key]
 
-    # ──────────────────────────────────────────────────────────────────────────
-    # Ending lookup
-    # ──────────────────────────────────────────────────────────────────────────
-
-    def _fetch_endings(self, class_num, voice, tense, root_str=None):
-        """Return the endings dict for the given tense/voice/class."""
+    def _fetch_endings(
+        self,
+        class_num: int,
+        voice: str,
+        tense: str,
+        root_str: str | None = None,
+    ) -> dict[str, Suffix]:
         if voice == "passive":
             if tense in ("aorist", "injunctive"):
-                return SuffixProvider.get_aorist_passive(class_num=class_num, root_str=root_str)
+                return SuffixProvider.get_aorist_passive(
+                    class_num=class_num, root_str=root_str
+                )
             return SuffixProvider.get_passive_endings(tense)
 
         key = (tense, voice)
         provider = self._ending_dispatch.get(key)
         if provider is None:
             raise ValueError(f"No ending table for tense='{tense}' voice='{voice}'.")
-
         return provider(class_num=class_num, root_str=root_str, tense=tense)
-
 
     # ──────────────────────────────────────────────────────────────────────────
     # Main entry point
     # ──────────────────────────────────────────────────────────────────────────
 
     @lru_cache(maxsize=4096)
-    def conjugate(self, root_str, class_num, person, number, voice="active", tense="present", derivative=None):
+    def conjugate(
+        self,
+        root_str: str,
+        class_num: int,
+        person: str,
+        number: str,
+        voice: str = "active",
+        tense: str = "present",
+        derivative: str | None = None,
+        use_db: bool = True,
+    ) -> str:
         """Conjugate a Sanskrit root.
 
         Args:
-            root_str: IAST string (e.g., "bhū")
-            class_num: 1-10
-            person: "1", "2", "3"
-            number: "sg", "du", "pl"
-            voice: "active", "middle", "passive"
-            tense: "present", "imperfect", "imperative", "optative", "future",
-                   "conditional", "perfect", "periphrastic_future", "aorist", "injunctive"
-            derivative: None, "causative"
+            root_str:   IAST string (e.g. "bhū")
+            class_num:  Gaṇa 1-10
+            person:     "1", "2", "3"
+            number:     "sg", "du", "pl"
+            voice:      "active" | "middle" | "passive"
+            tense:      "present" | "imperfect" | "imperative" | "optative" |
+                        "future" | "conditional" | "perfect" |
+            derivative: None | "causative" | "desiderative" | "intensive"
+
+        Returns:
+            IAST form, or multiple forms joined with " OR ".
         """
-        # Block morphologically impossible combinations
-        if voice == "passive" and tense in ("perfect", "future", "periphrastic_future", "conditional"):
-            raise ValueError(f"Impossible combination: voice='{voice}' and tense='{tense}'. These tenses do not have a distinct passive morphological paradigm.")
+        if tense == "krdantas":
+            return self.get_krdantas_block(root_str, class_num, use_db=use_db)
+        # Block morphologically impossible combinations early
+        if voice == "passive" and tense in (
+            "perfect", "future", "periphrastic_future", "conditional", "benedictive"
+        ):
+            raise ValueError(
+                f"Impossible combination: voice='{voice}' tense='{tense}'. "
+                "These tenses have no distinct passive morphological paradigm."
+            )
 
-        # 1. Evaluate stem strength based on grammar rules
-        if tense == "perfect":
-            is_periphrastic = derivative in _PERIPHRASTIC_DERIVATIVES or class_num == 10
-            if not is_periphrastic:
-                phonemes = ALPHABET.parse_phonemes(root_str)
-                if phonemes and phonemes[0] in _LONG_VOWEL_INITIALS:
-                    is_periphrastic = True
-            if is_periphrastic:
-                return self._conjugate_periphrastic_perfect(
-                    root_str, class_num, voice, person, number, derivative
-                )
+        # ── 0. Parse Preverbs (Upasargas) ────────────────────────────────────
+        preverb_str = ""
+        if "+" in root_str:
+            parts = root_str.rsplit("+", 1)
+            preverb_str = parts[0] + "+"
+            root_str = parts[1]
 
-        if derivative == "desiderative":
-            # Desiderative bases end in thematic 'a' and conjugate like Class 1
-            strength = "[STRONG]"
-            effective_class = 1
-            if voice == "passive":
-                effective_derivative = "desiderative_passive"
-            else:
-                effective_derivative = "desiderative"
-        elif derivative == "intensive":
-            # Intensive middle is thematic (Cl 1), active is athematic (Cl 2)
-            if voice == "middle":
-                strength = "[WEAK]"
-                effective_class = 1
-                effective_derivative = "intensive_middle"
-            else:
-                strength = _evaluate_strength(2, person, number, voice, tense)
-                effective_class = 3 # Use Class 3 endings for intensive active (e.g. 3pl -ati)
-                effective_derivative = "intensive_active"
-        elif voice == "passive":
-            # Passive 'ya' stem is only for the present system (present, imperfect, imperative, optative)
-            # Aorist passive 3sg is a special form (Vriddhi + -i), others use standard aorist middle.
-            strength = "[WEAK]"
-            effective_class = class_num
-            if tense in ("present", "imperfect", "imperative", "optative"):
-                effective_derivative = "passive"
-            elif tense in ("aorist", "injunctive") and person == "3" and number == "sg":
-                effective_derivative = "aorist_passive_3sg"
-            else:
-                effective_derivative = None
-        else:
-            strength = _evaluate_strength(class_num, person, number, voice, tense)
-            effective_class = class_num
-            effective_derivative = derivative
+        # ── 1. Resolve morphological features ────────────────────────────────
+        f = self.resolver.resolve(
+            root_str, class_num, person, number, voice, tense, derivative
+        )
 
-        # ── 1. Build / fetch stem ─────────────────────────────────────────────
-        stem = self._get_stem(root_str, effective_class, strength, tense, effective_derivative, person, number)
+        if f.is_periphrastic:
+            return self._conjugate_periphrastic_perfect(
+                root_str, class_num, voice, person, number, derivative, preverb_str
+            )
 
-        # ── 2. Augmentation (a- prefix for past tenses) ───────────────────────
-        if tense in ("imperfect", "conditional", "aorist"):
+        # ── 2. Build / fetch stem FST ─────────────────────────────────────────
+        stem = self._get_stem(
+            root_str, f.effective_class, f.strength, tense,
+            f.effective_derivative, person, number,
+        )
+
+        # ── 3. Augmentation (a- prefix for past tenses) ───────────────────────
+        if f.augment:
             stem = pn.accep("a+") + stem
 
-        endings = self._fetch_endings(effective_class, voice, tense, root_str=root_str)
-        tag     = f"[{person}{number}]"
+        # ── 4. Fetch ending and combine ───────────────────────────────────────
+        endings = self._fetch_endings(f.effective_class, voice, tense, root_str=root_str)
+        tag = f"[{person}{number}]"
         if tag not in endings:
             raise ValueError(f"No ending for {tag} in {tense} {voice}.")
 
-        ending = endings[tag]
-
-        if ending:
-            combined = stem + pn.accep("+") + pn.accep(ending)
-        else:
+        suffix: Suffix = endings[tag]
+        if suffix.is_empty:
             combined = stem
+        else:
+            combined = stem + pn.accep("+") + suffix.to_fst()
 
-        # ── 4. FST post-processing ────────────────────────────────────────────
+        if preverb_str:
+            combined = pn.accep(preverb_str) + combined
+
+        # ── 5. Post-processing ────────────────────────────────────────────────
         morph_fst  = self.morphology.apply_all(combined)
         sandhi_fst = self.sandhi.apply_all(morph_fst)
-        result = sandhi_fst.optimize()
+        result     = sandhi_fst.optimize()
 
         try:
-            forms = list(result.paths().ostrings())
-            if not forms:
-                return "CRASHED: No valid path"
-            return " OR ".join(forms)
+            forms = set(result.paths().ostrings())
         except Exception as e:
-            # Fallback for complex FSTs or errors
             try:
-                return pn.shortestpath(result).string()
-            except:
-                return f"CRASHED: {str(e)}"
+                forms = {pn.shortestpath(result).string()}
+            except Exception:
+                forms = set()
 
-    def _conjugate_periphrastic_perfect(self, root_str, class_num, voice, person, number, derivative=None):
-        """Periphrastic perfect: base-stem + \u0101m + auxiliary (kr, bhu, or as)."""
+        if use_db:
+            db_forms = INRIA_LOOKUP.lookup(root_str, tense, voice, person, number, derivative)
+            forms.update(db_forms)
+
+        if not forms:
+            return "CRASHED: No valid path"
+            
+        return " OR ".join(sorted(forms))
+
+    # ──────────────────────────────────────────────────────────────────────────
+    # Periphrastic perfect
+    # ──────────────────────────────────────────────────────────────────────────
+
+    def _conjugate_periphrastic_perfect(
+        self,
+        root_str: str,
+        class_num: int,
+        voice: str,
+        person: str,
+        number: str,
+        derivative: str | None = None,
+        preverb_str: str = "",
+    ) -> str:
+        """Periphrastic perfect: base-stem + ām + auxiliary (kṛ/bhū/as)."""
         base_fst = self.stems._build_periphrastic_base(root_str, class_num, derivative)
-        # Apply morphology tags then erase boundaries within the base
         base_fst = (base_fst @ self.morphology.clean_tags).optimize()
 
-        # kṛ (Class 8) is the standard auxiliary for periphrastic perfect
         aux_str = self.conjugate("kṛ", 8, person, number, voice, "perfect")
         results = []
         for aux in aux_str.split(" OR "):
             combined = base_fst + pn.accep("+") + pn.accep(aux)
+            if preverb_str:
+                combined = pn.accep(preverb_str) + combined
             for form in self.sandhi.apply_all(combined).optimize().paths().ostrings():
                 results.append(form)
-
         return " OR ".join(sorted(set(results))) if results else "CRASHED: No periphrastic forms"
 
+    def get_krdantas_block(self, root_str: str, class_num: int, use_db: bool = False) -> str:
+        preverb_str = ""
+        if "+" in root_str:
+            parts = root_str.rsplit("+", 1)
+            preverb_str = parts[0] + "+"
+            root_str = parts[1]
+            
+        from krdantas import KrdantaEngine
+        engine = KrdantaEngine(self)
+        return engine.generate_block(root_str, class_num, preverb_str)
+
     # ──────────────────────────────────────────────────────────────────────────
-    # Debug helper
+    # Debug helper — per-rule trace through entire pipeline
     # ──────────────────────────────────────────────────────────────────────────
 
-    def debug_conjugate(self, root_str, class_num, person, number,
-                        voice="active", tense="present"):
-        """Step-by-step pipeline trace that shows where the FST first goes empty."""
+    def debug_conjugate(
+        self,
+        root_str: str,
+        class_num: int,
+        person: str,
+        number: str,
+        voice: str = "active",
+        tense: str = "present",
+        derivative: str | None = None,
+    ) -> None:
+        """Step-by-step pipeline trace with per-rule sandhi/morphology breakdown.
 
-        def check(label, fst):
-            fst = fst.optimize()
-            try:
-                s = fst.string()
-                print(f"  ✅ {label}: '{s}'")
-            except Exception:
-                sp = pn.shortestpath(fst)
-                try:
-                    s = sp.string()
-                    print(f"  ⚠️  {label}: AMBIGUOUS, shortest='{s}'")
-                except Exception:
-                    print(f"  ❌ {label}: EMPTY FST")
-            return fst
+        Uses ``debug=True`` on MorphologyEngine and SandhiEngine so every
+        individual rule prints its output (or flags the exact rule that kills
+        the FST).
+        """
+        print(f"\n{'='*60}")
+        print(f"DEBUG: {root_str} cl{class_num} {person}{number} {voice} {tense}"
+              + (f" [{derivative}]" if derivative else ""))
+        print(f"{'='*60}")
 
-        print(f"\n{'='*50}")
-        print(f"DEBUG: {root_str} cl{class_num} {person}{number} {voice} {tense}")
-        print(f"{'='*50}")
+        f = self.resolver.resolve(
+            root_str, class_num, person, number, voice, tense, derivative
+        )
+        print(f"  ResolvedFeatures: strength={f.strength}  "
+              f"class={f.effective_class}  derivative={f.effective_derivative}  "
+              f"augment={f.augment}  periphrastic={f.is_periphrastic}")
 
-        strength   = _evaluate_strength(class_num, person, number, voice, tense)
-        derivative = "passive" if voice == "passive" else None
-        print(f"  Strength tag: {strength}")
+        # Step 1 – stem
+        stem = self._get_stem(
+            root_str, f.effective_class, f.strength, tense,
+            f.effective_derivative, person, number,
+        )
+        try:
+            print(f"  1. stem: '{stem.optimize().string()}'")
+        except Exception:
+            print(f"  1. stem: ambiguous / empty")
 
-        # Step 1 – raw root acceptor
-        root_fst = pn.accep(root_str + strength)
-        check("1. root_fst", root_fst)
-
-        # Step 2 – guna only
-        guna_only = root_fst @ self.strength_engine.get_guna()
-        check("2. guna applied", guna_only)
-
-        # Step 3 – full stem
-        stem = self._get_stem(root_str, class_num, strength, tense, derivative)
-        check("3. stem built", stem)
-
-        # Step 4 – augmentation
-        if tense in ("imperfect", "conditional"):
+        # Step 2 – augment
+        if f.augment:
             stem = pn.accep("a+") + stem
-            check("4. augmented stem", stem)
+            try:
+                print(f"  2. augmented stem: '{stem.optimize().string()}'")
+            except Exception:
+                print(f"  2. augmented stem: ambiguous / empty")
 
-        # Step 5 – ending attached
-        endings = self._fetch_endings(class_num, voice, tense)
-        tag     = f"[{person}{number}]"
-        ending  = endings.get(tag, "")
-        print(f"  Ending for {tag}: '{ending}'")
-        combined = (stem + pn.accep("+") + pn.accep(ending)) if ending else stem
-        check("5. stem+ending", combined)
+        # Step 3 – ending
+        endings = self._fetch_endings(f.effective_class, voice, tense, root_str=root_str)
+        tag = f"[{person}{number}]"
+        suffix: Suffix = endings.get(tag, Suffix(""))
+        print(f"  3. ending surface='{suffix.surface}' tags={suffix.tags}")
 
-        # Step 6 – morphology
-        morph = self.morphology.apply_all(combined)
-        check("6. after morphology", morph)
+        combined = stem + pn.accep("+") + suffix.to_fst()
+        try:
+            print(f"  4. stem+ending: '{combined.optimize().string()}'")
+        except Exception:
+            print(f"  4. stem+ending: ambiguous / empty")
 
-        # Step 7 – sandhi phases
-        vowel_done = self.sandhi.vowel_phase(morph)
-        check("7a. after vowel_phase", vowel_done)
+        # Step 5 – morphology (per-rule)
+        morph = self.morphology.apply_all(combined, debug=True)
 
-        cons_done = self.sandhi.consonant_phase(vowel_done)
-        check("7b. after consonant_phase", cons_done)
-
-        long_done = self.sandhi.long_distance_phase(cons_done)
-        check("7c. after long_distance_phase", long_done)
+        # Step 6 – sandhi (per-rule, all three phases)
+        self.sandhi.apply_all(morph, debug=True)

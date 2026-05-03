@@ -42,12 +42,23 @@ class MorphologyEngine:
         # Simplest correct approach: apply guna/lengthening on the whole root string
         # by replacing i→ī when [CLASS4] is somewhere to the right.
         # cdrewrite left-context "" / right-context: any consonants then [CLASS4]
-        _any_cons = ALPHABET.consonants.closure()
+        _any_cons = pn.closure(ALPHABET.consonants)
         self.class4_lengthening = pn.cdrewrite(
             pn.string_map([("i", "ī"), ("u", "ū")]),
             "",
             _any_cons + pn.accep("[CLASS4]"),
             sig
+        )
+
+        # ── 2.5. Samprasāraṇa ────────────────────────────────────────────────
+        # Converts semivowels to vowels in weak contexts for specific roots (e.g. vac -> uc)
+        self.samprasarana = pn.cdrewrite(
+            pn.string_map([
+                ("ya", "i"),
+                ("va", "u"),
+                ("ra", "ṛ"),
+            ]),
+            "", "[SAMPRASARANA]", sig
         )
 
 
@@ -72,7 +83,7 @@ class MorphologyEngine:
         self.class8_suppletion = pn.cdrewrite(
             pn.cross("kṛ", "kur"),
             "",
-            "+u",    # only fires before the class-8 weak affix
+            "+u+",    # only fires before the class-8 weak affix (+u+)
             sig
         )
 
@@ -106,7 +117,7 @@ class MorphologyEngine:
         self.aorist_pass_vriddhi = pn.cdrewrite(
             vriddhi_map,
             "",
-            ALPHABET.consonants.closure() + tag_or_boundary.star + "[AORIST_PASS_3SG]",
+            pn.closure(ALPHABET.consonants) + tag_or_boundary.star + "[AORIST_PASS_3SG]",
             sig
         )
 
@@ -117,17 +128,71 @@ class MorphologyEngine:
             "", "", sig
         )
 
+        # ── 7. Class 2 Weak overrides ───────────────────────────────────────
+        self.class2_weak_cons = pn.cdrewrite(
+            pn.cross("han[CLASS2_WEAK]+", "ha+"),
+            "",
+            ALPHABET.consonants,
+            sig
+        )
+        self.class2_weak_vowel = pn.cdrewrite(
+            pn.cross("han[CLASS2_WEAK]+", "ghn+"),
+            "",
+            ALPHABET.vowels,
+            sig
+        )
+        self.class2_weak_vac = pn.cdrewrite(
+            pn.cross("vac[CLASS2_WEAK]+", "uc+"),
+            "",
+            ALPHABET.vowels,
+            sig
+        )
+
         all_tags = pn.union(
             "[PASSIVE]", "[CLASS4]", "[CLASS8]", "[CAUS_PASS]",
-            "[STRONG]",  "[WEAK]",   "[VRIDDHI]",
-            "[ROOT_AORIST]", "[AORIST]", "[AORIST_PASS_3SG]", "[INTENSIVE_ACTIVE]"
+            "[STRONG]",  "[WEAK]",   "[VRIDDHI]", "[CLASS2_WEAK]",
+            "[ROOT_AORIST]", "[AORIST]", "[AORIST_PASS_3SG]", "[INTENSIVE_ACTIVE]",
+            "[SAMPRASARANA]"
         )
         self.clean_tags = pn.cdrewrite(pn.cross(all_tags, ""), "", "", sig)
 
-    def apply_all(self, fst):
+    def apply_all(self, fst: pn.Fst, debug: bool = False) -> pn.Fst:
         """Apply all morphological adjustments in order."""
+        if debug:
+            rules = [
+                ("passive_vowels",          self.passive_vowels),
+                ("class4_lengthening",       self.class4_lengthening),
+                ("caus_pass_erase_with_a",   self.caus_pass_erase_with_a),
+                ("caus_pass_erase",          self.caus_pass_erase),
+                ("class8_suppletion",        self.class8_suppletion),
+                ("class8_u_drop",            self.class8_u_drop),
+                ("root_aorist_bhuv",         self.root_aorist_bhuv),
+                ("aorist_pass_vriddhi",      self.aorist_pass_vriddhi),
+                ("intensive_i_it",           self.intensive_i_it),
+                ("class2_weak_cons",         self.class2_weak_cons),
+                ("class2_weak_vowel",        self.class2_weak_vowel),
+                ("class2_weak_vac",          self.class2_weak_vac),
+                ("samprasarana",             self.samprasarana),
+                ("clean_tags",               self.clean_tags),
+            ]
+            print("  [morphology]")
+            for name, rule_fst in rules:
+                fst = (fst @ rule_fst).optimize()
+                if fst.num_states() == 0:
+                    print(f"    ❌ {name}: FST went EMPTY")
+                    return fst
+                try:
+                    print(f"    ✅ {name}: '{fst.string()}'")
+                except Exception:
+                    try:
+                        sp = pn.shortestpath(fst).string()
+                        print(f"    ⚠️  {name}: ambiguous, shortest='{sp}'")
+                    except Exception:
+                        print(f"    ⚠️  {name}: ambiguous")
+            return fst
         return (
             fst
+            @ self.samprasarana
             @ self.passive_vowels
             @ self.class4_lengthening
             @ self.caus_pass_erase_with_a
@@ -137,5 +202,8 @@ class MorphologyEngine:
             @ self.root_aorist_bhuv
             @ self.aorist_pass_vriddhi
             @ self.intensive_i_it
+            @ self.class2_weak_cons
+            @ self.class2_weak_vowel
+            @ self.class2_weak_vac
             @ self.clean_tags
         )

@@ -120,3 +120,53 @@ class ReduplicationEngine:
         target_vowel = guna_map.get(root_vowel, root_vowel)
         
         return self._reduce_via_fst(consonants + target_vowel)
+
+    def generate_aorist_prefix(self, root_str: str) -> str:
+        """Type 3 (Reduplicated / Caṅ) Aorist prefix.
+        Used mostly for causatives.
+        Reduplicating vowel is i/ī or u/ū.
+        It is lengthened if the root is 'light' (short vowel + at most one consonant).
+        """
+        syllable = self._extract_initial_syllable(root_str)
+        vowels = {"a", "ā", "i", "ī", "u", "ū", "ṛ", "ṝ", "ḷ", "e", "ai", "o", "au"}
+        long_vowels = {"ā", "ī", "ū", "ṝ", "e", "ai", "o", "au"}
+        
+        # Determine root vowel and post-vowel consonants
+        root_vowel = ""
+        post_vowel_cons = ""
+        pre_vowel_cons = ""
+        found_vowel = False
+        
+        for ch in root_str:
+            if ch in vowels:
+                root_vowel = ch
+                found_vowel = True
+            elif found_vowel:
+                post_vowel_cons += ch
+            else:
+                pre_vowel_cons += ch
+                
+        # Determine weight
+        is_heavy = (root_vowel in long_vowels) or (len(post_vowel_cons) > 1)
+        
+        # Determine base reduplicating vowel
+        if root_vowel in ("u", "ū", "o", "au"):
+            base_v = "u"
+        else:
+            base_v = "i"
+            
+        # Lengthen if light
+        if not is_heavy:
+            if base_v == "i": base_v = "ī"
+            elif base_v == "u": base_v = "ū"
+            
+        # Standard consonant reduction
+        fst = pn.accep(pre_vowel_cons + base_v)
+        res = (
+            fst
+            @ self.palatalize
+            @ self.deaspirate
+            # Aorist reduplication preserves the long vowel if lengthened!
+            @ self.r_to_a
+        ).optimize()
+        return list(res.paths().ostrings())[0]

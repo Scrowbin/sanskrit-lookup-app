@@ -1,294 +1,384 @@
-import pynini as pn
-from paradigm import is_thematic
+"""endings.py — Tiṅ-pratyaya (verb ending) tables.
 
+Each ending is a ``Suffix`` dataclass that carries both its surface IAST string
+and an optional set of morpho-phonemic tags.  The ``to_fst()`` method converts
+the suffix to a Pynini FST so that tag-triggered morphological rules (e.g. Vriddhi
+for aorist-passive 3sg) are encoded in the *ending* rather than intercepted
+upstream in the orchestrator.
+
+Usage::
+
+    suffixes = SuffixProvider.get_present_active(class_num=1)
+    suffix   = suffixes["[3sg]"]      # Suffix(surface="ti", tags=frozenset())
+    fst      = suffix.to_fst()        # pn.accep("ti")
+"""
+from __future__ import annotations
+
+import pynini as pn
+from dataclasses import dataclass, field
+def is_thematic(class_num: int) -> bool:
+    return class_num in (1, 4, 6, 10)
+
+
+# ── Suffix dataclass ───────────────────────────────────────────────────────────
+
+@dataclass(frozen=True)
+class Suffix:
+    """An inflectional ending with optional morpho-phonemic trigger tags.
+
+    Attributes:
+        surface: IAST string that will appear in the final output (may be empty
+                 for zero-endings such as imperative 2sg thematic "—").
+        tags: Frozenset of abstract tags that instruct MorphologyEngine to apply
+              additional rules.  Currently supported tags:
+                  ``"AORIST_PASS_3SG"`` — triggers Vriddhi on the stem (ciṇ-ending)
+    """
+    surface: str
+    tags: frozenset[str] = field(default_factory=frozenset)
+
+    def to_fst(self) -> pn.Fst:
+        """Return a Pynini FST for this ending.
+
+        Tag FSTs are prepended before the surface so MorphologyEngine sees them
+        in the correct left-to-right position relative to the stem.
+        For zero-endings (imperative 2sg thematic), returns an epsilon machine.
+        """
+        base: pn.Fst = pn.accep(self.surface) if self.surface else pn.epsilon_machine()
+        if "AORIST_PASS_3SG" in self.tags:
+            base = pn.accep("[AORIST_PASS_3SG]") + base
+        return base
+
+    @property
+    def is_empty(self) -> bool:
+        """True for zero-endings (no surface form, no tags)."""
+        return not self.surface and not self.tags
+
+
+# Convenience constructor for the common tag-free case
+def _s(surface: str, *tags: str) -> Suffix:
+    """Build a Suffix with optional tags. Keeps table definitions concise."""
+    return Suffix(surface, frozenset(tags))
+
+
+# ── SuffixProvider ─────────────────────────────────────────────────────────────
 
 class SuffixProvider:
     """Manages the Tiṅ-pratyaya (verb endings) tables.
 
-    Dual keys use 'du' (matching INRIA's number column: sg / du / pl).
+    All methods return ``dict[str, Suffix]``.  Dual keys use ``'du'`` (matching
+    INRIA's number column: sg / du / pl).
 
     Paradigm branching uses ``is_thematic(class_num)`` (from paradigm.py)
     rather than inline ``class_num in [1, 4, 6, 10]`` checks.
     Class-3 further overrides 3pl active forms wherever it differs.
     """
 
-    # ── 1. PRESENT TENSE (Laṭ) ───────────────────────────────────────────────
+    # ── 1. PRESENT TENSE (Laṭ) ────────────────────────────────────────────────
 
     @staticmethod
-    def get_present_active(class_num=1, root_str=None, **kwargs):
+    def get_present_active(class_num: int = 1, root_str=None, **kwargs) -> dict[str, Suffix]:
         # Future/Conditional always use thematic endings
         if kwargs.get("tense") in ("future", "conditional"):
             class_num = 1
         if is_thematic(class_num):
             return {
-                "[3sg]": "ti",  "[3du]": "taḥ",  "[3pl]": "nti",
-                "[2sg]": "si",  "[2du]": "thaḥ", "[2pl]": "tha",
-                "[1sg]": "āmi", "[1du]": "āvaḥ", "[1pl]": "āmaḥ"
+                "[3sg]": _s("ti"),   "[3du]": _s("taḥ"),  "[3pl]": _s("nti"),
+                "[2sg]": _s("si"),   "[2du]": _s("thaḥ"), "[2pl]": _s("tha"),
+                "[1sg]": _s("āmi"),  "[1du]": _s("āvaḥ"), "[1pl]": _s("āmaḥ"),
             }
-        # Athematic: 3pl = "ati" for cl3 (juhv+ati), "anti" otherwise
         third_pl = "ati" if class_num == 3 else "anti"
         return {
-            "[3sg]": "ti",  "[3du]": "taḥ",  "[3pl]": third_pl,
-            "[2sg]": "si",  "[2du]": "thaḥ", "[2pl]": "tha",
-            "[1sg]": "mi",  "[1du]": "vaḥ",  "[1pl]": "maḥ"
+            "[3sg]": _s("ti"),   "[3du]": _s("taḥ"),    "[3pl]": _s(third_pl),
+            "[2sg]": _s("si"),   "[2du]": _s("thaḥ"),   "[2pl]": _s("tha"),
+            "[1sg]": _s("mi"),   "[1du]": _s("vaḥ"),    "[1pl]": _s("maḥ"),
         }
 
     @staticmethod
-    def get_present_middle(class_num=1, root_str=None, **kwargs):
+    def get_present_middle(class_num: int = 1, root_str=None, **kwargs) -> dict[str, Suffix]:
         if kwargs.get("tense") in ("future", "conditional"):
             class_num = 1
         if is_thematic(class_num):
             return {
-                "[3sg]": "te",  "[3du]": "ete",   "[3pl]": "nte",
-                "[2sg]": "se",  "[2du]": "ethe",  "[2pl]": "dhve",
-                "[1sg]": "e",   "[1du]": "āvahe", "[1pl]": "āmahe"
+                "[3sg]": _s("te"),   "[3du]": _s("ete"),   "[3pl]": _s("nte"),
+                "[2sg]": _s("se"),   "[2du]": _s("ethe"),  "[2pl]": _s("dhve"),
+                "[1sg]": _s("e"),    "[1du]": _s("āvahe"), "[1pl]": _s("āmahe"),
             }
         return {
-            "[3sg]": "te",  "[3du]": "āte",  "[3pl]": "ate",
-            "[2sg]": "ṣe",  "[2du]": "āthe", "[2pl]": "dhve",
-            "[1sg]": "e",   "[1du]": "vahe", "[1pl]": "mahe"
+            "[3sg]": _s("te"),   "[3du]": _s("āte"),  "[3pl]": _s("ate"),
+            "[2sg]": _s("ṣe"),   "[2du]": _s("āthe"), "[2pl]": _s("dhve"),
+            "[1sg]": _s("e"),    "[1du]": _s("vahe"),  "[1pl]": _s("mahe"),
         }
 
-
-    # ── 2. IMPERFECT / CONDITIONAL (Laṅ / Lṛṅ) ──────────────────────────────
+    # ── 2. IMPERFECT / CONDITIONAL (Laṅ / Lṛṅ) ───────────────────────────────
 
     @staticmethod
-    def get_secondary_active(class_num=1, root_str=None, **kwargs):
+    def get_secondary_active(class_num: int = 1, root_str=None, **kwargs) -> dict[str, Suffix]:
         if kwargs.get("tense") == "conditional":
             class_num = 1
         if is_thematic(class_num):
             return {
-                "[3sg]": "t",  "[3du]": "tām",  "[3pl]": "n",
-                "[2sg]": "s",  "[2du]": "tam",  "[2pl]": "ta",
-                "[1sg]": "m",  "[1du]": "āva",  "[1pl]": "āma"
+                "[3sg]": _s("t"),   "[3du]": _s("tām"),  "[3pl]": _s("n"),
+                "[2sg]": _s("s"),   "[2du]": _s("tam"),  "[2pl]": _s("ta"),
+                "[1sg]": _s("m"),   "[1du]": _s("āva"),  "[1pl]": _s("āma"),
             }
-        # Athematic: 3pl = "uḥ" for cl3 (ajuhavuḥ), "an" otherwise
         third_pl = "uḥ" if class_num == 3 else "an"
-        
-        # √ad cl-2 imperfect/aorist/injunctive active uses connecting-vowel endings
+        # √ad cl-2 imperfect uses connecting-vowel endings
         if root_str == "ad":
             return {
-                "[3sg]": "at",  "[3du]": "tām",  "[3pl]": "an",
-                "[2sg]": "as",  "[2du]": "tam",  "[2pl]": "ta",
-                "[1sg]": "am",  "[1du]": "va",   "[1pl]": "ma"
+                "[3sg]": _s("at"),  "[3du]": _s("tām"), "[3pl]": _s("an"),
+                "[2sg]": _s("as"),  "[2du]": _s("tam"), "[2pl]": _s("ta"),
+                "[1sg]": _s("am"),  "[1du]": _s("va"),  "[1pl]": _s("ma"),
             }
-
         return {
-            "[3sg]": "t",   "[3du]": "tām", "[3pl]": third_pl,
-            "[2sg]": "s",   "[2du]": "tam", "[2pl]": "ta",
-            "[1sg]": "am",  "[1du]": "va",  "[1pl]": "ma"
+            "[3sg]": _s("t"),   "[3du]": _s("tām"), "[3pl]": _s(third_pl),
+            "[2sg]": _s("s"),   "[2du]": _s("tam"), "[2pl]": _s("ta"),
+            "[1sg]": _s("am"),  "[1du]": _s("va"),  "[1pl]": _s("ma"),
         }
 
     @staticmethod
-    def get_secondary_middle(class_num=1, root_str=None, **kwargs):
+    def get_secondary_middle(class_num: int = 1, root_str=None, **kwargs) -> dict[str, Suffix]:
         if kwargs.get("tense") == "conditional":
             class_num = 1
         if is_thematic(class_num):
             return {
-                "[3sg]": "ta",   "[3du]": "etām",  "[3pl]": "nta",
-                "[2sg]": "thāḥ", "[2du]": "ethām", "[2pl]": "dhvam",
-                "[1sg]": "i",    "[1du]": "āvahi", "[1pl]": "āmahi"
+                "[3sg]": _s("ta"),   "[3du]": _s("etām"),  "[3pl]": _s("nta"),
+                "[2sg]": _s("thāḥ"), "[2du]": _s("ethām"), "[2pl]": _s("dhvam"),
+                "[1sg]": _s("i"),    "[1du]": _s("āvahi"), "[1pl]": _s("āmahi"),
             }
         return {
-            "[3sg]": "ta",   "[3du]": "ātām",  "[3pl]": "ata",
-            "[2sg]": "thāḥ", "[2du]": "āthām", "[2pl]": "dhvam",
-            "[1sg]": "i",    "[1du]": "vahi",  "[1pl]": "mahi"
+            "[3sg]": _s("ta"),   "[3du]": _s("ātām"),  "[3pl]": _s("ata"),
+            "[2sg]": _s("thāḥ"), "[2du]": _s("āthām"), "[2pl]": _s("dhvam"),
+            "[1sg]": _s("i"),    "[1du]": _s("vahi"),  "[1pl]": _s("mahi"),
         }
 
-
-    # ── 3. IMPERATIVE TENSE (Loṭ) ────────────────────────────────────────────
+    # ── 3. IMPERATIVE (Loṭ) ───────────────────────────────────────────────────
 
     @staticmethod
-    def get_imperative_active(class_num=1, root_str=None, **kwargs):
+    def get_imperative_active(class_num: int = 1, root_str=None, **kwargs) -> dict[str, Suffix]:
         if is_thematic(class_num):
             return {
-                "[3sg]": "tu",   "[3du]": "tām",  "[3pl]": "ntu",
-                "[2sg]": "",     "[2du]": "tam",  "[2pl]": "ta",
-                "[1sg]": "āni",  "[1du]": "āva",  "[1pl]": "āma"
+                "[3sg]": _s("tu"),   "[3du]": _s("tām"),  "[3pl]": _s("ntu"),
+                "[2sg]": _s(""),     "[2du]": _s("tam"),  "[2pl]": _s("ta"),
+                "[1sg]": _s("āni"),  "[1du]": _s("āva"),  "[1pl]": _s("āma"),
             }
         if class_num == 3:
-            # Panini 6.4.101: dhi after hu/ad; hi elsewhere for athematic cl3
+            sg2 = "dhi" if root_str in ("hu", "ad") else "hi"
             return {
-                "[3sg]": "tu",  "[3du]": "tām", "[3pl]": "atu",
-                "[2sg]": "dhi" if root_str in ("hu", "ad") else "hi",
-                "[2du]": "tam", "[2pl]": "ta",
-                "[1sg]": "āni", "[1du]": "āva", "[1pl]": "āma"
+                "[3sg]": _s("tu"),  "[3du]": _s("tām"), "[3pl]": _s("atu"),
+                "[2sg]": _s(sg2),   "[2du]": _s("tam"), "[2pl]": _s("ta"),
+                "[1sg]": _s("āni"), "[1du]": _s("āva"), "[1pl]": _s("āma"),
             }
-        # Generic athematic
         return {
-            "[3sg]": "tu",   "[3du]": "tām",  "[3pl]": "antu",
-            "[2sg]": "hi",   "[2du]": "tam",  "[2pl]": "ta",
-            "[1sg]": "āni",  "[1du]": "āva",  "[1pl]": "āma"
+            "[3sg]": _s("tu"),   "[3du]": _s("tām"),  "[3pl]": _s("antu"),
+            "[2sg]": _s("hi"),   "[2du]": _s("tam"),  "[2pl]": _s("ta"),
+            "[1sg]": _s("āni"),  "[1du]": _s("āva"),  "[1pl]": _s("āma"),
         }
 
     @staticmethod
-    def get_imperative_middle(class_num=1, root_str=None, **kwargs):
+    def get_imperative_middle(class_num: int = 1, root_str=None, **kwargs) -> dict[str, Suffix]:
         if is_thematic(class_num):
             return {
-                "[3sg]": "tām",  "[3du]": "itām",  "[3pl]": "ntām",
-                "[2sg]": "sva",  "[2du]": "ithām", "[2pl]": "dhvam",
-                # "ai" ending: sandhi a+ai→ai handled in sandhi.thematic_merger
-                "[1sg]": "ai",   "[1du]": "āvahai", "[1pl]": "āmahai"
+                "[3sg]": _s("tām"),  "[3du]": _s("itām"),   "[3pl]": _s("ntām"),
+                "[2sg]": _s("sva"),  "[2du]": _s("ithām"),  "[2pl]": _s("dhvam"),
+                "[1sg]": _s("ai"),   "[1du]": _s("āvahai"), "[1pl]": _s("āmahai"),
             }
         return {
-            "[3sg]": "tām",  "[3du]": "ātām",   "[3pl]": "atām",
-            "[2sg]": "ṣva",  "[2du]": "āthām",  "[2pl]": "dhvam",
-            "[1sg]": "ai",   "[1du]": "āvahai", "[1pl]": "āmahai"
+            "[3sg]": _s("tām"),  "[3du]": _s("ātām"),   "[3pl]": _s("atām"),
+            "[2sg]": _s("ṣva"),  "[2du]": _s("āthām"),  "[2pl]": _s("dhvam"),
+            "[1sg]": _s("ai"),   "[1du]": _s("āvahai"), "[1pl]": _s("āmahai"),
         }
 
-
-    # ── 4. OPTATIVE TENSE (Vidhi Liṅ) ────────────────────────────────────────
+    # ── 4. OPTATIVE (Vidhi Liṅ) ───────────────────────────────────────────────
 
     @staticmethod
-    def get_optative_active(class_num=1, root_str=None, **kwargs):
+    def get_optative_active(class_num: int = 1, root_str=None, **kwargs) -> dict[str, Suffix]:
         if is_thematic(class_num):
             return {
-                "[3sg]": "et",   "[3du]": "etām",  "[3pl]": "eyuḥ",
-                "[2sg]": "eḥ",   "[2du]": "etam",  "[2pl]": "eta",
-                "[1sg]": "eyam", "[1du]": "eva",   "[1pl]": "ema"
+                "[3sg]": _s("et"),   "[3du]": _s("etām"),  "[3pl]": _s("eyuḥ"),
+                "[2sg]": _s("eḥ"),   "[2du]": _s("etam"),  "[2pl]": _s("eta"),
+                "[1sg]": _s("eyam"), "[1du]": _s("eva"),   "[1pl]": _s("ema"),
             }
         return {
-            "[3sg]": "yāt",  "[3du]": "yātām", "[3pl]": "yuḥ",
-            "[2sg]": "yāḥ",  "[2du]": "yātam", "[2pl]": "yāta",
-            "[1sg]": "yām",  "[1du]": "yāva",  "[1pl]": "yāma"
+            "[3sg]": _s("yāt"),  "[3du]": _s("yātām"), "[3pl]": _s("yuḥ"),
+            "[2sg]": _s("yāḥ"),  "[2du]": _s("yātam"), "[2pl]": _s("yāta"),
+            "[1sg]": _s("yām"),  "[1du]": _s("yāva"),  "[1pl]": _s("yāma"),
         }
 
     @staticmethod
-    def get_optative_middle(class_num=1, root_str=None, **kwargs):
+    def get_optative_middle(class_num: int = 1, root_str=None, **kwargs) -> dict[str, Suffix]:
         if is_thematic(class_num):
             return {
-                "[3sg]": "eta",   "[3du]": "eyātām",  "[3pl]": "eran",
-                "[2sg]": "ethāḥ", "[2du]": "eyāthām", "[2pl]": "edhvam",
-                "[1sg]": "eya",   "[1du]": "evahi",   "[1pl]": "emahi"
+                "[3sg]": _s("eta"),   "[3du]": _s("eyātām"),  "[3pl]": _s("eran"),
+                "[2sg]": _s("ethāḥ"), "[2du]": _s("eyāthām"), "[2pl]": _s("edhvam"),
+                "[1sg]": _s("eya"),   "[1du]": _s("evahi"),   "[1pl]": _s("emahi"),
             }
         return {
-            "[3sg]": "īta",   "[3du]": "īyātām",  "[3pl]": "īran",
-            "[2sg]": "īthāḥ", "[2du]": "īyāthām", "[2pl]": "īdhvam",
-            "[1sg]": "īya",   "[1du]": "īvahi",   "[1pl]": "īmahi"
+            "[3sg]": _s("īta"),   "[3du]": _s("īyātām"),  "[3pl]": _s("īran"),
+            "[2sg]": _s("īthāḥ"), "[2du]": _s("īyāthām"), "[2pl]": _s("īdhvam"),
+            "[1sg]": _s("īya"),   "[1du]": _s("īvahi"),   "[1pl]": _s("īmahi"),
         }
 
-
-    # ── 5. PERFECT TENSE (Liṭ) ───────────────────────────────────────────────
+    # ── 5. PERFECT (Liṭ) ──────────────────────────────────────────────────────
 
     @staticmethod
-    def get_perfect_active(root_str=None, **kwargs):
-        # Default 2sg ending is -itha (with connecting vowel i).
-        # Roots that take bare -tha are handled as overrides.
+    def get_perfect_active(root_str=None, **kwargs) -> dict[str, Suffix]:
         from irregulars import perfect_bare_tha_roots, perfect_weak_guna_roots
-        
-        second_sg = "tha" if (root_str in perfect_bare_tha_roots or root_str in perfect_weak_guna_roots) else "itha"
-        
+        second_sg = "tha" if (
+            root_str in perfect_bare_tha_roots
+            or root_str in perfect_weak_guna_roots
+        ) else "itha"
+        first_third_sg = "au" if root_str and root_str.endswith("ā") else "a"
         endings = {
-            "[3sg]": "a",     "[3du]": "atuḥ",  "[3pl]": "uḥ",
-            "[2sg]": second_sg, "[2du]": "athuḥ", "[2pl]": "a",
-            "[1sg]": "a",     "[1du]": "iva",   "[1pl]": "ima"
+            "[3sg]": _s(first_third_sg), "[3du]": _s("atuḥ"),  "[3pl]": _s("uḥ"),
+            "[2sg]": _s(second_sg),      "[2du]": _s("athuḥ"), "[2pl]": _s("a"),
+            "[1sg]": _s(first_third_sg), "[1du]": _s("iva"),   "[1pl]": _s("ima"),
         }
-
-        # ṛ-final roots in the perfect take bare 'va/vahe/ma/mahe' du/pl endings
+        # ṛ-final roots use bare du/pl endings
         if root_str and root_str.endswith("ṛ"):
-            endings["[1du]"] = "va"
-            endings["[1pl]"] = "ma"
-            endings["[2du]"] = "vathuḥ"
-            
+            endings["[1du]"] = _s("va")
+            endings["[1pl]"] = _s("ma")
+            endings["[2du]"] = _s("vathuḥ")
         return endings
 
     @staticmethod
-    def get_perfect_middle(root_str=None, **kwargs):
+    def get_perfect_middle(root_str=None, **kwargs) -> dict[str, Suffix]:
         endings = {
-            "[3sg]": "e",    "[3du]": "āte",   "[3pl]": "ire",
-            "[2sg]": "iṣe",  "[2du]": "āthe",  "[2pl]": "idhve",
-            "[1sg]": "e",    "[1du]": "ivahe", "[1pl]": "imahe"
+            "[3sg]": _s("e"),    "[3du]": _s("āte"),   "[3pl]": _s("ire"),
+            "[2sg]": _s("iṣe"),  "[2du]": _s("āthe"),  "[2pl]": _s("idhve"),
+            "[1sg]": _s("e"),    "[1du]": _s("ivahe"), "[1pl]": _s("imahe"),
         }
-        
-        # ṛ-final roots in the perfect take bare 'vahe/mahe' du/pl endings
         if root_str and root_str.endswith("ṛ"):
-            endings["[1du]"] = "vahe"
-            endings["[1pl]"] = "mahe"
-            
+            endings["[1du]"] = _s("vahe")
+            endings["[1pl]"] = _s("mahe")
         return endings
 
-    # ── 6. PERIPHRASTIC FUTURE (Luṭ) ─────────────────────────────────────────
+    # ── 6. PERIPHRASTIC FUTURE (Luṭ) ──────────────────────────────────────────
 
     @staticmethod
-    def get_periphrastic_future_active(**kwargs):
+    def get_periphrastic_future_active(**kwargs) -> dict[str, Suffix]:
         return {
-            "[3sg]": "tā",    "[3du]": "tārau",  "[3pl]": "tāraḥ",
-            "[2sg]": "tāsi",  "[2du]": "tāsthaḥ", "[2pl]": "tāstha",
-            "[1sg]": "tāsmi", "[1du]": "tāsvaḥ",  "[1pl]": "tāsmaḥ"
+            "[3sg]": _s("tā"),    "[3du]": _s("tārau"),  "[3pl]": _s("tāraḥ"),
+            "[2sg]": _s("tāsi"),  "[2du]": _s("tāsthaḥ"),"[2pl]": _s("tāstha"),
+            "[1sg]": _s("tāsmi"), "[1du]": _s("tāsvaḥ"), "[1pl]": _s("tāsmaḥ"),
         }
 
     @staticmethod
-    def get_periphrastic_future_middle(**kwargs):
+    def get_periphrastic_future_middle(**kwargs) -> dict[str, Suffix]:
         return {
-            "[3sg]": "tā",    "[3du]": "tārau",   "[3pl]": "tāraḥ",
-            "[2sg]": "tāse",  "[2du]": "tāsāthe", "[2pl]": "tādhve",
-            "[1sg]": "tāhe",  "[1du]": "tāsvahe", "[1pl]": "tāsmahe"
+            "[3sg]": _s("tā"),    "[3du]": _s("tārau"),   "[3pl]": _s("tāraḥ"),
+            "[2sg]": _s("tāse"),  "[2du]": _s("tāsāthe"), "[2pl]": _s("tādhve"),
+            "[1sg]": _s("tāhe"),  "[1du]": _s("tāsvahe"), "[1pl]": _s("tāsmahe"),
         }
 
-    # ── 7. AORIST (Luṅ) / INJUNCTIVE ─────────────────────────────────────────
+    # ── 7. AORIST (Luṅ) / INJUNCTIVE ──────────────────────────────────────────
 
     @staticmethod
-    def get_aorist_active(class_num=1, root_str=None, **kwargs):
+    def get_aorist_active(class_num: int = 1, root_str=None, **kwargs) -> dict[str, Suffix]:
         from irregulars import aorist_overrides
+        from dhatupatha_analyzer import DHATUPATHA_ANALYZER
         info = aorist_overrides.get(root_str)
-        aorist_type = info["type"] if info else "s"
-        
+        aorist_type = info["type"] if info else DHATUPATHA_ANALYZER.get_aorist_type(root_str, class_num)
+
         if aorist_type in ("a", "reduplicated", "sa"):
             return SuffixProvider.get_secondary_active(class_num=1)
         if aorist_type == "root":
-            # Root aorist uses standard athematic secondary endings
             return SuffixProvider.get_secondary_active(class_num=2)
-            
         if aorist_type == "is":
             return {
-                "[3sg]": "īt",     "[3du]": "iṣṭām", "[3pl]": "iṣus",
-                "[2sg]": "īs",     "[2du]": "iṣṭam", "[2pl]": "iṣṭa",
-                "[1sg]": "iṣam",   "[1du]": "iṣva",  "[1pl]": "iṣma"
+                "[3sg]": _s("īt"),    "[3du]": _s("iṣṭām"), "[3pl]": _s("iṣus"),
+                "[2sg]": _s("īs"),    "[2du]": _s("iṣṭam"), "[2pl]": _s("iṣṭa"),
+                "[1sg]": _s("iṣam"),  "[1du]": _s("iṣva"),  "[1pl]": _s("iṣma"),
             }
-        
-        # s, sis aorists use special endings:
+        if aorist_type == "sis":
+            return {
+                "[3sg]": _s("siṣīt"),   "[3du]": _s("siṣṭām"), "[3pl]": _s("siṣus"),
+                "[2sg]": _s("siṣīs"),   "[2du]": _s("siṣṭam"), "[2pl]": _s("siṣṭa"),
+                "[1sg]": _s("siṣam"),   "[1du]": _s("siṣva"),  "[1pl]": _s("siṣma"),
+            }
+        # s-aorist
         return {
-            "[3sg]": "īt",  "[3du]": "tām", "[3pl]": "us",
-            "[2sg]": "īs",  "[2du]": "tam", "[2pl]": "ta",
-            "[1sg]": "am",  "[1du]": "va",  "[1pl]": "ma"
+            "[3sg]": _s("īt"),  "[3du]": _s("tām"), "[3pl]": _s("us"),
+            "[2sg]": _s("īs"),  "[2du]": _s("tam"), "[2pl]": _s("ta"),
+            "[1sg]": _s("am"),  "[1du]": _s("va"),  "[1pl]": _s("ma"),
         }
 
     @staticmethod
-    def get_aorist_middle(class_num=1, root_str=None, **kwargs):
+    def get_aorist_middle(class_num: int = 1, root_str=None, **kwargs) -> dict[str, Suffix]:
         from irregulars import aorist_overrides
+        from dhatupatha_analyzer import DHATUPATHA_ANALYZER
         info = aorist_overrides.get(root_str)
-        aorist_type = (info.get("middle_type") or info["type"]) if info else "s"
-        
+        aorist_type = (info.get("middle_type") or info["type"]) if info else DHATUPATHA_ANALYZER.get_aorist_type(root_str, class_num)
+
         if aorist_type in ("a", "reduplicated", "sa"):
             return SuffixProvider.get_secondary_middle(class_num=1)
         if aorist_type == "root":
             return SuffixProvider.get_secondary_middle(class_num=2)
-            
         if aorist_type == "is":
             return {
-                "[3sg]": "iṣṭa",   "[3du]": "iṣātām",  "[3pl]": "iṣata",
-                "[2sg]": "iṣṭhāḥ", "[2du]": "iṣāthām", "[2pl]": "idhvam",
-                "[1sg]": "iṣi",    "[1du]": "iṣvahi",  "[1pl]": "iṣmahi"
+                "[3sg]": _s("iṣṭa"),   "[3du]": _s("iṣātām"),  "[3pl]": _s("iṣata"),
+                "[2sg]": _s("iṣṭhāḥ"), "[2du]": _s("iṣāthām"), "[2pl]": _s("idhvam"),
+                "[1sg]": _s("iṣi"),    "[1du]": _s("iṣvahi"),  "[1pl]": _s("iṣmahi"),
             }
-            
-        # s, sis aorists
+        # s-aorist
         return {
-            "[3sg]": "ta",   "[3du]": "ātām",  "[3pl]": "ata",
-            "[2sg]": "thāḥ", "[2du]": "āthām", "[2pl]": "dhvam",
-            "[1sg]": "i",    "[1du]": "vahi",  "[1pl]": "mahi"
+            "[3sg]": _s("ta"),   "[3du]": _s("ātām"),  "[3pl]": _s("ata"),
+            "[2sg]": _s("thāḥ"), "[2du]": _s("āthām"), "[2pl]": _s("dhvam"),
+            "[1sg]": _s("i"),    "[1du]": _s("vahi"),  "[1pl]": _s("mahi"),
         }
+
     @staticmethod
-    def get_aorist_passive(class_num=1, root_str=None, **kwargs):
-        """Passive aorist endings. 3sg ciṇ uses bare -i (Vriddhi on the stem side)."""
+    def get_aorist_passive(class_num: int = 1, root_str=None, **kwargs) -> dict[str, Suffix]:
+        """Passive aorist endings.  3sg ciṇ carries the AORIST_PASS_3SG tag
+        which instructs MorphologyEngine to apply Vriddhi on the stem side."""
         endings = SuffixProvider.get_aorist_middle(class_num=class_num, root_str=root_str)
-        endings["[3sg]"] = "i"   # ciṇ ending; stem carries [AORIST_PASS_3SG] for Vriddhi
+        # Override 3sg with the tagged Suffix — Vriddhi tag is self-contained here
+        endings["[3sg]"] = _s("i", "AORIST_PASS_3SG")
         return endings
 
-
-    # ── 6. PASSIVE VOICE (Karmani Prayoga) ───────────────────────────────────
+    # ── 8. BENEDICTIVE (Āśīr-liṅ) ─────────────────────────────────────────────
 
     @staticmethod
-    def get_passive_endings(tense):
+    def get_benedictive_active(root_str=None, **kwargs) -> dict[str, Suffix]:
+        """Active Benedictive endings (-yāsut). Added directly to the bare root."""
+        return {
+            "[3sg]": _s("yāt"),   "[3du]": _s("yāstām"), "[3pl]": _s("yāsuḥ"),
+            "[2sg]": _s("yāḥ"),   "[2du]": _s("yāstam"), "[2pl]": _s("yāsta"),
+            "[1sg]": _s("yāsam"), "[1du]": _s("yāsva"),  "[1pl]": _s("yāsma"),
+        }
+
+    @staticmethod
+    def get_benedictive_middle(root_str=None, **kwargs) -> dict[str, Suffix]:
+        """Middle Benedictive endings (-sīṣṭa). Very rare in Classical Sanskrit."""
+        return {
+            "[3sg]": _s("sīṣṭa"),   "[3du]": _s("sīyāstām"), "[3pl]": _s("sīran"),
+            "[2sg]": _s("sīṣṭhāḥ"), "[2du]": _s("sīyāsthām"),"[2pl]": _s("sīdhvam"),
+            "[1sg]": _s("sīya"),    "[1du]": _s("sīvahi"),   "[1pl]": _s("sīmahi"),
+        }
+
+    # ── 9. SUBJUNCTIVE (Leṭ) ──────────────────────────────────────────────────
+
+    @staticmethod
+    def get_subjunctive_active(root_str=None, **kwargs) -> dict[str, Suffix]:
+        """Subjunctive active endings. Mostly Vedic. Uses generalized thematic paradigm."""
+        return {
+            "[3sg]": _s("āt"),   "[3du]": _s("ātaḥ"), "[3pl]": _s("ān"),
+            "[2sg]": _s("ās"),   "[2du]": _s("āthaḥ"),"[2pl]": _s("ātha"),
+            "[1sg]": _s("āni"),  "[1du]": _s("āva"),  "[1pl]": _s("āma"),
+        }
+
+    @staticmethod
+    def get_subjunctive_middle(root_str=None, **kwargs) -> dict[str, Suffix]:
+        """Subjunctive middle endings. Mostly Vedic."""
+        return {
+            "[3sg]": _s("āte"),  "[3du]": _s("āithe"),"[3pl]": _s("ānte"),
+            "[2sg]": _s("āse"),  "[2du]": _s("āithe"),"[2pl]": _s("ādhve"),
+            "[1sg]": _s("āi"),   "[1du]": _s("āvahai"),"[1pl]": _s("āmahai"),
+        }
+
+    # ── 10. PASSIVE VOICE (Karmani Prayoga) ────────────────────────────────────
+
+    @staticmethod
+    def get_passive_endings(tense: str) -> dict[str, Suffix]:
         """Passives use the Middle voice endings (thematic pattern)."""
         if tense in ("present", "future"):
             return SuffixProvider.get_present_middle(class_num=1)

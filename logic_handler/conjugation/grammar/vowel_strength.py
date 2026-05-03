@@ -36,7 +36,7 @@ class VowelStrengthEngine:
         self.apply_guna = pn.cdrewrite(
             guna_map,
             "",
-            ALPHABET.consonants.closure() + "[STRONG]",
+            pn.closure(ALPHABET.consonants) + "[STRONG]",
             sig
         )
 
@@ -51,7 +51,7 @@ class VowelStrengthEngine:
         self.apply_vriddhi = pn.cdrewrite(
             vriddhi_map,
             "",
-            ALPHABET.consonants.closure() + "[VRIDDHI]",
+            pn.closure(ALPHABET.consonants) + "[VRIDDHI]",
             sig
         )
 

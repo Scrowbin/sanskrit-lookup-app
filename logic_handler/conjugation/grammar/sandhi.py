@@ -1,12 +1,19 @@
+"""sandhi.py — FST-based Sanskrit internal phonology (stem-boundary sandhi).
+
+Pipeline order: vowel_phase → consonant_phase → long_distance_phase.
+Within each phase, rules are ordered by specificity (most specific first).
+
+All three phase methods accept ``debug=True``.  When enabled, rules are
+applied *one by one* via ``_apply_rules_with_trace()``, which prints the
+intermediate string after every rule and stops immediately when a rule causes
+the FST to go empty — identifying exactly which rule killed the valid path.
+"""
 import pynini as pn
 from alphabet import ALPHABET
 
-class SandhiEngine:
-    """Modular FST engine for Sanskrit internal phonology (stem-boundary sandhi).
 
-    Pipeline order: vowel_phase → consonant_phase → long_distance_phase.
-    Within each phase, rules are ordered by specificity (most specific first).
-    """
+class SandhiEngine:
+    """Modular FST engine for Sanskrit internal phonology."""
 
     def __init__(self):
         self.sig = ALPHABET.sigma_star
@@ -15,15 +22,15 @@ class SandhiEngine:
         self._setup_long_distance_rules()
         # Erase morpheme boundaries at the very end
         self.clean_boundaries = pn.cdrewrite(pn.cross("+", ""), "", "", self.sig)
+        # Named rule lists — populated after all rules are built
+        self._build_named_rule_lists()
 
     # ──────────────────────────────────────────────────────────────────────────
-    # A. Vowel phase
+    # Rule setup
     # ──────────────────────────────────────────────────────────────────────────
 
     def _setup_vowel_rules(self):
         # 1. Thematic / Pararupa mergers: a/ā + {e,o,ai,au} → the diphthong wins.
-        #    MUST run before Savarna so a+ai doesn't get split into ā+i.
-        #    Bug 7 fix: added a+ai→ai and a+au→au pairs.
         self.thematic_merger = pn.cdrewrite(
             pn.string_map([
                 ("a+e",  "e"),  ("ā+e",  "e"),
@@ -34,21 +41,17 @@ class SandhiEngine:
             "", "", self.sig
         )
 
-        # 2. Savarna (identical vowel coalescence): a+a→ā, ī+ī→ī, etc.
-        # NOTE: i+i→ī is intentionally EXCLUDED here. In the perfect weak paradigm,
-        # short i+i should be handled by yan (i+→y) giving 'iy' not 'ī'. Example:
-        #   cikri+ivahe → yan: i+→y → cikriyivahe  ✓  (NOT cikrīvahe via savarna)
-        # Long-vowel coalescences (ī+ī, ī+i, i+ī) are kept for class-9 optative etc.
+        # 2. Savarna (identical vowel coalescence).
+        # NOTE: i+i→ī intentionally excluded — perfect weak yan handles it.
         self.savarna = pn.cdrewrite(
             pn.string_map([
                 ("a+a", "ā"), ("a+ā", "ā"), ("ā+a", "ā"), ("ā+ā", "ā"),
-                ("i+ī", "ī"), ("ī+i", "ī"), ("ī+ī", "ī"),   # no i+i→ī
+                ("i+ī", "ī"), ("ī+i", "ī"), ("ī+ī", "ī"),
                 ("u+u", "ū"), ("u+ū", "ū"), ("ū+u", "ū"), ("ū+ū", "ū"),
                 ("ṛ+ṛ", "ṝ"), ("ṛ+ṝ", "ṝ"), ("ṝ+ṛ", "ṝ"), ("ṝ+ṝ", "ṝ"),
             ]),
             "", "", self.sig
         )
-
 
         # 3. Guna sandhi: a/ā + i/u/ṛ → e/o/ar
         self.guna_sandhi = pn.cdrewrite(
@@ -60,7 +63,7 @@ class SandhiEngine:
             "", "", self.sig
         )
 
-        # 4. Ayadi (diphthong before vowel or y): e+V → ay+V, o+V → av+V, etc.
+        # 4. Ayadi (diphthong before vowel): e+V → ay+V, o+V → av+V, etc.
         self.ayadi = pn.cdrewrite(
             pn.string_map([
                 ("e+", "ay"), ("o+", "av"), ("ai+", "āy"), ("au+", "āv"),
@@ -83,15 +86,10 @@ class SandhiEngine:
             pn.cross("ī+", ""), "", ALPHABET.vowels, self.sig
         )
 
-    # ──────────────────────────────────────────────────────────────────────────
-    # B. Consonant phase
-    # ──────────────────────────────────────────────────────────────────────────
-
     def _setup_consonant_rules(self):
         unvoiced_triggers = pn.union("+t", "+th", "+s", "+ṣ")
 
         # Bartholomae (aspirate assimilation): h+t → gdh, etc.
-        # Must run before general devoicing.
         self.bartho_hth = pn.cdrewrite(pn.cross("h+th", "gdh"), "", "", self.sig)
         self.bartho_hdh = pn.cdrewrite(pn.cross("h+dh", "gdh"), "", "", self.sig)
         self.bartho_ht  = pn.cdrewrite(pn.cross("h+t",  "gdh"), "", "", self.sig)
@@ -129,32 +127,49 @@ class SandhiEngine:
             "", unvoiced_triggers, self.sig
         )
 
-        # Nasal assimilation: n/ñ → ñ before +j/+c  (Bug 5 support)
+        # Nasal assimilation: n → ñ before +j/+c
         self.nasal_assimilation = pn.cdrewrite(
             pn.cross("n", "ñ"), "", pn.union("+j", "+c", "j", "c"), self.sig
         )
 
-        # Retroflex assimilation (Panini 8.4.41)
-        # Written as separate rules to avoid string_map prefix ambiguity (ṣ+t vs ṣ+th)
-        self.retro_th = pn.cdrewrite(pn.cross("ṣ+th", "ṣṭh"), "", "", self.sig)
-        self.retro_t  = pn.cdrewrite(pn.cross("ṣ+t",  "ṣṭ"),  "", "", self.sig)
-        self.retro_dhv = pn.cdrewrite(pn.cross("ṣ+dhv", "ḍhv"), "", "", self.sig)
-        self.retro_s = pn.cdrewrite(pn.cross("ṣ+s", "kṣ"), "", "", self.sig)
+        # ── Anusvāra and Parasavarṇa (m + consonant) ──────────────────────────
+        # m -> anusvāra before all consonants (this is optional before stops externally, but obligatory internally/preverbs)
+        # Then anusvāra -> parasavarṇa (homorganic nasal) before stops.
+        # We can implement this directly mapping m + stop -> homorganic nasal + stop
+        self.parasavarna = pn.cdrewrite(
+            pn.string_map([
+                ("m+k", "ṅ+k"), ("m+kh", "ṅ+kh"), ("m+g", "ṅ+g"), ("m+gh", "ṅ+gh"),
+                ("m+c", "ñ+c"), ("m+ch", "ñ+ch"), ("m+j", "ñ+j"), ("m+jh", "ñ+jh"),
+                ("m+ṭ", "ṇ+ṭ"), ("m+ṭh", "ṇ+ṭh"), ("m+ḍ", "ṇ+ḍ"), ("m+ḍh", "ṇ+ḍh"),
+                ("m+t", "n+t"), ("m+th", "n+th"), ("m+d", "n+d"), ("m+dh", "n+dh"), ("m+n", "n+n"),
+                ("m+p", "m+p"), ("m+ph", "m+ph"), ("m+b", "m+b"), ("m+bh", "m+bh"), ("m+m", "m+m"),
+            ]),
+            "", "", self.sig
+        )
+        
+        # m -> ṃ (anusvāra) before semivowels (y, r, l, v) and sibilants (ś, ṣ, s, h)
+        self.anusvara = pn.cdrewrite(
+            pn.cross("m+", "ṃ+"),
+            "", pn.union("y", "r", "l", "v", "ś", "ṣ", "s", "h"), self.sig
+        )
 
-        # Velar nasal: n/ñ → ṅ before velar stops.
-        # Bug 6 fix: also converts ñ (which nasal_assimilation produced) → ṅ.
-        # Must run AFTER palatal_sandhi so j→k is already done.
+        # Retroflex assimilation (Panini 8.4.41)
+        self.retro_th  = pn.cdrewrite(pn.cross("ṣ+th", "ṣṭh"), "", "", self.sig)
+        self.retro_t   = pn.cdrewrite(pn.cross("ṣ+t",  "ṣṭ"),  "", "", self.sig)
+        self.retro_dhv = pn.cdrewrite(pn.cross("ṣ+dhv", "ḍhv"), "", "", self.sig)
+        self.retro_s   = pn.cdrewrite(
+            pn.string_map([("ṣ+s", "kṣ"), ("ś+s", "kṣ")]), 
+            "", "", self.sig
+        )
+
+        # Velar nasal: n/ñ → ṅ before velar stops
         self.velar_nasal = pn.cdrewrite(
             pn.string_map([("n", "ṅ"), ("ñ", "ṅ")]),
             "", pn.union("+k", "+g", "+kh", "+gh"), self.sig
         )
 
-    # ──────────────────────────────────────────────────────────────────────────
-    # C. Long-distance phase
-    # ──────────────────────────────────────────────────────────────────────────
-
     def _setup_long_distance_rules(self):
-        # RUKI: s → ṣ after r/ṛ/u/ū/k/i/ī/e/ai/o/au (across optional +)
+        # RUKI: s → ṣ after r/ṛ/u/ū/k/i/ī/e/ai/o/au
         ruki_triggers = pn.union(
             "ṛ", "r", "u", "ū", "k", "i", "ī", "e", "ai", "o", "au"
         )
@@ -176,8 +191,7 @@ class SandhiEngine:
             self.sig
         )
 
-        # Post-RUKI retroflex assimilation: new ṣ from RUKI needs to assimilate
-        # following dentals just like existing ṣ (Panini 8.4.41 still applies).
+        # Post-RUKI retroflex assimilation
         self.retro_post_ruki_th  = pn.cdrewrite(pn.cross("ṣ+th",  "ṣṭh"), "", "", self.sig)
         self.retro_post_ruki_t   = pn.cdrewrite(pn.cross("ṣ+t",   "ṣṭ"),  "", "", self.sig)
         self.retro_post_ruki_dhv = pn.cdrewrite(pn.cross("ṣ+dhv", "ḍhv"), "", "", self.sig)
@@ -195,19 +209,88 @@ class SandhiEngine:
         )
 
     # ──────────────────────────────────────────────────────────────────────────
+    # Named rule lists (for per-rule debug tracing)
+    # ──────────────────────────────────────────────────────────────────────────
+
+    def _build_named_rule_lists(self):
+        self._vowel_rules: list[tuple[str, pn.Fst]] = [
+            ("thematic_merger",    self.thematic_merger),
+            ("class9_special",     self.class9_special),
+            ("ayadi",              self.ayadi),
+            ("savarna",            self.savarna),
+            ("yan_sandhi",         self.yan_sandhi),
+            ("guna_sandhi",        self.guna_sandhi),
+        ]
+        self._consonant_rules: list[tuple[str, pn.Fst]] = [
+            ("bartho_hth",         self.bartho_hth),
+            ("bartho_hdh",         self.bartho_hdh),
+            ("bartho_ht",          self.bartho_ht),
+            ("grassmann_throwback",self.grassmann_throwback),
+            ("h_to_k",             self.h_to_k),
+            ("palatal_sandhi",     self.palatal_sandhi),
+            ("retro_th",           self.retro_th),
+            ("retro_t",            self.retro_t),
+            ("retro_dhv",          self.retro_dhv),
+            ("retro_s",            self.retro_s),
+            ("devoicing",          self.devoicing),
+            ("nasal_assimilation", self.nasal_assimilation),
+            ("anusvara",           self.anusvara),
+            ("parasavarna",        self.parasavarna),
+            ("velar_nasal",        self.velar_nasal),
+        ]
+        self._long_distance_rules: list[tuple[str, pn.Fst]] = [
+            ("ruki",                 self.ruki),
+            ("retro_post_ruki_th",   self.retro_post_ruki_th),
+            ("retro_post_ruki_t",    self.retro_post_ruki_t),
+            ("retro_post_ruki_dhv",  self.retro_post_ruki_dhv),
+            ("nati",                 self.nati),
+            ("visarga",              self.visarga),
+            ("cluster_reduction",    self.cluster_reduction),
+            ("clean_boundaries",     self.clean_boundaries),
+        ]
+
+    # ──────────────────────────────────────────────────────────────────────────
+    # Debug helper
+    # ──────────────────────────────────────────────────────────────────────────
+
+    @staticmethod
+    def _apply_rules_with_trace(
+        fst: pn.Fst,
+        rules: list[tuple[str, pn.Fst]],
+        phase: str,
+    ) -> pn.Fst:
+        """Apply rules one by one, printing each result.
+
+        Stops immediately when a rule causes the FST to go empty, identifying
+        exactly which rule killed the valid path.
+        """
+        print(f"  [{phase}]")
+        for name, rule_fst in rules:
+            fst = (fst @ rule_fst).optimize()
+            if fst.num_states() == 0:
+                print(f"    ❌ {name}: FST went EMPTY — this rule killed the path")
+                return fst
+            try:
+                print(f"    ✅ {name}: '{fst.string()}'")
+            except Exception:
+                try:
+                    sp = pn.shortestpath(fst).string()
+                    print(f"    ⚠️  {name}: ambiguous, shortest='{sp}'")
+                except Exception:
+                    print(f"    ⚠️  {name}: ambiguous (no shortest path)")
+        return fst
+
+    # ──────────────────────────────────────────────────────────────────────────
     # Phase entry points
     # ──────────────────────────────────────────────────────────────────────────
 
-    def vowel_phase(self, fst):
-        # ORDER IS CRITICAL:
-        # 1. thematic_merger: a+ai→ai etc. must precede savarna (a+ai ≠ ā+i)
-        # 2. class9_special: ī+→ε before a/ā (nī-dropping)
-        # 3. ayadi FIRST: consume full diphthong au+/ai+/o+/e+ before vowel
-        #    → MUST precede yan so the 'u' in 'au+' isn't stolen by yan (u+→v)
-        # 4. savarna: identical vowels coalesce BEFORE yan fires on ī+ī → yī
-        #    (e.g. nī+ī → nī, not nyī)
-        # 5. yan: remaining i/ī/u/ū/ṛ before vowel → semivowel
-        # 6. guna_sandhi: a+i→e, a+u→o (last, after other vowel changes)
+    def vowel_phase(self, fst: pn.Fst, debug: bool = False) -> pn.Fst:
+        """Apply vowel sandhi rules.
+
+        Order is critical — see inline comments in _setup_vowel_rules.
+        """
+        if debug:
+            return self._apply_rules_with_trace(fst, self._vowel_rules, "vowel_phase")
         return (fst
                 @ self.thematic_merger
                 @ self.class9_special
@@ -216,9 +299,10 @@ class SandhiEngine:
                 @ self.yan_sandhi
                 @ self.guna_sandhi)
 
-    def consonant_phase(self, fst):
-        # Order matters: Bartholomae → Grassmann → h_to_k → palatal/devoicing
-        # → nasal_assimilation → velar_nasal (sees k produced by palatal_sandhi)
+    def consonant_phase(self, fst: pn.Fst, debug: bool = False) -> pn.Fst:
+        """Apply consonant cluster sandhi rules."""
+        if debug:
+            return self._apply_rules_with_trace(fst, self._consonant_rules, "consonant_phase")
         return (fst
                 @ self.bartho_hth
                 @ self.bartho_hdh
@@ -232,9 +316,16 @@ class SandhiEngine:
                 @ self.retro_s
                 @ self.devoicing
                 @ self.nasal_assimilation
+                @ self.anusvara
+                @ self.parasavarna
                 @ self.velar_nasal)
 
-    def long_distance_phase(self, fst):
+    def long_distance_phase(self, fst: pn.Fst, debug: bool = False) -> pn.Fst:
+        """Apply long-distance rules (RUKI, Nati, Visarga, etc.)."""
+        if debug:
+            return self._apply_rules_with_trace(
+                fst, self._long_distance_rules, "long_distance_phase"
+            )
         return (fst
                 @ self.ruki
                 @ self.retro_post_ruki_th
@@ -245,9 +336,10 @@ class SandhiEngine:
                 @ self.cluster_reduction
                 @ self.clean_boundaries)
 
-    def apply_all(self, fst):
+    def apply_all(self, fst: pn.Fst, debug: bool = False) -> pn.Fst:
+        """Run all three sandhi phases in sequence."""
         return self.long_distance_phase(
             self.consonant_phase(
-                self.vowel_phase(fst)
-            )
+                self.vowel_phase(fst, debug), debug
+            ), debug
         )

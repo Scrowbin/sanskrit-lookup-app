@@ -46,7 +46,8 @@ class SanskritAlphabet:
         self.tags_list = [
             "[STRONG]", "[WEAK]", "[VRIDDHI]",
             "[CLASS4]", "[CLASS8]", "[PASSIVE]", "[CAUS_PASS]",
-            "[ROOT_AORIST]", "[AORIST]", "[AORIST_PASS_3SG]", "[INTENSIVE_ACTIVE]"
+            "[ROOT_AORIST]", "[AORIST]", "[AORIST_PASS_3SG]", "[INTENSIVE_ACTIVE]",
+            "[CLASS2_WEAK]"
         ]
 
         # ── Pynini FST atoms ─────────────────────────────────────────────────
@@ -69,7 +70,7 @@ class SanskritAlphabet:
             ["+"]               # morpheme boundary
         )
         self.alpha      = pn.union(*all_chars)
-        self.sigma_star = self.alpha.closure()
+        self.sigma_star = pn.closure(self.alpha)
 
     def parse_phonemes(self, s: str) -> list:
         """Tokenize an IAST string into Sanskrit phonemes."""
