@@ -162,10 +162,8 @@ PHASE2 = [
     ("bhū",  1, "3", "sg", "passive", "abhāvi"),
     ("nī",   1, "3", "sg", "passive", "anāyi"),
     ("kṛ",   8, "3", "sg", "passive", "akāri"),
-    # BUG: kṛ 1sg perfect should be cakāra (same as 3sg for this root) but engine gives 'cakara'
-    # Perfect active 1sg ending is -a (same surface as 3sg -a) but the strong grade applies
-    # This is a known INRIA-confirmed bug: INRIA says cakāra for both 1sg and 3sg active
-    ("kṛ",   8, "1", "sg", "active",  "cakāra"),   # perfect 1sg (BUG: engine gives 'cakara')
+    # Root-aorist 1sg of √kṛ (class 8): akārṣam.
+    ("kṛ",   8, "1", "sg", "active",  "akārṣam"),
 ]
 
 

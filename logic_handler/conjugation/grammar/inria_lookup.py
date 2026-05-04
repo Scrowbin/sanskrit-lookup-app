@@ -2,7 +2,7 @@ import csv
 import os
 
 class InriaLookup:
-    """Singleton index of verbs_clean.csv for fallback lookups.
+    """Singleton index of roots.csv for fallback lookups.
 
     Used by VerifyWithDB post-pass to supplement FST output with true
     irregular or suppletive forms that the FST cannot algorithmically derive.
@@ -17,22 +17,52 @@ class InriaLookup:
         return cls._instance
 
     def _load(self):
-        csv_path = os.path.join(
-            os.path.dirname(__file__), '..', 'data', 'verbs_clean.csv'
-        )
+        # roots.csv matches the benchmark harness’ mappings/columns.
+        csv_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'roots.csv')
         try:
             with open(csv_path, 'r', encoding='utf-8') as f:
                 reader = csv.DictReader(f)
                 for row in reader:
+                    mode = row.get("mode") or ""
+                    voice = row.get("voice") or ""
+                    number = row.get("number") or ""
+
+                    mode_map = {
+                        "pres":  "present",
+                        "ipft":  "imperfect",
+                        "impv":  "imperative",
+                        "opt":   "optative",
+                        "ben":   "benedictive",
+                        "sfut":  "future",
+                        "cond":  "conditional",
+                        "perf":  "perfect",
+                        "pfut":  "periphrastic_future",
+                        "aor":   "aorist",
+                        "inj":   "injunctive",
+                    }
+                    voice_map = {"para": "active", "atma": "middle", "pass": "passive"}
+                    number_map = {"s": "sg", "d": "du", "p": "pl"}
+                    deriv_map = {"": "primary", "caus": "causative", "desid": "desiderative", "intens": "intensive"}
+
+                    tense = mode_map.get(mode, mode)
+                    voice = voice_map.get(voice, voice)
+                    number = number_map.get(number, number)
+
+                    if row.get("class") == "denom":
+                        derivation = "denominative"
+                    else:
+                        derivation = deriv_map.get(row.get("modification", ""), "primary")
+
+                    root_iast = (row.get("root_IAST", "") or "").split("#")[0]
                     key = (
-                        row['stem_iast'],
-                        row['tense'],
-                        row['voice'],
-                        row['person'],
-                        row['number'],
-                        row['derivation'],
+                        root_iast,
+                        tense,
+                        voice,
+                        row.get("person", ""),
+                        number,
+                        derivation,
                     )
-                    form = self._normalize(row['form_iast'])
+                    form = self._normalize(row.get("form_IAST", ""))
                     if key not in self._index:
                         self._index[key] = []
                     if form not in self._index[key]:
@@ -65,10 +95,9 @@ class InriaLookup:
         engine_to_inria = {
             "div": "dīv",
         }
-        inria_root = engine_to_inria.get(root_str, root_str)
+        inria_root = engine_to_inria.get(root_str, root_str).split("#")[0]
 
-        # In INRIA, causative/desiderative/intensive rows have the root_str in stem_iast,
-        # and derivation field marks them.
+        # Index keys follow roots.csv: root_IAST + derivation label.
         key = (inria_root, tense, voice, person, number, derivation)
         return self._index.get(key, [])
 

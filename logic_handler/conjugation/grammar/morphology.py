@@ -129,12 +129,26 @@ class MorphologyEngine:
         )
 
         # ── 7. Class 2 Weak overrides ───────────────────────────────────────
+        # han: 'n' drops before stops (t, th, s, etc.) but STAYS before nasals (m, n).
+        # Whitney §636: han before consonant endings: ha- (stops) but han- (nasals).
+        # Rule A: han[CLASS2_WEAK]+ before a STOP consonant → ha+
+        _stops = pn.union("t", "th", "d", "dh", "k", "kh", "g", "gh",
+                          "p", "ph", "b", "bh", "c", "j", "s", "ś", "ṣ")
         self.class2_weak_cons = pn.cdrewrite(
             pn.cross("han[CLASS2_WEAK]+", "ha+"),
             "",
-            ALPHABET.consonants,
+            _stops,
             sig
         )
+        # Rule B: han[CLASS2_WEAK]+ before a NASAL → han+ (n retained)
+        _nasals = pn.union("m", "n", "ṇ", "ṅ")
+        self.class2_weak_nasal = pn.cdrewrite(
+            pn.cross("han[CLASS2_WEAK]+", "han+"),
+            "",
+            _nasals,
+            sig
+        )
+        # Rule C: han[CLASS2_WEAK]+ before a VOWEL → ghn+ (Grassmann throwback)
         self.class2_weak_vowel = pn.cdrewrite(
             pn.cross("han[CLASS2_WEAK]+", "ghn+"),
             "",
@@ -169,11 +183,12 @@ class MorphologyEngine:
                 ("root_aorist_bhuv",         self.root_aorist_bhuv),
                 ("aorist_pass_vriddhi",      self.aorist_pass_vriddhi),
                 ("intensive_i_it",           self.intensive_i_it),
+                ("class2_weak_nasal",        self.class2_weak_nasal),
                 ("class2_weak_cons",         self.class2_weak_cons),
                 ("class2_weak_vowel",        self.class2_weak_vowel),
                 ("class2_weak_vac",          self.class2_weak_vac),
                 ("samprasarana",             self.samprasarana),
-                ("clean_tags",               self.clean_tags),
+                ("clean_tags",              self.clean_tags),
             ]
             print("  [morphology]")
             for name, rule_fst in rules:
@@ -202,6 +217,7 @@ class MorphologyEngine:
             @ self.root_aorist_bhuv
             @ self.aorist_pass_vriddhi
             @ self.intensive_i_it
+            @ self.class2_weak_nasal
             @ self.class2_weak_cons
             @ self.class2_weak_vowel
             @ self.class2_weak_vac

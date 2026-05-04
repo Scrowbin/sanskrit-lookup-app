@@ -7,12 +7,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from dhatupatha_analyzer import DHATUPATHA_ANALYZER
 
-# Derivatives whose perfect is always periphrastic (uses kṛ auxiliary)
-_PERIPHRASTIC_DERIVATIVES: frozenset[str] = frozenset(
-    {"causative", "desiderative", "intensive", "denominative"}
-)
+# Derivatives whose perfect is always periphrastic (uses kṛ auxiliary).
+# NOTE: Desideratives and intensives regularly build non-periphrastic perfects
+# (e.g. bububhūṣ-iva, bobhav-a), which INRIA expects; do not force periphrastic.
+_PERIPHRASTIC_DERIVATIVES: frozenset[str] = frozenset({"causative", "denominative"})
 
-# Tenses that require the augment "a+" prefix
+# Tenses that require the augment "a+" prefix.
 _AUGMENTED_TENSES: frozenset[str] = frozenset({"imperfect", "conditional", "aorist"})
 
 # Priority-ordered (predicate, strength_tag) table.
@@ -113,7 +113,8 @@ class MorphologicalFeatureResolver:
         if derivative == "causative":
             strength = _evaluate_strength(10, person, number, voice, tense)
             effective_class = 10
-            effective_derivative = None
+            # Causative passive uses a dedicated stem in -ya (not -aya).
+            effective_derivative = "causative_passive" if voice == "passive" else None
 
         elif derivative == "desiderative":
             strength = "[STRONG]"
@@ -158,6 +159,10 @@ class MorphologicalFeatureResolver:
             effective_derivative = derivative
 
         augment = tense in _AUGMENTED_TENSES
+        # INRIA’s roots.csv has a small number of “injunctive” cells stored
+        # with augment (notably 1sg active for some roots like √bhū).
+        if tense == "injunctive" and voice == "active" and person == "1" and number == "sg":
+            augment = True
 
         return ResolvedFeatures(
             strength=strength,

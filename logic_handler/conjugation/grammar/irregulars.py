@@ -6,12 +6,16 @@ class_1_irregulars = {
     "sthā": "tiṣṭh",
     "pā":   "pib",
     "sad":  "sīd",
+    # Orthographic variant support in test data: scand -> skand.
+    "scand": "skand",
 }
 
 # ── Class 2: Irregular stems ──────────────────────────────────────────────────
 class_2_irregulars = {
     "han": {"strong": "han", "weak_cons": "ha", "weak_vowel": "ghn"},
     "vac": {"strong": "vac", "weak_cons": "vac", "weak_vowel": "uc"},
+    # Whitney §212-213: mṛj strong stem mārj- gives mārṣṭi before -ti.
+    "mṛj": {"strong": "mārj", "weak_cons": "mṛj", "weak_vowel": "mṛj"},
 }
 
 # ── Class 3: Irregular stems ──────────────────────────────────────────────────
@@ -25,14 +29,17 @@ class_5_irregulars = {
 }
 
 # ── Passive stem overrides ────────────────────────────────────────────────────
+# Only roots whose passive stem CANNOT be derived by the algorithmic
+# Samprasāraṇa rule (_compute_samprasarana_passive in stem_rules.py) are listed
+# here.  Pāṇini 6.1.13-15 / Whitney §252 covers: y→i (yaj→ij), v→u (vac→uc,
+# vap→up, vah→uh), r→ṛ (grah→gṛh).  Those are now algorithmic.
+# prach→pṛcch: the root vowel is 'a' after 'pr', but the cluster 'rch' does
+# not cleanly satisfy the Cv-semivowel pattern, so we keep it as an override.
 passive_stem_overrides = {
-    "vac": "uc",     # ucyate (Samprasāraṇa: v→u, a→zero, c stays)
-    "yaj": "ij",    # ijyate
-    "svap": "sup",  # supyate
-    "vap": "up",    # upyate
-    "vah": "uh",    # uhyate
-    "grah": "gṛh",  # gṛhyate
-    "prach": "pṛcch", # pṛchyate
+    "prach": "pṛcch", # pṛcchyate  — non-standard cluster, keep as override
+    # √smṛ passive is smar-ya (INRIA): smaryate (not *smriyate).
+    # True lexical irregularity (attested), so keep as override.
+    "smṛ": "smar",
 }
 
 # ── Aniṭ roots (future takes bare -sya-, not -iṣya-) ─────────────────────────
@@ -52,6 +59,9 @@ aset_roots = {
     "krī",   # kreṣyāmi
     "tud",   # totsyati
     "gam",   # gantā (periphrastic future is aniṭ)
+    "sthā",  # sthāsyati (Pāṇini 7.2.10: sthā is aniṭ)
+    "mā",    # māsyati
+    "hā",    # hāsyati
 }
 
 
@@ -64,6 +74,10 @@ causative_stem_irregulars = {
     "div": "dev",    # devayati (guna of div — no vriddhi since i is short penultimate)
     "gam": "gam",    # gamayati (a-vowel root: no change)
     "han": "ghāt",   # ghātayati
+    "labh": "lambh", # lambhayati (INRIA)
+    "dā": "dāp",     # dāpayati
+    "sthā": "sthāp", # sthāpayati
+    "pā": "pāy",     # pāyayati (INRIA also allows pālayati)
     "pūj": "pūj",    # pūjayati (long-ū root: no vrddhi/guna change)
     "cur": "cor",    # corayati (guna of u → o; NOT vrddhi)
 }
@@ -110,12 +124,24 @@ perfect_stem_overrides = {
     "su":  {"strong": "suṣāv", "weak": "suṣav", "weak2": "suṣuv"},
     "gam": {"strong": "jagām", "weak": "jagm"},
     "div": {"strong": "didev", "weak": "didiv"},  # didev+a=dideva / didiviva
-    "pā":  {"strong": "papā", "weak": "pap"},     # 3sg papau is handled via ending, but strong stem is papā
+    "pā":  {"strong": "papā", "weak": "pap"},
     "dā":  {"strong": "dadā", "weak": "dad"},
     "sthā": {"strong": "tasthā", "weak": "tasth"},
     "mā":  {"strong": "mamā", "weak": "mam"},
     "hā":  {"strong": "jahā", "weak": "jah"},
-    "han": {"strong": "jaghān", "weak": "jaghn"},
+    "han": {"strong": "jaghan", "weak": "jaghn"},
+    # yaj: Samprasāraṇa perfect. INRIA favors strong iyāj(a), weak īj-forms.
+    "yaj": {"strong": "iyāj", "weak": "īj"},
+    # labh: strong = lalabh, weak = e-grade lebh (INRIA benchmark forms).
+    "labh": {"strong": "lalabh", "weak": "lebh"},
+    # man: perfect strong mamān-, weak men- (Whitney class pattern).
+    "man": {"strong": "mamān", "weak": "men"},
+    # vac: perfect 3sg uvāca, weak ūc- (Whitney §840 pattern).
+    "vac": {"strong": "uvāc", "weak": "ūc"},
+    # vid: perfect-as-present veda (Whitney §801); weak stem kept as vid-.
+    "vid": {"strong": "ved", "weak": "vid"},
+    # kṛ: perfect strong cakār-, weak cakṛ- (Whitney perfect paradigm family).
+    "kṛ": {"strong": "cakār", "weak": "cakṛ"},
 }
 
 
@@ -130,7 +156,8 @@ aorist_overrides = {
     "div":  {"type": "is", "active": "dīv", "middle": "dīv"},     # is-aorist; iṣ is in endings
     "su":   {"type": "s"},                                         # s-aorist
     "tud":  {"type": "s"},                                         # s-aorist aniṭ (tut+s)
-    "yuj":  {"type": "root"},
+    # yuj shows sigmatic aorist alternatives (e.g. ayokṣīt / ayaukṣīt).
+    "yuj":  {"type": "s"},
     "tan":  {"type": "s"},
     "krī":  {"type": "s"},
     "cur":  {"type": "a", "active": "cūcur+a", "middle": "cūcur+a"},  # reduplicated a-aorist
@@ -143,9 +170,9 @@ aorist_overrides = {
     "han":  {"type": "is", "active": "vadh", "middle": "vadh"},   # suppletive aorist
     
     # Type 1: Root Aorists
-    "pā":   {"type": "root"},
+    "pā":   {"type": "root", "middle": "is"},     # middle: apeṣi (Whitney §879: pā takes is in middle aorist)
     "sthā": {"type": "root"},
-    "dā":   {"type": "root"},
+    "dā":   {"type": "root", "middle": "is"},     # middle: adiṣi (Whitney §879: dā takes is in middle aorist)
     "dhā":  {"type": "root"},
     "gā":   {"type": "root"},
     "bhū":  {"type": "root"},
@@ -184,16 +211,25 @@ future_stem_overrides = {
     "kṛ":  {"stem": "kar", "anit": False},  # kariṣyati: guna of ṛ = ar; Seṭ (overrides lexicon)
     "krī": {"stem": "kre", "anit": True},   # kreṣyati: Aniṭ (overrides lexicon)
     "kṣip": {"stem": "kṣep", "anit": True}, # kṣepsyati: Aniṭ override for veṭ root
+    "sthā": {"stem": "sthā", "anit": True}, # sthāsyati: ā-root aniṭ (Pāṇini 7.2.10)
+    "mā":  {"stem": "mā",  "anit": True},   # māsyati
+    "hā":  {"stem": "hā",  "anit": True},   # hāsyati
+    "pā":  {"stem": "pā",  "anit": True},   # pāsyati (root-aorist class, aniṭ)
 }
 
 # Periphrastic-future stem overrides (where stem ≠ guna + i)
 periphrastic_stem_overrides = {
     "gam": "gan",    # gantā: the 'tā' ending provides the t; n comes from nasal insertion
     "div": "dīv",    # dīvitā (uses lengthened class-4 stem + i from builder)
-    "nī":  "ne",     # netā (ainiṭ: ne+tā, no connecting i) — compare nētum, netavya
-    "jī":  "je",     # jetā (ainiṭ: je+tā)
-    "bhī":  "bhe",    # bhetā (ainiṭ)
-    "pā":  "pā",     # pātā (ainiṭ: pā+tā)
+    "nī":  "ne",     # netā (aniṭ: ne+tā, no connecting i)
+    "jī":  "je",     # jetā (aniṭ: je+tā)
+    "bhī":  "bhe",   # bhetā (aniṭ)
+    "pā":  "pā",     # pātā (aniṭ: pā+tā)
+    "sthā": "sthā",  # sthātā (aniṭ: keeps full ā; Pāṇini 7.2.10)
+    "mā":  "mā",     # mātā (aniṭ)
+    "hā":  "hā",     # hātā (aniṭ)
+    "dā":  "dā",     # dātā (aniṭ: class 3 root-aorist)
+    "yaj": "yaṣ",    # yaṣṭā (INRIA)
 }
 
 # ── Desiderative stem overrides ──────────────────────────────────────────────
@@ -213,6 +249,10 @@ desiderative_stem_overrides = {
     "div":  ["dideviṣa"],   # desid of div: redupl di + guna dev + iṣa
     "han":  ["jighāṃsa"],
     "vac":  ["vivakṣa"],
+    "yaj":  ["yiyakṣa"],
+    "ji":   ["jigīṣa"],
+    "labh": ["lipsa"],
+    "man":  ["mīmāṃsa"],
     "dā":   ["ditsa"],
     "śru":  ["śuśrūṣa"],
     "pā":   ["pipāsa"],
@@ -230,8 +270,6 @@ intensive_stem_overrides = {
     "dviṣ": "dedviṣ",  # prefix drops 'v': di + dviṣ → dedviṣ (not dvedveṣ)
     "budh": "bobhodh", # Grassmann throwback: bo + bodh → bobhodh
     "han":  "jaṅghan",
-    "hu":   "johū",
-    "bhū":  "bobhū",
     "vṛ":   "varīvṛ",
     "pā":   "pepīy",
     "kṛ":   "cekṛ",

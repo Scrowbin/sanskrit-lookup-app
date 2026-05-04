@@ -161,6 +161,13 @@ class SuffixProvider:
                 "[2sg]": _s(""),     "[2du]": _s("tam"),  "[2pl]": _s("ta"),
                 "[1sg]": _s("āni"),  "[1du]": _s("āva"),  "[1pl]": _s("āma"),
             }
+        # √ad has irregular 2sg imperative addhi (not *adhi).
+        if root_str == "ad":
+            return {
+                "[3sg]": _s("tu"),  "[3du]": _s("tām"), "[3pl]": _s("antu"),
+                "[2sg]": _s("dhi"), "[2du]": _s("tam"), "[2pl]": _s("ta"),
+                "[1sg]": _s("āni"), "[1du]": _s("āva"), "[1pl]": _s("āma"),
+            }
         if class_num == 3:
             sg2 = "dhi" if root_str in ("hu", "ad") else "hi"
             return {
@@ -227,6 +234,9 @@ class SuffixProvider:
             root_str in perfect_bare_tha_roots
             or root_str in perfect_weak_guna_roots
         ) else "itha"
+        # √kṛ perfect uses bare -tha in 2sg (cakartha).
+        if root_str == "kṛ":
+            second_sg = "tha"
         first_third_sg = "au" if root_str and root_str.endswith("ā") else "a"
         endings = {
             "[3sg]": _s(first_third_sg), "[3du]": _s("atuḥ"),  "[3pl]": _s("uḥ"),
@@ -234,7 +244,7 @@ class SuffixProvider:
             "[1sg]": _s(first_third_sg), "[1du]": _s("iva"),   "[1pl]": _s("ima"),
         }
         # ṛ-final roots use bare du/pl endings
-        if root_str and root_str.endswith("ṛ"):
+        if root_str and root_str.endswith("ṛ") and root_str != "kṛ":
             endings["[1du]"] = _s("va")
             endings["[1pl]"] = _s("ma")
             endings["[2du]"] = _s("vathuḥ")
@@ -247,6 +257,10 @@ class SuffixProvider:
             "[2sg]": _s("iṣe"),  "[2du]": _s("āthe"),  "[2pl]": _s("idhve"),
             "[1sg]": _s("e"),    "[1du]": _s("ivahe"), "[1pl]": _s("imahe"),
         }
+        # √kṛ perfect middle keeps bare ṣe/dhve (cakṛṣe, cakṛdhve).
+        if root_str == "kṛ":
+            endings["[2sg]"] = _s("ṣe")
+            endings["[2pl]"] = _s("dhve")
         if root_str and root_str.endswith("ṛ"):
             endings["[1du]"] = _s("vahe")
             endings["[1pl]"] = _s("mahe")

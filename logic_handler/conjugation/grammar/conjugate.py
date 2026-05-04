@@ -160,7 +160,7 @@ class SanskritConjugator:
             voice:      "active" | "middle" | "passive"
             tense:      "present" | "imperfect" | "imperative" | "optative" |
                         "future" | "conditional" | "perfect" |
-            derivative: None | "causative" | "desiderative" | "intensive"
+            derivative: None | "causative" | "desiderative" | "intensive" | "denominative"
 
         Returns:
             IAST form, or multiple forms joined with " OR ".

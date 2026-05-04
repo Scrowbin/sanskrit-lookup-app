@@ -89,7 +89,14 @@ class SandhiEngine:
     def _setup_consonant_rules(self):
         unvoiced_triggers = pn.union("+t", "+th", "+s", "+ṣ")
 
+        # Homorganic stop+aspirate assimilation at morpheme boundary:
+        # ad + dhi → addhi (cf. standard internal sandhi; needed for imperative 2sg).
+        self.d_dh_gemination = pn.cdrewrite(pn.cross("d+dh", "ddh"), "", "", self.sig)
+
         # Bartholomae (aspirate assimilation): h+t → gdh, etc.
+        # bh+t is handled separately as bdh (e.g. labh+ta -> labdha).
+        self.bartho_bht = pn.cdrewrite(pn.cross("bh+t", "bdh"), "", "", self.sig)
+        self.bartho_bhth = pn.cdrewrite(pn.cross("bh+th", "bdh"), "", "", self.sig)
         self.bartho_hth = pn.cdrewrite(pn.cross("h+th", "gdh"), "", "", self.sig)
         self.bartho_hdh = pn.cdrewrite(pn.cross("h+dh", "gdh"), "", "", self.sig)
         self.bartho_ht  = pn.cdrewrite(pn.cross("h+t",  "gdh"), "", "", self.sig)
@@ -100,7 +107,7 @@ class SandhiEngine:
         )
         self.grassmann_throwback = pn.cdrewrite(
             pn.string_map([("b", "bh"), ("d", "dh"), ("g", "gh")]),
-            "", ALPHABET.vowels + pn.union("gh", "dh", "bh", "h") + throwback_triggers,
+            "", ALPHABET.vowels + pn.union("gh", "dh", "bh", "h", "gdh") + throwback_triggers,
             self.sig
         )
 
@@ -117,6 +124,12 @@ class SandhiEngine:
             pn.string_map([("j", "k"), ("c", "k")]),
             "", unvoiced_triggers, self.sig
         )
+        # After r, palatal j before dental t/th surfaces as retroflex ṣṭ/ṣṭh
+        # (e.g. mārj+ti -> mārṣṭi; Whitney §212-213).
+        self.rj_retroflex = pn.cdrewrite(
+            pn.string_map([("rj+t", "rṣṭ"), ("rj+th", "rṣṭh")]),
+            "", "", self.sig
+        )
 
         # General devoicing
         self.devoicing = pn.cdrewrite(
@@ -130,6 +143,17 @@ class SandhiEngine:
         # Nasal assimilation: n → ñ before +j/+c
         self.nasal_assimilation = pn.cdrewrite(
             pn.cross("n", "ñ"), "", pn.union("+j", "+c", "j", "c"), self.sig
+        )
+        # Class-7 yuj-type clusters: yuñj+dhv/hi -> yuṅgdhv/i.
+        # This bridges nasal assimilation output (ñj) to attested velar+aspirate
+        # sequences in middle/imperative paradigms (Whitney class-7 behavior).
+        self.nj_cluster_hardening = pn.cdrewrite(
+            pn.string_map([
+                ("ñ+j+dhv", "ṅgdhv"),
+                ("ñ+j+dh", "ṅgdh"),
+                ("ñ+j+h", "ṅgdh"),
+            ]),
+            "", "", self.sig
         )
 
         # ── Anusvāra and Parasavarṇa (m + consonant) ──────────────────────────
@@ -152,11 +176,22 @@ class SandhiEngine:
             pn.cross("m+", "ṃ+"),
             "", pn.union("y", "r", "l", "v", "ś", "ṣ", "s", "h"), self.sig
         )
+        # Internal root+suffix m+y (e.g. gam+ya) remains m, not anusvāra.
+        # This prevents over-assimilation in forms like saṅgamya (Whitney §993).
+        self.gamya_fix = pn.cdrewrite(
+            pn.cross("gaṃ+y", "gam+y"), "", "", self.sig
+        )
 
         # Retroflex assimilation (Panini 8.4.41)
         self.retro_th  = pn.cdrewrite(pn.cross("ṣ+th", "ṣṭh"), "", "", self.sig)
         self.retro_t   = pn.cdrewrite(pn.cross("ṣ+t",  "ṣṭ"),  "", "", self.sig)
         self.retro_dhv = pn.cdrewrite(pn.cross("ṣ+dhv", "ḍhv"), "", "", self.sig)
+        # Sigmatic aorist clusters like -kṣ+t- surface as -kt- (yuj: ayokta),
+        # not as retroflex -kṣṭ-.
+        self.ksha_t_simplify = pn.cdrewrite(
+            pn.string_map([("kṣ+t", "kt"), ("kṣ+th", "kth")]),
+            "", "", self.sig
+        )
         self.retro_s   = pn.cdrewrite(
             pn.string_map([("ṣ+s", "kṣ"), ("ś+s", "kṣ")]), 
             "", "", self.sig
@@ -195,6 +230,11 @@ class SandhiEngine:
         self.retro_post_ruki_th  = pn.cdrewrite(pn.cross("ṣ+th",  "ṣṭh"), "", "", self.sig)
         self.retro_post_ruki_t   = pn.cdrewrite(pn.cross("ṣ+t",   "ṣṭ"),  "", "", self.sig)
         self.retro_post_ruki_dhv = pn.cdrewrite(pn.cross("ṣ+dhv", "ḍhv"), "", "", self.sig)
+        # After RUKI, sigmatic aorist k+ṣ+t/th should still simplify to kt/kth.
+        self.ksha_t_simplify_post_ruki = pn.cdrewrite(
+            pn.string_map([("k+ṣ+t", "k+t"), ("k+ṣ+th", "k+th")]),
+            "", "", self.sig
+        )
 
         # Visarga: word-final s/ṣ → ḥ
         self.visarga = pn.cdrewrite(
@@ -204,7 +244,13 @@ class SandhiEngine:
 
         # Word-final cluster reduction: ṣṭ → ṭ
         self.cluster_reduction = pn.cdrewrite(
-            pn.cross("ṣṭ", "ṭ"),
+            pn.string_map([
+                ("ṣṭ", "ṭ"),
+                # Whitney-style imperfects like ayunakt -> ayunak.
+                ("k+t", "k"),
+                # doh+t path after Bartholomae/throwback: a+dhogdh -> a+dhok.
+                ("gdh", "k"),
+            ]),
             "", pn.union("[EOS]", "+[EOS]"), self.sig
         )
 
@@ -222,24 +268,32 @@ class SandhiEngine:
             ("guna_sandhi",        self.guna_sandhi),
         ]
         self._consonant_rules: list[tuple[str, pn.Fst]] = [
+            ("d_dh_gemination",   self.d_dh_gemination),
+            ("bartho_bht",         self.bartho_bht),
+            ("bartho_bhth",        self.bartho_bhth),
             ("bartho_hth",         self.bartho_hth),
             ("bartho_hdh",         self.bartho_hdh),
             ("bartho_ht",          self.bartho_ht),
             ("grassmann_throwback",self.grassmann_throwback),
             ("h_to_k",             self.h_to_k),
+            ("rj_retroflex",       self.rj_retroflex),
             ("palatal_sandhi",     self.palatal_sandhi),
+            ("ksha_t_simplify",    self.ksha_t_simplify),
             ("retro_th",           self.retro_th),
             ("retro_t",            self.retro_t),
             ("retro_dhv",          self.retro_dhv),
             ("retro_s",            self.retro_s),
             ("devoicing",          self.devoicing),
             ("nasal_assimilation", self.nasal_assimilation),
+            ("nj_cluster_hardening", self.nj_cluster_hardening),
             ("anusvara",           self.anusvara),
+            ("gamya_fix",          self.gamya_fix),
             ("parasavarna",        self.parasavarna),
             ("velar_nasal",        self.velar_nasal),
         ]
         self._long_distance_rules: list[tuple[str, pn.Fst]] = [
             ("ruki",                 self.ruki),
+            ("ksha_t_simplify_post_ruki", self.ksha_t_simplify_post_ruki),
             ("retro_post_ruki_th",   self.retro_post_ruki_th),
             ("retro_post_ruki_t",    self.retro_post_ruki_t),
             ("retro_post_ruki_dhv",  self.retro_post_ruki_dhv),
@@ -304,19 +358,26 @@ class SandhiEngine:
         if debug:
             return self._apply_rules_with_trace(fst, self._consonant_rules, "consonant_phase")
         return (fst
+                @ self.d_dh_gemination
+                @ self.bartho_bht
+                @ self.bartho_bhth
                 @ self.bartho_hth
                 @ self.bartho_hdh
                 @ self.bartho_ht
                 @ self.grassmann_throwback
                 @ self.h_to_k
+                @ self.rj_retroflex
                 @ self.palatal_sandhi
+                @ self.ksha_t_simplify
                 @ self.retro_th
                 @ self.retro_t
                 @ self.retro_dhv
                 @ self.retro_s
                 @ self.devoicing
                 @ self.nasal_assimilation
+                @ self.nj_cluster_hardening
                 @ self.anusvara
+                @ self.gamya_fix
                 @ self.parasavarna
                 @ self.velar_nasal)
 
@@ -328,6 +389,7 @@ class SandhiEngine:
             )
         return (fst
                 @ self.ruki
+                @ self.ksha_t_simplify_post_ruki
                 @ self.retro_post_ruki_th
                 @ self.retro_post_ruki_t
                 @ self.retro_post_ruki_dhv
