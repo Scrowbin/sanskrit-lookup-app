@@ -94,6 +94,36 @@ class StemBuilder:
     # ─── Public entry point ──────────────────────────────────────────────────
 
     def build(self, root_str, class_num, strength, tense="present", derivative=None, person=None, number=None):
+        root_obj = DHATUPATHA_ANALYZER.get(root_str, class_num)
+        fst = pn.accep(root_str)
+
+        # Pāṇini 7.1.58: Id-it roots always get a nasal (Num-āgama)
+        if root_obj.is_idit:
+            fst = pn.accep("[NASAL]") + fst
+
+        # Let the FST handle Samprasāraṇa dynamically!
+        apply_samp = (strength == "[WEAK]" and 
+                     root_obj.takes_samprasarana and 
+                     tense not in ("present", "imperfect", "imperative", "optative"))
+        
+        if apply_samp or derivative == "passive":
+            fst = pn.accep("[SAMP]") + pn.accep(root_str)
+        # SPECIAL CASE: Causative futures/conditionals (class-10 with future tenses)
+        # Pāṇini 6.4.51 + 7.2.3: Causative base + aya + iṣya/sya
+        # Must be handled before the normal class-10 handler to avoid hardcoded +aya
+        if class_num == 10 and tense in ("future", "conditional"):
+            base = self._build_causative_base(root_str)
+            # base includes the "+" at the end, e.g. "bhāv+"
+            # Now we append "aya" and let the future system add iṣya/sya
+            fst = base + pn.accep("aya")
+            
+            # Regular future/conditional: add +iṣya or +sya
+            root_obj_for_future = DHATUPATHA_ANALYZER.get(root_str, class_num)
+            is_anit = False  # Causatives are typically Seṭ (Whitney 1028)
+            suffix = "+sya" if is_anit else "+iṣya"
+            fst = fst + pn.accep(suffix)
+            return (fst @ self._clean()).optimize()
+        
         if derivative == "desiderative":
             # Desiderative is a present-system stem in -a (…-ṣa/…-iṣa).
             # For the perfect, the desiderative stem itself takes a perfect formation
@@ -184,7 +214,9 @@ class StemBuilder:
         """Return the FST for the causative base (Vṛddhi/Guna + ayadi)."""
         if root_str in causative_stem_irregulars:
             return pn.accep(causative_stem_irregulars[root_str])
-
+        
+        if root_str.endswith("ā"):
+            return pn.accep(root_str + "p+")
         if self._takes_guna_in_causative(root_str):
             base = self._apply_guna(root_str, "[STRONG]")
         else:
@@ -202,43 +234,18 @@ class StemBuilder:
 
     def _build_future_system(self, root_str, class_num, strength, tense, **kwargs):
         """Future (Lṛṭ) and Conditional (Lṛṅ)."""
-        derivative = kwargs.get("derivative")
-
-        # Desideratives form future with -sya (not -iṣya):
-        # bubhūṣyati, pipāsyati, yuyukṣyati.
-        if derivative in ("desiderative", "desiderative_passive"):
-            base = self._build_desiderative(root_str, "[STRONG]")
-            # desiderative stem ends in -a; future base drops this thematic a.
-            return ((base + pn.accep("+"))
-                    @ pn.cdrewrite(pn.cross("a+", ""), "", "", self.sig)
-                    + pn.accep("sya"))
-
-        if class_num == 10:
-            base = self._build_causative_base(root_str)
-            return base + pn.accep("ayiṣya")
-
-        # Root-specific future stem override (e.g. div uses dīv+iṣya, not guna)
+        root_obj = DHATUPATHA_ANALYZER.get(root_str, class_num)
+        
+        # Priority: Override > Lexicon
         if root_str in future_stem_overrides:
             info = future_stem_overrides[root_str]
             stem = pn.accep(info["stem"])
             is_anit = info.get("anit", False)
-            suffix = "+sya" if is_anit else "+iṣya"
-            return stem + pn.accep(suffix)
-
-        # Aniṭ/Seṭ from lexicon (RootObject), with explicit override fallback
-        root_obj = DHATUPATHA_ANALYZER.get(root_str, class_num)
-
-        stem = self._apply_guna(root_str, "[STRONG]")
-        
-        is_anit = root_obj.is_anit
-        is_vet = root_obj.is_vet
-
-        if root_str in future_stem_overrides:
-            stem_info = future_stem_overrides[root_str]
-            stem = pn.accep(stem_info["stem"])
-            if "anit" in stem_info:
-                is_anit = stem_info["anit"]
-                is_vet = False # override vet if anit is explicitly forced
+            is_vet = False
+        else:
+            stem = self._apply_guna(root_str, "[STRONG]")
+            is_anit = root_obj.is_anit
+            is_vet = root_obj.is_vet
 
         if is_vet:
             return pn.union(stem + pn.accep("+sya"), stem + pn.accep("+iṣya"))
@@ -260,9 +267,12 @@ class StemBuilder:
             # Seṭ roots take +i: div→dīvitā
             # Detect seṭ by presence in future_stem_overrides with anit:False
             # or by dhatupatha; default: if not in seṭ list, treat as aniṭ
-            is_seṭ_override = (root_str in future_stem_overrides
-                               and not future_stem_overrides[root_str].get("anit", True))
-            is_anit = not is_seṭ_override
+            # Special: class-6 and class-7 roots are generally Aniṭ for periphrastic
+            is_class_nasal = class_num in (6, 7)
+            is_set_override = (root_str in future_stem_overrides
+                            and not future_stem_overrides[root_str].get("anit", True))
+            is_anit = is_class_nasal or not is_set_override
+            suffix = "" if is_anit else "+i"
             suffix = "" if is_anit else "+i"
             return pn.accep(bare) + pn.accep(suffix)
 
@@ -374,17 +384,14 @@ class StemBuilder:
         uses the samprasāraṇa (weak/passive-style) form of the root, not the full root.
         e.g. yaj (active bened.) → ij+yāsām (not yaj+yāsām).
         """        
+        root_obj = DHATUPATHA_ANALYZER.get(root_str, class_num)
         voice = kwargs.get("voice", "active")
         
-        # In the active voice, the suffix begins with y. Special sandhi applies to the root:
         if voice == "active":
-            # Samprasāraṇa roots (Whitney §921a): use the passive/weak root form
-            _SAMPRASARANA_BENED_ROOTS = {"yaj", "vac", "vap", "vah", "grah", "svap",
-                                         "vad", "vas", "vyadh", "vyac"}
-            if root_str in _SAMPRASARANA_BENED_ROOTS:
-                samp = self._compute_samprasarana_passive(root_str)
-                if samp is not None:
-                    return pn.accep(samp)
+            # Samprasāraṇa roots (Whitney §921a): Inject tag for Morphology
+            if root_obj.takes_samprasarana:
+                return pn.accep("[SAMP]" + root_str)
+
                     
             if root_str.endswith("ā"):
                 # dā -> de
@@ -589,6 +596,7 @@ class StemBuilder:
         4. Algorithmic Samprasarana (whitelist only, Panini 6.1.13-15).
         5. Generic [PASSIVE] tag.
         """
+        root_obj = DHATUPATHA_ANALYZER.get(root_str, class_num)
         if class_num == 10:
             base = self._build_causative_base(root_str)
             return base + pn.accep("ya")
@@ -604,28 +612,16 @@ class StemBuilder:
             stem = root_str[:-1] + "ī"
             return pn.accep(stem) + pn.accep("+ya")
 
-        # Layer 3: sru: class-5 weak stem is srr, but passive uses sruu (Whitney 997)
+        # Special śru case
         if root_str == "śru":
-            return pn.accep("śrū") + pn.accep("+ya")
+            return pn.accep("śrū+ya")
 
-        # Layer 3b: class-4 roots retain internal vowel lengthening in the passive
-        # (Panini 3.1.67 / Whitney 770). [CLASS4] triggers MorphologyEngine i->ii.
-        # e.g. div class-4 passive: div[CLASS4]+ya -> diivyate
-        if class_num == 4:
-            return pn.accep(root_str + "[CLASS4]") + pn.accep("+ya")
-
-        # Layer 4: Algorithmic Samprasarana - whitelisted roots only.
-        # Panini 6.1.13-15 applies to yaj, vac, vap, vah, grah, svap etc.
-        # Roots like yuj (y+u+j) are NOT Samprasarana and keep yujyate.
-        _SAMPRASARANA_ROOTS = {"yaj", "vac", "vap", "vah", "grah", "svap",
-                               "vad", "vas", "vyadh", "vyac"}
-        if root_str in _SAMPRASARANA_ROOTS:
-            samp = self._compute_samprasarana_passive(root_str)
-            if samp is not None:
-                return pn.accep(samp) + pn.accep("+ya")
-
-        # Layer 5: Generic passive (sandhi FST handles [PASSIVE] lengthening)
-        return pn.accep(root_str + "[PASSIVE]") + pn.accep("+ya")
+        # MorphologyEngine handles Samprasāraṇa via the [SAMP] tag injected in build()
+        # and Generic passive lengthening via [PASSIVE].
+        tag = "[PASSIVE]"
+        if class_num == 4: tag = "[CLASS4]"
+        
+        return pn.accep(root_str + tag) + pn.accep("+ya")
 
     def _build_aorist_passive_3sg(self, root_str):
         return pn.accep(root_str + "[AORIST_PASS_3SG]")
@@ -666,8 +662,12 @@ class StemBuilder:
         return pn.accep(root_str) + pn.accep(affix)
 
     def _build_class_6(self, root_str, strength):
-        if root_str in nasal_roots:
-            return pn.accep(nasal_roots[root_str] + "+a")
+        """Class 6 (Tudādi) - Handles Nasal insertion for the 'muc' group."""
+        # Panini 7.1.59: muc, lip, vid, etc. get a nasal in the present system.
+        # These are traditionally marked with 'ḷ' (L) in the Dhatupatha.
+        # Until DhatupathaAnalyzer handles is_lrit, we use this targeted check.
+        if root_str in {"muc", "vid", "lip", "sic", "kṛt", "khād"}:
+             return pn.accep("[NASAL]" + root_str + "+a")
         return pn.accep(root_str) + pn.accep("+a")
 
     def _build_class_7(self, root_str, strength):

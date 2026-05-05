@@ -47,9 +47,8 @@ class SanskritAlphabet:
             "[STRONG]", "[WEAK]", "[VRIDDHI]",
             "[CLASS4]", "[CLASS8]", "[PASSIVE]", "[CAUS_PASS]",
             "[ROOT_AORIST]", "[AORIST]", "[AORIST_PASS_3SG]", "[INTENSIVE_ACTIVE]",
-            "[CLASS2_WEAK]", "[SAMPRASARANA]", "[AUG]"
+            "[CLASS2_WEAK]", "[SAMP]", "[AUG]", "[NASAL]"
         ]
-
         # ── Pynini FST atoms ─────────────────────────────────────────────────
         self.vowels      = pn.union(*self.vowels_list)
         self.gutturals   = pn.union(*self.gutturals_list)

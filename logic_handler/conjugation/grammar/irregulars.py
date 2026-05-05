@@ -246,6 +246,10 @@ periphrastic_stem_overrides = {
     "yaj": "yaṣ",    # yaṣṭā (INRIA)
     # Aniṭ roots whose periphrastic future omits -i-:
     "smṛ": "smar",   # smartā (aniṭ; guna of smṛ = smar, then aniṭ)
+    # Class-6 roots: use nasal-less stem (no nasal insertion in non-present tenses)
+    # Whitney §994: class-6 periphrastic uses the simple nasal-less stem
+    "budh": "bodh",  # boddhā: bodh + tā (no -i- as budh is aniṭ for periphrastic)
+    "vid": "vid",    # viddhā (class-6 nasal-less stem for periphrastic)
 }
 
 
@@ -285,18 +289,17 @@ desiderative_stem_overrides = {
 intensive_stem_overrides = {
     "gam":  "jaṅgam",  # nasal insertion: ga+gam → jaṅgam (not jagam)
     "dviṣ": "dedviṣ",  # prefix drops 'v': di + dviṣ → dedviṣ (not dvedveṣ)
-    "budh": "bobodh",  # Grassmann throwback: bo + bodh → bobodh (not bobhodh)
+    # "budh": removed — let FST handle. Grassmann applies after: bo+bodh → bobodh → bobhodh
     "han":  "jaṅghan",
     "vṛ":   "varīvṛ",
     "pā":   "pepīy",
     # Whitney §1002 / INRIA: kṛ intensive uses carkar- base (not cekṛ-)
     # The forms attest: carkarīmi, carkarīṣi, carkarti, carkarvaḥ etc.
     "kṛ":   "carkar",
-    "kṣip": "cekṣip",
+    # "kṣip": removed — let algorithm handle kśip → cekṣip
     # yaj: intensive prefix is yāy- (long ā); Whitney §1014 heavy-syllable intensives
     "yaj":  "yāyaj",
-    # vid: intensive vedvid- (redupl. + root with Grassmann)
-    "vid":  "vevid",
+    # "vid": removed — let algorithm handle: vi + vid → vevid (no Grassmann issue here)
 }
 
 
@@ -328,53 +331,5 @@ krdanta_overrides = {
         "abs_tva": {"m": "dyūtvā\nAbsolutive\ndīvitvā"},
         "abs_ya": {"m": "-dyūya"}
     },
-    # √vac (cl.2) — Samprasāraṇa: va→u, → ukta, uktvā
-    "vac": {
-        "ppp":    {"m": "ukta",    "f": "uktā"},
-        "pp_act": {"m": "uktavat", "f": "uktavatī"},
-        "abs_tva": {"m": "uktvā"},
-        "abs_ya":  {"m": "-ucya"},
-    },
-    # √yaj (cl.1/4) — Samprasāraṇa: ya→i, aj→ij → iṣṭa
-    "yaj": {
-        "ppp":    {"m": "iṣṭa",    "f": "iṣṭā"},
-        "pp_act": {"m": "iṣṭavat", "f": "iṣṭavatī"},
-        "abs_tva": {"m": "iṣṭvā"},
-        "abs_ya":  {"m": "-ijya"},
-    },
-    # √svap (cl.2) — Samprasāraṇa: sva→su → supta
-    "svap": {
-        "ppp":    {"m": "supta",    "f": "suptā"},
-        "pp_act": {"m": "suptavat", "f": "suptavatī"},
-        "abs_tva": {"m": "suptvā"},
-        "abs_ya":  {"m": "-supya"},
-    },
-    # √vap (cl.1) — Samprasāraṇa: va→u → upta
-    "vap": {
-        "ppp":    {"m": "upta",    "f": "uptā"},
-        "pp_act": {"m": "uptavat", "f": "uptavatī"},
-        "abs_tva": {"m": "uptvā"},
-        "abs_ya":  {"m": "-upya"},
-    },
-    # √vah (cl.1) — Samprasāraṇa: va→u → ūḍha (h→ḍh)
-    "vah": {
-        "ppp":    {"m": "ūḍha",    "f": "ūḍhā"},
-        "pp_act": {"m": "ūḍhavat", "f": "ūḍhavaṭī"},
-        "abs_tva": {"m": "ūḍhvā"},
-        "abs_ya":  {"m": "-uhya"},
-    },
-    # √grah (cl.9) — Samprasāraṇa: ra→ṛ → gṛhīta (seṭ: takes i)
-    "grah": {
-        "ppp":    {"m": "gṛhīta",    "f": "gṛhītā"},
-        "pp_act": {"m": "gṛhītavat", "f": "gṛhītavatī"},
-        "abs_tva": {"m": "gṛhītvā"},
-        "abs_ya":  {"m": "-gṛhya"},
-    },
-    # √prach (cl.6) — Samprasāraṇa → pṛṣṭa
-    "prach": {
-        "ppp":    {"m": "pṛṣṭa",    "f": "pṛṣṭā"},
-        "pp_act": {"m": "pṛṣṭavat", "f": "pṛṣṭavatī"},
-        "abs_tva": {"m": "pṛṣṭvā"},
-        "abs_ya":  {"m": "-pṛcchya"},
-    },
+
 }

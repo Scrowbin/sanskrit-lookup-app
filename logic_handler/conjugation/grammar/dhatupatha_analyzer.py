@@ -14,6 +14,13 @@ IAST_TO_SLP1 = {
 # Long vowels that force periphrastic perfect when root-initial
 _PERIPHRASTIC_LONG_VOWELS = frozenset({"ī", "ū", "ṛ", "ṝ", "e", "ai", "o", "au"})
 
+# Pāṇini 6.1.15-16: Roots that undergo Samprasāraṇa (y/v/r → i/u/ṛ) in weak forms.
+_SAMPRASARANA_ROOTS = frozenset({
+    # Yajādi / Vacādi group (6.1.15)
+    "yaj", "vac", "vap", "svap", "vah", "vas", "vad", "ve", "vye", "hve", "śvi",
+    # Grahādi group (6.1.16)
+    "grah", "jyā", "vay", "vyadh", "vaś", "vyac", "vraśc", "prach", "bhrajj"
+})
 
 def to_slp1(iast_str: str) -> str:
     s = iast_str
@@ -44,8 +51,17 @@ class RootObject:
     class_num: int
     is_anit: bool
     is_vet: bool
+    is_idit: bool       # i-it: Triggers Nasal Insertion (Num)
+    is_irit: bool       # ir-it: Optional a-aorist (Pāṇini 3.1.57)
+    is_uuit: bool       # ū-it: Optional i (Veṭ) in Participles (Pāṇini 7.2.44)
+    is_duit: bool       # du-it: Mandatory a-aorist (Pāṇini 3.1.55)
+    is_s_opadesa: bool  # ṣ-opadeśa: Initial ṣ requires prefix-sandhi (ṣatva)
+    is_n_opadesa: bool  # ṇ-opadeśa: Initial ṇ requires prefix-sandhi (natva)
     aorist_type: str
     takes_periphrastic_perfect: bool
+    permitted_voices: set[str]
+    takes_samprasarana: bool
+    
 
     @property
     def is_set(self) -> bool:
@@ -70,6 +86,30 @@ class DhatupathaAnalyzer:
         self._entries: list[dict] = []
         self._cache: dict[tuple[str, int], RootObject] = {}
         self._load()
+        
+    def _parse_paninian_flags(self, raw: str) -> dict:
+        """Extracts Pāṇinian markers from the raw SLP1 string."""
+        # Initial consonant checks (Initial mutation)
+        is_s = raw.startswith('z')  # SLP1 'z' is 'ṣ'
+        is_n = raw.startswith('R')  # SLP1 'R' is 'ṇ'
+
+        # Helper to check for a vowel-marker combination
+        # ir-it must be checked before id-it so 'ir' isn't mistaken for 'i'
+        is_irit = "ir" in raw or "i~r" in raw
+        is_idit = ("i" in raw or "i~" in raw) and not is_irit
+        
+        is_uuit = "U" in raw  # SLP1 'U' is long 'ū'
+        is_duit = "du" in raw # SLP1 'du' is 'du' marker
+
+        return {
+            "is_idit": is_idit,
+            "is_irit": is_irit,
+            "is_uuit": is_uuit,
+            "is_duit": is_duit,
+            "is_s_opadesa": is_s,
+            "is_n_opadesa": is_n
+        }
+
 
     def _load(self):
         csv_path = os.path.join(
@@ -91,7 +131,6 @@ class DhatupathaAnalyzer:
             print(f"DhatupathaAnalyzer: error loading CSV — {e}")
 
     # ── Internal lookup ────────────────────────────────────────────────────────
-
     def _find_raw(self, root_str: str, class_num: int) -> str | None:
         """Return the raw Dhatupatha entry string, or None if not found."""
         slp1_base = to_slp1(root_str)
@@ -132,6 +171,41 @@ class DhatupathaAnalyzer:
                     return raw
                     
         return None
+
+    def _raw_is_idit(self, raw: str) -> bool:
+        """
+        True if the root is marked with a short 'i' (Id-it).
+        Pāṇini 7.1.58: 'idito num dhātoḥ' (Id-it roots get a nasal).
+        """
+        # Remove markers for nasalization (~), anudatta (\), and svarita (^)
+        # Example: 'vadi~\' -> 'vadi'
+        clean = raw.replace('~', '').replace('\\', '').replace('^', '')
+        return clean.endswith('i')
+
+
+    def _raw_permitted_voices(self, raw: str) -> set[str]:
+        """Derive permitted voice (Pada) from Pāṇinian anubandhas and accents."""
+        # 1. Check for explicit consonant anubandhas
+        if raw.endswith('N'):
+            return {"middle"}           # ṅ-it -> Ātmanepada
+        if raw.endswith('Y'):
+            return {"active", "middle"} # ñ-it -> Ubhayapada
+
+        # 2. Check for Pāṇinian accent markers on the final anubandha.
+        # We must peel away the '~' (nasalization) and other common 
+        # consonant tags (like 'p', 'c', 'x') to expose the bare accent.
+        suffix = raw
+        while suffix and suffix[-1] in ('~', 'p', 'x', 'm', 'f', 'c'):
+            suffix = suffix[:-1]
+            
+        # '\' = Anudāttet (Ātmanepada), '^' = Svaritet (Ubhayapada)
+        if suffix.endswith('\\'):
+            return {"middle"}
+        elif suffix.endswith('^'):
+            return {"active", "middle"}
+            
+        # 3. Default to Parasmaipada
+        return {"active"}
 
     @staticmethod
     def _raw_is_anit(raw: str) -> bool:
@@ -185,34 +259,79 @@ class DhatupathaAnalyzer:
             return self._cache[key]
 
         raw = self._find_raw(root_str, class_num)
+        flags = self._parse_paninian_flags(raw) if raw else {
+            k: False for k in ["is_idit", "is_irit", "is_uuit", "is_duit", "is_s_opadesa", "is_n_opadesa"]
+        }
+
         if raw is None:
             obj = RootObject(
                 iast=root_str,
                 class_num=class_num,
                 is_anit=False,
                 is_vet=False,
-                aorist_type='is',
+                aorist_type="",
                 takes_periphrastic_perfect=self._check_periphrastic(root_str),
+                permitted_voices={"active", "middle"},
+                takes_samprasarana=(root_str in _SAMPRASARANA_ROOTS),
+                **flags
             )
         else:
-            is_anit = self._raw_is_anit(raw)
-            is_vet = self._raw_is_vet(raw)
             obj = RootObject(
                 iast=root_str,
                 class_num=class_num,
-                is_anit=is_anit,
-                is_vet=is_vet,
+                is_anit=self._raw_is_anit(raw),
+                is_vet=self._raw_is_vet(raw),
                 aorist_type=self._raw_aorist_type(root_str, raw),
                 takes_periphrastic_perfect=self._check_periphrastic(root_str),
+                permitted_voices=self._raw_permitted_voices(raw),
+                takes_samprasarana=(root_str in _SAMPRASARANA_ROOTS),
+                **flags
             )
+            
         self._cache[key] = obj
         return obj
 
     @staticmethod
     def _check_periphrastic(root_str: str) -> bool:
-        """True if the root's first phoneme is a long vowel (→ periphrastic perfect)."""
+        """
+        True if the root structurally requires the periphrastic perfect.
+        1. Polysyllabic roots.
+        2. Vowel-initial roots with a heavy syllable (except a/ā).
+        3. Explicitly mandated Pāṇinian exceptions (uṣ, vid, jāgṛ, etc.).
+        """
+        # Pāṇini 3.1.35 - 3.1.38: Explicit overrides
+        explicit_periphrastic = {"uṣ", "jāgṛ", "vid", "cakās", "daridrā", "ay", "day", "ās"}
+        if root_str in explicit_periphrastic:
+            return True
+
         phonemes = ALPHABET.parse_phonemes(root_str)
-        return bool(phonemes) and phonemes[0] in _PERIPHRASTIC_LONG_VOWELS
+        if not phonemes:
+            return False
+
+        # 1. Polysyllabic roots (contains more than one vowel)
+        vowel_count = sum(1 for p in phonemes if p in ALPHABET.vowels_list)
+        if vowel_count > 1:
+            return True
+
+        # 2. Heavy vowel-initial roots (ijādeś ca gurumato 'nṛcḥ)
+        # Starts with a vowel (excluding a/ā)
+        first = phonemes[0]
+        if first in ALPHABET.vowels_list and first not in ("a", "ā"):
+            # Inherently long vowels are heavy
+            if first in _PERIPHRASTIC_LONG_VOWELS:
+                return True
+            
+            # Short vowels are heavy if followed by a consonant cluster (2+ consonants)
+            cons_count = 0
+            for p in phonemes[1:]:
+                if p in ALPHABET.consonants_list:
+                    cons_count += 1
+                else:
+                    break
+            if cons_count >= 2:
+                return True
+
+        return False
 
     # ── Legacy helpers (kept for backwards compat) ─────────────────────────────
 

@@ -13,7 +13,7 @@ Usage::
     fst      = suffix.to_fst()        # pn.accep("ti")
 """
 from __future__ import annotations
-
+from irregulars import perfect_stem_overrides
 import pynini as pn
 from dataclasses import dataclass, field
 def is_thematic(class_num: int) -> bool:

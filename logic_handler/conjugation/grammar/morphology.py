@@ -31,8 +31,17 @@ class MorphologyEngine:
                 ("[AUG]a+u",  "au"), ("[AUG]a+ū",  "au"),
                 ("[AUG]a+ṛ",  "ār"), ("[AUG]a+ṝ",  "ār"),
                 ("[AUG]a+a",  "ā"),  ("[AUG]a+ā",  "ā"),
-                ("[AUG]a+e",  "e"),   # a+e → e (already guna-form; rare)
-                ("[AUG]a+o",  "o"),   # a+o → o (already guna-form; rare)
+
+                # this shit is pre gemini
+                # ("[AUG]a+e",  "e"),   # a+e → e (already guna-form; rare)
+                # ("[AUG]a+o",  "o"),   # a+o → o (already guna-form; rare)
+
+                # If StemBuilder already applied Guna, the augment meets e, o, or ar.
+                # Pāṇini dictates the augment still forces Vriddhi here.
+                ("[AUG]a+e",  "ai"),  # a + e -> ai
+                ("[AUG]a+o",  "au"),  # a + o -> au
+                ("[AUG]a+ar", "ār"),  # a + ar -> ār (guna of ṛ)
+                ("[AUG]a+al", "āl"),  # a + al -> āl (guna of ḷ)
             ]),
             "", "", sig
         )
@@ -40,7 +49,53 @@ class MorphologyEngine:
         self.augment_erase = pn.cdrewrite(
             pn.cross("[AUG]", ""), "", "", sig
         )
-
+        # ── 0.5. Nasal insertion (Pāṇini 7.1.58-59, Whitney §150-152) ───────────
+        # Id-it (I-marked) roots receive a homorganic nasal before consonant suffixes.
+        # The nasal is determined by the following consonant (parasavarṇa rule):
+        #   Before p/ph/b/bh/m → m
+        #   Before t/th/d/dh/n → n
+        #   Before ṭ/ṭh/ḍ/ḍh/ṇ → ṇ
+        #   Before k/kh/g/gh/ṅ → ṅ
+        #   Before c/ch/j/jh/ñ → ñ
+        # Example: [NASAL]muc → muc + m before +chaṭ → muñc+chaṭ
+        self.nasal_m_insertion = pn.cdrewrite(
+            pn.cross("[NASAL]", "m"),
+            "",
+            pn.union("p", "ph", "b", "bh", "m"),
+            sig
+        )
+        self.nasal_n_insertion = pn.cdrewrite(
+            pn.cross("[NASAL]", "n"),
+            "",
+            pn.union("t", "th", "d", "dh", "n"),
+            sig
+        )
+        self.nasal_retroflex_insertion = pn.cdrewrite(
+            pn.cross("[NASAL]", "ṇ"),
+            "",
+            pn.union("ṭ", "ṭh", "ḍ", "ḍh", "ṇ"),
+            sig
+        )
+        self.nasal_velar_insertion = pn.cdrewrite(
+            pn.cross("[NASAL]", "ṅ"),
+            "",
+            pn.union("k", "kh", "g", "gh", "ṅ"),
+            sig
+        )
+        self.nasal_palatal_insertion = pn.cdrewrite(
+            pn.cross("[NASAL]", "ñ"),
+            "",
+            pn.union("c", "ch", "j", "jh", "ñ"),
+            sig
+        )
+        # Fallback: if [NASAL] is followed by a vowel, it becomes n
+        # (rare but theoretically possible in some constructions)
+        self.nasal_vowel_fallback = pn.cdrewrite(
+            pn.cross("[NASAL]", "n"),  # default to n for vowel-initial suffixes
+            "",
+            ALPHABET.vowels,
+            sig
+        )
         # ── 1. Passive vowel lengthening ──────────────────────────────────────
         self.passive_vowels = pn.cdrewrite(
             pn.string_map([
@@ -74,13 +129,17 @@ class MorphologyEngine:
         # Converts semivowels to vowels in weak contexts for specific roots (e.g. vac -> uc)
         self.samprasarana = pn.cdrewrite(
             pn.string_map([
-                ("ya", "i"),
-                ("va", "u"),
-                ("ra", "ṛ"),
+                ("[SAMP]ya", "i"),   # yaj -> i + j -> ij
+                ("[SAMP]va", "u"),   # vap -> u + p -> up
+                ("[SAMP]ra", "ṛ"),   # grah -> gṛh
+                
+                # Handle cases where a consonant precedes the semivowel (e.g., svap)
+                # s + [SAMP]va -> su
+                ("s[SAMP]va", "su"), 
+                ("p[SAMP]ra", "pṛ"), 
             ]),
-            "", "[SAMPRASARANA]", sig
+            "", "", sig
         )
-
 
         # ── 3. Causative passive: erase the ayadi-trigger 'a' and the tag ─────
         # The cl10 passive stem is: vriddhi(root) + "+a[CAUS_PASS]+ya"
@@ -186,7 +245,7 @@ class MorphologyEngine:
             "[PASSIVE]", "[CLASS4]", "[CLASS8]", "[CAUS_PASS]",
             "[STRONG]",  "[WEAK]",   "[VRIDDHI]", "[CLASS2_WEAK]",
             "[ROOT_AORIST]", "[AORIST]", "[AORIST_PASS_3SG]", "[INTENSIVE_ACTIVE]",
-            "[SAMPRASARANA]", "[AUG]"
+            "[SAMP]", "[AUG]", "[NASAL]"
         )
         self.clean_tags = pn.cdrewrite(pn.cross(all_tags, ""), "", "", sig)
 
@@ -231,6 +290,12 @@ class MorphologyEngine:
             fst
             @ self.augment_vriddhi
             @ self.augment_erase
+            @ self.nasal_m_insertion
+            @ self.nasal_n_insertion
+            @ self.nasal_retroflex_insertion
+            @ self.nasal_velar_insertion
+            @ self.nasal_palatal_insertion
+            @ self.nasal_vowel_fallback
             @ self.samprasarana
             @ self.passive_vowels
             @ self.class4_lengthening

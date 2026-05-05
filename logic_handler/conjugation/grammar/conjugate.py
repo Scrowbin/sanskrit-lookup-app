@@ -35,7 +35,7 @@ from endings import SuffixProvider, Suffix
 from morphology import MorphologyEngine
 from feature_resolver import MorphologicalFeatureResolver
 from inria_lookup import INRIA_LOOKUP
-
+from dhatupatha_analyzer import DHATUPATHA_ANALYZER
 
 class SanskritConjugator:
     """Orchestrates the conjugation pipeline from root to inflected form.
@@ -149,6 +149,7 @@ class SanskritConjugator:
         tense: str = "present",
         derivative: str | None = None,
         use_db: bool = True,
+        auxiliary: str = "kṛ",
     ) -> str:
         """Conjugate a Sanskrit root.
 
@@ -166,8 +167,7 @@ class SanskritConjugator:
             IAST form, or multiple forms joined with " OR ".
         """
         if tense == "krdantas":
-            return self.get_krdantas_block(root_str, class_num, use_db=use_db)
-        # Block morphologically impossible combinations early
+            return self.get_krdantas_block(root_str, class_num, derivative=derivative, use_db=use_db)        # Block morphologically impossible combinations early
         if voice == "passive" and tense in (
             "perfect", "future", "periphrastic_future", "conditional", "benedictive"
         ):
@@ -178,10 +178,22 @@ class SanskritConjugator:
 
         # ── 0. Parse Preverbs (Upasargas) ────────────────────────────────────
         preverb_str = ""
+        clean_root_str = root_str
         if "+" in root_str:
             parts = root_str.rsplit("+", 1)
             preverb_str = parts[0] + "+"
             root_str = parts[1]
+
+        # ── 0.5 Voice (Pada) Validation Gatekeeper ───────────────────────────
+        # We only strictly validate primary (non-derivative) active/middle requests.
+        if voice != "passive" and derivative is None:
+            root_obj = DHATUPATHA_ANALYZER.get(clean_root_str, class_num)
+            if voice not in root_obj.permitted_voices:
+                allowed = "/".join(root_obj.permitted_voices)
+                raise ValueError(
+                    f"Grammar error: Root '{clean_root_str}' class {class_num} "
+                    f"does not permit '{voice}' voice. Allowed: {allowed}."
+                )
 
         # ── 1. Resolve morphological features ────────────────────────────────
         f = self.resolver.resolve(
@@ -190,7 +202,7 @@ class SanskritConjugator:
 
         if f.is_periphrastic:
             return self._conjugate_periphrastic_perfect(
-                root_str, class_num, voice, person, number, derivative, preverb_str
+                root_str, class_num, voice, person, number, derivative, preverb_str, auxiliary
             )
 
         # ── 2. Build / fetch stem FST ─────────────────────────────────────────
@@ -256,12 +268,37 @@ class SanskritConjugator:
         number: str,
         derivative: str | None = None,
         preverb_str: str = "",
+        auxiliary: str = "kṛ",
     ) -> str:
         """Periphrastic perfect: base-stem + ām + auxiliary (kṛ/bhū/as)."""
+        
+        # 1. Validate auxiliary and map to its Dhatupatha class
+        valid_aux = {"kṛ": 8, "bhū": 1, "as": 2}
+        if auxiliary not in valid_aux:
+            raise ValueError(
+                f"Invalid periphrastic auxiliary '{auxiliary}'. "
+                "Sanskrit only permits 'kṛ', 'bhū', or 'as'."
+            )
+
         base_fst = self.stems._build_periphrastic_base(root_str, class_num, derivative)
         base_fst = (base_fst @ self.morphology.clean_tags).optimize()
 
-        aux_str = self.conjugate("kṛ", 8, person, number, voice, "perfect")
+        # 2. Enforce Pāṇinian voice rules for auxiliaries
+        # 'bhū' and 'as' ONLY take active endings, regardless of the main verb's voice.
+        aux_voice = "active" if auxiliary in ("bhū", "as") else voice
+        aux_class = valid_aux[auxiliary]
+
+        # 3. Generate the auxiliary (turn off DB to ensure pure generation)
+        aux_str = self.conjugate(
+            root_str=auxiliary, 
+            class_num=aux_class, 
+            person=person, 
+            number=number, 
+            voice=aux_voice, 
+            tense="perfect", 
+            use_db=False
+        )
+        
         results = []
         for aux in aux_str.split(" OR "):
             combined = base_fst + pn.accep("+") + pn.accep(aux)
@@ -269,9 +306,10 @@ class SanskritConjugator:
                 combined = pn.accep(preverb_str) + combined
             for form in self.sandhi.apply_all(combined).optimize().paths().ostrings():
                 results.append(form)
+                
         return " OR ".join(sorted(set(results))) if results else "CRASHED: No periphrastic forms"
 
-    def get_krdantas_block(self, root_str: str, class_num: int, use_db: bool = False) -> str:
+    def get_krdantas_block(self, root_str: str, class_num: int, derivative: str | None = None, use_db: bool = False) -> str:
         preverb_str = ""
         if "+" in root_str:
             parts = root_str.rsplit("+", 1)
@@ -280,7 +318,7 @@ class SanskritConjugator:
             
         from krdantas import KrdantaEngine
         engine = KrdantaEngine(self)
-        return engine.generate_block(root_str, class_num, preverb_str)
+        return engine.generate_block(root_str, class_num, preverb_str, derivative=derivative)
 
     # ──────────────────────────────────────────────────────────────────────────
     # Debug helper — per-rule trace through entire pipeline
