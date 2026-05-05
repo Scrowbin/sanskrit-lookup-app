@@ -53,13 +53,26 @@ class ReduplicationEngine:
     # ── Internal helpers ──────────────────────────────────────────────────────
 
     def _extract_initial_syllable(self, root_str: str) -> str:
-        """Return the initial consonant-cluster + first vowel of *root_str*."""
+        """Return the FIRST consonant + first vowel of *root_str* for reduplication.
+
+        Whitney §590 / Pāṇini 7.4.60: when a root begins with a consonant cluster,
+        only the FIRST consonant of the cluster is reduplicated.
+        e.g. kṣip → initial 'k' (not 'kṣ'); śru → initial 'ś' (not 'śr').
+        For vowel-initial roots the first vowel is the syllable nucleus.
+        """
         vowels = set(ALPHABET.vowels_list)
         syllable = ""
+        saw_consonant = False
         for ch in root_str:
-            syllable += ch
             if ch in vowels:
+                syllable += ch
                 break
+            else:
+                if not saw_consonant:
+                    # Take only the FIRST consonant before the root vowel
+                    syllable += ch
+                    saw_consonant = True
+                # Any further consonants in the initial cluster are skipped
         return syllable
 
     def _reduce_via_fst(self, syllable: str) -> str:

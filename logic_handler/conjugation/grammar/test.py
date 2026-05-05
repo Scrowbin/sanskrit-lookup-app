@@ -304,4 +304,4 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
         print(f"  {root:<10} {c['pass']:>6} {c['fail']:>6} {c['error']:>6} {c['unsupported']:>6}  {desc}")
 
 if __name__ == "__main__":
-    run_focused_benchmark("../data/roots.csv", "benchmark_failures.csv")
+    run_focused_benchmark("data/roots.csv", "benchmark_failures.csv")

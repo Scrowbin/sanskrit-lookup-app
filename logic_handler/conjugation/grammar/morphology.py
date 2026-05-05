@@ -21,6 +21,26 @@ class MorphologyEngine:
         self._build_rules(sig)
 
     def _build_rules(self, sig):
+        # ── 0. Augment vriddhi coalescence ──────────────────────────────
+        # Whitney §135 / Pāṇini 6.1.87-89: augment a + vowel-initial stem
+        # yields vriddhi coalescence, NOT guna.
+        # [AUG]a+i/ī → ai, [AUG]a+u/ū → au, [AUG]a+ṛ/ṝ → ār, [AUG]a+a/ā → ā
+        self.augment_vriddhi = pn.cdrewrite(
+            pn.string_map([
+                ("[AUG]a+i",  "ai"), ("[AUG]a+ī",  "ai"),
+                ("[AUG]a+u",  "au"), ("[AUG]a+ū",  "au"),
+                ("[AUG]a+ṛ",  "ār"), ("[AUG]a+ṝ",  "ār"),
+                ("[AUG]a+a",  "ā"),  ("[AUG]a+ā",  "ā"),
+                ("[AUG]a+e",  "e"),   # a+e → e (already guna-form; rare)
+                ("[AUG]a+o",  "o"),   # a+o → o (already guna-form; rare)
+            ]),
+            "", "", sig
+        )
+        # Erase unused [AUG] tag (when augment precedes consonant-initial stem)
+        self.augment_erase = pn.cdrewrite(
+            pn.cross("[AUG]", ""), "", "", sig
+        )
+
         # ── 1. Passive vowel lengthening ──────────────────────────────────────
         self.passive_vowels = pn.cdrewrite(
             pn.string_map([
@@ -166,7 +186,7 @@ class MorphologyEngine:
             "[PASSIVE]", "[CLASS4]", "[CLASS8]", "[CAUS_PASS]",
             "[STRONG]",  "[WEAK]",   "[VRIDDHI]", "[CLASS2_WEAK]",
             "[ROOT_AORIST]", "[AORIST]", "[AORIST_PASS_3SG]", "[INTENSIVE_ACTIVE]",
-            "[SAMPRASARANA]"
+            "[SAMPRASARANA]", "[AUG]"
         )
         self.clean_tags = pn.cdrewrite(pn.cross(all_tags, ""), "", "", sig)
 
@@ -174,7 +194,10 @@ class MorphologyEngine:
         """Apply all morphological adjustments in order."""
         if debug:
             rules = [
-                ("passive_vowels",          self.passive_vowels),
+                ("augment_vriddhi",          self.augment_vriddhi),
+                ("augment_erase",            self.augment_erase),
+                ("samprasarana",             self.samprasarana),
+                ("passive_vowels",           self.passive_vowels),
                 ("class4_lengthening",       self.class4_lengthening),
                 ("caus_pass_erase_with_a",   self.caus_pass_erase_with_a),
                 ("caus_pass_erase",          self.caus_pass_erase),
@@ -187,8 +210,7 @@ class MorphologyEngine:
                 ("class2_weak_cons",         self.class2_weak_cons),
                 ("class2_weak_vowel",        self.class2_weak_vowel),
                 ("class2_weak_vac",          self.class2_weak_vac),
-                ("samprasarana",             self.samprasarana),
-                ("clean_tags",              self.clean_tags),
+                ("clean_tags",               self.clean_tags),
             ]
             print("  [morphology]")
             for name, rule_fst in rules:
@@ -207,6 +229,8 @@ class MorphologyEngine:
             return fst
         return (
             fst
+            @ self.augment_vriddhi
+            @ self.augment_erase
             @ self.samprasarana
             @ self.passive_vowels
             @ self.class4_lengthening

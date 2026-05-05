@@ -101,7 +101,7 @@ perfect_redupe_overrides = {
 
 # ── Perfect 2sg: roots that take bare -tha (not -itha) ───────────────────────
 # INRIA uses -itha for yuj (yuyojitha), so yuj is NOT in this set.
-perfect_bare_tha_roots = set()  # none confirmed by INRIA data
+perfect_bare_tha_roots = {"tan", "man", "labh"}  # none confirmed by INRIA data
 
 # ── Perfect weak: roots that use GUNA grade (not bare root) in weak forms ─────
 # For roots in this set, the perfect weak stem = guna(root), not bare root.
@@ -116,14 +116,19 @@ perfect_weak_guna_roots = set()  # hu/su now fully handled by perfect_stem_overr
 # Key: root IAST → dict with "strong" (sg active) and "weak" (all others) stems.
 # The stems are bare (no boundary prefix); _build_perfect_system prepends prefix+.
 perfect_stem_overrides = {
-    "tan": {"strong": "tatan", "weak": "ten"},
+    # Whitney §789: 3sg strong uses the long-ā (vriddhi) stem while 1sg/2sg use guna.
+    # 'strong' = 1sg/2sg stem; 'strong_3sg' = 3sg stem.
+    "tan": {"strong": "tatan", "strong_3sg": "tatān", "weak": "ten"},
     "bhū": {"strong": "babhūv", "weak": "babhūv"},
     # hu: weak before vowels (juhav+iva) vs zero-grade before consonants (juhuv+thaḥ)
-    "hu":  {"strong": "juhāv", "weak": "juhav", "weak2": "juhuv"},
+    "hu":  {"strong": "juhav",  "strong_3sg": "juhāv",  "weak": "juhav",  "weak2": "juhuv"},
     # su: weak before vowels (suṣav+iva) vs zero-grade before consonants (suṣuv+thaḥ)
-    "su":  {"strong": "suṣāv", "weak": "suṣav", "weak2": "suṣuv"},
-    "gam": {"strong": "jagām", "weak": "jagm"},
-    "div": {"strong": "didev", "weak": "didiv"},  # didev+a=dideva / didiviva
+    "su":  {"strong": "suṣav",  "strong_3sg": "suṣāv",  "weak": "suṣav",  "weak2": "suṣuv"},
+    
+    "div": {"strong": "didīv",  "strong_3sg": "didev",   "weak": "didīv"},
+    # gam: Whitney §789 – 1sg/2sg jagama/jagantha; 3sg jagāma (long ā)
+    "gam": {"strong": "jagam", "strong_3sg": "jagām", "weak": "jagm"},
+    "smṛ": {"strong": "sasmar", "strong_3sg": "sasmār", "weak": "sasmar"},
     "pā":  {"strong": "papā", "weak": "pap"},
     "dā":  {"strong": "dadā", "weak": "dad"},
     "sthā": {"strong": "tasthā", "weak": "tasth"},
@@ -133,15 +138,23 @@ perfect_stem_overrides = {
     # yaj: Samprasāraṇa perfect. INRIA favors strong iyāj(a), weak īj-forms.
     "yaj": {"strong": "iyāj", "weak": "īj"},
     # labh: strong = lalabh, weak = e-grade lebh (INRIA benchmark forms).
-    "labh": {"strong": "lalabh", "weak": "lebh"},
-    # man: perfect strong mamān-, weak men- (Whitney class pattern).
-    "man": {"strong": "mamān", "weak": "men"},
+    "labh": {"strong": "lalabh", "strong_3sg": "lalābh", "weak": "lebh"},
+    # man: Whitney §789 – 1sg/2sg mamana/mamantha; 3sg mamāna (long ā)
+    "man": {"strong": "maman", "strong_3sg": "mamān", "weak": "men"},
     # vac: perfect 3sg uvāca, weak ūc- (Whitney §840 pattern).
     "vac": {"strong": "uvāc", "weak": "ūc"},
     # vid: perfect-as-present veda (Whitney §801); weak stem kept as vid-.
-    "vid": {"strong": "ved", "weak": "vid"},
+    "vid": {"strong": "vived", "strong_3sg": "vived", "weak": "vivid", "weak2": "vid"},
     # kṛ: perfect strong cakār-, weak cakṛ- (Whitney perfect paradigm family).
     "kṛ": {"strong": "cakār", "weak": "cakṛ"},
+    # nī: 3sg naināya (vriddhi ni → nai via ayadi → nāya); 1sg/2sg ninaya
+    # Whitney §787: 3sg takes vriddhi for long-vowel roots.
+    "nī": {"strong": "nine", "strong_3sg": "nināy", "weak": "nin"},
+    # śru: per INRIA: strong śuśrav, weak śuśruv (not śruśrv-)
+    "śru": {"strong": "śuśrav", "weak": "śuśruv"},
+    # kṣip: class-6 root — perfect takes no guṇa (Pāṇini 7.3.84)
+    # strong = cikṣip (short i, no e-guna); weak = cikṣip- (same)
+    "kṣip": {"strong": "cikṣip", "weak": "cikṣip"},
 }
 
 
@@ -206,7 +219,7 @@ aorist_overrides = {
 # Roots whose future stem is NOT guna(root) + sya/iṣya.
 # Maps root_str → {"stem": bare_stem, "anit": bool}
 future_stem_overrides = {
-    "div": {"stem": "dīv"},          # dīviṣyati — uses class-4 lengthened stem, no guna
+    "div": {"stem": "dīv", "anit": False},  # dīvitā (seṭ; class-4 lengthened stem + i)
     "gam": {"stem": "gam"},          # gamiṣyati (Seṭ despite anudātta)
     "kṛ":  {"stem": "kar", "anit": False},  # kariṣyati: guna of ṛ = ar; Seṭ (overrides lexicon)
     "krī": {"stem": "kre", "anit": True},   # kreṣyati: Aniṭ (overrides lexicon)
@@ -216,6 +229,7 @@ future_stem_overrides = {
     "hā":  {"stem": "hā",  "anit": True},   # hāsyati
     "pā":  {"stem": "pā",  "anit": True},   # pāsyati (root-aorist class, aniṭ)
 }
+
 
 # Periphrastic-future stem overrides (where stem ≠ guna + i)
 periphrastic_stem_overrides = {
@@ -230,7 +244,10 @@ periphrastic_stem_overrides = {
     "hā":  "hā",     # hātā (aniṭ)
     "dā":  "dā",     # dātā (aniṭ: class 3 root-aorist)
     "yaj": "yaṣ",    # yaṣṭā (INRIA)
+    # Aniṭ roots whose periphrastic future omits -i-:
+    "smṛ": "smar",   # smartā (aniṭ; guna of smṛ = smar, then aniṭ)
 }
+
 
 # ── Desiderative stem overrides ──────────────────────────────────────────────
 # Maps root_str -> list of possible desiderative bases
@@ -268,13 +285,20 @@ desiderative_stem_overrides = {
 intensive_stem_overrides = {
     "gam":  "jaṅgam",  # nasal insertion: ga+gam → jaṅgam (not jagam)
     "dviṣ": "dedviṣ",  # prefix drops 'v': di + dviṣ → dedviṣ (not dvedveṣ)
-    "budh": "bobhodh", # Grassmann throwback: bo + bodh → bobhodh
+    "budh": "bobodh",  # Grassmann throwback: bo + bodh → bobodh (not bobhodh)
     "han":  "jaṅghan",
     "vṛ":   "varīvṛ",
     "pā":   "pepīy",
-    "kṛ":   "cekṛ",
+    # Whitney §1002 / INRIA: kṛ intensive uses carkar- base (not cekṛ-)
+    # The forms attest: carkarīmi, carkarīṣi, carkarti, carkarvaḥ etc.
+    "kṛ":   "carkar",
     "kṣip": "cekṣip",
+    # yaj: intensive prefix is yāy- (long ā); Whitney §1014 heavy-syllable intensives
+    "yaj":  "yāyaj",
+    # vid: intensive vedvid- (redupl. + root with Grassmann)
+    "vid":  "vevid",
 }
+
 
 # ── Krdanta Overrides ────────────────────────────────────────────────────────
 # Used for suppletive/irregular kṛdanta forms that cannot be derived algorithmically.

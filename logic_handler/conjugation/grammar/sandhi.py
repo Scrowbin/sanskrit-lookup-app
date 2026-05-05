@@ -72,11 +72,18 @@ class SandhiEngine:
         )
 
         # 5. Yan sandhi (semi-vowelisation before vowel)
+        # Whitney §128-129 / Pāṇini 6.1.77: short i/u/ṛ before a vowel-initial
+        # suffix insert a semivowel (y/v/r) while RETAINING the root vowel.
+        # e.g. cikri+iva → cikriyiva  (not cikryiva)
+        #      suṣu+iva  → suṣuviva   (not suṣviva)
+        # Long ī/ū at a morpheme boundary become y/v (standard yan).
         self.yan_sandhi = pn.cdrewrite(
             pn.string_map([
-                ("i+", "y"), ("ī+", "y"),
-                ("u+", "v"), ("ū+", "v"),
-                ("ṛ+", "r"),
+                ("i+",  "iy"),  # short i: insert y, keep i
+                ("ī+",  "y"),   # long ī: becomes y (standard yan)
+                ("u+",  "v"),  # short u: insert v, keep u
+                ("ū+",  "v"),   # long ū: becomes v (standard yan)
+                ("ṛ+",  "r"),
             ]),
             "", ALPHABET.vowels, self.sig
         )

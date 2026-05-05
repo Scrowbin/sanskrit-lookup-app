@@ -368,11 +368,24 @@ class StemBuilder:
         return pn.accep(root_str + "[AORIST]")
 
     def _build_benedictive_system(self, root_str, class_num, strength, tense, **kwargs):
-        """Benedictive stem: root with specific phonological mutations before active suffix."""
+        """Benedictive stem: root with specific phonological mutations before active suffix.
+
+        Whitney §921a: the active benedictive (precative) of samprasāraṇa roots
+        uses the samprasāraṇa (weak/passive-style) form of the root, not the full root.
+        e.g. yaj (active bened.) → ij+yāsām (not yaj+yāsām).
+        """        
         voice = kwargs.get("voice", "active")
         
         # In the active voice, the suffix begins with y. Special sandhi applies to the root:
         if voice == "active":
+            # Samprasāraṇa roots (Whitney §921a): use the passive/weak root form
+            _SAMPRASARANA_BENED_ROOTS = {"yaj", "vac", "vap", "vah", "grah", "svap",
+                                         "vad", "vas", "vyadh", "vyac"}
+            if root_str in _SAMPRASARANA_BENED_ROOTS:
+                samp = self._compute_samprasarana_passive(root_str)
+                if samp is not None:
+                    return pn.accep(samp)
+                    
             if root_str.endswith("ā"):
                 # dā -> de
                 root_str = root_str[:-1] + "e"
@@ -415,10 +428,16 @@ class StemBuilder:
                     return pn.accep("cakār")
                 return pn.accep("cakar")
             if root_str in perfect_stem_overrides:
-                stem_str = perfect_stem_overrides[root_str]["strong"]
-                return pn.accep(stem_str)
-            # Whitney 805: strong forms use Guna (not Vrddhi) for most roots
-            root_fst = self._apply_guna(root_str, "[STRONG]")
+                info = perfect_stem_overrides[root_str]
+                # Whitney §789/805: 3sg uses the vriddhi/long-ā stem;
+                # 1sg and 2sg use the regular strong (guna) stem.
+                # Use the 'strong_3sg' key if present, else fall back to 'strong'.
+                if person == "3" and number == "sg" and "strong_3sg" in info:
+                    return pn.accep(info["strong_3sg"])
+                return pn.accep(info["strong"])
+            else:
+                # Whitney §805: strong forms use Guna (not Vrddhi) for most roots
+                root_fst = self._apply_guna(root_str, "[STRONG]")
         else:
             # Weak: priority table
             if root_str in perfect_stem_overrides:

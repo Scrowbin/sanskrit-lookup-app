@@ -199,9 +199,12 @@ class SanskritConjugator:
             f.effective_derivative, person, number,
         )
 
-        # ── 3. Augmentation (a- prefix for past tenses) ───────────────────────
+        # ── 3. Augmentation (a- prefix for past tenses) ──────────────────────────────
         if f.augment:
-            stem = pn.accep("a+") + stem
+            # [AUG] tag allows MorphologyEngine to apply vriddhi coalescence
+            # (a+i→ai, a+u→au) rather than guna (e, o) when the stem is
+            # vowel-initial. Whitney §135 / Pāṇini 6.1.87-89.
+            stem = pn.accep("[AUG]a+") + stem
 
         # ── 4. Fetch ending and combine ───────────────────────────────────────
         endings = self._fetch_endings(f.effective_class, voice, tense, root_str=root_str)

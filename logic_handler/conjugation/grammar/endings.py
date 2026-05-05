@@ -155,7 +155,7 @@ class SuffixProvider:
 
     @staticmethod
     def get_imperative_active(class_num: int = 1, root_str=None, **kwargs) -> dict[str, Suffix]:
-        if is_thematic(class_num):
+        if is_thematic(class_num) or class_num in (5, 8, 9):
             return {
                 "[3sg]": _s("tu"),   "[3du]": _s("tām"),  "[3pl]": _s("ntu"),
                 "[2sg]": _s(""),     "[2du]": _s("tam"),  "[2pl]": _s("ta"),
@@ -244,7 +244,7 @@ class SuffixProvider:
             "[1sg]": _s(first_third_sg), "[1du]": _s("iva"),   "[1pl]": _s("ima"),
         }
         # ṛ-final roots use bare du/pl endings
-        if root_str and root_str.endswith("ṛ") and root_str != "kṛ":
+        if root_str and root_str.endswith("ṛ") and root_str != "kṛ" and root_str not in perfect_stem_overrides:
             endings["[1du]"] = _s("va")
             endings["[1pl]"] = _s("ma")
             endings["[2du]"] = _s("vathuḥ")

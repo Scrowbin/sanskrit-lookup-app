@@ -47,7 +47,7 @@ class SanskritAlphabet:
             "[STRONG]", "[WEAK]", "[VRIDDHI]",
             "[CLASS4]", "[CLASS8]", "[PASSIVE]", "[CAUS_PASS]",
             "[ROOT_AORIST]", "[AORIST]", "[AORIST_PASS_3SG]", "[INTENSIVE_ACTIVE]",
-            "[CLASS2_WEAK]"
+            "[CLASS2_WEAK]", "[SAMPRASARANA]", "[AUG]"
         ]
 
         # ── Pynini FST atoms ─────────────────────────────────────────────────
