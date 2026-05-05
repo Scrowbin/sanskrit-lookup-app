@@ -1,3 +1,13 @@
 A single irregular i-stem noun,[32] sakhi ,[R][q] has a stem in -i but declines similarly to the above – simply with y i ī taking the place of r ṛ ṝ: 
 
 
+
+our format should be:
+
+word[STEM][Nom / Acc / Ins] [Sg Pl Du]
+
+
+Inria L's 
+
+incorrect declension for the word bhāvant: its NEU PL NOM should be bhāvanti NOT bhāvannti
+

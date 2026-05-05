@@ -1,26 +1,39 @@
 import pynini as pn
-from rules import *
 
 # 1. Define our dynamic gender matchers
 any_g = pn.union("[Masc]", "[Fem]", "[Neut]")
-mf_g = pn.union("[Masc]", "[Fem]") # For Masc/Fem shared cases
+mf_g = pn.union("[Masc]", "[Fem]")  # For Masc/Fem shared cases
 
-'''
+"""
 1. Consonant t-stem (e.g., marut, trivṛt)
-'''
+"""
 # --- Gender-Specific Cases (Nom, Acc, Voc) ---
 # Masc/Fem
 nom_sg_t_mf = pn.cross("[T_STEM]", "") + pn.cross(mf_g, "") + pn.cross("[Nom][Sg]", "")
-acc_sg_t_mf = pn.cross("[T_STEM]", "") + pn.cross(mf_g, "") + pn.cross("[Acc][Sg]", "am")
+acc_sg_t_mf = (
+    pn.cross("[T_STEM]", "") + pn.cross(mf_g, "") + pn.cross("[Acc][Sg]", "am")
+)
 voc_sg_t_mf = pn.cross("[T_STEM]", "") + pn.cross(mf_g, "") + pn.cross("[Voc][Sg]", "")
 
-nom_du_t_mf = pn.cross("[T_STEM]", "") + pn.cross(mf_g, "") + pn.cross("[Nom][Du]", "au")
-acc_du_t_mf = pn.cross("[T_STEM]", "") + pn.cross(mf_g, "") + pn.cross("[Acc][Du]", "au")
-voc_du_t_mf = pn.cross("[T_STEM]", "") + pn.cross(mf_g, "") + pn.cross("[Voc][Du]", "au")
+nom_du_t_mf = (
+    pn.cross("[T_STEM]", "") + pn.cross(mf_g, "") + pn.cross("[Nom][Du]", "au")
+)
+acc_du_t_mf = (
+    pn.cross("[T_STEM]", "") + pn.cross(mf_g, "") + pn.cross("[Acc][Du]", "au")
+)
+voc_du_t_mf = (
+    pn.cross("[T_STEM]", "") + pn.cross(mf_g, "") + pn.cross("[Voc][Du]", "au")
+)
 
-nom_pl_t_mf = pn.cross("[T_STEM]", "") + pn.cross(mf_g, "") + pn.cross("[Nom][Pl]", "as")
-acc_pl_t_mf = pn.cross("[T_STEM]", "") + pn.cross(mf_g, "") + pn.cross("[Acc][Pl]", "as")
-voc_pl_t_mf = pn.cross("[T_STEM]", "") + pn.cross(mf_g, "") + pn.cross("[Voc][Pl]", "as")
+nom_pl_t_mf = (
+    pn.cross("[T_STEM]", "") + pn.cross(mf_g, "") + pn.cross("[Nom][Pl]", "as")
+)
+acc_pl_t_mf = (
+    pn.cross("[T_STEM]", "") + pn.cross(mf_g, "") + pn.cross("[Acc][Pl]", "as")
+)
+voc_pl_t_mf = (
+    pn.cross("[T_STEM]", "") + pn.cross(mf_g, "") + pn.cross("[Voc][Pl]", "as")
+)
 
 # Neuter
 nom_sg_t_n = pn.cross("[T_STEM][Neut][Nom][Sg]", "")
@@ -60,9 +73,9 @@ gen_pl_t = t_base + pn.cross("[Gen][Pl]", "ām")
 loc_pl_t = t_base + pn.cross("[Loc][Pl]", "su")
 
 
-'''
+"""
 2. Consonant as-stem & is-stem (e.g., manas, havis)
-'''
+"""
 # --- Gender-Specific Cases (Nom, Acc, Voc - Neut) ---
 nom_sg_s_n = pn.cross("[S_STEM][Neut][Nom][Sg]", "")
 acc_sg_s_n = pn.cross("[S_STEM][Neut][Acc][Sg]", "")
@@ -103,4 +116,3 @@ dat_pl_s = s_base + pn.cross("[Dat][Pl]", "bhyas")
 abl_pl_s = s_base + pn.cross("[Abl][Pl]", "bhyas")
 gen_pl_s = s_base + pn.cross("[Gen][Pl]", "ām")
 loc_pl_s = s_base + pn.cross("[Loc][Pl]", "su")
-

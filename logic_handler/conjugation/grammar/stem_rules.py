@@ -206,22 +206,50 @@ class StemBuilder:
         phonemes = ALPHABET.parse_phonemes(root_str)
         if not phonemes: return False
         if phonemes[-1] in ALPHABET.vowels_list: return False
-        if len(phonemes) >= 2 and phonemes[-2] in ("i", "u", "ṛ", "ḷ"):
+        if len(phonemes) >= 2 and phonemes[-2] in ("i", "u", "ṛ", "ḷ"): move all the unncesarry stem override shit in irregulars.py and implement the actual rules
             return True
         return False
 
     def _build_causative_base(self, root_str: str):
-        """Return the FST for the causative base (Vṛddhi/Guna + ayadi)."""
+        """Return the FST f move all the unncesarry stem override shit in irregulars.py and implement the actual rulesor the causative base (Vṛddhi/Guna + ayadi)."""
         if root_str in causative_stem_irregulars:
             return pn.accep(causative_stem_irregulars[root_str])
-        
+
+        phonemes = ALPHABET.parse_phonemes(root_str)
+        vowels = set(ALPHABET.vowels_list)
+        vowel_positions = [i for i, ph in enumerate(phonemes) if ph in vowels]
+
+        # Paninian default for ā-final roots: dā -> dāp-, sthā -> sthāp-.
         if root_str.endswith("ā"):
             return pn.accep(root_str + "p+")
+
+        # Productive rule family: consonant-final a-roots (e.g. gam, car)
+        # generally keep the root vowel in ṇic (gam->gamaya, car->cāraya/coraya
+        # by lexical split). Keep pure a-roots unchanged unless a lexical
+        # irregular explicitly overrides this.
+        if (
+            phonemes
+            and phonemes[-1] not in vowels
+            and len(vowel_positions) == 1
+            and phonemes[vowel_positions[0]] == "a"
+        ):
+            return pn.accep(root_str + "+")
+
+        # Many consonant-final roots with long high vowels are non-strengthening
+        # in causative stem formation (e.g. pūj -> pūjaya).
+        if (
+            phonemes
+            and phonemes[-1] not in vowels
+            and len(phonemes) >= 2
+            and phonemes[-2] in {"ī", "ū", "ṝ"}
+        ):
+            return pn.accep(root_str + "+")
+
         if self._takes_guna_in_causative(root_str):
             base = self._apply_guna(root_str, "[STRONG]")
         else:
             base = self._apply_vriddhi(root_str)
-        
+
         return base + pn.accep("+")
 
     # ─── Tense-system builders ────────────────────────────────────────────────

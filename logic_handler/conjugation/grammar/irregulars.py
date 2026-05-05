@@ -71,15 +71,11 @@ aset_roots = {
 # _build_class_10 appends "+aya" after this base.
 causative_stem_irregulars = {
     "krī": "krāp",   # krāpayati
-    "div": "dev",    # devayati (guna of div — no vriddhi since i is short penultimate)
-    "gam": "gam",    # gamayati (a-vowel root: no change)
     "han": "ghāt",   # ghātayati
     "labh": "lambh", # lambhayati (INRIA)
     "dā": "dāp",     # dāpayati
     "sthā": "sthāp", # sthāpayati
     "pā": "pāy",     # pāyayati (INRIA also allows pālayati)
-    "pūj": "pūj",    # pūjayati (long-ū root: no vrddhi/guna change)
-    "cur": "cor",    # corayati (guna of u → o; NOT vrddhi)
 }
 
 

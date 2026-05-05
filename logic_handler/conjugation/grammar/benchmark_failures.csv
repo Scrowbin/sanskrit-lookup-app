@@ -1,0 +1,1033 @@
+Root,Class,Derivation,Tense,Voice,Person,Number,Expected (INRIA),Actual (FST),Error_Type
+bhū,1 (primary),primary,perfect,active,1,du,babhūviva,babhviva,Mismatch
+bhū,1 (primary),primary,perfect,active,1,pl,babhūvima,babhvima,Mismatch
+bhū,1 (primary),primary,perfect,active,2,sg,babhūtha OR babhūvitha,babhavitha,Mismatch
+bhū,1 (primary),primary,perfect,active,2,du,babhūvathuḥ,babhvathuḥ,Mismatch
+bhū,1 (primary),primary,perfect,active,2,pl,babhūva,babhva,Mismatch
+bhū,1 (primary),primary,perfect,active,3,du,babhūvatuḥ,babhvatuḥ,Mismatch
+bhū,1 (primary),primary,perfect,active,3,pl,babhūvuḥ,babhūḥ,Mismatch
+bhū,1 (desiderative),desiderative,present,active,1,sg,bubhūṣāmi,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,active,1,du,bubhūṣāvaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,active,1,pl,bubhūṣāmaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,active,2,sg,bubhūṣasi,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,active,2,du,bubhūṣathaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,active,2,pl,bubhūṣatha,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,active,3,sg,bubhūṣati,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,active,3,du,bubhūṣataḥ,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,active,3,pl,bubhūṣanti,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,middle,1,sg,bubhūṣe,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,middle,1,du,bubhūṣāvahe,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,middle,1,pl,bubhūṣāmahe,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,middle,2,sg,bubhūṣase,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,middle,2,du,bubhūṣethe,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,middle,2,pl,bubhūṣadhve,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,middle,3,sg,bubhūṣate,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,middle,3,du,bubhūṣete,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,middle,3,pl,bubhūṣante,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,passive,1,sg,bubhūṣye,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,passive,1,du,bubhūṣyāvahe,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,passive,1,pl,bubhūṣyāmahe,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,passive,2,sg,bubhūṣyase,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,passive,2,du,bubhūṣyethe,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,passive,2,pl,bubhūṣyadhve,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,passive,3,sg,bubhūṣyate,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,passive,3,du,bubhūṣyete,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,present,passive,3,pl,bubhūṣyante,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,active,1,sg,abubhūṣam,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,active,1,du,abubhūṣāva,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,active,1,pl,abubhūṣāma,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,active,2,sg,abubhūṣaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,active,2,du,abubhūṣatam,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,active,2,pl,abubhūṣata,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,active,3,sg,abubhūṣat,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,active,3,du,abubhūṣatām,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,active,3,pl,abubhūṣan,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,middle,1,sg,abubhūṣe,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,middle,1,du,abubhūṣāvahi,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,middle,1,pl,abubhūṣāmahi,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,middle,2,sg,abubhūṣathāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,middle,2,du,abubhūṣethām,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,middle,2,pl,abubhūṣadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,middle,3,du,abubhūṣetām,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,middle,3,pl,abubhūṣanta,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,passive,1,sg,abubhūṣye,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,passive,1,du,abubhūṣyāvahi,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,passive,1,pl,abubhūṣyāmahi,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,passive,2,sg,abubhūṣyathāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,passive,2,du,abubhūṣyethām,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,passive,2,pl,abubhūṣyadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,passive,3,sg,abubhūṣyata,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,passive,3,du,abubhūṣyetām,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperfect,passive,3,pl,abubhūṣyanta,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,active,1,sg,bubhūṣāṇi,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,active,1,du,bubhūṣāva,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,active,1,pl,bubhūṣāma,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,active,2,sg,bubhūṣa,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,active,2,du,bubhūṣatam,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,active,2,pl,bubhūṣata,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,active,3,sg,bubhūṣatu,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,active,3,du,bubhūṣatām,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,active,3,pl,bubhūṣantu,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,middle,1,sg,bubhūṣai,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,middle,1,du,bubhūṣāvahai,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,middle,1,pl,bubhūṣāmahai,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,middle,2,sg,bubhūṣasva,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,middle,2,du,bubhūṣethām,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,middle,2,pl,bubhūṣadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,middle,3,pl,bubhūṣantām,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,passive,1,sg,bubhūṣyai,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,passive,1,du,bubhūṣyāvahai,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,passive,1,pl,bubhūṣyāmahai,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,passive,2,sg,bubhūṣyasva,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,passive,2,du,bubhūṣyethām,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,passive,2,pl,bubhūṣyadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,passive,3,sg,bubhūṣyatām,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,passive,3,du,bubhūṣyetām,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,imperative,passive,3,pl,bubhūṣyantām,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,active,1,sg,bubhūṣeyam,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,active,1,du,bubhūṣeva,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,active,1,pl,bubhūṣema,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,active,2,sg,bubhūṣeḥ,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,active,2,du,bubhūṣetam,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,active,2,pl,bubhūṣeta,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,active,3,sg,bubhūṣet,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,active,3,du,bubhūṣetām,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,active,3,pl,bubhūṣeyuḥ,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,middle,1,sg,bubhūṣeya,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,middle,1,du,bubhūṣevahi,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,middle,1,pl,bubhūṣemahi,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,middle,2,sg,bubhūṣethāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,middle,2,du,bubhūṣeyāthām,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,middle,2,pl,bubhūṣedhvam,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,middle,3,du,bubhūṣeyātām,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,middle,3,pl,bubhūṣeran,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,passive,1,sg,bubhūṣyeya,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,passive,1,du,bubhūṣyevahi,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,passive,1,pl,bubhūṣyemahi,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,passive,2,sg,bubhūṣyethāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,passive,2,du,bubhūṣyeyāthām,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,passive,2,pl,bubhūṣyedhvam,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,passive,3,sg,bubhūṣyeta,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,passive,3,du,bubhūṣyeyātām,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,optative,passive,3,pl,bubhūṣyeran,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,future,active,1,sg,bubhūṣiṣyāmi,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,future,active,1,du,bubhūṣiṣyāvaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,future,active,1,pl,bubhūṣiṣyāmaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,future,active,2,sg,bubhūṣiṣyasi,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,future,active,2,du,bubhūṣiṣyathaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,future,active,2,pl,bubhūṣiṣyatha,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,future,active,3,sg,bubhūṣiṣyati,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,future,active,3,du,bubhūṣiṣyataḥ,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,future,active,3,pl,bubhūṣiṣyanti,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,future,middle,1,sg,bubhūṣiṣye,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,future,middle,1,du,bubhūṣiṣyāvahe,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,future,middle,1,pl,bubhūṣiṣyāmahe,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,future,middle,2,sg,bubhūṣiṣyase,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,future,middle,2,du,bubhūṣiṣyethe,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,future,middle,2,pl,bubhūṣiṣyadhve,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,future,middle,3,sg,bubhūṣiṣyate,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,future,middle,3,du,bubhūṣiṣyete,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (desiderative),desiderative,future,middle,3,pl,bubhūṣiṣyante,UNSUPPORTED,Unsupported derivation: desiderative
+bhū,1 (intensive),intensive,present,active,1,sg,bobhavīmi OR bobhomi,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,present,active,1,du,bobhavvaḥ OR bobhovaḥ,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,present,active,1,pl,bobhavmaḥ OR bobhomaḥ,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,present,active,2,sg,bobhavīṣi OR bobhoṣi,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,present,active,2,du,bobhavthaḥ OR bobhothaḥ,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,present,active,2,pl,bobhavtha OR bobhotha,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,present,active,3,sg,bobhavīti OR bobhoti,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,present,active,3,du,bobhavtaḥ OR bobhotaḥ,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,present,active,3,pl,bobhavati,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,present,middle,1,sg,bobhūye,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,present,middle,1,du,bobhūyāvahe,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,present,middle,1,pl,bobhūyāmahe,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,present,middle,2,sg,bobhūyase,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,present,middle,2,du,bobhūyethe,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,present,middle,2,pl,bobhūyadhve,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,present,middle,3,sg,bobhūyate,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,present,middle,3,du,bobhūyete,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,present,middle,3,pl,bobhūyante,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperfect,active,1,sg,abobhavam,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperfect,active,1,du,abobhavva OR abobhova,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperfect,active,1,pl,abobhavma OR abobhoma,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperfect,active,2,sg,abobhavīḥ OR abobhoḥ,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperfect,active,2,du,abobhavtam OR abobhotam,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperfect,active,2,pl,abobhavta OR abobhota,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperfect,active,3,sg,abobhavīt OR abobhot,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperfect,active,3,du,abobhavtām OR abobhotām,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperfect,active,3,pl,abobhavuḥ,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperfect,middle,1,sg,abobhūye,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperfect,middle,1,du,abobhūyāvahi,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperfect,middle,1,pl,abobhūyāmahi,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperfect,middle,2,sg,abobhūyathāḥ,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperfect,middle,2,du,abobhūyethām,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperfect,middle,2,pl,abobhūyadhvam,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperfect,middle,3,sg,abobhūyata,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperfect,middle,3,du,abobhūyetām,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperfect,middle,3,pl,abobhūyanta,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperative,active,1,sg,bobhavāni,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperative,active,1,du,bobhavāva,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperative,active,1,pl,bobhavāma,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperative,active,2,sg,bobhavdhi OR bobhohi,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperative,active,2,du,bobhavtam OR bobhotam,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperative,active,2,pl,bobhavta OR bobhota,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperative,active,3,sg,bobhavītu,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperative,active,3,du,bobhavtām OR bobhotām,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperative,active,3,pl,bobhavatu OR bobhotu,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperative,middle,1,sg,bobhūyai,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperative,middle,1,du,bobhūyāvahai,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperative,middle,1,pl,bobhūyāmahai,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperative,middle,2,sg,bobhūyasva,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperative,middle,2,du,bobhūyethām,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperative,middle,2,pl,bobhūyadhvam,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperative,middle,3,sg,bobhūyatām,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperative,middle,3,du,bobhūyetām,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,imperative,middle,3,pl,bobhūyantām,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,optative,active,1,sg,bobhavyām,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,optative,active,1,du,bobhavyāva,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,optative,active,1,pl,bobhavyāma,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,optative,active,2,sg,bobhavyāḥ,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,optative,active,2,du,bobhavyātam,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,optative,active,2,pl,bobhavyāta,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,optative,active,3,sg,bobhavyāt,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,optative,active,3,du,bobhavyātām,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,optative,active,3,pl,bobhavyuḥ,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,optative,middle,1,sg,bobhūyeya,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,optative,middle,1,du,bobhūyevahi,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,optative,middle,1,pl,bobhūyemahi,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,optative,middle,2,sg,bobhūyethāḥ,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,optative,middle,2,du,bobhūyeyāthām,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,optative,middle,2,pl,bobhūyedhvam,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,optative,middle,3,sg,bobhūyeta,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,optative,middle,3,du,bobhūyeyātām,UNSUPPORTED,Unsupported derivation: intensive
+bhū,1 (intensive),intensive,optative,middle,3,pl,bobhūyeran,UNSUPPORTED,Unsupported derivation: intensive
+ad,2 (primary),primary,imperative,active,2,sg,addhi,adhi,Mismatch
+ad,10 (causative),causative,imperfect,active,2,sg,ādayaḥ,ādayāḥ,Mismatch
+ad,10 (causative),causative,imperfect,active,3,sg,ādayat,ādayāt,Mismatch
+hu,3 (primary),primary,imperative,active,2,sg,juhudhi,juhuhi,Mismatch
+hu,3 (primary),primary,perfect,active,2,du,juhuvathuḥ,juhavathuḥ,Mismatch
+hu,3 (primary),primary,perfect,active,2,pl,juhuva,juhava,Mismatch
+hu,3 (primary),primary,perfect,active,3,sg,juhāva,juhava,Mismatch
+hu,3 (primary),primary,perfect,active,3,du,juhuvatuḥ,juhavatuḥ,Mismatch
+hu,3 (primary),primary,perfect,active,3,pl,juhuvuḥ,juhavuḥ,Mismatch
+hu,3 (primary),primary,perfect,middle,1,du,juhuvahe OR juhuvivahe,juhavivahe,Mismatch
+hu,3 (primary),primary,perfect,middle,1,pl,juhumahe OR juhuvimahe,juhavimahe,Mismatch
+hu,3 (primary),primary,perfect,middle,2,sg,juhuviṣe OR juhuṣe,juhaviṣe,Mismatch
+hu,3 (primary),primary,perfect,middle,2,du,juhuvāthe,juhavāthe,Mismatch
+hu,3 (primary),primary,perfect,middle,2,pl,juhudhve OR juhuvidhve,juhavidhve,Mismatch
+hu,3 (primary),primary,perfect,middle,3,sg,juhuve,juhave,Mismatch
+hu,3 (primary),primary,perfect,middle,3,du,juhuvāte,juhavāte,Mismatch
+hu,3 (primary),primary,perfect,middle,3,pl,juhuvire,juhavire,Mismatch
+hu,3 (desiderative),desiderative,present,active,1,sg,juhūṣāmi,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,present,active,1,du,juhūṣāvaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,present,active,1,pl,juhūṣāmaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,present,active,2,sg,juhūṣasi,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,present,active,2,du,juhūṣathaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,present,active,2,pl,juhūṣatha,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,present,active,3,sg,juhūṣati,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,present,active,3,du,juhūṣataḥ,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,present,active,3,pl,juhūṣanti,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,present,passive,1,sg,juhūṣye,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,present,passive,1,du,juhūṣyāvahe,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,present,passive,1,pl,juhūṣyāmahe,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,present,passive,2,sg,juhūṣyase,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,present,passive,2,du,juhūṣyethe,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,present,passive,2,pl,juhūṣyadhve,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,present,passive,3,sg,juhūṣyate,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,present,passive,3,du,juhūṣyete,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,present,passive,3,pl,juhūṣyante,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperfect,active,1,sg,ajuhūṣam,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperfect,active,1,du,ajuhūṣāva,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperfect,active,1,pl,ajuhūṣāma,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperfect,active,2,sg,ajuhūṣaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperfect,active,2,du,ajuhūṣatam,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperfect,active,2,pl,ajuhūṣata,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperfect,active,3,sg,ajuhūṣat,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperfect,active,3,du,ajuhūṣatām,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperfect,active,3,pl,ajuhūṣan,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperfect,passive,1,sg,ajuhūṣye,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperfect,passive,1,du,ajuhūṣyāvahi,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperfect,passive,1,pl,ajuhūṣyāmahi,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperfect,passive,2,sg,ajuhūṣyathāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperfect,passive,2,du,ajuhūṣyethām,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperfect,passive,2,pl,ajuhūṣyadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperfect,passive,3,sg,ajuhūṣyata,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperfect,passive,3,du,ajuhūṣyetām,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperfect,passive,3,pl,ajuhūṣyanta,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperative,active,1,sg,juhūṣāṇi,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperative,active,1,du,juhūṣāva,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperative,active,1,pl,juhūṣāma,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperative,active,2,sg,juhūṣa,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperative,active,2,du,juhūṣatam,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperative,active,2,pl,juhūṣata,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperative,active,3,sg,juhūṣatu,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperative,active,3,du,juhūṣatām,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperative,active,3,pl,juhūṣantu,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperative,passive,1,sg,juhūṣyai,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperative,passive,1,du,juhūṣyāvahai,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperative,passive,1,pl,juhūṣyāmahai,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperative,passive,2,sg,juhūṣyasva,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperative,passive,2,du,juhūṣyethām,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperative,passive,2,pl,juhūṣyadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperative,passive,3,sg,juhūṣyatām,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperative,passive,3,du,juhūṣyetām,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,imperative,passive,3,pl,juhūṣyantām,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,optative,active,1,sg,juhūṣeyam,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,optative,active,1,du,juhūṣeva,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,optative,active,1,pl,juhūṣema,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,optative,active,2,sg,juhūṣeḥ,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,optative,active,2,du,juhūṣetam,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,optative,active,2,pl,juhūṣeta,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,optative,active,3,sg,juhūṣet,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,optative,active,3,du,juhūṣetām,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,optative,active,3,pl,juhūṣeyuḥ,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,optative,passive,1,sg,juhūṣyeya,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,optative,passive,1,du,juhūṣyevahi,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,optative,passive,1,pl,juhūṣyemahi,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,optative,passive,2,sg,juhūṣyethāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,optative,passive,2,du,juhūṣyeyāthām,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,optative,passive,2,pl,juhūṣyedhvam,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,optative,passive,3,sg,juhūṣyeta,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,optative,passive,3,du,juhūṣyeyātām,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,optative,passive,3,pl,juhūṣyeran,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,future,active,1,sg,juhūṣiṣyāmi,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,future,active,1,du,juhūṣiṣyāvaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,future,active,1,pl,juhūṣiṣyāmaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,future,active,2,sg,juhūṣiṣyasi,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,future,active,2,du,juhūṣiṣyathaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,future,active,2,pl,juhūṣiṣyatha,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,future,active,3,sg,juhūṣiṣyati,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,future,active,3,du,juhūṣiṣyataḥ,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (desiderative),desiderative,future,active,3,pl,juhūṣiṣyanti,UNSUPPORTED,Unsupported derivation: desiderative
+hu,3 (intensive),intensive,present,active,1,sg,johavīmi OR johomi,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,present,active,1,du,johavvaḥ,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,present,active,1,pl,johavmaḥ,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,present,active,2,sg,johavīṣi OR johoṣi,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,present,active,2,du,johavthaḥ,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,present,active,2,pl,johavtha,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,present,active,3,sg,johavīti OR johoti,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,present,active,3,du,johavtaḥ,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,present,active,3,pl,johavati,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,imperfect,active,1,sg,ajohavam,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,imperfect,active,1,du,ajohavva,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,imperfect,active,1,pl,ajohavma,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,imperfect,active,2,sg,ajohavīḥ OR ajohoḥ,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,imperfect,active,2,du,ajohavtam,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,imperfect,active,2,pl,ajohavta,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,imperfect,active,3,sg,ajohavīt OR ajohot,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,imperfect,active,3,du,ajohavtām,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,imperfect,active,3,pl,ajohavuḥ,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,imperative,active,1,sg,johavāni,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,imperative,active,1,du,johavāva,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,imperative,active,1,pl,johavāma,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,imperative,active,2,sg,johavdhi,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,imperative,active,2,du,johavtam,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,imperative,active,2,pl,johavta,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,imperative,active,3,sg,johavītu OR johotu,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,imperative,active,3,du,johavtām,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,imperative,active,3,pl,johavatu,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,optative,active,1,sg,johavyām,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,optative,active,1,du,johavyāva,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,optative,active,1,pl,johavyāma,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,optative,active,2,sg,johavyāḥ,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,optative,active,2,du,johavyātam,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,optative,active,2,pl,johavyāta,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,optative,active,3,sg,johavyāt,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,optative,active,3,du,johavyātām,UNSUPPORTED,Unsupported derivation: intensive
+hu,3 (intensive),intensive,optative,active,3,pl,johavyuḥ,UNSUPPORTED,Unsupported derivation: intensive
+su,5 (primary),primary,imperative,active,2,sg,sunu,sunuhi,Mismatch
+su,5 (primary),primary,perfect,active,2,du,suṣuvathuḥ,suṣavathuḥ,Mismatch
+su,5 (primary),primary,perfect,active,2,pl,suṣuva,suṣava,Mismatch
+su,5 (primary),primary,perfect,active,3,sg,suṣāva,suṣava,Mismatch
+su,5 (primary),primary,perfect,active,3,du,suṣuvatuḥ,suṣavatuḥ,Mismatch
+su,5 (primary),primary,perfect,active,3,pl,suṣuvuḥ,suṣavuḥ,Mismatch
+su,5 (primary),primary,perfect,middle,1,du,suṣuvahe OR suṣuvivahe,suṣavivahe,Mismatch
+su,5 (primary),primary,perfect,middle,1,pl,suṣumahe OR suṣuvimahe,suṣavimahe,Mismatch
+su,5 (primary),primary,perfect,middle,2,sg,suṣuviṣe OR suṣuṣe,suṣaviṣe,Mismatch
+su,5 (primary),primary,perfect,middle,2,du,suṣuvāthe,suṣavāthe,Mismatch
+su,5 (primary),primary,perfect,middle,2,pl,suṣudhve OR suṣuvidhve,suṣavidhve,Mismatch
+su,5 (primary),primary,perfect,middle,3,sg,suṣuve,suṣave,Mismatch
+su,5 (primary),primary,perfect,middle,3,du,suṣuvāte,suṣavāte,Mismatch
+su,5 (primary),primary,perfect,middle,3,pl,suṣuvire,suṣavire,Mismatch
+yuj,7 (primary),primary,present,middle,2,pl,yuṅgdhve,yuñjdhve,Mismatch
+yuj,7 (primary),primary,imperfect,active,2,sg,ayujyaḥ,ayunakḥ,Mismatch
+yuj,7 (primary),primary,imperfect,active,3,sg,ayujyat OR ayunak,ayunakt,Mismatch
+yuj,7 (primary),primary,imperfect,middle,2,pl,ayuṅgdhvam,ayuñjdhvam,Mismatch
+yuj,7 (primary),primary,imperative,active,2,sg,yuṅgdhi OR yujya,yuñjhi,Mismatch
+yuj,7 (primary),primary,imperative,middle,2,pl,yuṅgdhvam,yuñjdhvam,Mismatch
+yuj,7 (desiderative),desiderative,present,active,1,sg,yuyukṣāmi,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,present,active,1,du,yuyukṣāvaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,present,active,1,pl,yuyukṣāmaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,present,active,2,sg,yuyukṣasi,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,present,active,2,du,yuyukṣathaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,present,active,2,pl,yuyukṣatha,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,present,active,3,sg,yuyukṣati,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,present,active,3,du,yuyukṣataḥ,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,present,active,3,pl,yuyukṣanti,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,present,passive,1,sg,yuyukṣye,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,present,passive,1,du,yuyukṣyāvahe,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,present,passive,1,pl,yuyukṣyāmahe,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,present,passive,2,sg,yuyukṣyase,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,present,passive,2,du,yuyukṣyethe,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,present,passive,2,pl,yuyukṣyadhve,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,present,passive,3,sg,yuyukṣyate,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,present,passive,3,du,yuyukṣyete,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,present,passive,3,pl,yuyukṣyante,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperfect,active,1,sg,ayuyukṣam,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperfect,active,1,du,ayuyukṣāva,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperfect,active,1,pl,ayuyukṣāma,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperfect,active,2,sg,ayuyukṣaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperfect,active,2,du,ayuyukṣatam,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperfect,active,2,pl,ayuyukṣata,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperfect,active,3,sg,ayuyukṣat,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperfect,active,3,du,ayuyukṣatām,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperfect,active,3,pl,ayuyukṣan,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperfect,passive,1,sg,ayuyukṣye,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperfect,passive,1,du,ayuyukṣyāvahi,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperfect,passive,1,pl,ayuyukṣyāmahi,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperfect,passive,2,sg,ayuyukṣyathāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperfect,passive,2,du,ayuyukṣyethām,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperfect,passive,2,pl,ayuyukṣyadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperfect,passive,3,sg,ayuyukṣyata,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperfect,passive,3,du,ayuyukṣyetām,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperfect,passive,3,pl,ayuyukṣyanta,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperative,active,1,sg,yuyukṣāṇi,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperative,active,1,du,yuyukṣāva,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperative,active,1,pl,yuyukṣāma,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperative,active,2,sg,yuyukṣa,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperative,active,2,du,yuyukṣatam,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperative,active,2,pl,yuyukṣata,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperative,active,3,sg,yuyukṣatu,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperative,active,3,du,yuyukṣatām,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperative,active,3,pl,yuyukṣantu,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperative,passive,1,sg,yuyukṣyai,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperative,passive,1,du,yuyukṣyāvahai,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperative,passive,1,pl,yuyukṣyāmahai,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperative,passive,2,sg,yuyukṣyasva,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperative,passive,2,du,yuyukṣyethām,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperative,passive,2,pl,yuyukṣyadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperative,passive,3,sg,yuyukṣyatām,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperative,passive,3,du,yuyukṣyetām,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,imperative,passive,3,pl,yuyukṣyantām,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,optative,active,1,sg,yuyukṣeyam,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,optative,active,1,du,yuyukṣeva,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,optative,active,1,pl,yuyukṣema,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,optative,active,2,sg,yuyukṣeḥ,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,optative,active,2,du,yuyukṣetam,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,optative,active,2,pl,yuyukṣeta,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,optative,active,3,sg,yuyukṣet,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,optative,active,3,du,yuyukṣetām,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,optative,active,3,pl,yuyukṣeyuḥ,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,optative,passive,1,sg,yuyukṣyeya,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,optative,passive,1,du,yuyukṣyevahi,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,optative,passive,1,pl,yuyukṣyemahi,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,optative,passive,2,sg,yuyukṣyethāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,optative,passive,2,du,yuyukṣyeyāthām,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,optative,passive,2,pl,yuyukṣyedhvam,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,optative,passive,3,sg,yuyukṣyeta,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,optative,passive,3,du,yuyukṣyeyātām,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,optative,passive,3,pl,yuyukṣyeran,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,future,active,1,sg,yuyukṣiṣyāmi,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,future,active,1,du,yuyukṣiṣyāvaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,future,active,1,pl,yuyukṣiṣyāmaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,future,active,2,sg,yuyukṣiṣyasi,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,future,active,2,du,yuyukṣiṣyathaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,future,active,2,pl,yuyukṣiṣyatha,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,future,active,3,sg,yuyukṣiṣyati,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,future,active,3,du,yuyukṣiṣyataḥ,UNSUPPORTED,Unsupported derivation: desiderative
+yuj,7 (desiderative),desiderative,future,active,3,pl,yuyukṣiṣyanti,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (primary),primary,imperative,active,2,sg,tanu OR tanya,tanuhi,Mismatch
+tan,8 (primary),primary,perfect,active,2,sg,tatantha OR tenitha,tatanitha,Mismatch
+tan,8 (primary),primary,perfect,active,3,sg,tatāna,tatana,Mismatch
+tan,8 (desiderative),desiderative,present,active,1,sg,titaṃsāmi OR titaniṣāmi OR titāṃsāmi,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,present,active,1,du,titaṃsāvaḥ OR titaniṣāvaḥ OR titāṃsāvaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,present,active,1,pl,titaṃsāmaḥ OR titaniṣāmaḥ OR titāṃsāmaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,present,active,2,sg,titaṃsasi OR titaniṣasi OR titāṃsasi,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,present,active,2,du,titaṃsathaḥ OR titaniṣathaḥ OR titāṃsathaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,present,active,2,pl,titaṃsatha OR titaniṣatha OR titāṃsatha,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,present,active,3,sg,titaṃsati OR titaniṣati OR titāṃsati,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,present,active,3,du,titaṃsataḥ OR titaniṣataḥ OR titāṃsataḥ,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,present,active,3,pl,titaṃsanti OR titaniṣanti OR titāṃsanti,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,present,passive,1,sg,titaṃsye OR titaniṣye OR titāṃsye,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,present,passive,1,du,titaṃsyāvahe OR titaniṣyāvahe OR titāṃsyāvahe,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,present,passive,1,pl,titaṃsyāmahe OR titaniṣyāmahe OR titāṃsyāmahe,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,present,passive,2,sg,titaṃsyase OR titaniṣyase OR titāṃsyase,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,present,passive,2,du,titaṃsyethe OR titaniṣyethe OR titāṃsyethe,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,present,passive,2,pl,titaṃsyadhve OR titaniṣyadhve OR titāṃsyadhve,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,present,passive,3,sg,titaṃsyate OR titaniṣyate OR titāṃsyate,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,present,passive,3,du,titaṃsyete OR titaniṣyete OR titāṃsyete,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,present,passive,3,pl,titaṃsyante OR titaniṣyante OR titāṃsyante,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperfect,active,1,sg,atitaṃsam OR atitaniṣam OR atitāṃsam,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperfect,active,1,du,atitaṃsāva OR atitaniṣāva OR atitāṃsāva,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperfect,active,1,pl,atitaṃsāma OR atitaniṣāma OR atitāṃsāma,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperfect,active,2,sg,atitaṃsaḥ OR atitaniṣaḥ OR atitāṃsaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperfect,active,2,du,atitaṃsatam OR atitaniṣatam OR atitāṃsatam,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperfect,active,2,pl,atitaṃsata OR atitaniṣata OR atitāṃsata,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperfect,active,3,sg,atitaṃsat OR atitaniṣat OR atitāṃsat,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperfect,active,3,du,atitaṃsatām OR atitaniṣatām OR atitāṃsatām,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperfect,active,3,pl,atitaṃsan OR atitaniṣan OR atitāṃsan,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperfect,passive,1,sg,atitaṃsye OR atitaniṣye OR atitāṃsye,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperfect,passive,1,du,atitaṃsyāvahi OR atitaniṣyāvahi OR atitāṃsyāvahi,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperfect,passive,1,pl,atitaṃsyāmahi OR atitaniṣyāmahi OR atitāṃsyāmahi,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperfect,passive,2,sg,atitaṃsyathāḥ OR atitaniṣyathāḥ OR atitāṃsyathāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperfect,passive,2,du,atitaṃsyethām OR atitaniṣyethām OR atitāṃsyethām,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperfect,passive,2,pl,atitaṃsyadhvam OR atitaniṣyadhvam OR atitāṃsyadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperfect,passive,3,sg,atitaṃsyata OR atitaniṣyata OR atitāṃsyata,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperfect,passive,3,du,atitaṃsyetām OR atitaniṣyetām OR atitāṃsyetām,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperfect,passive,3,pl,atitaṃsyanta OR atitaniṣyanta OR atitāṃsyanta,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperative,active,1,sg,titaṃsāni OR titaniṣāṇi OR titāṃsāni,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperative,active,1,du,titaṃsāva OR titaniṣāva OR titāṃsāva,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperative,active,1,pl,titaṃsāma OR titaniṣāma OR titāṃsāma,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperative,active,2,sg,titaṃsa OR titaniṣa OR titāṃsa,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperative,active,2,du,titaṃsatam OR titaniṣatam OR titāṃsatam,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperative,active,2,pl,titaṃsata OR titaniṣata OR titāṃsata,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperative,active,3,sg,titaṃsatu OR titaniṣatu OR titāṃsatu,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperative,active,3,du,titaṃsatām OR titaniṣatām OR titāṃsatām,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperative,active,3,pl,titaṃsantu OR titaniṣantu OR titāṃsantu,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperative,passive,1,sg,titaṃsyai OR titaniṣyai OR titāṃsyai,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperative,passive,1,du,titaṃsyāvahai OR titaniṣyāvahai OR titāṃsyāvahai,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperative,passive,1,pl,titaṃsyāmahai OR titaniṣyāmahai OR titāṃsyāmahai,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperative,passive,2,sg,titaṃsyasva OR titaniṣyasva OR titāṃsyasva,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperative,passive,2,du,titaṃsyethām OR titaniṣyethām OR titāṃsyethām,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperative,passive,2,pl,titaṃsyadhvam OR titaniṣyadhvam OR titāṃsyadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperative,passive,3,sg,titaṃsyatām OR titaniṣyatām OR titāṃsyatām,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperative,passive,3,du,titaṃsyetām OR titaniṣyetām OR titāṃsyetām,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,imperative,passive,3,pl,titaṃsyantām OR titaniṣyantām OR titāṃsyantām,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,optative,active,1,sg,titaṃseyam OR titaniṣeyam OR titāṃseyam,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,optative,active,1,du,titaṃseva OR titaniṣeva OR titāṃseva,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,optative,active,1,pl,titaṃsema OR titaniṣema OR titāṃsema,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,optative,active,2,sg,titaṃseḥ OR titaniṣeḥ OR titāṃseḥ,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,optative,active,2,du,titaṃsetam OR titaniṣetam OR titāṃsetam,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,optative,active,2,pl,titaṃseta OR titaniṣeta OR titāṃseta,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,optative,active,3,sg,titaṃset OR titaniṣet OR titāṃset,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,optative,active,3,du,titaṃsetām OR titaniṣetām OR titāṃsetām,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,optative,active,3,pl,titaṃseyuḥ OR titaniṣeyuḥ OR titāṃseyuḥ,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,optative,passive,1,sg,titaṃsyeya OR titaniṣyeya OR titāṃsyeya,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,optative,passive,1,du,titaṃsyevahi OR titaniṣyevahi OR titāṃsyevahi,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,optative,passive,1,pl,titaṃsyemahi OR titaniṣyemahi OR titāṃsyemahi,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,optative,passive,2,sg,titaṃsyethāḥ OR titaniṣyethāḥ OR titāṃsyethāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,optative,passive,2,du,titaṃsyeyāthām OR titaniṣyeyāthām OR titāṃsyeyāthām,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,optative,passive,2,pl,titaṃsyedhvam OR titaniṣyedhvam OR titāṃsyedhvam,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,optative,passive,3,sg,titaṃsyeta OR titaniṣyeta OR titāṃsyeta,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,optative,passive,3,du,titaṃsyeyātām OR titaniṣyeyātām OR titāṃsyeyātām,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,optative,passive,3,pl,titaṃsyeran OR titaniṣyeran OR titāṃsyeran,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,future,active,1,sg,titaṃsiṣyāmi OR titaniṣiṣyāmi OR titāṃsiṣyāmi,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,future,active,1,du,titaṃsiṣyāvaḥ OR titaniṣiṣyāvaḥ OR titāṃsiṣyāvaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,future,active,1,pl,titaṃsiṣyāmaḥ OR titaniṣiṣyāmaḥ OR titāṃsiṣyāmaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,future,active,2,sg,titaṃsiṣyasi OR titaniṣiṣyasi OR titāṃsiṣyasi,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,future,active,2,du,titaṃsiṣyathaḥ OR titaniṣiṣyathaḥ OR titāṃsiṣyathaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,future,active,2,pl,titaṃsiṣyatha OR titaniṣiṣyatha OR titāṃsiṣyatha,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,future,active,3,sg,titaṃsiṣyati OR titaniṣiṣyati OR titāṃsiṣyati,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,future,active,3,du,titaṃsiṣyataḥ OR titaniṣiṣyataḥ OR titāṃsiṣyataḥ,UNSUPPORTED,Unsupported derivation: desiderative
+tan,8 (desiderative),desiderative,future,active,3,pl,titaṃsiṣyanti OR titaniṣiṣyanti OR titāṃsiṣyanti,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (primary),primary,imperfect,active,1,sg,akrīṇām,akrīṇam,Mismatch
+krī,9 (primary),primary,imperative,active,1,sg,krīṇāni,krīṇāṇi,Mismatch
+krī,9 (primary),primary,perfect,active,1,du,cikrayiva OR cikriyiva,cikryiva,Mismatch
+krī,9 (primary),primary,perfect,active,1,pl,cikrayima OR cikriyima,cikryima,Mismatch
+krī,9 (primary),primary,perfect,active,2,du,cikriyathuḥ,cikryathuḥ,Mismatch
+krī,9 (primary),primary,perfect,active,2,pl,cikriya,cikrya,Mismatch
+krī,9 (primary),primary,perfect,active,3,sg,cikrāya,cikraya,Mismatch
+krī,9 (primary),primary,perfect,active,3,du,cikriyatuḥ,cikryatuḥ,Mismatch
+krī,9 (primary),primary,perfect,active,3,pl,cikriyuḥ,cikryuḥ,Mismatch
+krī,9 (primary),primary,perfect,middle,1,du,cikriyivahe,cikryivahe,Mismatch
+krī,9 (primary),primary,perfect,middle,1,pl,cikriyimahe,cikryimahe,Mismatch
+krī,9 (primary),primary,perfect,middle,2,sg,cikriyiṣe,cikryiṣe,Mismatch
+krī,9 (primary),primary,perfect,middle,2,du,cikriyāthe,cikryāthe,Mismatch
+krī,9 (primary),primary,perfect,middle,2,pl,cikriyidhve,cikryidhve,Mismatch
+krī,9 (primary),primary,perfect,middle,3,sg,cikriye,cikrye,Mismatch
+krī,9 (primary),primary,perfect,middle,3,du,cikriyāte,cikryāte,Mismatch
+krī,9 (primary),primary,perfect,middle,3,pl,cikriyire,cikryire,Mismatch
+krī,9 (desiderative),desiderative,present,middle,1,sg,cikrīṣe,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,present,middle,1,du,cikrīṣāvahe,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,present,middle,1,pl,cikrīṣāmahe,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,present,middle,2,sg,cikrīṣase,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,present,middle,2,du,cikrīṣethe,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,present,middle,2,pl,cikrīṣadhve,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,present,middle,3,sg,cikrīṣate,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,present,middle,3,du,cikrīṣete,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,present,middle,3,pl,cikrīṣante,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,present,passive,1,sg,cikrīṣye,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,present,passive,1,du,cikrīṣyāvahe,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,present,passive,1,pl,cikrīṣyāmahe,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,present,passive,2,sg,cikrīṣyase,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,present,passive,2,du,cikrīṣyethe,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,present,passive,2,pl,cikrīṣyadhve,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,present,passive,3,sg,cikrīṣyate,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,present,passive,3,du,cikrīṣyete,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,present,passive,3,pl,cikrīṣyante,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperfect,middle,1,sg,acikrīṣe,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperfect,middle,1,du,acikrīṣāvahi,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperfect,middle,1,pl,acikrīṣāmahi,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperfect,middle,2,sg,acikrīṣathāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperfect,middle,2,du,acikrīṣethām,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperfect,middle,2,pl,acikrīṣadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperfect,middle,3,sg,acikrīṣata,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperfect,middle,3,du,acikrīṣetām,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperfect,middle,3,pl,acikrīṣanta,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperfect,passive,1,sg,acikrīṣye,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperfect,passive,1,du,acikrīṣyāvahi,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperfect,passive,1,pl,acikrīṣyāmahi,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperfect,passive,2,sg,acikrīṣyathāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperfect,passive,2,du,acikrīṣyethām,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperfect,passive,2,pl,acikrīṣyadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperfect,passive,3,sg,acikrīṣyata,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperfect,passive,3,du,acikrīṣyetām,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperfect,passive,3,pl,acikrīṣyanta,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperative,middle,1,sg,cikrīṣai,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperative,middle,1,du,cikrīṣāvahai,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperative,middle,1,pl,cikrīṣāmahai,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperative,middle,2,sg,cikrīṣasva,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperative,middle,2,du,cikrīṣethām,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperative,middle,2,pl,cikrīṣadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperative,middle,3,sg,cikrīṣatām,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperative,middle,3,du,cikrīṣetām,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperative,middle,3,pl,cikrīṣantām,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperative,passive,1,sg,cikrīṣyai,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperative,passive,1,du,cikrīṣyāvahai,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperative,passive,1,pl,cikrīṣyāmahai,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperative,passive,2,sg,cikrīṣyasva,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperative,passive,2,du,cikrīṣyethām,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperative,passive,2,pl,cikrīṣyadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperative,passive,3,sg,cikrīṣyatām,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperative,passive,3,du,cikrīṣyetām,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,imperative,passive,3,pl,cikrīṣyantām,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,optative,middle,1,sg,cikrīṣeya,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,optative,middle,1,du,cikrīṣevahi,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,optative,middle,1,pl,cikrīṣemahi,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,optative,middle,2,sg,cikrīṣethāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,optative,middle,2,du,cikrīṣeyāthām,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,optative,middle,2,pl,cikrīṣedhvam,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,optative,middle,3,sg,cikrīṣeta,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,optative,middle,3,du,cikrīṣeyātām,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,optative,middle,3,pl,cikrīṣeran,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,optative,passive,1,sg,cikrīṣyeya,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,optative,passive,1,du,cikrīṣyevahi,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,optative,passive,1,pl,cikrīṣyemahi,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,optative,passive,2,sg,cikrīṣyethāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,optative,passive,2,du,cikrīṣyeyāthām,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,optative,passive,2,pl,cikrīṣyedhvam,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,optative,passive,3,sg,cikrīṣyeta,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,optative,passive,3,du,cikrīṣyeyātām,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,optative,passive,3,pl,cikrīṣyeran,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,future,middle,1,sg,cikrīṣiṣye,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,future,middle,1,du,cikrīṣiṣyāvahe,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,future,middle,1,pl,cikrīṣiṣyāmahe,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,future,middle,2,sg,cikrīṣiṣyase,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,future,middle,2,du,cikrīṣiṣyethe,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,future,middle,2,pl,cikrīṣiṣyadhve,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,future,middle,3,sg,cikrīṣiṣyate,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,future,middle,3,du,cikrīṣiṣyete,UNSUPPORTED,Unsupported derivation: desiderative
+krī,9 (desiderative),desiderative,future,middle,3,pl,cikrīṣiṣyante,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (primary),primary,imperative,active,2,sg,kuru OR kṛṇu OR kṛdhi,kuruhi,Mismatch
+kṛ,8 (primary),primary,perfect,active,2,sg,cakartha,cakaritha,Mismatch
+kṛ,8 (primary),primary,perfect,active,2,du,cakrathuḥ,cakṛvathuḥ,Mismatch
+kṛ,8 (primary),primary,perfect,active,3,sg,cakāra,cakara,Mismatch
+kṛ,8 (primary),primary,perfect,active,3,pl,cakruḥ,cakuruḥ,Mismatch
+kṛ,8 (primary),primary,perfect,middle,2,sg,cakṛṣe,cakriṣe,Mismatch
+kṛ,8 (primary),primary,perfect,middle,2,pl,cakṛdhve,cakridhve,Mismatch
+kṛ,8 (desiderative),desiderative,present,active,1,sg,cikīrṣāmi,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,active,1,du,cikīrṣāvaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,active,1,pl,cikīrṣāmaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,active,2,sg,cikīrṣasi,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,active,2,du,cikīrṣathaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,active,2,pl,cikīrṣatha,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,active,3,sg,cikīrṣati,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,active,3,du,cikīrṣataḥ,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,active,3,pl,cikīrṣanti,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,middle,1,sg,cikīrṣe,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,middle,1,du,cikīrṣāvahe,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,middle,1,pl,cikīrṣāmahe,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,middle,2,sg,cikīrṣase,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,middle,2,du,cikīrṣethe,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,middle,2,pl,cikīrṣadhve,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,middle,3,sg,cikīrṣate,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,middle,3,du,cikīrṣete,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,middle,3,pl,cikīrṣante,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,passive,1,sg,cikīrṣye,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,passive,1,du,cikīrṣyāvahe,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,passive,1,pl,cikīrṣyāmahe,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,passive,2,sg,cikīrṣyase,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,passive,2,du,cikīrṣyethe,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,passive,2,pl,cikīrṣyadhve,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,passive,3,sg,cikīrṣyate,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,passive,3,du,cikīrṣyete,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,present,passive,3,pl,cikīrṣyante,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,active,1,sg,acikīrṣam,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,active,1,du,acikīrṣāva,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,active,1,pl,acikīrṣāma,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,active,2,sg,acikīrṣaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,active,2,du,acikīrṣatam,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,active,2,pl,acikīrṣata,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,active,3,sg,acikīrṣat,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,active,3,du,acikīrṣatām,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,active,3,pl,acikīrṣan,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,middle,1,sg,acikīrṣe,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,middle,1,du,acikīrṣāvahi,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,middle,1,pl,acikīrṣāmahi,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,middle,2,sg,acikīrṣathāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,middle,2,du,acikīrṣethām,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,middle,2,pl,acikīrṣadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,middle,3,du,acikīrṣetām,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,middle,3,pl,acikīrṣanta,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,passive,1,sg,acikīrṣye,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,passive,1,du,acikīrṣyāvahi,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,passive,1,pl,acikīrṣyāmahi,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,passive,2,sg,acikīrṣyathāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,passive,2,du,acikīrṣyethām,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,passive,2,pl,acikīrṣyadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,passive,3,sg,acikīrṣyata,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,passive,3,du,acikīrṣyetām,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperfect,passive,3,pl,acikīrṣyanta,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,active,1,sg,cikīrṣāṇi,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,active,1,du,cikīrṣāva,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,active,1,pl,cikīrṣāma,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,active,2,sg,cikīrṣa,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,active,2,du,cikīrṣatam,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,active,2,pl,cikīrṣata,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,active,3,sg,cikīrṣatu,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,active,3,du,cikīrṣatām,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,active,3,pl,cikīrṣantu,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,middle,1,sg,cikīrṣai,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,middle,1,du,cikīrṣāvahai,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,middle,1,pl,cikīrṣāmahai,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,middle,2,sg,cikīrṣasva,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,middle,2,du,cikīrṣethām,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,middle,2,pl,cikīrṣadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,middle,3,pl,cikīrṣantām,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,passive,1,sg,cikīrṣyai,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,passive,1,du,cikīrṣyāvahai,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,passive,1,pl,cikīrṣyāmahai,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,passive,2,sg,cikīrṣyasva,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,passive,2,du,cikīrṣyethām,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,passive,2,pl,cikīrṣyadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,passive,3,sg,cikīrṣyatām,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,passive,3,du,cikīrṣyetām,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,imperative,passive,3,pl,cikīrṣyantām,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,active,1,sg,cikīrṣeyam,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,active,1,du,cikīrṣeva,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,active,1,pl,cikīrṣema,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,active,2,sg,cikīrṣeḥ,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,active,2,du,cikīrṣetam,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,active,2,pl,cikīrṣeta,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,active,3,sg,cikīrṣet,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,active,3,du,cikīrṣetām,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,active,3,pl,cikīrṣeyuḥ,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,middle,1,sg,cikīrṣeya,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,middle,1,du,cikīrṣevahi,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,middle,1,pl,cikīrṣemahi,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,middle,2,sg,cikīrṣethāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,middle,2,du,cikīrṣeyāthām,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,middle,2,pl,cikīrṣedhvam,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,middle,3,du,cikīrṣeyātām,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,middle,3,pl,cikīrṣeran,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,passive,1,sg,cikīrṣyeya,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,passive,1,du,cikīrṣyevahi,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,passive,1,pl,cikīrṣyemahi,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,passive,2,sg,cikīrṣyethāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,passive,2,du,cikīrṣyeyāthām,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,passive,2,pl,cikīrṣyedhvam,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,passive,3,sg,cikīrṣyeta,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,passive,3,du,cikīrṣyeyātām,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,optative,passive,3,pl,cikīrṣyeran,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,future,active,1,sg,cikīrṣiṣyāmi,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,future,active,1,du,cikīrṣiṣyāvaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,future,active,1,pl,cikīrṣiṣyāmaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,future,active,2,sg,cikīrṣiṣyasi,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,future,active,2,du,cikīrṣiṣyathaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,future,active,2,pl,cikīrṣiṣyatha,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,future,active,3,sg,cikīrṣiṣyati,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,future,active,3,du,cikīrṣiṣyataḥ,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,future,active,3,pl,cikīrṣiṣyanti,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,future,middle,1,sg,cikīrṣiṣye,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,future,middle,1,du,cikīrṣiṣyāvahe,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,future,middle,1,pl,cikīrṣiṣyāmahe,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,future,middle,2,sg,cikīrṣiṣyase,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,future,middle,2,du,cikīrṣiṣyethe,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,future,middle,2,pl,cikīrṣiṣyadhve,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,future,middle,3,sg,cikīrṣiṣyate,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,future,middle,3,du,cikīrṣiṣyete,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (desiderative),desiderative,future,middle,3,pl,cikīrṣiṣyante,UNSUPPORTED,Unsupported derivation: desiderative
+kṛ,8 (intensive),intensive,present,active,1,sg,carīkarīmi OR carīkarmi OR carkarīmi OR carkarmi,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,present,active,1,du,carīkarvaḥ OR carkarvaḥ,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,present,active,1,pl,carīkarmaḥ OR carkarmaḥ,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,present,active,2,sg,carīkarīṣi OR carīkarṣi OR carkarīṣi OR carkarṣi,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,present,active,2,du,carīkarthaḥ OR carkarthaḥ,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,present,active,2,pl,carīkartha OR carkartha,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,present,active,3,sg,carīkarīti OR carīkarti OR carkarīti OR carkarti,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,present,active,3,du,carīkartaḥ OR carkartaḥ,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,present,active,3,pl,carīkarati OR carkarati,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,imperfect,active,1,sg,acarīkaram OR acarkaram,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,imperfect,active,1,du,acarīkarva OR acarkarva,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,imperfect,active,1,pl,acarīkarma OR acarkarma,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,imperfect,active,2,sg,acarīkarīḥ OR acarkarīḥ,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,imperfect,active,2,du,acarīkartam OR acarkartam,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,imperfect,active,2,pl,acarīkarta OR acarkarta,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,imperfect,active,3,sg,acarīkaḥ OR acarīkarīt OR acarkaḥ OR acarkarīt,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,imperfect,active,3,du,acarīkartām OR acarkartām,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,imperfect,active,3,pl,acarīkaruḥ OR acarkaruḥ,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,imperative,active,1,sg,carīkarāṇi OR carkarāṇi,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,imperative,active,1,du,carīkarāva OR carkarāva,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,imperative,active,1,pl,carīkarāma OR carkarāma,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,imperative,active,2,sg,carīkardhi OR carkardhi,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,imperative,active,2,du,carīkartam OR carkartam,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,imperative,active,2,pl,carīkarta OR carkarta,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,imperative,active,3,sg,carīkarītu OR carīkartu OR carkarītu OR carkartu,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,imperative,active,3,du,carīkartām OR carkartām,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,imperative,active,3,pl,carīkaratu OR carkaratu,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,optative,active,1,sg,carīkaryām OR carkaryām,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,optative,active,1,du,carīkaryāva OR carkaryāva,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,optative,active,1,pl,carīkaryāma OR carkaryāma,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,optative,active,2,sg,carīkaryāḥ OR carkaryāḥ,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,optative,active,2,du,carīkaryātam OR carkaryātam,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,optative,active,2,pl,carīkaryāta OR carkaryāta,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,optative,active,3,sg,carīkaryāt OR carkaryāt,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,optative,active,3,du,carīkaryātām OR carkaryātām,UNSUPPORTED,Unsupported derivation: intensive
+kṛ,8 (intensive),intensive,optative,active,3,pl,carīkaryuḥ OR carkaryuḥ,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (desiderative),desiderative,present,active,1,sg,bubhutsāmi OR bubhodhiṣāmi,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,active,1,du,bubhutsāvaḥ OR bubhodhiṣāvaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,active,1,pl,bubhutsāmaḥ OR bubhodhiṣāmaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,active,2,sg,bubhutsasi OR bubhodhiṣasi,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,active,2,du,bubhutsathaḥ OR bubhodhiṣathaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,active,2,pl,bubhutsatha OR bubhodhiṣatha,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,active,3,sg,bubhutsati OR bubhodhiṣati,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,active,3,du,bubhutsataḥ OR bubhodhiṣataḥ,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,active,3,pl,bubhutsanti OR bubhodhiṣanti,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,middle,1,sg,bubhutse OR bubhodiṣe,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,middle,1,du,bubhutsāvahe OR bubhodiṣāvahe,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,middle,1,pl,bubhutsāmahe OR bubhodiṣāmahe,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,middle,2,sg,bubhutsase OR bubhodiṣase,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,middle,2,du,bubhutsethe OR bubhodiṣethe,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,middle,2,pl,bubhutsadhve OR bubhodiṣadhve,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,middle,3,sg,bubhutsate OR bubhodiṣate,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,middle,3,du,bubhutsete OR bubhodiṣete,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,middle,3,pl,bubhutsante OR bubhodiṣante,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,passive,1,sg,bubhutsye OR bubhodiṣye OR bubhodhiṣye,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,passive,1,du,bubhutsyāvahe OR bubhodiṣyāvahe OR bubhodhiṣyāvahe,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,passive,1,pl,bubhutsyāmahe OR bubhodiṣyāmahe OR bubhodhiṣyāmahe,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,passive,2,sg,bubhutsyase OR bubhodiṣyase OR bubhodhiṣyase,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,passive,2,du,bubhutsyethe OR bubhodiṣyethe OR bubhodhiṣyethe,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,passive,2,pl,bubhutsyadhve OR bubhodiṣyadhve OR bubhodhiṣyadhve,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,passive,3,sg,bubhutsyate OR bubhodiṣyate OR bubhodhiṣyate,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,passive,3,du,bubhutsyete OR bubhodiṣyete OR bubhodhiṣyete,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,present,passive,3,pl,bubhutsyante OR bubhodiṣyante OR bubhodhiṣyante,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,active,1,sg,abubhutsam OR abubhodhiṣam,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,active,1,du,abubhutsāva OR abubhodhiṣāva,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,active,1,pl,abubhutsāma OR abubhodhiṣāma,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,active,2,sg,abubhutsaḥ OR abubhodhiṣaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,active,2,du,abubhutsatam OR abubhodhiṣatam,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,active,2,pl,abubhutsata OR abubhodhiṣata,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,active,3,sg,abubhutsat OR abubhodhiṣat,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,active,3,du,abubhutsatām OR abubhodhiṣatām,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,active,3,pl,abubhutsan OR abubhodhiṣan,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,middle,1,sg,abubhutse OR abubhodiṣe,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,middle,1,du,abubhutsāvahi OR abubhodiṣāvahi,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,middle,1,pl,abubhutsāmahi OR abubhodiṣāmahi,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,middle,2,sg,abubhutsathāḥ OR abubhodiṣathāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,middle,2,du,abubhutsethām OR abubhodiṣethām,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,middle,2,pl,abubhutsadhvam OR abubhodiṣadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,middle,3,sg,abubhodiṣata,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,middle,3,du,abubhutsetām OR abubhodiṣetām,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,middle,3,pl,abubhutsanta OR abubhodiṣanta,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,passive,1,sg,abubhutsye OR abubhodiṣye OR abubhodhiṣye,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,passive,1,du,abubhutsyāvahi OR abubhodiṣyāvahi OR abubhodhiṣyāvahi,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,passive,1,pl,abubhutsyāmahi OR abubhodiṣyāmahi OR abubhodhiṣyāmahi,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,passive,2,sg,abubhutsyathāḥ OR abubhodiṣyathāḥ OR abubhodhiṣyathāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,passive,2,du,abubhutsyethām OR abubhodiṣyethām OR abubhodhiṣyethām,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,passive,2,pl,abubhutsyadhvam OR abubhodiṣyadhvam OR abubhodhiṣyadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,passive,3,sg,abubhutsyata OR abubhodiṣyata OR abubhodhiṣyata,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,passive,3,du,abubhutsyetām OR abubhodiṣyetām OR abubhodhiṣyetām,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperfect,passive,3,pl,abubhutsyanta OR abubhodiṣyanta OR abubhodhiṣyanta,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,active,1,sg,bubhutsāni OR bubhodhiṣāṇi,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,active,1,du,bubhutsāva OR bubhodhiṣāva,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,active,1,pl,bubhutsāma OR bubhodhiṣāma,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,active,2,sg,bubhutsa OR bubhodhiṣa,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,active,2,du,bubhutsatam OR bubhodhiṣatam,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,active,2,pl,bubhutsata OR bubhodhiṣata,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,active,3,sg,bubhutsatu OR bubhodhiṣatu,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,active,3,du,bubhutsatām OR bubhodhiṣatām,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,active,3,pl,bubhutsantu OR bubhodhiṣantu,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,middle,1,sg,bubhutsai OR bubhodiṣai,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,middle,1,du,bubhutsāvahai OR bubhodiṣāvahai,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,middle,1,pl,bubhutsāmahai OR bubhodiṣāmahai,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,middle,2,sg,bubhutsasva OR bubhodiṣasva,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,middle,2,du,bubhutsethām OR bubhodiṣethām,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,middle,2,pl,bubhutsadhvam OR bubhodiṣadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,middle,3,sg,bubhodiṣatām,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,middle,3,du,bubhodiṣetām,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,middle,3,pl,bubhutsantām OR bubhodiṣantām,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,passive,1,sg,bubhutsyai OR bubhodiṣyai OR bubhodhiṣyai,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,passive,1,du,bubhutsyāvahai OR bubhodiṣyāvahai OR bubhodhiṣyāvahai,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,passive,1,pl,bubhutsyāmahai OR bubhodiṣyāmahai OR bubhodhiṣyāmahai,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,passive,2,sg,bubhutsyasva OR bubhodiṣyasva OR bubhodhiṣyasva,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,passive,2,du,bubhutsyethām OR bubhodiṣyethām OR bubhodhiṣyethām,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,passive,2,pl,bubhutsyadhvam OR bubhodiṣyadhvam OR bubhodhiṣyadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,passive,3,sg,bubhutsyatām OR bubhodiṣyatām OR bubhodhiṣyatām,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,passive,3,du,bubhutsyetām OR bubhodiṣyetām OR bubhodhiṣyetām,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,imperative,passive,3,pl,bubhutsyantām OR bubhodiṣyantām OR bubhodhiṣyantām,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,active,1,sg,bubhutseyam OR bubhodhiṣeyam,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,active,1,du,bubhutseva OR bubhodhiṣeva,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,active,1,pl,bubhutsema OR bubhodhiṣema,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,active,2,sg,bubhutseḥ OR bubhodhiṣeḥ,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,active,2,du,bubhutsetam OR bubhodhiṣetam,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,active,2,pl,bubhutseta OR bubhodhiṣeta,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,active,3,sg,bubhutset OR bubhodhiṣet,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,active,3,du,bubhutsetām OR bubhodhiṣetām,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,active,3,pl,bubhutseyuḥ OR bubhodhiṣeyuḥ,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,middle,1,sg,bubhutseya OR bubhodiṣeya,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,middle,1,du,bubhutsevahi OR bubhodiṣevahi,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,middle,1,pl,bubhutsemahi OR bubhodiṣemahi,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,middle,2,sg,bubhutsethāḥ OR bubhodiṣethāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,middle,2,du,bubhutseyāthām OR bubhodiṣeyāthām,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,middle,2,pl,bubhutsedhvam OR bubhodiṣedhvam,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,middle,3,sg,bubhodiṣeta,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,middle,3,du,bubhutseyātām OR bubhodiṣeyātām,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,middle,3,pl,bubhutseran OR bubhodiṣeran,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,passive,1,sg,bubhutsyeya OR bubhodiṣyeya OR bubhodhiṣyeya,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,passive,1,du,bubhutsyevahi OR bubhodiṣyevahi OR bubhodhiṣyevahi,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,passive,1,pl,bubhutsyemahi OR bubhodiṣyemahi OR bubhodhiṣyemahi,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,passive,2,sg,bubhutsyethāḥ OR bubhodiṣyethāḥ OR bubhodhiṣyethāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,passive,2,du,bubhutsyeyāthām OR bubhodiṣyeyāthām OR bubhodhiṣyeyāthām,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,passive,2,pl,bubhutsyedhvam OR bubhodiṣyedhvam OR bubhodhiṣyedhvam,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,passive,3,sg,bubhutsyeta OR bubhodiṣyeta OR bubhodhiṣyeta,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,passive,3,du,bubhutsyeyātām OR bubhodiṣyeyātām OR bubhodhiṣyeyātām,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,optative,passive,3,pl,bubhutsyeran OR bubhodiṣyeran OR bubhodhiṣyeran,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,future,active,1,sg,bubhutsiṣyāmi OR bubhodhiṣiṣyāmi,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,future,active,1,du,bubhutsiṣyāvaḥ OR bubhodhiṣiṣyāvaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,future,active,1,pl,bubhutsiṣyāmaḥ OR bubhodhiṣiṣyāmaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,future,active,2,sg,bubhutsiṣyasi OR bubhodhiṣiṣyasi,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,future,active,2,du,bubhutsiṣyathaḥ OR bubhodhiṣiṣyathaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,future,active,2,pl,bubhutsiṣyatha OR bubhodhiṣiṣyatha,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,future,active,3,sg,bubhutsiṣyati OR bubhodhiṣiṣyati,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,future,active,3,du,bubhutsiṣyataḥ OR bubhodhiṣiṣyataḥ,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,future,active,3,pl,bubhutsiṣyanti OR bubhodhiṣiṣyanti,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,future,middle,1,sg,bubhutsiṣye OR bubhodiṣiṣye,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,future,middle,1,du,bubhutsiṣyāvahe OR bubhodiṣiṣyāvahe,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,future,middle,1,pl,bubhutsiṣyāmahe OR bubhodiṣiṣyāmahe,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,future,middle,2,sg,bubhutsiṣyase OR bubhodiṣiṣyase,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,future,middle,2,du,bubhutsiṣyethe OR bubhodiṣiṣyethe,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,future,middle,2,pl,bubhutsiṣyadhve OR bubhodiṣiṣyadhve,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,future,middle,3,sg,bubhutsiṣyate OR bubhodiṣiṣyate,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,future,middle,3,du,bubhutsiṣyete OR bubhodiṣiṣyete,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (desiderative),desiderative,future,middle,3,pl,bubhutsiṣyante OR bubhodiṣiṣyante,UNSUPPORTED,Unsupported derivation: desiderative
+budh,1 (intensive),intensive,present,active,1,sg,bobhudhīmi OR bobhodhmi,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,present,active,1,du,bobhudhvaḥ,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,present,active,1,pl,bobhudhmaḥ,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,present,active,2,sg,bobhudhīṣi OR bobhotsi,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,present,active,3,sg,bobhudhīti OR bobhoddhi,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,present,active,3,du,bobhuddhaḥ,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,present,active,3,pl,bobhudhati,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,imperfect,active,1,sg,abobhodham,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,imperfect,active,1,du,abobhudhva,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,imperfect,active,1,pl,abobhudhma,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,imperfect,active,2,sg,abobhudhīḥ,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,imperfect,active,2,du,abobhuddham,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,imperfect,active,2,pl,abobhuddha,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,imperfect,active,3,sg,abobhudhīt OR abobhot,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,imperfect,active,3,du,abobhuddhām,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,imperfect,active,3,pl,abobhodhuḥ,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,imperative,active,1,sg,bobhodhāni,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,imperative,active,1,du,bobhodhāva,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,imperative,active,1,pl,bobhodhāma,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,imperative,active,2,sg,bobhuddhi,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,imperative,active,2,du,bobhuddham,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,imperative,active,2,pl,bobhuddha,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,imperative,active,3,sg,bobhudhītu OR bobhoddhu,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,imperative,active,3,du,bobhuddhām,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,imperative,active,3,pl,bobhudhatu,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,optative,active,1,sg,bobhudhyām,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,optative,active,1,du,bobhudhyāva,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,optative,active,1,pl,bobhudhyāma,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,optative,active,2,sg,bobhudhyāḥ,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,optative,active,2,du,bobhudhyātam,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,optative,active,2,pl,bobhudhyāta,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,optative,active,3,sg,bobhudhyāt,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,optative,active,3,du,bobhudhyātām,UNSUPPORTED,Unsupported derivation: intensive
+budh,1 (intensive),intensive,optative,active,3,pl,bobhudhyuḥ,UNSUPPORTED,Unsupported derivation: intensive
+duh,2 (primary),primary,present,active,2,du,duhyathaḥ,dugdhaḥ,Mismatch
+duh,2 (primary),primary,present,active,2,pl,duhyatha,dugdha,Mismatch
+duh,2 (primary),primary,present,middle,2,pl,dhugdhve,dugdhve,Mismatch
+duh,2 (primary),primary,imperfect,active,2,sg,aduhyaḥ,adhokḥ,Mismatch
+duh,2 (primary),primary,imperfect,active,3,sg,aduhyat OR adhok,adogdh,Mismatch
+duh,2 (primary),primary,imperfect,middle,2,pl,adhugdhvam,adugdhvam,Mismatch
+duh,2 (primary),primary,imperative,active,2,sg,dugdhi OR duhya,duhhi,Mismatch
+duh,2 (primary),primary,imperative,middle,2,pl,dhugdhvam,dugdhvam,Mismatch
+duh,2 (desiderative),desiderative,present,active,1,sg,dudhukṣāmi,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,present,active,1,du,dudhukṣāvaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,present,active,1,pl,dudhukṣāmaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,present,active,2,sg,dudhukṣasi,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,present,active,2,du,dudhukṣathaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,present,active,2,pl,dudhukṣatha,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,present,active,3,sg,dudhukṣati,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,present,active,3,du,dudhukṣataḥ,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,present,active,3,pl,dudhukṣanti,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,present,passive,1,sg,dudhukṣye,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,present,passive,1,du,dudhukṣyāvahe,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,present,passive,1,pl,dudhukṣyāmahe,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,present,passive,2,sg,dudhukṣyase,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,present,passive,2,du,dudhukṣyethe,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,present,passive,2,pl,dudhukṣyadhve,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,present,passive,3,sg,dudhukṣyate,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,present,passive,3,du,dudhukṣyete,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,present,passive,3,pl,dudhukṣyante,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperfect,active,1,sg,adudhukṣam,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperfect,active,1,du,adudhukṣāva,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperfect,active,1,pl,adudhukṣāma,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperfect,active,2,sg,adudhukṣaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperfect,active,2,du,adudhukṣatam,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperfect,active,2,pl,adudhukṣata,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperfect,active,3,sg,adudhukṣat,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperfect,active,3,du,adudhukṣatām,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperfect,active,3,pl,adudhukṣan,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperfect,passive,1,sg,adudhukṣye,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperfect,passive,1,du,adudhukṣyāvahi,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperfect,passive,1,pl,adudhukṣyāmahi,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperfect,passive,2,sg,adudhukṣyathāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperfect,passive,2,du,adudhukṣyethām,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperfect,passive,2,pl,adudhukṣyadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperfect,passive,3,sg,adudhukṣyata,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperfect,passive,3,du,adudhukṣyetām,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperfect,passive,3,pl,adudhukṣyanta,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperative,active,1,sg,dudhukṣāṇi,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperative,active,1,du,dudhukṣāva,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperative,active,1,pl,dudhukṣāma,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperative,active,2,sg,dudhukṣa,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperative,active,2,du,dudhukṣatam,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperative,active,2,pl,dudhukṣata,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperative,active,3,sg,dudhukṣatu,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperative,active,3,du,dudhukṣatām,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperative,active,3,pl,dudhukṣantu,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperative,passive,1,sg,dudhukṣyai,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperative,passive,1,du,dudhukṣyāvahai,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperative,passive,1,pl,dudhukṣyāmahai,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperative,passive,2,sg,dudhukṣyasva,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperative,passive,2,du,dudhukṣyethām,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperative,passive,2,pl,dudhukṣyadhvam,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperative,passive,3,sg,dudhukṣyatām,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperative,passive,3,du,dudhukṣyetām,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,imperative,passive,3,pl,dudhukṣyantām,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,optative,active,1,sg,dudhukṣeyam,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,optative,active,1,du,dudhukṣeva,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,optative,active,1,pl,dudhukṣema,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,optative,active,2,sg,dudhukṣeḥ,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,optative,active,2,du,dudhukṣetam,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,optative,active,2,pl,dudhukṣeta,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,optative,active,3,sg,dudhukṣet,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,optative,active,3,du,dudhukṣetām,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,optative,active,3,pl,dudhukṣeyuḥ,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,optative,passive,1,sg,dudhukṣyeya,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,optative,passive,1,du,dudhukṣyevahi,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,optative,passive,1,pl,dudhukṣyemahi,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,optative,passive,2,sg,dudhukṣyethāḥ,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,optative,passive,2,du,dudhukṣyeyāthām,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,optative,passive,2,pl,dudhukṣyedhvam,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,optative,passive,3,sg,dudhukṣyeta,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,optative,passive,3,du,dudhukṣyeyātām,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,optative,passive,3,pl,dudhukṣyeran,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,future,active,1,sg,dudhukṣiṣyāmi,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,future,active,1,du,dudhukṣiṣyāvaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,future,active,1,pl,dudhukṣiṣyāmaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,future,active,2,sg,dudhukṣiṣyasi,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,future,active,2,du,dudhukṣiṣyathaḥ,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,future,active,2,pl,dudhukṣiṣyatha,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,future,active,3,sg,dudhukṣiṣyati,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,future,active,3,du,dudhukṣiṣyataḥ,UNSUPPORTED,Unsupported derivation: desiderative
+duh,2 (desiderative),desiderative,future,active,3,pl,dudhukṣiṣyanti,UNSUPPORTED,Unsupported derivation: desiderative
