@@ -20,8 +20,10 @@ class SandhiEngine:
         self._setup_vowel_rules()
         self._setup_consonant_rules()
         self._setup_long_distance_rules()
-        # Erase morpheme boundaries at the very end
-        self.clean_boundaries = pn.cdrewrite(pn.cross("+", ""), "", "", self.sig)
+        # Erase morpheme boundaries and [CLASS9] at the very end
+        self.clean_boundaries = pn.cdrewrite(
+            pn.union(pn.cross("+", ""), pn.cross("[CLASS9]", "")), "", "", self.sig
+        )
         # Named rule lists — populated after all rules are built
         self._build_named_rule_lists()
 
@@ -71,26 +73,49 @@ class SandhiEngine:
             "", pn.union(ALPHABET.vowels, "y"), self.sig
         )
 
-        # 5. Yan sandhi (semi-vowelisation before vowel)
-        # Whitney §128-129 / Pāṇini 6.1.77: short i/u/ṛ before a vowel-initial
-        # suffix insert a semivowel (y/v/r) while RETAINING the root vowel.
-        # e.g. cikri+iva → cikriyiva  (not cikryiva)
-        #      suṣu+iva  → suṣuviva   (not suṣviva)
-        # Long ī/ū at a morpheme boundary become y/v (standard yan).
+        # Perfect weak yan sandhi (er anekācaḥ asamyogapūrvasya & exceptions)
+        # Pāṇini 6.4.82: i/ī after single consonant -> y.
+        # Pāṇini 6.4.77: i/ī after conjunct -> iy. u/ū -> uv.
+        conjunct = ALPHABET.consonants + pn.accep("") + ALPHABET.consonants
+        self.perfect_yan_conjunct = pn.cdrewrite(
+            pn.string_map([
+                ("i[PERF_WEAK]+", "iy"),
+                ("ī[PERF_WEAK]+", "iy"),
+                ("u[PERF_WEAK]+", "uv"),
+                ("ū[PERF_WEAK]+", "uv"),
+            ]),
+            conjunct, ALPHABET.vowels, self.sig
+        )
+        self.perfect_yan_simple = pn.cdrewrite(
+            pn.string_map([
+                ("i[PERF_WEAK]+", "y"),
+                ("ī[PERF_WEAK]+", "y"),
+                ("u[PERF_WEAK]+", "uv"), # u/ū universally take uv
+                ("ū[PERF_WEAK]+", "uv"),
+                ("ṛ[PERF_WEAK]+", "r"),
+            ]),
+            "", ALPHABET.vowels, self.sig
+        )
+        
+        self.clean_perf_weak = pn.cdrewrite(
+            pn.cross("[PERF_WEAK]", ""), "", "", self.sig
+        )
+
+        # 5. General Yan sandhi (semi-vowelisation before vowel)
         self.yan_sandhi = pn.cdrewrite(
             pn.string_map([
-                ("i+",  "iy"),  # short i: insert y, keep i
-                ("ī+",  "y"),   # long ī: becomes y (standard yan)
-                ("u+",  "v"),  # short u: insert v, keep u
-                ("ū+",  "v"),   # long ū: becomes v (standard yan)
+                ("i+",  "y"),
+                ("ī+",  "y"),
+                ("u+",  "v"),
+                ("ū+",  "v"),
                 ("ṛ+",  "r"),
             ]),
             "", ALPHABET.vowels, self.sig
         )
 
-        # 6. Class-9 suffix vowel-drop: ī+ erased before any vowel-initial ending
+        # 6. Class-9 suffix vowel-drop: ī[CLASS9]+ erased before any vowel-initial ending
         self.class9_special = pn.cdrewrite(
-            pn.cross("ī+", ""), "", ALPHABET.vowels, self.sig
+            pn.cross("ī[CLASS9]+", "+"), "", ALPHABET.vowels, self.sig
         )
 
     def _setup_consonant_rules(self):
@@ -100,10 +125,18 @@ class SandhiEngine:
         # ad + dhi → addhi (cf. standard internal sandhi; needed for imperative 2sg).
         self.d_dh_gemination = pn.cdrewrite(pn.cross("d+dh", "ddh"), "", "", self.sig)
 
-        # Bartholomae (aspirate assimilation): h+t → gdh, etc.
-        # bh+t is handled separately as bdh (e.g. labh+ta -> labdha).
-        self.bartho_bht = pn.cdrewrite(pn.cross("bh+t", "bdh"), "", "", self.sig)
-        self.bartho_bhth = pn.cdrewrite(pn.cross("bh+th", "bdh"), "", "", self.sig)
+        # Bartholomae (aspirate assimilation):
+        # Voiced aspirates (bh, dh, gh, jh) + t/th -> bd, dd, gd, jd + dh.
+        # This MUST run before h+t to prevent h+t from matching the 'h' in 'dh'.
+        self.bartholomae_general = pn.cdrewrite(
+            pn.string_map([
+                ("bh+t", "bdh"), ("bh+th", "bdh"),
+                ("dh+t", "ddh"), ("dh+th", "ddh"),
+                ("gh+t", "gdh"), ("gh+th", "gdh"),
+                ("jh+t", "gdh"), ("jh+th", "gdh"), # jh marginal
+            ]),
+            "", "", self.sig
+        )
         self.bartho_hth = pn.cdrewrite(pn.cross("h+th", "gdh"), "", "", self.sig)
         self.bartho_hdh = pn.cdrewrite(pn.cross("h+dh", "gdh"), "", "", self.sig)
         self.bartho_ht  = pn.cdrewrite(pn.cross("h+t",  "gdh"), "", "", self.sig)
@@ -147,9 +180,19 @@ class SandhiEngine:
             "", unvoiced_triggers, self.sig
         )
 
-        # Nasal assimilation: n → ñ before +j/+c
+        # Nasal assimilation: n → homorganic nasal before stops
         self.nasal_assimilation = pn.cdrewrite(
-            pn.cross("n", "ñ"), "", pn.union("+j", "+c", "j", "c"), self.sig
+            pn.string_map([
+                ("n", "ñ"),
+            ]), "", pn.union("+j", "+c", "j", "c"), self.sig
+        ) @ pn.cdrewrite(
+            pn.string_map([
+                ("n", "m"),
+            ]), "", pn.union("+p", "+ph", "+b", "+bh", "p", "ph", "b", "bh"), self.sig
+        ) @ pn.cdrewrite(
+            pn.string_map([
+                ("n", "ṇ"),
+            ]), "", pn.union("+ṭ", "+ṭh", "+ḍ", "+ḍh", "ṭ", "ṭh", "ḍ", "ḍh"), self.sig
         )
         # Class-7 yuj-type clusters: yuñj+dhv/hi -> yuṅgdhv/i.
         # This bridges nasal assimilation output (ñj) to attested velar+aspirate
@@ -229,7 +272,7 @@ class SandhiEngine:
         self.nati = pn.cdrewrite(
             pn.cross("n", "ṇ"),
             triggers + allowed_interveners,
-            pn.union(ALPHABET.vowels, "n", "m", "y", "v"),
+            pn.accep("+").star + pn.union(ALPHABET.vowels, "n", "m", "y", "v"),
             self.sig
         )
 
@@ -270,14 +313,16 @@ class SandhiEngine:
             ("thematic_merger",    self.thematic_merger),
             ("class9_special",     self.class9_special),
             ("ayadi",              self.ayadi),
+            ("perfect_yan_conjunct", self.perfect_yan_conjunct),
+            ("perfect_yan_simple",   self.perfect_yan_simple),
+            ("clean_perf_weak",      self.clean_perf_weak),
             ("savarna",            self.savarna),
             ("yan_sandhi",         self.yan_sandhi),
             ("guna_sandhi",        self.guna_sandhi),
         ]
         self._consonant_rules: list[tuple[str, pn.Fst]] = [
             ("d_dh_gemination",   self.d_dh_gemination),
-            ("bartho_bht",         self.bartho_bht),
-            ("bartho_bhth",        self.bartho_bhth),
+            ("bartholomae_general", self.bartholomae_general),
             ("bartho_hth",         self.bartho_hth),
             ("bartho_hdh",         self.bartho_hdh),
             ("bartho_ht",          self.bartho_ht),
@@ -356,6 +401,9 @@ class SandhiEngine:
                 @ self.thematic_merger
                 @ self.class9_special
                 @ self.ayadi
+                @ self.perfect_yan_conjunct
+                @ self.perfect_yan_simple
+                @ self.clean_perf_weak
                 @ self.savarna
                 @ self.yan_sandhi
                 @ self.guna_sandhi)
@@ -366,8 +414,7 @@ class SandhiEngine:
             return self._apply_rules_with_trace(fst, self._consonant_rules, "consonant_phase")
         return (fst
                 @ self.d_dh_gemination
-                @ self.bartho_bht
-                @ self.bartho_bhth
+                @ self.bartholomae_general
                 @ self.bartho_hth
                 @ self.bartho_hdh
                 @ self.bartho_ht

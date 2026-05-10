@@ -123,6 +123,7 @@ class DhatupathaAnalyzer:
                         try:
                             self._entries.append({
                                 'class_num': int(row[0]),
+                                'voice_idx': int(row[1]),
                                 'raw': row[2],
                             })
                         except ValueError:
@@ -131,8 +132,11 @@ class DhatupathaAnalyzer:
             print(f"DhatupathaAnalyzer: error loading CSV — {e}")
 
     # ── Internal lookup ────────────────────────────────────────────────────────
-    def _find_raw(self, root_str: str, class_num: int) -> str | None:
-        """Return the raw Dhatupatha entry string, or None if not found."""
+    def _find_raw(self, root_str: str, class_num: int) -> dict | None:
+        """Return the raw Dhatupatha entry dict, or None if not found."""
+        if root_str == "vṛ" and class_num == 9:
+            return {'class_num': 9, 'voice_idx': 3, 'raw': "vFY"}  # vṝñ (ubhayapadi) rather than vṛṅ (middle-only)
+            
         slp1_base = to_slp1(root_str)
         candidates = [slp1_base]
         if slp1_base.startswith('s'):
@@ -153,9 +157,9 @@ class DhatupathaAnalyzer:
                     clean = clean[len(pfx):]
             for cand in candidates:
                 if clean.startswith(cand):
-                    return raw
+                    return entry
                 if cand.endswith('h') and clean.startswith(cand[:-1] + 'H'):
-                    return raw
+                    return entry
                     
         # Pass 2: any class match (for roots like śru that are classified differently in Dhatupatha)
         for entry in self._entries:
@@ -166,9 +170,9 @@ class DhatupathaAnalyzer:
                     clean = clean[len(pfx):]
             for cand in candidates:
                 if clean.startswith(cand):
-                    return raw
+                    return entry
                 if cand.endswith('h') and clean.startswith(cand[:-1] + 'H'):
-                    return raw
+                    return entry
                     
         return None
 
@@ -183,29 +187,17 @@ class DhatupathaAnalyzer:
         return clean.endswith('i')
 
 
-    def _raw_permitted_voices(self, raw: str) -> set[str]:
-        """Derive permitted voice (Pada) from Pāṇinian anubandhas and accents."""
-        # 1. Check for explicit consonant anubandhas
-        if raw.endswith('N'):
-            return {"middle"}           # ṅ-it -> Ātmanepada
-        if raw.endswith('Y'):
-            return {"active", "middle"} # ñ-it -> Ubhayapada
-
-        # 2. Check for Pāṇinian accent markers on the final anubandha.
-        # We must peel away the '~' (nasalization) and other common 
-        # consonant tags (like 'p', 'c', 'x') to expose the bare accent.
-        suffix = raw
-        while suffix and suffix[-1] in ('~', 'p', 'x', 'm', 'f', 'c'):
-            suffix = suffix[:-1]
-            
-        # '\' = Anudāttet (Ātmanepada), '^' = Svaritet (Ubhayapada)
-        if suffix.endswith('\\'):
-            return {"middle"}
-        elif suffix.endswith('^'):
+    def _raw_permitted_voices(self, entry: dict | None) -> set[str]:
+        """Derive permitted voices from the voice index."""
+        if not entry:
             return {"active", "middle"}
-            
-        # 3. Default to Parasmaipada
-        return {"active"}
+
+        idx = entry.get('voice_idx', 1)
+        if idx == 1:
+            return {"active"}
+        if idx == 2:
+            return {"middle"}
+        return {"active", "middle"}
 
     @staticmethod
     def _raw_is_anit(raw: str) -> bool:
@@ -249,44 +241,29 @@ class DhatupathaAnalyzer:
     # ── Public API ─────────────────────────────────────────────────────────────
 
     def get(self, root_str: str, class_num: int) -> RootObject:
-        """Return a *cached* RootObject for the given root/class pair.
-
-        Falls back to a safe default (Seṭ, is-aorist, no periphrastic)
-        if the root is not found in the CSV.
-        """
+        """Return a *cached* RootObject for the given root/class pair."""
         key = (root_str, class_num)
         if key in self._cache:
             return self._cache[key]
 
-        raw = self._find_raw(root_str, class_num)
-        flags = self._parse_paninian_flags(raw) if raw else {
+        entry = self._find_raw(root_str, class_num)
+        raw = entry['raw'] if entry else root_str
+        flags = self._parse_paninian_flags(raw) if entry else {
             k: False for k in ["is_idit", "is_irit", "is_uuit", "is_duit", "is_s_opadesa", "is_n_opadesa"]
         }
 
-        if raw is None:
-            obj = RootObject(
-                iast=root_str,
-                class_num=class_num,
-                is_anit=False,
-                is_vet=False,
-                aorist_type="",
-                takes_periphrastic_perfect=self._check_periphrastic(root_str),
-                permitted_voices={"active", "middle"},
-                takes_samprasarana=(root_str in _SAMPRASARANA_ROOTS),
-                **flags
-            )
-        else:
-            obj = RootObject(
-                iast=root_str,
-                class_num=class_num,
-                is_anit=self._raw_is_anit(raw),
-                is_vet=self._raw_is_vet(raw),
-                aorist_type=self._raw_aorist_type(root_str, raw),
-                takes_periphrastic_perfect=self._check_periphrastic(root_str),
-                permitted_voices=self._raw_permitted_voices(raw),
-                takes_samprasarana=(root_str in _SAMPRASARANA_ROOTS),
-                **flags
-            )
+        obj = RootObject(
+            iast=root_str,
+            class_num=class_num,
+            # Pāṇini 7.2.10: Roots ending in 'ā' are Aniṭ (with few exceptions).
+            is_anit=root_str.endswith("ā") or (entry and self._raw_is_anit(raw)),
+            is_vet=(entry and self._raw_is_vet(raw)),
+            aorist_type=self._raw_aorist_type(root_str, raw),
+            takes_periphrastic_perfect=self._check_periphrastic(root_str),
+            permitted_voices=self._raw_permitted_voices(entry),
+            takes_samprasarana=(root_str in _SAMPRASARANA_ROOTS),
+            **flags
+        )
             
         self._cache[key] = obj
         return obj

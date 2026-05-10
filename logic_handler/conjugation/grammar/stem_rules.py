@@ -22,7 +22,8 @@ _PURE_VOWELS = {"a", "ā", "i", "ī", "u", "ū", "ṛ", "ṝ", "ḷ", "ḹ"}
 _AYADI_MAP = {"au": "āv", "ai": "āy", "o": "av", "e": "ay"}
 
 # Perfect weak vowel-shortening table (module-level constant)
-_PERFECT_SHORTEN = {"ī": "i", "ū": "u", "ṝ": "ṛ", "ā": "a"}
+# Whitney §786: ī and ū do NOT shorten in the weak perfect.
+_PERFECT_SHORTEN = {"ṝ": "ṛ", "ā": "a"}
 
 
 def _ends_in_consonant(s: str) -> bool:
@@ -114,8 +115,8 @@ class StemBuilder:
         if class_num == 10 and tense in ("future", "conditional"):
             base = self._build_causative_base(root_str)
             # base includes the "+" at the end, e.g. "bhāv+"
-            # Now we append "aya" and let the future system add iṣya/sya
-            fst = base + pn.accep("aya")
+            # Pāṇini 6.4.48 (ato lopaḥ): The 'a' of 'aya' drops before the vowel 'i' of 'iṣya'
+            fst = base + pn.accep("ay")
             
             # Regular future/conditional: add +iṣya or +sya
             root_obj_for_future = DHATUPATHA_ANALYZER.get(root_str, class_num)
@@ -206,12 +207,39 @@ class StemBuilder:
         phonemes = ALPHABET.parse_phonemes(root_str)
         if not phonemes: return False
         if phonemes[-1] in ALPHABET.vowels_list: return False
-        if len(phonemes) >= 2 and phonemes[-2] in ("i", "u", "ṛ", "ḷ"): move all the unncesarry stem override shit in irregulars.py and implement the actual rules
+        if len(phonemes) >= 2 and phonemes[-2] in ("i", "u", "ṛ", "ḷ"): 
             return True
         return False
 
+    # Roots whose ā-final causative uses -y- extension instead of -p-
+    # (Whitney §1042: pā-class). pā → pāyayati (not pāpayati).
+    _CAUSATIVE_AY_ROOTS = frozenset({"pā"})
+
+    # Roots that insert a nasal in the causative (Pāṇini 7.3.36 / Whitney §1042b).
+    # labh → lambhayati, rabh → rambhayati.
+    _CAUSATIVE_NASAL = {"labh": "lambh", "rabh": "rambh"}
+
+    # Vowel-final roots (ī/ū) whose causative drops the final vowel and appends -āp-.
+    # Whitney §1042: krī → krāpayati (dropping ī, lengthening with ā, then +p).
+    # Not universal: bhī → bhīṣayati (uses fear-causative, different form).
+    # We use an explicit set for safety.
+    _CAUSATIVE_IP_ROOTS = frozenset({"krī", "jī", "nī"})
+
     def _build_causative_base(self, root_str: str):
-        """Return the FST f move all the unncesarry stem override shit in irregulars.py and implement the actual rulesor the causative base (Vṛddhi/Guna + ayadi)."""
+        """Return the FST for the causative base (Vṛddhi/Guna + ayadi).
+
+        Priority:
+        1. Remaining true irregulars (han→ghāt, krī→krāp handled below).
+        2. Nasal-insertion roots (labh→lambh — Pāṇini 7.3.36).
+        3. ā-final roots with -y- extension (pā → pāy — Whitney §1042).
+        4. ā-final roots with -p- extension (dā, sthā, … — Pāṇini 6.4.55).
+        5. ī/ū-final roots with -p- extension (krī → krāp — Whitney §1042).
+        6. a-vowel consonant-final roots — no strengthening (gamaya, caray).
+        7. Long high-vowel penultimate — no strengthening (pūjaya).
+        8. guna-eligible short i/u/ṛ penultimate — Guna + base.
+        9. Default — Vṛddhi.
+        """
+        # Layer 1: true irregular override (han→ghāt only after removing dā/sthā/pā/krī/labh)
         if root_str in causative_stem_irregulars:
             return pn.accep(causative_stem_irregulars[root_str])
 
@@ -219,29 +247,45 @@ class StemBuilder:
         vowels = set(ALPHABET.vowels_list)
         vowel_positions = [i for i, ph in enumerate(phonemes) if ph in vowels]
 
-        # Paninian default for ā-final roots: dā -> dāp-, sthā -> sthāp-.
+        # Layer 2: Nasal-insertion causative (Pāṇini 7.3.36 / Whitney §1042b)
+        # labh → lambhayati, rabh → rambhayati
+        if root_str in self._CAUSATIVE_NASAL:
+            return pn.accep(self._CAUSATIVE_NASAL[root_str] + "+")
+
+        # Layer 3: ā-final roots with -y- extension (pā → pāyayati — Whitney §1042)
+        if root_str in self._CAUSATIVE_AY_ROOTS:
+            return pn.accep(root_str + "y+")
+
+        # Layer 4: ā-final roots with -p- extension (dā→dāp, sthā→sthāp — Pāṇini 6.4.55)
         if root_str.endswith("ā"):
             return pn.accep(root_str + "p+")
 
-        # Productive rule family: consonant-final a-roots (e.g. gam, car)
-        # generally keep the root vowel in ṇic (gam->gamaya, car->cāraya/coraya
-        # by lexical split). Keep pure a-roots unchanged unless a lexical
-        # irregular explicitly overrides this.
+        # Layer 5: ī/ū-final vowel roots — drop vowel, use ā + p extension
+        # Whitney §1042: krī → krāpayati (root ī dropped, ā substituted, +p+aya).
+        if root_str in self._CAUSATIVE_IP_ROOTS:
+            # Strip the final ī/ū and substitute ā, then append p
+            cons_base = root_str[:-1]  # e.g. 'kr' from 'krī'
+            return pn.accep(cons_base + "āp+")
+
+        # Layer 6: consonant-final a-vowel roots — Pāṇini 7.2.116 prescribes Upadhā vriddhi (a -> ā)
+        # EXCEPT for roots ending in 'am' (Pāṇini 7.3.73) which do not take vriddhi (e.g., gam -> gamaya).
         if (
             phonemes
             and phonemes[-1] not in vowels
             and len(vowel_positions) == 1
             and phonemes[vowel_positions[0]] == "a"
         ):
-            return pn.accep(root_str + "+")
+            if root_str.endswith("am"):
+                return pn.accep(root_str + "+")
+            # Otherwise, it falls through to Layer 9 (Default - Vṛddhi) which correctly applies Upadhā Vriddhi!
 
-        # Many consonant-final roots with long high vowels are non-strengthening
-        # in causative stem formation (e.g. pūj -> pūjaya).
+        # Layer 7: consonant-final with long-high penultimate vowel (ṝ/ū/ī already handled above)
+        # kept for any remaining cases (e.g. ṝ-penultimate)
         if (
             phonemes
             and phonemes[-1] not in vowels
             and len(phonemes) >= 2
-            and phonemes[-2] in {"ī", "ū", "ṝ"}
+            and phonemes[-2] in {"ṝ"}
         ):
             return pn.accep(root_str + "+")
 
@@ -274,6 +318,10 @@ class StemBuilder:
             stem = self._apply_guna(root_str, "[STRONG]")
             is_anit = root_obj.is_anit
             is_vet = root_obj.is_vet
+
+        if root_str == "vṛ":
+            # Pāṇini 7.2.38 (vṛto vā): vṛ takes optionally long īṭ in future systems
+            return pn.union(stem + pn.accep("+iṣya"), stem + pn.accep("+īṣya"))
 
         if is_vet:
             return pn.union(stem + pn.accep("+sya"), stem + pn.accep("+iṣya"))
@@ -312,6 +360,8 @@ class StemBuilder:
         # kṛ: Aniṭ periphrastic (kartā) despite Seṭ simple future
         if root_str == "kṛ":
             return stem
+        if root_str == "vṛ":
+            return pn.union(stem + pn.accep("+i"), stem + pn.accep("+ī"))
         suffix = "" if is_anit else "+i"
         return stem + pn.accep(suffix)
 
@@ -367,7 +417,7 @@ class StemBuilder:
                 return self._apply_guna(root_str, "[STRONG]")
             return pn.accep(root_str)
 
-        if a_type in ("s", "is") and is_vet:
+        if a_type == "s_or_is" or (a_type in ("s", "is") and is_vet):
             return pn.union(build_s(), build_is())
 
         if a_type == "s":
@@ -437,42 +487,96 @@ class StemBuilder:
     def _build_perfect_system(self, root_str, class_num, strength, tense, **kwargs):
         """Perfect stem = reduplication prefix + (guna | shortened) root.
 
-        Whitney 805-807: Strong forms (1sg, 2sg, 3sg active) use GUNA.
-        The 3sg active is the bare (ending-less) strong stem.
-        Exception: roots in aa use Vrddhi in 3sg (papau, etc.) — handled via
-        perfect_stem_overrides.
-
-        Whitney 794: Roots ending in short a before voiced aspirate (labh, rabh,
-        nabh, grabh) use e-grade (guna of a) in the perfect WEAK stem.
-        e.g. labh -> weak: lebh (prefix + lebh + endings)
+        Whitney §805-807: Strong forms (1sg, 2sg, 3sg active) use GUNA.
+        Whitney §789: 3sg active takes Vriddhi (long-ā) for a-vowel roots.
+        Whitney §800: ā-final roots: strong=prefix+ā, weak=prefix+consonant.
+        Whitney §783c: Samprasāraṇa roots form perfect via samprasāraṇa vowel.
+        Pāṇini 7.3.84: Class-6 (Tudādi) roots take NO guna in the perfect.
+        Whitney §794: Roots ending in a before voiced aspirate use e-grade weak.
         """
         prefix = self.reduplicator.generate_prefix(root_str)
 
-        # Whitney 794 weak e-grade roots (a -> e before bh/gh/dh/ḍh in weak perfect)
-        # These roots show e instead of bare a in the weak stem.
+        # Whitney 794 weak e-grade roots (a → e before bh/gh/dh/ḍh in weak perfect)
         _E_GRADE_WEAK_ROOTS = {"labh", "rabh", "nabh", "grabh"}
 
         person = kwargs.get("person")
         number = kwargs.get("number")
+        phonemes = ALPHABET.parse_phonemes(root_str)
+        vowels = set(ALPHABET.vowels_list)
+
+        # ── Rule A: ā-final root perfect (Whitney §800) ───────────────────────
+        # pā→papā/pap, dā→dadā/dad, sthā→tasthā/tasth, mā→mamā/mam, hā→jahā/jah
+        # Strong: prefix + ā-root (keeps ā).
+        # Weak:   prefix + root-minus-ā (zero grade = bare consonant cluster).
+        if phonemes and phonemes[-1] == "ā":
+            if strength == "[STRONG]":
+                return pn.accep(prefix + "+") + pn.accep(root_str)   # prefix+dā
+            else:
+                return pn.accep(prefix + "+") + pn.accep(root_str[:-1])  # prefix+d
+
+        # ── Rule B: Samprasāraṇa perfect (Whitney §783c / Pāṇini 6.1.13-16) ─
+        # yaj→iyāj/īj (strong/weak), vac→uvāc/ūc.
+        # Samprasāraṇa: semivowel (y/v) replaced by corresponding vowel (i/u);
+        # then vriddhi of that vowel applies in strong, long stays in weak.
+        root_obj = DHATUPATHA_ANALYZER.get(root_str, class_num)
+        if root_obj.takes_samprasarana:
+            samp = self._compute_samprasarana_passive(root_str)
+            if samp is not None:
+                samp_phonemes = ALPHABET.parse_phonemes(samp)
+                # Determine the samprasāraṇa vowel (first phoneme if vowel-initial)
+                if samp_phonemes and samp_phonemes[0] in vowels:
+                    sv = samp_phonemes[0]  # e.g. 'i' for yaj, 'u' for vac
+                    # Strong: vriddhi of sv as the prefix (ī/ū-long) + rest
+                    # 3sg uses additional vriddhi: i→ī (long), u→ū (long)
+                    # Non-3sg strong: sv as-is (i, u) + rest
+                    vriddhi_sv = {"i": "ī", "u": "ū", "ṛ": "ṝ"}.get(sv, sv)
+                    rest = "".join(samp_phonemes[1:])  # e.g. 'j' for yaj
+                    if strength == "[STRONG]":
+                        # Whitney §783c: strong = long sampv + rest (iyāj/uvāc pattern)
+                        # The 'y' or 'v' glide is inserted before the vowel in 3sg by convention.
+                        # non-3sg: i + yāj, u + vāc (with prefix)
+                        # 3sg: ī + j (vriddhi of 'i' = ī), ū + c (vriddhi of 'u' = ū)
+                        # Actually INRIA: strong = iyāj (3sg), weak = īj.
+                        # Use prefix-less forms matching INRIA:
+                        glide = {"i": "y", "u": "v"}.get(sv, "")
+                        if person == "3" and number == "sg":
+                            return pn.accep(sv + glide + "ā" + rest)  # iyāj, uvāc
+                        else:
+                            return pn.accep(sv + glide + "a" + rest)  # iyaj (rare)
+                    else:
+                        # Weak: long vowel (vriddhi) + rest, no prefix
+                        return pn.accep(vriddhi_sv + rest)  # īj, ūc
 
         if strength == "[STRONG]":
-            # √kṛ has split strong behavior in active perfect:
-            # 3sg cakāra, but non-3sg strong cells show cakar- before endings.
-            if root_str == "kṛ":
-                if person == "3" and number == "sg":
-                    return pn.accep("cakār")
-                return pn.accep("cakar")
+            # Whitney §787 & §789: vowel-final roots and medial a-vowel roots
+            # use Vriddhi in 3sg active perfect, REGARDLESS of overrides.
+            # Exception: bhū is completely anomalous and takes neither vriddhi nor guna (Whitney §793).
+            if person == "3" and number == "sg" and root_str != "bhū":
+                if phonemes:
+                    # Condition 1: Vowel-final root (short or long)
+                    if phonemes[-1] in vowels:
+                        vr_root_fst = self._apply_vriddhi(root_str)
+                        return pn.accep(prefix + "+") + vr_root_fst
+                    # Condition 2: Medial 'a' (e.g. tan, gam)
+                    root_vowel_idx = next(
+                        (i for i, p in enumerate(phonemes) if p in vowels), None
+                    )
+                    if root_vowel_idx is not None and phonemes[root_vowel_idx] == "a":
+                        vr_phonemes = list(phonemes)
+                        vr_phonemes[root_vowel_idx] = "ā"
+                        vr_root = "".join(vr_phonemes)
+                        return pn.accep(prefix + "+") + pn.accep(vr_root)
+
+            # Override check: non-3sg strong, or roots with explicit strong_3sg
+            # that aren't a-vowel (e.g. hu→juhāv, su→suṣāv, div→didev).
             if root_str in perfect_stem_overrides:
                 info = perfect_stem_overrides[root_str]
-                # Whitney §789/805: 3sg uses the vriddhi/long-ā stem;
-                # 1sg and 2sg use the regular strong (guna) stem.
-                # Use the 'strong_3sg' key if present, else fall back to 'strong'.
                 if person == "3" and number == "sg" and "strong_3sg" in info:
                     return pn.accep(info["strong_3sg"])
                 return pn.accep(info["strong"])
-            else:
-                # Whitney §805: strong forms use Guna (not Vrddhi) for most roots
-                root_fst = self._apply_guna(root_str, "[STRONG]")
+
+            # Whitney §805: strong forms use Guna for most roots
+            root_fst = self._apply_guna(root_str, "[STRONG]")
         else:
             # Weak: priority table
             if root_str in perfect_stem_overrides:
@@ -480,22 +584,21 @@ class StemBuilder:
                 if "weak2" in info:
                     return pn.union(pn.accep(info["weak"]), pn.accep(info["weak2"]))
                 return pn.accep(info["weak"])
+
             if root_str in _E_GRADE_WEAK_ROOTS:
-                # Whitney 794: e-grade weak stem.
-                # The reduplication prefix and root vowel a fuse to give e.
-                # Return just the e-grade root (la + a + bh = lebh) with no prefix.
-                phonemes = ALPHABET.parse_phonemes(root_str)
+                # Whitney §794: e-grade weak stem (a→e, e.g. labh→lebh).
                 e_stem = "".join("e" if ph == "a" else ph for ph in phonemes)
                 return pn.accep(e_stem)
             elif root_str in perfect_weak_guna_roots:
                 root_fst = self._apply_guna(root_str, "[STRONG]")
             else:
-                # Whitney 783: shorten long vowels in the weak perfect.
+                # Whitney §783: shorten long vowels in the weak perfect.
                 if root_str and root_str[-1] in _PERFECT_SHORTEN:
                     short_root = root_str[:-1] + _PERFECT_SHORTEN[root_str[-1]]
                 else:
                     short_root = root_str
-                root_fst = pn.accep(short_root)
+                # Tag with [PERF_WEAK] so sandhi.py can apply specific yan rules (e.g., ninyiva, suṣuviva).
+                root_fst = pn.accep(short_root + "[PERF_WEAK]")
         return pn.accep(prefix + "+") + root_fst
 
     def _build_perfect_krdanta_base(self, root_str, class_num, voice):
@@ -649,7 +752,11 @@ class StemBuilder:
         tag = "[PASSIVE]"
         if class_num == 4: tag = "[CLASS4]"
         
-        return pn.accep(root_str + tag) + pn.accep("+ya")
+        fst = pn.accep(root_str + tag)
+        if root_obj.takes_samprasarana:
+            fst = pn.accep("[SAMP]") + fst
+            
+        return fst + pn.accep("+ya")
 
     def _build_aorist_passive_3sg(self, root_str):
         return pn.accep(root_str + "[AORIST_PASS_3SG]")
@@ -664,19 +771,53 @@ class StemBuilder:
         return self._apply_guna(root_str, "[STRONG]") + pn.accep("+a")
 
     def _build_class_2(self, root_str, strength):
+        """Adādi (class 2) — athematic, strong/weak alternation.
+
+        Whitney §212-213 / Pāṇini 7.3.86:
+        - Strong: Guna for most roots; Vriddhi for ṛ-vowel roots (mṛj → mārj).
+        - Weak: [CLASS2_WEAK] tag for han/vac; bare root otherwise.
+        """
         if root_str in class_2_irregulars:
             irr = class_2_irregulars[root_str]
             if strength == "[STRONG]":
                 return pn.accep(irr["strong"])
             else:
                 return pn.accep(root_str + "[CLASS2_WEAK]")
+
+        # Whitney §212: ṛ-vowel class-2 roots take Vriddhi in strong forms.
+        # e.g. mṛj → mārj (Vriddhi of ṛ = ār), not *merj (Guna = er).
+        if strength == "[STRONG]":
+            phonemes = ALPHABET.parse_phonemes(root_str)
+            vowels = set(ALPHABET.vowels_list)
+            if any(ph == "ṛ" for ph in phonemes if ph in vowels):
+                return self._apply_vriddhi(root_str)
+
         return self._apply_guna(root_str, strength)
 
     def _build_class_3(self, root_str, strength):
+        """Juhotyādi (class 3) reduplication stem.
+
+        Whitney §671 / Pāṇini 3.1.5:
+        - Strong (sg act): prefix + full root (guna if applicable).
+        - Weak (all others): prefix + zero-grade root.
+          For ā-final roots (dā, dhā): zero-grade = root minus ā (d, dh).
+        """
         if root_str in class_3_irregulars:
             irr = class_3_irregulars[root_str]
             return pn.accep(irr["strong"] if strength == "[STRONG]" else irr["weak"])
+
         prefix = self.reduplicator.generate_prefix(root_str)
+
+        # Whitney §671: ā-final roots (dā, dhā, …) — weak stem drops the ā.
+        # generate_prefix already gives the shortened prefix (ā→a, ī→i, ū→u).
+        # e.g. dā → prefix='da', strong='da+dā', weak='da+d'
+        phonemes = ALPHABET.parse_phonemes(root_str)
+        if phonemes and phonemes[-1] == "ā":
+            if strength == "[STRONG]":
+                return pn.accep(prefix) + pn.accep(root_str)  # dadā
+            else:
+                return pn.accep(prefix) + pn.accep(root_str[:-1])  # dad (drop ā)
+
         return pn.accep(prefix) + self._apply_guna(root_str, strength)
 
     def _build_class_4(self, root_str, strength):
@@ -695,7 +836,14 @@ class StemBuilder:
         # These are traditionally marked with 'ḷ' (L) in the Dhatupatha.
         # Until DhatupathaAnalyzer handles is_lrit, we use this targeted check.
         if root_str in {"muc", "vid", "lip", "sic", "kṛt", "khād"}:
-             return pn.accep("[NASAL]" + root_str + "+a")
+            vowels = set(ALPHABET.vowels_list)
+            insert_idx = -1
+            for i, ch in enumerate(root_str):
+                if ch in vowels:
+                    insert_idx = i + 1
+                    break
+            if insert_idx != -1:
+                root_str = root_str[:insert_idx] + "n" + "+" + root_str[insert_idx:]
         return pn.accep(root_str) + pn.accep("+a")
 
     def _build_class_7(self, root_str, strength):
@@ -727,7 +875,7 @@ class StemBuilder:
         return stem + pn.accep(affix)
 
     def _build_class_9(self, root_str, strength):
-        affix = "+nā" if strength == "[STRONG]" else "+nī"
+        affix = "+nā" if strength == "[STRONG]" else "+nī[CLASS9]"
         return pn.accep(root_str) + pn.accep(affix)
 
     def _build_intensive(self, root_str, strength, voice="middle"):

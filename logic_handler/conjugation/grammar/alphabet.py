@@ -75,6 +75,9 @@ class SanskritAlphabet:
             "[SAMP]",
             "[AUG]",
             "[NASAL]",
+            "[PERF_WEAK]",
+            "[CLASS9]",
+            "[EOS]",
         ]
         # ── Pynini FST atoms ─────────────────────────────────────────────────
         self.vowels = pn.union(*self.vowels_list)
@@ -96,7 +99,6 @@ class SanskritAlphabet:
             + ["+"]  # morpheme boundary
         )
         self.alpha = pn.union(*all_chars)
-        self.alpha = pn.union(self.alpha, "[EOS]").closure()
         self.sigma_star = pn.closure(self.alpha)
 
     def parse_phonemes(self, s: str) -> list:

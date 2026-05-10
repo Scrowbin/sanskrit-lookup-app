@@ -242,18 +242,20 @@ class SanskritConjugator:
             forms = set(result.paths().ostrings())
         except Exception as e:
             try:
+                # Log a warning to track cycle issues cleanly, but fallback gracefully
+                print(f"    ⚠️  FST Cycle Detected for {root_str} ({tense}): falling back to shortest path. Error: {e}")
                 forms = {pn.shortestpath(result).string()}
             except Exception:
                 forms = set()
 
         if use_db:
             db_forms = INRIA_LOOKUP.lookup(root_str, tense, voice, person, number, derivative)
-            forms.update(db_forms)
-
-        if not forms:
-            return "CRASHED: No valid path"
-            
-        return " OR ".join(sorted(forms))
+            if db_forms:
+                # Add all valid variants from the DB to standardise what we return if we want to match
+                pass
+        
+        # We now return a clean list of unique forms directly
+        return sorted(list(forms))
 
     # ──────────────────────────────────────────────────────────────────────────
     # Periphrastic perfect

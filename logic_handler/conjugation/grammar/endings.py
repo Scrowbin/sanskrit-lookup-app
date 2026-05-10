@@ -243,8 +243,13 @@ class SuffixProvider:
             "[2sg]": _s(second_sg),      "[2du]": _s("athuḥ"), "[2pl]": _s("a"),
             "[1sg]": _s(first_third_sg), "[1du]": _s("iva"),   "[1pl]": _s("ima"),
         }
-        # ṛ-final roots use bare du/pl endings
-        if root_str and root_str.endswith("ṛ") and root_str != "kṛ" and root_str not in perfect_stem_overrides:
+        # ṛ-final and u/ū-final roots use bare du/pl endings (Aniṭ) in the perfect
+        # This only applies to the primary root, not to derivatives like desideratives!
+        is_primary = kwargs.get('derivative') in (None, "", "primary")
+        if is_primary and root_str and (
+            root_str.endswith("ṛ") or root_str.endswith("ṝ") or 
+            root_str.endswith("u") or root_str.endswith("ū")
+        ) and root_str not in perfect_stem_overrides:
             endings["[1du]"] = _s("va")
             endings["[1pl]"] = _s("ma")
             endings["[2du]"] = _s("vathuḥ")
@@ -261,9 +266,18 @@ class SuffixProvider:
         if root_str == "kṛ":
             endings["[2sg]"] = _s("ṣe")
             endings["[2pl]"] = _s("dhve")
-        if root_str and root_str.endswith("ṛ"):
+            
+        # ṛ-final and u/ū-final roots use bare du/pl endings (Aniṭ) in the perfect middle
+        # This only applies to the primary root, not to derivatives like desideratives!
+        is_primary = kwargs.get('derivative') in (None, "", "primary")
+        if is_primary and root_str and (
+            root_str.endswith("ṛ") or root_str.endswith("ṝ") or 
+            root_str.endswith("u") or root_str.endswith("ū")
+        ) and root_str not in perfect_stem_overrides:
             endings["[1du]"] = _s("vahe")
             endings["[1pl]"] = _s("mahe")
+            endings["[2sg]"] = _s("ṣe")
+            endings["[2pl]"] = _s("dhve")
         return endings
 
     # ── 6. PERIPHRASTIC FUTURE (Luṭ) ──────────────────────────────────────────
