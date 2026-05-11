@@ -63,15 +63,20 @@ def normalize(form: str) -> str:
         return form[:-1] + "ḥ"
     return form
 
-def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_failures.csv"):
+def run_focused_benchmark(csv_file="../data/roots.csv", output_report="benchmark_failures.csv"):
     print("Loading INRIA database...")
     t_start = time.perf_counter()
 
     inria_db = {}
     with open(csv_file, mode='r', encoding='utf-8') as f:
         for row in csv.DictReader(f):
+            cls = row.get('class', '')
+            class_str = cls.split(' ')[0] if cls else None
+            class_val = int(class_str) if class_str and class_str.isdigit() else class_str
+
             key = (
                 normalize_root(row['root_IAST']),
+                class_val,
                 MODE_MAP.get(row['mode'], row['mode']),
                 VOICE_MAP.get(row['voice'], row['voice']),
                 row['person'],
@@ -160,6 +165,7 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
     totals   = {"pass": 0, "fail": 0, "error": 0, "skip_inria": 0, "unsupported": 0, "impossible": 0}
     per_root = {}
     failed_rows = []
+    multiple_expected_rows = []
 
     print("Running tests...\n")
 
@@ -184,8 +190,18 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
 
                             is_impossible = (voice, tense) in IMPOSSIBLE
 
+                            is_present_system = tense in ("present", "imperfect", "imperative", "optative")
+                            is_passive = voice == "passive"
+
+                            if is_denom:
+                                query_class = "denom"
+                            elif derivation != "primary" or is_passive or not is_present_system:
+                                query_class = None
+                            else:
+                                query_class = effective_class
+
                             norm_root = normalize_root(root)
-                            inria_key = (norm_root, tense, voice, person, number, derivation)
+                            inria_key = (norm_root, query_class, tense, voice, person, number, derivation)
 
                             if inria_key not in inria_db:
                                 if is_impossible:
@@ -225,10 +241,22 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
                                     actual = api.conjugate(engine_root, effective_class,
                                                            person, number, **call_kwargs)
 
-                                actual_list = actual.split(" OR ")
+                                actual_list = actual if isinstance(actual, list) else [actual]
                                 if any(a in expected_forms for a in actual_list):
                                     counts["pass"] += 1
                                     totals["pass"] += 1
+                                    if len(expected_forms) > 1:
+                                        multiple_expected_rows.append({
+                                            "Root":             root,
+                                            "Class":            f"{primary_class} ({derivation})",
+                                            "Derivation":       derivation,
+                                            "Tense":            tense,
+                                            "Voice":            voice,
+                                            "Person":           person,
+                                            "Number":           number,
+                                            "Expected (INRIA)": " OR ".join(expected_forms),
+                                            "Actual (FST)":     " OR ".join(actual_list),
+                                        })
                                 else:
                                     counts["fail"] += 1
                                     totals["fail"] += 1
@@ -241,7 +269,7 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
                                         "Person":           person,
                                         "Number":           number,
                                         "Expected (INRIA)": " OR ".join(expected_forms),
-                                        "Actual (FST)":     actual,
+                                        "Actual (FST)":     " OR ".join(actual_list) if actual_list else "CRASHED: No valid path",
                                         "Error_Type":       "Mismatch",
                                     })
 
@@ -279,6 +307,15 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
             writer.writerows(failed_rows)
         print(f"\n📄 Failure report → {output_report}  ({len(failed_rows)} rows)")
 
+    if multiple_expected_rows:
+        fieldnames = ["Root", "Class", "Derivation", "Tense", "Voice", "Person",
+                      "Number", "Expected (INRIA)", "Actual (FST)"]
+        with open("correct_multiple_expected.csv", mode='w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(multiple_expected_rows)
+        print(f"📄 Multiple expected matches → correct_multiple_expected.csv  ({len(multiple_expected_rows)} rows)")
+
     # ── Terminal summary ───────────────────────────────────────────────────────
     t_total = time.perf_counter() - t_start
     tested  = totals["pass"] + totals["fail"] + totals["error"]
@@ -304,4 +341,6 @@ def run_focused_benchmark(csv_file="verbs_clean.csv", output_report="benchmark_f
         print(f"  {root:<10} {c['pass']:>6} {c['fail']:>6} {c['error']:>6} {c['unsupported']:>6}  {desc}")
 
 if __name__ == "__main__":
-    run_focused_benchmark("data/roots.csv", "benchmark_failures.csv")
+    # 3) Optionally run a full sweep and dump failures to CSV
+    # Uncomment to run the full benchmark
+    run_focused_benchmark("../data/roots.csv", "benchmark_failures.csv")

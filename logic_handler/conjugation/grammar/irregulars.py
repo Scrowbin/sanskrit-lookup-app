@@ -44,28 +44,6 @@ passive_stem_overrides = {
     "smṛ": "smar",
 }
 
-# ── Aniṭ roots (future takes bare -sya-, not -iṣya-) ─────────────────────────
-# Decision is made on the POST-GUNA form in stem_rules._build_future_system.
-# Diphthong-final guna forms (e/o) ALSO count as consonant-ending for Seṭ
-# (they resolve via ayadi before the following i: bho+iṣya → bhaviṣya).
-# Aniṭ roots override this and always take bare -sya-.
-aset_roots = {
-    "yaj",   # yakṣyati
-    "vac",   # vakṣyati
-    "vah",   # vakṣyati
-    "dviṣ",  # dvekṣyati
-    "duh",   # dhokṣyati
-    "yuj",   # yokṣyati
-    "ad",    # atsyati
-    "hu",    # hoṣyati
-    "krī",   # kreṣyāmi
-    "tud",   # totsyati
-    "gam",   # gantā (periphrastic future is aniṭ)
-    "sthā",  # sthāsyati (Pāṇini 7.2.10: sthā is aniṭ)
-    "mā",    # māsyati
-    "hā",    # hāsyati
-}
-
 
 # ── Causative stem irregulars ─────────────────────────────────────────────────
 # Only roots whose causative base CANNOT be derived by the engine rules are
@@ -91,18 +69,7 @@ nasal_roots = {
     "lip": "limp",
 }
 
-# ── Perfect reduplication overrides ──────────────────────────────────────────
-# Key: root IAST → reduplication prefix string
-# dviṣ→di is now handled algorithmically: the standard Whitney §590 cluster-drop
-# rule in _extract_initial_syllable takes only the first consonant of 'dv',
-# giving 'd', then the reduction FST shortens/palatalizes as needed → 'di'. ✓
-perfect_redupe_overrides = {
-    "bhū": "ba",   # babhūva — ū roots exceptionally take 'a' prefix (not 'bu')
-    "krī": "ci",   # cikraya — algorithm gives 'kri' (wrong); 'ci' is the attested form
-    # Whitney §788: sthā reduplicates with 'ta' (not 'sa' which the algorithm gives).
-    # The initial 'sth' cluster → 's' by default, but Pāṇinian perfect uses 'ta'.
-    "sthā": "ta",
-}
+
 
 # ── Perfect 2sg: roots that take bare -tha (not -itha) ───────────────────────
 # INRIA uses -itha for yuj (yuyojitha), so yuj is NOT in this set.
@@ -208,26 +175,7 @@ aorist_overrides = {
 }
 
 
-# ── Future stem overrides ─────────────────────────────────────────────────────
-# Roots whose future stem is NOT guna(root) + sya/iṣya.
-# Maps root_str → {"stem": bare_stem, "anit": bool}
-future_stem_overrides = {
-    "div": {"stem": "dīv", "anit": False},  # dīvitā (seṭ; class-4 lengthened stem + i)
-    "gam": {"stem": "gam"},          # gamiṣyati (Seṭ despite anudātta)
-    "kṛ":  {"stem": "kar", "anit": False},  # kariṣyati: guna of ṛ = ar; Seṭ (overrides lexicon)
-}
 
-
-# Periphrastic-future stem overrides (where stem ≠ guna + i)
-periphrastic_stem_overrides = {
-    "gam": "gan",    # gantā: the 'tā' ending provides the t; n comes from nasal insertion
-    "div": "dīv",    # dīvitā (uses lengthened class-4 stem + i from builder)
-    "yaj": "yaṣ",    # yaṣṭā (INRIA)
-    # Aniṭ roots whose periphrastic future omits -i- despite being Seṭ elsewhere:
-    "smṛ": "smar",   # smartā (aniṭ; guna of smṛ = smar, then aniṭ)
-    "budh": "bodh",  # boddhā: bodh + tā (no -i- as budh is aniṭ for periphrastic)
-    "vid": "ved",    # vettā (aniṭ: ved + tā -> vettā)
-}
 
 
 # ── Desiderative stem overrides ──────────────────────────────────────────────

@@ -11,6 +11,9 @@ IAST_TO_SLP1 = {
     'ph':'P', 'bh':'B', 'ś':'S', 'ṣ':'z', 'ḥ':'H', 'ṃ':'M',
 }
 
+# SLP1 vowel characters (single-char in SLP1)
+_SLP1_VOWELS = frozenset('aAiIuUeEoOfFxX')
+
 # Long vowels that force periphrastic perfect when root-initial
 _PERIPHRASTIC_LONG_VOWELS = frozenset({"ī", "ū", "ṛ", "ṝ", "e", "ai", "o", "au"})
 
@@ -20,6 +23,53 @@ _SAMPRASARANA_ROOTS = frozenset({
     "yaj", "vac", "vap", "svap", "vah", "vas", "vad", "ve", "vye", "hve", "śvi",
     # Grahādi group (6.1.16)
     "grah", "jyā", "vay", "vyadh", "vaś", "vyac", "vraśc", "prach", "bhrajj"
+})
+
+# Roots that are genuinely Aniṭ but whose CSV entries do NOT have an anudātta
+# accent (\\) on any character other than a suffix-~ — so the position-aware
+# parser cannot auto-detect them.  Keep this set as small as possible; every
+# entry here should cite a Whitney/Pāṇini source.
+# Roots now auto-detected from CSV accent (no longer needed here):
+#   hu, mā, hā, kṛ, smṛ, duh, dviṣ, diś, yaj, vah, vad, pac, budh, chid,
+#   śi, zu, du, stṛ, mā (class 3)
+_KNOWN_ANIT_ROOTS = frozenset({
+    # Missing from the CSV entirely (Whitney references)
+    "gam",   # Whitney §735
+    "han",   # Whitney §736
+    "ad",    # Whitney §632 (class 2 adādi)
+    "krī",   # Whitney §671 (class 9)
+    "tud",   # Whitney §687 (class 6 tudādi)
+    "muc",   # Whitney §742 (class 6)
+    "lip",   # Whitney §694 (class 6)
+    "sad",   # Whitney §716 (class 1)
+    "pad",   # Whitney §716 (class 1/4)
+    "bhid",  # Whitney §730 (class 7)
+    "yuj",   # Whitney §730 (class 7)
+    "mṛj",   # Whitney §627 (class 2)
+    "sṛj",   # Whitney §716 (class 6)
+    "vac",   # Whitney §730 (class 2)
+    "vid",   # Whitney §694 (class 2, 'know' sense)
+    "sthā",  # Whitney §672 (class 1)
+    "śak",   # Whitney §694 (class 5)
+})
+
+# Ubhayapada roots whose MW/Huet unprefixed-roots.csv entry is incomplete
+# (lists only 'para', missing the 'atma' row).  Every entry is cited from
+# Whitney or traditional grammar.  The engine merges this set with the MW
+# voice data so that the full ubhayapada voice range is always returned.
+_KNOWN_UBHAYA_ROOTS = frozenset({
+    "duh",   # class 2 — Whitney §638; traditional ubhayapada
+    "muc",   # class 6 — Whitney §742, P. 1.3.73
+    "bhid",  # class 7 — Whitney §730, P. 1.3.66 (bhidādi)
+    "yuj",   # class 7 — Whitney §730, P. 1.3.66
+    "vij",   # class 7 — Whitney §730
+    "rud",   # class 2 — Whitney §638
+    "sah",   # class 1 — Whitney §723
+    "vas",   # class 1 (dwell) — Whitney §723
+    "nī",    # class 1 — Whitney §725
+    "grah",  # class 9 — Whitney §706; widely ubhayapada
+    "kram",  # class 1/4 — Whitney §722; ubhayapada (krāmati/kramate)
+    "hṛ",    # class 1 — Whitney §725; harati/harate both attested
 })
 
 def to_slp1(iast_str: str) -> str:
@@ -39,29 +89,53 @@ class RootObject:
     phonetic heuristics scattered across stem_rules.py and conjugate.py.
 
     Attributes:
-        iast: IAST string (e.g. "bhū")
-        class_num: Gaṇa (verb class) as integer 1-10
-        is_anit: True if root has anudātta accent (\\) — takes no connecting 'i'
-        is_set: Inverse of is_anit (convenience property)
-        aorist_type: Paninian aorist class: 'root'|'a'|'s'|'is'|'sa'
-        takes_periphrastic_perfect: True for causatives, desideratives, intensives,
-            class-10 roots, or roots whose *first* phoneme is a long vowel.
+        iast            IAST string (e.g. "bhū")
+        class_num       Gaṇa (verb class) as integer 1-10
+        is_anit         Anudātta on ROOT vowel → takes no connecting 'i'
+        is_set          Inverse of is_anit (convenience property)
+        is_vet          Svarita (~) marker → optionally seṭ
+        is_idit         i-it: Nasal insertion (P. 7.1.58)
+        is_irit         ir-it: Optional a-aorist (P. 3.1.57)
+        is_uuit         ū-it: Optional iṭ in participles (P. 7.2.44)
+        is_udit         u-it (short): Optional iṭ before ktvā (P. 7.2.56)
+        is_duit         du-it: Mandatory a-aorist (P. 3.1.55)
+        is_edit         e-it: Prohibits vṛddhi in s-Aorist (P. 7.2.5)
+        is_odit         o-it: t→n blocked in kta/ktavatū (P. 8.2.45)
+        is_nit          ñ-it (Y): Ubhayapada (P. 1.3.72)
+        is_ngit         ṅ-it (N suffix): Ātmanepada (P. 1.3.12)
+        is_pit          p-it: Prevents ā-lengthening (very rare)
+        is_ssit         ṣ-it (suffix z): Forces aṅ-Aorist (P. 3.1.59)
+        is_ttit         ṭ-it (suffix w): ṅīp feminine suffix (P. 4.1.15)
+        is_s_opadesa    Initial ṣ: requires prefix-sandhi (ṣatva)
+        is_n_opadesa    Initial ṇ: requires prefix-sandhi (ṇatva)
+        aorist_type     'root'|'a'|'s'|'is'|'sa'
+        takes_periphrastic_perfect
+        permitted_voices
+        takes_samprasarana
     """
     iast: str
     class_num: int
+    hom: str              # homonym number from MW ('', '1', '2', …)
     is_anit: bool
     is_vet: bool
-    is_idit: bool       # i-it: Triggers Nasal Insertion (Num)
-    is_irit: bool       # ir-it: Optional a-aorist (Pāṇini 3.1.57)
-    is_uuit: bool       # ū-it: Optional i (Veṭ) in Participles (Pāṇini 7.2.44)
-    is_duit: bool       # du-it: Mandatory a-aorist (Pāṇini 3.1.55)
-    is_s_opadesa: bool  # ṣ-opadeśa: Initial ṣ requires prefix-sandhi (ṣatva)
-    is_n_opadesa: bool  # ṇ-opadeśa: Initial ṇ requires prefix-sandhi (natva)
+    is_idit: bool
+    is_irit: bool
+    is_uuit: bool
+    is_udit: bool
+    is_duit: bool
+    is_edit: bool
+    is_odit: bool
+    is_nit: bool
+    is_ngit: bool
+    is_pit: bool
+    is_ssit: bool
+    is_ttit: bool
+    is_s_opadesa: bool
+    is_n_opadesa: bool
     aorist_type: str
     takes_periphrastic_perfect: bool
-    permitted_voices: set[str]
+    permitted_voices: set
     takes_samprasarana: bool
-    
 
     @property
     def is_set(self) -> bool:
@@ -74,42 +148,29 @@ class DhatupathaAnalyzer:
     """Loads dhatupatha.csv and answers grammatical queries about roots.
 
     CSV format (3 columns, no header):
-        col 0 – gaṇa (class) number (1-based group index, NOT verb class)
-        col 1 – serial within gaṇa
-        col 2 – raw Dhatupatha entry in SLP1 with anubandhas
+        col 0 – gaṇa (class) number
+        col 1 – serial number within the gaṇa
+        col 2 – raw Dhātupāṭha entry in SLP1 with anubandhas and accent marks
 
-    The verb class is read from col 0 of the *group header* that precedes
-    each gaṇa block.  This loader stores (class_num, raw) pairs.
+    Accent marks in SLP1:
+        \\  anudātta — immediately after root vowel → Aniṭ
+                     immediately after ~ (anubandha vowel) → Ātmanepada
+        ^   svarita  — after anubandha vowel/~ → Ubhayapada / Veṭ
+        ~   marks the preceding vowel as an it-marker (anubandha)
     """
 
     def __init__(self):
         self._entries: list[dict] = []
-        self._cache: dict[tuple[str, int], RootObject] = {}
+        self._cache: dict[tuple, RootObject] = {}
+        # MW voice index: (slp1_root, class_str) -> set of 'para'/'atma' values
+        # Also keyed without class for class-agnostic lookups.
+        self._mw_voice: dict[tuple, set[str]] = {}
+        # MW homonym index: (slp1_root, class_str) -> hom string
+        self._mw_hom: dict[tuple, str] = {}
         self._load()
-        
-    def _parse_paninian_flags(self, raw: str) -> dict:
-        """Extracts Pāṇinian markers from the raw SLP1 string."""
-        # Initial consonant checks (Initial mutation)
-        is_s = raw.startswith('z')  # SLP1 'z' is 'ṣ'
-        is_n = raw.startswith('R')  # SLP1 'R' is 'ṇ'
+        self._load_mw_roots()
 
-        # Helper to check for a vowel-marker combination
-        # ir-it must be checked before id-it so 'ir' isn't mistaken for 'i'
-        is_irit = "ir" in raw or "i~r" in raw
-        is_idit = ("i" in raw or "i~" in raw) and not is_irit
-        
-        is_uuit = "U" in raw  # SLP1 'U' is long 'ū'
-        is_duit = "du" in raw # SLP1 'du' is 'du' marker
-
-        return {
-            "is_idit": is_idit,
-            "is_irit": is_irit,
-            "is_uuit": is_uuit,
-            "is_duit": is_duit,
-            "is_s_opadesa": is_s,
-            "is_n_opadesa": is_n
-        }
-
+    # ── CSV loader ─────────────────────────────────────────────────────────────
 
     def _load(self):
         csv_path = os.path.join(
@@ -122,21 +183,53 @@ class DhatupathaAnalyzer:
                     if len(row) >= 3 and not row[0].startswith('#'):
                         try:
                             self._entries.append({
-                                'class_num': int(row[0]),
-                                'voice_idx': int(row[1]),
-                                'raw': row[2],
+                                'class_num':  int(row[0]),
+                                'serial_num': int(row[1]),   # serial within gaṇa
+                                'raw':        row[2],
                             })
                         except ValueError:
                             pass
         except Exception as e:
             print(f"DhatupathaAnalyzer: error loading CSV — {e}")
 
+    def _load_mw_roots(self):
+        """Load unprefixed-roots.csv (MW) for voice fallback and homonym data.
+
+        Format: root (SLP1), hom, class, voice, root_IAST
+        Voice values: 'para' (parasmaipada) | 'atma' (ātmanepada)
+
+        Ubhayapada roots appear as TWO rows — one para and one atma — for the
+        same (root, class) key.  We collect a set per key so both are captured.
+        """
+        csv_path = os.path.join(
+            os.path.dirname(__file__), '..', 'data', 'unprefixed-roots.csv'
+        )
+        try:
+            with open(csv_path, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    slp1   = row['root'].strip()
+                    hom    = row['hom'].strip()
+                    cls    = row['class'].strip()
+                    voice  = row['voice'].strip()   # 'para' or 'atma'
+                    if not slp1 or cls == 'denom':
+                        continue
+                    key = (slp1, cls)
+                    self._mw_voice.setdefault(key, set()).add(voice)
+                    # Store hom for the first (or only) entry per key
+                    if key not in self._mw_hom:
+                        self._mw_hom[key] = hom
+        except Exception as e:
+            print(f"DhatupathaAnalyzer: error loading unprefixed-roots — {e}")
+
+
     # ── Internal lookup ────────────────────────────────────────────────────────
+
     def _find_raw(self, root_str: str, class_num: int) -> dict | None:
         """Return the raw Dhatupatha entry dict, or None if not found."""
         if root_str == "vṛ" and class_num == 9:
-            return {'class_num': 9, 'voice_idx': 3, 'raw': "vFY"}  # vṝñ (ubhayapadi) rather than vṛṅ (middle-only)
-            
+            return {'class_num': 9, 'serial_num': 0, 'raw': "vFY"}
+
         slp1_base = to_slp1(root_str)
         candidates = [slp1_base]
         if slp1_base.startswith('s'):
@@ -146,85 +239,240 @@ class DhatupathaAnalyzer:
 
         strip_prefixes = ['qu', 'wu', 'o~', 'Y']
 
+        def _clean(raw):
+            # Strip quasi-prefixes BEFORE removing accent/nasal markers so
+            # that 'o~' (which contains '~') is still recognisable.
+            # P.1.1.5-6: qu/wu/o~ are grammatically inert initial markers.
+            c = raw
+            for pfx in strip_prefixes:
+                if c.startswith(pfx):
+                    c = c[len(pfx):]
+            return c.replace('\\', '').replace('^', '').replace('~', '')
+
         # Pass 1: exact class match
         for entry in self._entries:
             if entry['class_num'] != class_num:
                 continue
-            raw = entry['raw']
-            clean = raw.replace('\\', '').replace('^', '').replace('~', '')
-            for pfx in strip_prefixes:
-                if clean.startswith(pfx):
-                    clean = clean[len(pfx):]
+            clean = _clean(entry['raw'])
             for cand in candidates:
                 if clean.startswith(cand):
                     return entry
                 if cand.endswith('h') and clean.startswith(cand[:-1] + 'H'):
                     return entry
-                    
-        # Pass 2: any class match (for roots like śru that are classified differently in Dhatupatha)
+
+        # Pass 2: any class
         for entry in self._entries:
-            raw = entry['raw']
-            clean = raw.replace('\\', '').replace('^', '').replace('~', '')
-            for pfx in strip_prefixes:
-                if clean.startswith(pfx):
-                    clean = clean[len(pfx):]
+            clean = _clean(entry['raw'])
             for cand in candidates:
                 if clean.startswith(cand):
                     return entry
                 if cand.endswith('h') and clean.startswith(cand[:-1] + 'H'):
                     return entry
-                    
+
         return None
 
-    def _raw_is_idit(self, raw: str) -> bool:
-        """
-        True if the root is marked with a short 'i' (Id-it).
-        Pāṇini 7.1.58: 'idito num dhātoḥ' (Id-it roots get a nasal).
-        """
-        # Remove markers for nasalization (~), anudatta (\), and svarita (^)
-        # Example: 'vadi~\' -> 'vadi'
-        clean = raw.replace('~', '').replace('\\', '').replace('^', '')
-        return clean.endswith('i')
-
-
-    def _raw_permitted_voices(self, entry: dict | None) -> set[str]:
-        """Derive permitted voices from the voice index."""
-        if not entry:
-            return {"active", "middle"}
-
-        idx = entry.get('voice_idx', 1)
-        if idx == 1:
-            return {"active"}
-        if idx == 2:
-            return {"middle"}
-        return {"active", "middle"}
+    # ── Raw-string parsers ─────────────────────────────────────────────────────
 
     @staticmethod
     def _raw_is_anit(raw: str) -> bool:
-        """Anudātta accent marker '\\' indicates Aniṭ."""
-        return '\\' in raw
+        """True when the anudātta (\\) is on a ROOT syllable (not an anubandha).
+
+        In the SLP1 Dhātupāṭha encoding the accent mark directly follows the
+        syllable it belongs to.  An anubandha (it-marker) vowel is always
+        signalled by an adjacent '~'.  Therefore:
+
+        • '\\' preceded by '~'
+          → accent on anubandha vowel → Ātmanepada marker, NOT Aniṭ
+        • '\\' preceded by anything else (plain vowel OR root consonant)
+          → accent on the root syllable → Aniṭ
+
+        The second case is necessary because some roots place the anudātta
+        after the final root *consonant* rather than directly after the vowel:
+            duH\\a~^   d-u-H-\\ → \\ after root consonant H (= 'h') → aniṭ ✓
+            vah\\a~^   v-a-h-\\ → \\ after root consonant 'h'     → aniṭ ✓
+            ya\\ja~^   y-a-\\-j → \\ after root vowel 'a'         → aniṭ ✓
+            eDa~\\     ...a-~-\\ → \\ after '~'                    → NOT aniṭ ✓
+        """
+        for idx, ch in enumerate(raw):
+            if ch != '\\':
+                continue
+            if idx == 0:
+                continue
+            prev = raw[idx - 1]
+            if prev == '~':
+                # Accent is on an anubandha vowel → Ātmanepada, not Aniṭ
+                continue
+            # Accent on root vowel or root consonant → Aniṭ
+            return True
+        return False
 
     @staticmethod
     def _raw_is_vet(raw: str) -> bool:
-        """Svarita accent marker '~' typically indicates Veṭ (optionally Seṭ)."""
+        """Svarita '~' marker → Veṭ (optionally Seṭ)."""
         return '~' in raw
 
-    def _raw_aorist_type(self, root_str: str, raw: str) -> str:
+    @staticmethod
+    def _raw_voice_info(raw: str) -> tuple[bool, bool, bool]:
+        """Return (is_nit, is_ngit, has_svarita_on_suffix).
+
+        is_nit               Y (ñit) anywhere → Ubhayapada
+        is_ngit              N after position 0 → Ātmanepada (ṅit suffix)
+        has_svarita_on_suffix ^ immediately after '~' → Ubhayapada
+
+        The critical distinction (Whitney §83):
+          ^ directly after a ROOT vowel = svarita pitch accent on the root.
+            This does NOT indicate voice.  E.g. ga^mx~ (gam): ^ after 'a'.
+          ^ after '~' = svarita on an anubandha vowel = Ubhayapada marker.
+            E.g. di\\Sa~^ (diś): ^ after '~'.
+        """
+        is_nit = False
+        is_ngit = False
+        has_svarita_on_suffix = False
+
+        for idx, ch in enumerate(raw):
+            if ch == 'Y':
+                is_nit = True
+            elif ch == 'N' and idx > 0:
+                # Initial N at pos 0 is ṇ-opadeśa, not ṅit suffix
+                is_ngit = True
+            elif ch == '^' and idx > 0:
+                prev = raw[idx - 1]
+                # ONLY count as ubhayapada if ^ follows '~' (anubandha vowel)
+                # ^ after a bare vowel = pitch on root vowel, not a voice marker
+                if prev == '~':
+                    has_svarita_on_suffix = True
+
+        return is_nit, is_ngit, has_svarita_on_suffix
+
+    @staticmethod
+    def _raw_has_anudatta_on_suffix(raw: str) -> bool:
+        """True if \\ appears after a '~' (anudātta on anubandha → Ātmanepada)."""
+        for idx, ch in enumerate(raw):
+            if ch == '\\' and idx > 0 and raw[idx - 1] == '~':
+                return True
+        return False
+
+    def _raw_permitted_voices(self, raw: str) -> set:
+        """Derive permitted voices purely from raw string markers."""
+        is_nit, is_ngit, has_svarita_on_suffix = self._raw_voice_info(raw)
+        has_anudatta_on_suffix = self._raw_has_anudatta_on_suffix(raw)
+
+        if is_nit or has_svarita_on_suffix:
+            return {"active", "middle"}   # Ubhayapada
+        if is_ngit or has_anudatta_on_suffix:
+            return {"middle"}             # Ātmanepada
+        return {"active"}                 # Parasmaipada (default)
+
+    def _parse_paninian_flags(self, raw: str) -> dict:
+        """Extract all Pāṇinian anubandha flags from the raw SLP1 string."""
+        # ── Initial consonant checks ───────────────────────────────────────────
+        is_s = raw.startswith('z')   # ṣ-opadeśa
+        is_n = raw.startswith('R')   # ṇ-opadeśa
+
+        # ── Voice markers (Y / N-suffix) ───────────────────────────────────────
+        is_nit, is_ngit, _ = self._raw_voice_info(raw)
+
+        # ── Suffix-vowel it-markers ────────────────────────────────────────────
+        # Work on a clean copy for suffix detection (strip accent/nasal markers
+        # and initial quasi-prefixes so they don't interfere).
+        clean = raw.replace('\\', '').replace('^', '')
+        for pfx in ('qu', 'wu', 'o~'):
+            if clean.startswith(pfx):
+                clean = clean[len(pfx):]
+        # Strip initial Y (ñit) prefix if present
+        if clean.startswith('Y'):
+            clean = clean[1:]
+
+        # ir-it must be checked before i-it
+        is_irit = 'ir' in clean or 'i~r' in clean
+        is_idit = ('i~' in clean or clean.endswith('i')) and not is_irit
+        is_uuit = 'U~' in clean or clean.endswith('U') and '~' in raw  # ū-it
+        is_udit = ('u~' in clean) and not is_uuit                       # short u-it
+        is_duit = 'du' in clean                                         # du-it
+
+        # e-it: trailing 'e' or 'e~'
+        is_edit = 'e~' in clean or (clean.endswith('e') and len(clean) > 1)
+
+        # o-it: trailing 'o' or 'o~'
+        is_odit = 'o~' in clean or (clean.endswith('o') and len(clean) > 1)
+
+        # p-it: bare trailing 'p'
+        is_pit = clean.endswith('p') and len(clean) > 1
+
+        # ṣ-it (z) as a suffix consonant: 'z' that is NOT the initial ṣ-opadeśa
+        # Appears as a trailing consonant after a vowel (rare: jṝṣ entries)
+        is_ssit = (not is_s) and clean.endswith('z')
+
+        # ṭ-it (w) as suffix consonant
+        is_ttit = clean.endswith('w') and len(clean) > 1
+
+        return {
+            "is_idit":     is_idit,
+            "is_irit":     is_irit,
+            "is_uuit":     is_uuit,
+            "is_udit":     is_udit,
+            "is_duit":     is_duit,
+            "is_edit":     is_edit,
+            "is_odit":     is_odit,
+            "is_nit":      is_nit,
+            "is_ngit":     is_ngit,
+            "is_pit":      is_pit,
+            "is_ssit":     is_ssit,
+            "is_ttit":     is_ttit,
+            "is_s_opadesa": is_s,
+            "is_n_opadesa": is_n,
+        }
+
+    def _mw_voice_lookup(self, root_str: str, class_num: int) -> set:
+        """Return the MW-database voice set for (root, class), or empty set if unknown.
+
+        Translates MW's 'para'/'atma' encoding to the engine's {'active'}/{'middle'}
+        convention.  Ubhayapada roots appear as both 'para' AND 'atma' rows in the
+        CSV, so the set will contain both values.
+
+        Returns:
+            {'active'}          — parasmaipada only
+            {'middle'}          — ātmanepada only
+            {'active','middle'} — ubhayapada
+            set()               — root/class not in MW lexicon
+        """
+        slp1_root = to_slp1(root_str)
+        mw_voices = self._mw_voice.get((slp1_root, str(class_num)), set())
+
+        result: set[str] = set()
+        if 'para' in mw_voices:
+            result.add('active')
+        if 'atma' in mw_voices:
+            result.add('middle')
+        # MW is incomplete for some ubhayapada roots — supplement from the
+        # known-ubhaya set.  If MW already says {active, middle} this is a no-op.
+        if root_str in _KNOWN_UBHAYA_ROOTS:
+            result.update({"active", "middle"})
+        return result
+
+    def _raw_aorist_type(self, root_str: str, raw: str, flags: dict) -> str:
         """Derive aorist class from anubandhas + phonology."""
+        # Work on a cleaned string for suffix analysis
         cleaned = raw.replace('\\', '').replace('^', '').replace('~', '')
         suffix_part = cleaned
+        # Strip registered it-consonants from the tail
         for it in ('Y', 'N', 'p'):
             if suffix_part.endswith(it):
                 suffix_part = suffix_part[:-1]
 
         phonemes = ALPHABET.parse_phonemes(root_str)
 
-        # ḷ-it (x) or f-suffix anubandha → a-aorist
+        # ṣ-it suffix → aṅ-Aorist (P. 3.1.59)
+        if flags.get("is_ssit"):
+            return 'a'
+
+        # ḷ-it (x) → a-aorist
         if suffix_part.endswith('x'):
             return 'a'
+        # ṛ-it (f suffix, not the root vowel) → a-aorist
         if suffix_part.endswith('f') and phonemes and phonemes[-1] != 'ṛ':
             return 'a'
-        # m-suffix anubandha → a-aorist (gam, muc)
+        # m-suffix anubandha → a-aorist (gam, muc class)
         if suffix_part.endswith('m') and phonemes and phonemes[-1] != 'm':
             return 'a'
 
@@ -248,35 +496,90 @@ class DhatupathaAnalyzer:
 
         entry = self._find_raw(root_str, class_num)
         raw = entry['raw'] if entry else root_str
-        flags = self._parse_paninian_flags(raw) if entry else {
-            k: False for k in ["is_idit", "is_irit", "is_uuit", "is_duit", "is_s_opadesa", "is_n_opadesa"]
-        }
+
+        _empty_flags = {k: False for k in [
+            "is_idit", "is_irit", "is_uuit", "is_udit", "is_duit",
+            "is_edit", "is_odit", "is_nit", "is_ngit", "is_pit",
+            "is_ssit", "is_ttit", "is_s_opadesa", "is_n_opadesa",
+        ]}
+        flags = self._parse_paninian_flags(raw) if entry else _empty_flags
+
+        # ── Aniṭ determination ────────────────────────────────────────────────
+        # Priority: position-aware accent from CSV → known fallback set → ā rule
+        is_anit = (
+            self._raw_is_anit(raw)
+            or root_str in _KNOWN_ANIT_ROOTS
+            or root_str.endswith("ā")   # P. 7.2.10
+        )
+
+        # ── Voice ─────────────────────────────────────────────────────────────
+        # Three-tier priority system:
+        #
+        #  Tier 1 — HARD Pāṇinian markers (always authoritative):
+        #    Y  (ñit)        → ubhayapada  P. 1.3.72
+        #    N  (ṅit suffix) → ātmanepada  P. 1.3.12
+        #    \ after '~'    → ātmanepada  (anudātta on anubandha vowel)
+        #
+        #  Tier 2 — MW lexicon (unprefixed-roots.csv, authoritative for voice):
+        #    Applied when present; overrides the weak svarita-on-suffix signal.
+        #    The Dhātupāṭha 'a~^' pattern on class-6/4 roots is a gana marker
+        #    that does NOT reliably imply ubhayapada for every root in that gana.
+        #
+        #  Tier 3 — Weak svarita signal (^ after ~, only when MW has no entry):
+        #    Last resort when no MW data is available.
+
+        is_nit, is_ngit, has_svarita_suffix = self._raw_voice_info(raw)
+        has_anudatta_suffix = any(
+            raw[i - 1] == '~'
+            for i, ch in enumerate(raw)
+            if ch == '\\' and i > 0
+        )
+        mw_voices = self._mw_voice_lookup(root_str, class_num)
+
+        if is_nit:
+            # ñit → ubhayapada (P. 1.3.72) — hard rule
+            permitted_voices = {"active", "middle"}
+        elif is_ngit or has_anudatta_suffix:
+            # ṅit or anudātta on anubandha → ātmanepada — hard rule
+            permitted_voices = {"middle"}
+        elif mw_voices:
+            # MW lexicon is authoritative for voice when no hard marker
+            permitted_voices = mw_voices
+        elif has_svarita_suffix:
+            # Weak: svarita on anubandha → ubhayapada (last resort)
+            permitted_voices = {"active", "middle"}
+        else:
+            # Default: parasmaipada
+            permitted_voices = {"active"}
+
+        # ── Homonym ───────────────────────────────────────────────────────────
+        slp1_root = to_slp1(root_str)
+        hom = self._mw_hom.get((slp1_root, str(class_num)), "")
 
         obj = RootObject(
             iast=root_str,
             class_num=class_num,
-            # Pāṇini 7.2.10: Roots ending in 'ā' are Aniṭ (with few exceptions).
-            is_anit=root_str.endswith("ā") or (entry and self._raw_is_anit(raw)),
-            is_vet=(entry and self._raw_is_vet(raw)),
-            aorist_type=self._raw_aorist_type(root_str, raw),
+            hom=hom,
+            is_anit=is_anit,
+            is_vet=(entry is not None and self._raw_is_vet(raw)),
+            aorist_type=self._raw_aorist_type(root_str, raw, flags),
             takes_periphrastic_perfect=self._check_periphrastic(root_str),
-            permitted_voices=self._raw_permitted_voices(entry),
+            permitted_voices=permitted_voices,
             takes_samprasarana=(root_str in _SAMPRASARANA_ROOTS),
-            **flags
+            **flags,
         )
-            
+
         self._cache[key] = obj
         return obj
 
     @staticmethod
     def _check_periphrastic(root_str: str) -> bool:
-        """
-        True if the root structurally requires the periphrastic perfect.
+        """True if the root structurally requires the periphrastic perfect.
+
         1. Polysyllabic roots.
         2. Vowel-initial roots with a heavy syllable (except a/ā).
-        3. Explicitly mandated Pāṇinian exceptions (uṣ, vid, jāgṛ, etc.).
+        3. Explicitly mandated Pāṇinian exceptions.
         """
-        # Pāṇini 3.1.35 - 3.1.38: Explicit overrides
         explicit_periphrastic = {"uṣ", "jāgṛ", "vid", "cakās", "daridrā", "ay", "day", "ās"}
         if root_str in explicit_periphrastic:
             return True
@@ -285,20 +588,14 @@ class DhatupathaAnalyzer:
         if not phonemes:
             return False
 
-        # 1. Polysyllabic roots (contains more than one vowel)
         vowel_count = sum(1 for p in phonemes if p in ALPHABET.vowels_list)
         if vowel_count > 1:
             return True
 
-        # 2. Heavy vowel-initial roots (ijādeś ca gurumato 'nṛcḥ)
-        # Starts with a vowel (excluding a/ā)
         first = phonemes[0]
         if first in ALPHABET.vowels_list and first not in ("a", "ā"):
-            # Inherently long vowels are heavy
             if first in _PERIPHRASTIC_LONG_VOWELS:
                 return True
-            
-            # Short vowels are heavy if followed by a consonant cluster (2+ consonants)
             cons_count = 0
             for p in phonemes[1:]:
                 if p in ALPHABET.consonants_list:
@@ -310,7 +607,7 @@ class DhatupathaAnalyzer:
 
         return False
 
-    # ── Legacy helpers (kept for backwards compat) ─────────────────────────────
+    # ── Legacy helpers ─────────────────────────────────────────────────────────
 
     def get_root_entry(self, root_str: str, class_num: int) -> str | None:
         """Return raw CSV entry string (legacy API)."""

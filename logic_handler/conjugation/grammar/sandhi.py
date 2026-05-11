@@ -159,16 +159,24 @@ class SandhiEngine:
             self.sig
         )
 
+        # Specific roots where palatal j before dental t/th surfaces as retroflex ṣṭ/ṣṭh
+        # (e.g. mārj+ti -> mārṣṭi; Whitney §219, §212-213).
+        self.j_retroflex = pn.cdrewrite(
+            pn.string_map([
+                ("rj+t", "rṣṭ"), ("rj+th", "rṣṭh"),
+                ("yaj+t", "yaṣṭ"), ("yaj+th", "yaṣṭh"),
+                ("ij+t", "iṣṭ"), ("ij+th", "iṣṭh"),
+                ("sṛj+t", "sraṣṭ"), ("sṛj+th", "sraṣṭh"),
+                ("mṛj+t", "mṛṣṭ"), ("mṛj+th", "mṛṣṭh"),
+                ("bhrajj+t", "bhṛṣṭ"), ("bhrajj+th", "bhṛṣṭh"),
+            ]),
+            "", "", self.sig
+        )
+
         # Palatal → velar before unvoiced dental/sibilant
         self.palatal_sandhi = pn.cdrewrite(
             pn.string_map([("j", "k"), ("c", "k")]),
             "", unvoiced_triggers, self.sig
-        )
-        # After r, palatal j before dental t/th surfaces as retroflex ṣṭ/ṣṭh
-        # (e.g. mārj+ti -> mārṣṭi; Whitney §212-213).
-        self.rj_retroflex = pn.cdrewrite(
-            pn.string_map([("rj+t", "rṣṭ"), ("rj+th", "rṣṭh")]),
-            "", "", self.sig
         )
 
         # General devoicing
@@ -216,7 +224,6 @@ class SandhiEngine:
                 ("m+c", "ñ+c"), ("m+ch", "ñ+ch"), ("m+j", "ñ+j"), ("m+jh", "ñ+jh"),
                 ("m+ṭ", "ṇ+ṭ"), ("m+ṭh", "ṇ+ṭh"), ("m+ḍ", "ṇ+ḍ"), ("m+ḍh", "ṇ+ḍh"),
                 ("m+t", "n+t"), ("m+th", "n+th"), ("m+d", "n+d"), ("m+dh", "n+dh"), ("m+n", "n+n"),
-                ("m+p", "m+p"), ("m+ph", "m+ph"), ("m+b", "m+b"), ("m+bh", "m+bh"), ("m+m", "m+m"),
             ]),
             "", "", self.sig
         )
@@ -328,7 +335,7 @@ class SandhiEngine:
             ("bartho_ht",          self.bartho_ht),
             ("grassmann_throwback",self.grassmann_throwback),
             ("h_to_k",             self.h_to_k),
-            ("rj_retroflex",       self.rj_retroflex),
+            ("j_retroflex",        self.j_retroflex),
             ("palatal_sandhi",     self.palatal_sandhi),
             ("ksha_t_simplify",    self.ksha_t_simplify),
             ("retro_th",           self.retro_th),
@@ -420,7 +427,7 @@ class SandhiEngine:
                 @ self.bartho_ht
                 @ self.grassmann_throwback
                 @ self.h_to_k
-                @ self.rj_retroflex
+                @ self.j_retroflex
                 @ self.palatal_sandhi
                 @ self.ksha_t_simplify
                 @ self.retro_th

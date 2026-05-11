@@ -8,7 +8,6 @@ from irregulars import (
     causative_stem_irregulars,
     perfect_weak_guna_roots, perfect_stem_overrides,
     aorist_overrides, nasal_roots, desiderative_stem_overrides,
-    future_stem_overrides, periphrastic_stem_overrides,
     intensive_stem_overrides,
 )
 from dhatupatha_analyzer import DHATUPATHA_ANALYZER
@@ -308,16 +307,22 @@ class StemBuilder:
         """Future (Lṛṭ) and Conditional (Lṛṅ)."""
         root_obj = DHATUPATHA_ANALYZER.get(root_str, class_num)
         
-        # Priority: Override > Lexicon
-        if root_str in future_stem_overrides:
-            info = future_stem_overrides[root_str]
-            stem = pn.accep(info["stem"])
-            is_anit = info.get("anit", False)
-            is_vet = False
-        else:
-            stem = self._apply_guna(root_str, "[STRONG]")
-            is_anit = root_obj.is_anit
-            is_vet = root_obj.is_vet
+        stem = self._apply_guna(root_str, "[STRONG]")
+        is_anit = root_obj.is_anit
+        is_vet = root_obj.is_vet
+        
+        # Div lengthens in future
+        if root_str == "div":
+            stem = pn.accep("dīv")
+            is_anit = False
+
+        # Gam and Han are Seṭ in future (Pāṇini 7.2.58 etc.)
+        if root_str in {"gam", "han"}:
+            is_anit = False
+
+        # Kṛ and other ṛ-ending roots are Seṭ in future (Pāṇini 7.2.70 ṛddhanoḥ sye)
+        if root_str.endswith("ṛ") or root_str.endswith("ṝ"):
+            is_anit = False
 
         if root_str == "vṛ":
             # Pāṇini 7.2.38 (vṛto vā): vṛ takes optionally long īṭ in future systems
@@ -336,32 +341,21 @@ class StemBuilder:
             base = self._build_causative_base(root_str)
             return base + pn.accep("ayi")
 
-        # Root-specific override: returns the bare stem (gant, ne, dīv, etc.)
-        if root_str in periphrastic_stem_overrides:
-            bare = periphrastic_stem_overrides[root_str]
-            # Aniṭ roots take no connecting i: gam→gantā, nī→netā, pā→pātā
-            # Seṭ roots take +i: div→dīvitā
-            # Detect seṭ by presence in future_stem_overrides with anit:False
-            # or by dhatupatha; default: if not in seṭ list, treat as aniṭ
-            # Special: class-6 and class-7 roots are generally Aniṭ for periphrastic
-            is_class_nasal = class_num in (6, 7)
-            is_set_override = (root_str in future_stem_overrides
-                            and not future_stem_overrides[root_str].get("anit", True))
-            is_anit = is_class_nasal or not is_set_override
-            suffix = "" if is_anit else "+i"
-            suffix = "" if is_anit else "+i"
-            return pn.accep(bare) + pn.accep(suffix)
-
+        stem = self._apply_guna(root_str, "[STRONG]")
         is_anit = DHATUPATHA_ANALYZER.is_anit(root_str, class_num)
-        if root_str == "krī":
+        
+        # div -> dīv (Seṭ)
+        if root_str == "div":
+            stem = pn.accep("dīv")
+            is_anit = False
+
+        # Special: class-6 and class-7 roots are generally Aniṭ for periphrastic
+        if class_num in (6, 7):
             is_anit = True
 
-        stem = self._apply_guna(root_str, "[STRONG]")
-        # kṛ: Aniṭ periphrastic (kartā) despite Seṭ simple future
-        if root_str == "kṛ":
-            return stem
         if root_str == "vṛ":
             return pn.union(stem + pn.accep("+i"), stem + pn.accep("+ī"))
+            
         suffix = "" if is_anit else "+i"
         return stem + pn.accep(suffix)
 
