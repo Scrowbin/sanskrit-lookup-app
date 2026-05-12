@@ -3,6 +3,21 @@
 Pipeline order: vowel_phase → consonant_phase → long_distance_phase.
 Within each phase, rules are ordered by specificity (most specific first).
 
+**Vowel phase** (Whitney §126–131, §244): thematic mergers, class-9 ī-drop,
+ayadi, perfect weak yan, savarna, yan, guna (including **a/ā + ḷ** per §244).
+
+**Consonant phase**: ``d+dh`` gemination; **tag-gated** dental+palatal (``[SD_DCP]``),
+homorganic gemination (``[SD_GEM]``), ś+t retroflex (``[SD_SSR]``), sibilant
+clusters (``[SD_SIB]``), Bartholomae, Grassmann, palatal→velar before voiceless
+suffix initials, devoicing, nasals, anusvāra/parasavarṇa, **visarga+stop**
+(``[SD_LAR]``), then **``clean_sd_residual``** to strip any leftover ``[SD_*]``.
+Context tags are **inserted in MorphologyEngine** immediately before ``clean_tags``.
+
+**Long-distance phase**: RUKI, nati, visarga, cluster reduction, boundary cleanup.
+
+This is **not** a complete external-sandhi or Vedic-accent engine; see
+``ENGINE_AUDIT.md`` for remaining phonology gaps.
+
 All three phase methods accept ``debug=True``.  When enabled, rules are
 applied *one by one* via ``_apply_rules_with_trace()``, which prints the
 intermediate string after every rule and stops immediately when a rule causes
@@ -20,8 +35,10 @@ class SandhiEngine:
         self._setup_vowel_rules()
         self._setup_consonant_rules()
         self._setup_long_distance_rules()
-        # Erase morpheme boundaries at the very end
-        self.clean_boundaries = pn.cdrewrite(pn.cross("+", ""), "", "", self.sig)
+        # Erase morpheme boundaries and [CLASS9] at the very end
+        self.clean_boundaries = pn.cdrewrite(
+            pn.union(pn.cross("+", ""), pn.cross("[CLASS9]", "")), "", "", self.sig
+        )
         # Named rule lists — populated after all rules are built
         self._build_named_rule_lists()
 
@@ -53,12 +70,13 @@ class SandhiEngine:
             "", "", self.sig
         )
 
-        # 3. Guna sandhi: a/ā + i/u/ṛ → e/o/ar
+        # 3. Guna sandhi: a/ā + i/u/ṛ → e/o/ar; a/ā + ḷ → al/āl (Whitney §244)
         self.guna_sandhi = pn.cdrewrite(
             pn.string_map([
                 ("a+i", "e"),  ("a+ī", "e"),  ("ā+i", "e"),  ("ā+ī", "e"),
                 ("a+u", "o"),  ("a+ū", "o"),  ("ā+u", "o"),  ("ā+ū", "o"),
                 ("a+ṛ", "ar"), ("a+ṝ", "ar"), ("ā+ṛ", "ar"), ("ā+ṝ", "ar"),
+                ("a+ḷ", "al"), ("a+ḹ", "al"), ("ā+ḷ", "āl"), ("ā+ḹ", "āl"),
             ]),
             "", "", self.sig
         )
@@ -71,46 +89,107 @@ class SandhiEngine:
             "", pn.union(ALPHABET.vowels, "y"), self.sig
         )
 
-        # 5. Yan sandhi (semi-vowelisation before vowel)
-        # Whitney §128-129 / Pāṇini 6.1.77: short i/u/ṛ before a vowel-initial
-        # suffix insert a semivowel (y/v/r) while RETAINING the root vowel.
-        # e.g. cikri+iva → cikriyiva  (not cikryiva)
-        #      suṣu+iva  → suṣuviva   (not suṣviva)
-        # Long ī/ū at a morpheme boundary become y/v (standard yan).
+        # Perfect weak yan sandhi (er anekācaḥ asamyogapūrvasya & exceptions)
+        # Pāṇini 6.4.82: i/ī after single consonant -> y.
+        # Pāṇini 6.4.77: i/ī after conjunct -> iy. u/ū -> uv.
+        conjunct = ALPHABET.consonants + pn.accep("") + ALPHABET.consonants
+        self.perfect_yan_conjunct = pn.cdrewrite(
+            pn.string_map([
+                ("i[PERF_WEAK]+", "iy"),
+                ("ī[PERF_WEAK]+", "iy"),
+                ("u[PERF_WEAK]+", "uv"),
+                ("ū[PERF_WEAK]+", "uv"),
+            ]),
+            conjunct, ALPHABET.vowels, self.sig
+        )
+        self.perfect_yan_simple = pn.cdrewrite(
+            pn.string_map([
+                ("i[PERF_WEAK]+", "y"),
+                ("ī[PERF_WEAK]+", "y"),
+                ("u[PERF_WEAK]+", "uv"), # u/ū universally take uv
+                ("ū[PERF_WEAK]+", "uv"),
+                ("ṛ[PERF_WEAK]+", "r"),
+            ]),
+            "", ALPHABET.vowels, self.sig
+        )
+        
+        self.clean_perf_weak = pn.cdrewrite(
+            pn.cross("[PERF_WEAK]", ""), "", "", self.sig
+        )
+
+        # 5. General Yan sandhi (semi-vowelisation before vowel)
         self.yan_sandhi = pn.cdrewrite(
             pn.string_map([
-                ("i+",  "iy"),  # short i: insert y, keep i
-                ("ī+",  "y"),   # long ī: becomes y (standard yan)
-                ("u+",  "v"),  # short u: insert v, keep u
-                ("ū+",  "v"),   # long ū: becomes v (standard yan)
+                ("i+",  "y"),
+                ("ī+",  "y"),
+                ("u+",  "v"),
+                ("ū+",  "v"),
                 ("ṛ+",  "r"),
             ]),
             "", ALPHABET.vowels, self.sig
         )
 
-        # 6. Class-9 suffix vowel-drop: ī+ erased before any vowel-initial ending
+        # 6. Class-9 suffix vowel-drop: ī[CLASS9]+ erased before any vowel-initial ending
         self.class9_special = pn.cdrewrite(
-            pn.cross("ī+", ""), "", ALPHABET.vowels, self.sig
+            pn.cross("ī[CLASS9]+", "+"), "", ALPHABET.vowels, self.sig
         )
 
     def _setup_consonant_rules(self):
-        unvoiced_triggers = pn.union("+t", "+th", "+s", "+ṣ")
+        unvoiced_triggers = pn.union(
+            "+t", "+th", "+s", "+ṣ",
+            "+c", "+ch", "+k", "+kh", "+p", "+ph",
+            "+ṭ", "+ṭh",
+        )
 
         # Homorganic stop+aspirate assimilation at morpheme boundary:
         # ad + dhi → addhi (cf. standard internal sandhi; needed for imperative 2sg).
         self.d_dh_gemination = pn.cdrewrite(pn.cross("d+dh", "ddh"), "", "", self.sig)
 
-        # Bartholomae (aspirate assimilation): h+t → gdh, etc.
-        # bh+t is handled separately as bdh (e.g. labh+ta -> labdha).
-        self.bartho_bht = pn.cdrewrite(pn.cross("bh+t", "bdh"), "", "", self.sig)
-        self.bartho_bhth = pn.cdrewrite(pn.cross("bh+th", "bdh"), "", "", self.sig)
+        # Dental + palatal: **tag-gated** (MorphologyEngine inserts [SD_DCP]).
+        # Whitney §213, §219; Pāṇini 8.4.40–43.
+        self.dental_palatal_fusion = pn.cdrewrite(
+            pn.string_map([
+                ("t[SD_DCP]+c", "cc"), ("t[SD_DCP]+ch", "cch"),
+                ("d[SD_DCP]+c", "cc"), ("d[SD_DCP]+ch", "cch"),
+                ("dh[SD_DCP]+c", "cch"), ("dh[SD_DCP]+ch", "cch"),
+            ]),
+            "", "", self.sig
+        )
+
+        # Homorganic gemination across '+' — **tag-gated** ([SD_GEM]).
+        # Whitney §231; sonorants included for reduplication / intensive edges.
+        self.homorganic_gemination = pn.cdrewrite(
+            pn.string_map([
+                ("t[SD_GEM]+t", "tt"), ("d[SD_GEM]+d", "dd"),
+                ("p[SD_GEM]+p", "pp"), ("b[SD_GEM]+b", "bb"),
+                ("k[SD_GEM]+k", "kk"), ("g[SD_GEM]+g", "gg"),
+                ("ṭ[SD_GEM]+ṭ", "ṭṭ"), ("ḍ[SD_GEM]+ḍ", "ḍḍ"),
+                ("c[SD_GEM]+c", "cc"), ("j[SD_GEM]+j", "jj"),
+                ("l[SD_GEM]+l", "ll"), ("r[SD_GEM]+r", "rr"),
+                ("y[SD_GEM]+y", "yy"), ("v[SD_GEM]+v", "vv"),
+            ]),
+            "", "", self.sig
+        )
+
+        # Bartholomae (aspirate assimilation):
+        # Voiced aspirates (bh, dh, gh, jh) + t/th -> bd, dd, gd, jd + dh.
+        # This MUST run before h+t to prevent h+t from matching the 'h' in 'dh'.
+        self.bartholomae_general = pn.cdrewrite(
+            pn.string_map([
+                ("bh+t", "bdh"), ("bh+th", "bdh"),
+                ("dh+t", "ddh"), ("dh+th", "ddh"),
+                ("gh+t", "gdh"), ("gh+th", "gdh"),
+                ("jh+t", "gdh"), ("jh+th", "gdh"), # jh marginal
+            ]),
+            "", "", self.sig
+        )
         self.bartho_hth = pn.cdrewrite(pn.cross("h+th", "gdh"), "", "", self.sig)
         self.bartho_hdh = pn.cdrewrite(pn.cross("h+dh", "gdh"), "", "", self.sig)
         self.bartho_ht  = pn.cdrewrite(pn.cross("h+t",  "gdh"), "", "", self.sig)
 
         # Grassmann's Law (throwback deaspiuration)
         throwback_triggers = pn.union(
-            "+s", "+ṣ", "+t", "+th", "+dhv", "[EOS]", "+[EOS]"
+            "+s", "+ṣ", "+t", "+th", "+c", "+ch", "+dhv", "[EOS]", "+[EOS]"
         )
         self.grassmann_throwback = pn.cdrewrite(
             pn.string_map([("b", "bh"), ("d", "dh"), ("g", "gh")]),
@@ -126,16 +205,33 @@ class SandhiEngine:
             self.sig
         )
 
+        # Specific roots where palatal j before dental t/th surfaces as retroflex ṣṭ/ṣṭh
+        # (e.g. mārj+ti -> mārṣṭi; Whitney §219, §212-213).
+        self.j_retroflex = pn.cdrewrite(
+            pn.string_map([
+                ("rj+t", "rṣṭ"), ("rj+th", "rṣṭh"),
+                ("yaj+t", "yaṣṭ"), ("yaj+th", "yaṣṭh"),
+                ("ij+t", "iṣṭ"), ("ij+th", "iṣṭh"),
+                ("sṛj+t", "sraṣṭ"), ("sṛj+th", "sraṣṭh"),
+                ("mṛj+t", "mṛṣṭ"), ("mṛj+th", "mṛṣṭh"),
+                ("bhrajj+t", "bhṛṣṭ"), ("bhrajj+th", "bhṛṣṭh"),
+            ]),
+            "", "", self.sig
+        )
+
+        # Palatal ś before dental t/th → ṣṭ / ṣṭh — **tag-gated** ([SD_SSR] from morphology).
+        # Whitney §219; Pāṇini 8.4.44 śtutva.
+        self.palatal_sibilant_retroflex = pn.cdrewrite(
+            pn.string_map([
+                ("ś[SD_SSR]+t", "ṣṭ"), ("ś[SD_SSR]+th", "ṣṭh"),
+            ]),
+            "", "", self.sig
+        )
+
         # Palatal → velar before unvoiced dental/sibilant
         self.palatal_sandhi = pn.cdrewrite(
             pn.string_map([("j", "k"), ("c", "k")]),
             "", unvoiced_triggers, self.sig
-        )
-        # After r, palatal j before dental t/th surfaces as retroflex ṣṭ/ṣṭh
-        # (e.g. mārj+ti -> mārṣṭi; Whitney §212-213).
-        self.rj_retroflex = pn.cdrewrite(
-            pn.string_map([("rj+t", "rṣṭ"), ("rj+th", "rṣṭh")]),
-            "", "", self.sig
         )
 
         # General devoicing
@@ -147,9 +243,19 @@ class SandhiEngine:
             "", unvoiced_triggers, self.sig
         )
 
-        # Nasal assimilation: n → ñ before +j/+c
+        # Nasal assimilation: n → homorganic nasal before stops
         self.nasal_assimilation = pn.cdrewrite(
-            pn.cross("n", "ñ"), "", pn.union("+j", "+c", "j", "c"), self.sig
+            pn.string_map([
+                ("n", "ñ"),
+            ]), "", pn.union("+j", "+c", "j", "c"), self.sig
+        ) @ pn.cdrewrite(
+            pn.string_map([
+                ("n", "m"),
+            ]), "", pn.union("+p", "+ph", "+b", "+bh", "p", "ph", "b", "bh"), self.sig
+        ) @ pn.cdrewrite(
+            pn.string_map([
+                ("n", "ṇ"),
+            ]), "", pn.union("+ṭ", "+ṭh", "+ḍ", "+ḍh", "ṭ", "ṭh", "ḍ", "ḍh"), self.sig
         )
         # Class-7 yuj-type clusters: yuñj+dhv/hi -> yuṅgdhv/i.
         # This bridges nasal assimilation output (ñj) to attested velar+aspirate
@@ -173,7 +279,6 @@ class SandhiEngine:
                 ("m+c", "ñ+c"), ("m+ch", "ñ+ch"), ("m+j", "ñ+j"), ("m+jh", "ñ+jh"),
                 ("m+ṭ", "ṇ+ṭ"), ("m+ṭh", "ṇ+ṭh"), ("m+ḍ", "ṇ+ḍ"), ("m+ḍh", "ṇ+ḍh"),
                 ("m+t", "n+t"), ("m+th", "n+th"), ("m+d", "n+d"), ("m+dh", "n+dh"), ("m+n", "n+n"),
-                ("m+p", "m+p"), ("m+ph", "m+ph"), ("m+b", "m+b"), ("m+bh", "m+bh"), ("m+m", "m+m"),
             ]),
             "", "", self.sig
         )
@@ -199,10 +304,39 @@ class SandhiEngine:
             pn.string_map([("kṣ+t", "kt"), ("kṣ+th", "kth")]),
             "", "", self.sig
         )
-        self.retro_s   = pn.cdrewrite(
-            pn.string_map([("ṣ+s", "kṣ"), ("ś+s", "kṣ")]), 
+        # Sibilant clusters — **tag-gated** ([SD_SIB] from morphology).
+        # Whitney §249; replaces former global ṣ+s / ś+s only for tagged inputs.
+        self.sibilant_cluster_tagged = pn.cdrewrite(
+            pn.string_map([
+                ("ṣ[SD_SIB]+s", "kṣ"),
+                ("ś[SD_SIB]+s", "kṣ"),
+                ("s[SD_SIB]+ṣ", "kṣ"),
+                ("ṣ[SD_SIB]+ś", "ś"),
+            ]),
             "", "", self.sig
         )
+
+        # Visarga + voiceless stop — **tag-gated** ([SD_LAR] from morphology).
+        # Classical internal fusion (Whitney visarga sandhi, narrow).
+        self.visarga_stop_fusion = pn.cdrewrite(
+            pn.string_map([
+                ("ḥ[SD_LAR]+k", "k"), ("ḥ[SD_LAR]+kh", "kh"),
+                ("ḥ[SD_LAR]+g", "g"), ("ḥ[SD_LAR]+gh", "gh"),
+                ("ḥ[SD_LAR]+c", "c"), ("ḥ[SD_LAR]+ch", "ch"),
+                ("ḥ[SD_LAR]+t", "t"), ("ḥ[SD_LAR]+th", "th"),
+                ("ḥ[SD_LAR]+p", "p"), ("ḥ[SD_LAR]+ph", "ph"),
+            ]),
+            "", "", self.sig
+        )
+
+        # Strip any surviving [SD_*] markers (should not surface in output).
+        self.clean_sd_residual = (
+            pn.cdrewrite(pn.cross("[SD_DCP]", ""), "", "", self.sig)
+            @ pn.cdrewrite(pn.cross("[SD_GEM]", ""), "", "", self.sig)
+            @ pn.cdrewrite(pn.cross("[SD_SSR]", ""), "", "", self.sig)
+            @ pn.cdrewrite(pn.cross("[SD_SIB]", ""), "", "", self.sig)
+            @ pn.cdrewrite(pn.cross("[SD_LAR]", ""), "", "", self.sig)
+        ).optimize()
 
         # Velar nasal: n/ñ → ṅ before velar stops
         self.velar_nasal = pn.cdrewrite(
@@ -229,7 +363,7 @@ class SandhiEngine:
         self.nati = pn.cdrewrite(
             pn.cross("n", "ṇ"),
             triggers + allowed_interveners,
-            pn.union(ALPHABET.vowels, "n", "m", "y", "v"),
+            pn.accep("+").star + pn.union(ALPHABET.vowels, "n", "m", "y", "v"),
             self.sig
         )
 
@@ -270,26 +404,31 @@ class SandhiEngine:
             ("thematic_merger",    self.thematic_merger),
             ("class9_special",     self.class9_special),
             ("ayadi",              self.ayadi),
+            ("perfect_yan_conjunct", self.perfect_yan_conjunct),
+            ("perfect_yan_simple",   self.perfect_yan_simple),
+            ("clean_perf_weak",      self.clean_perf_weak),
             ("savarna",            self.savarna),
             ("yan_sandhi",         self.yan_sandhi),
             ("guna_sandhi",        self.guna_sandhi),
         ]
         self._consonant_rules: list[tuple[str, pn.Fst]] = [
             ("d_dh_gemination",   self.d_dh_gemination),
-            ("bartho_bht",         self.bartho_bht),
-            ("bartho_bhth",        self.bartho_bhth),
+            ("dental_palatal_fusion", self.dental_palatal_fusion),
+            ("homorganic_gemination", self.homorganic_gemination),
+            ("bartholomae_general", self.bartholomae_general),
             ("bartho_hth",         self.bartho_hth),
             ("bartho_hdh",         self.bartho_hdh),
             ("bartho_ht",          self.bartho_ht),
             ("grassmann_throwback",self.grassmann_throwback),
             ("h_to_k",             self.h_to_k),
-            ("rj_retroflex",       self.rj_retroflex),
+            ("j_retroflex",        self.j_retroflex),
+            ("palatal_sibilant_retroflex", self.palatal_sibilant_retroflex),
             ("palatal_sandhi",     self.palatal_sandhi),
             ("ksha_t_simplify",    self.ksha_t_simplify),
             ("retro_th",           self.retro_th),
             ("retro_t",            self.retro_t),
             ("retro_dhv",          self.retro_dhv),
-            ("retro_s",            self.retro_s),
+            ("sibilant_cluster_tagged", self.sibilant_cluster_tagged),
             ("devoicing",          self.devoicing),
             ("nasal_assimilation", self.nasal_assimilation),
             ("nj_cluster_hardening", self.nj_cluster_hardening),
@@ -297,6 +436,8 @@ class SandhiEngine:
             ("gamya_fix",          self.gamya_fix),
             ("parasavarna",        self.parasavarna),
             ("velar_nasal",        self.velar_nasal),
+            ("visarga_stop_fusion", self.visarga_stop_fusion),
+            ("clean_sd_residual",  self.clean_sd_residual),
         ]
         self._long_distance_rules: list[tuple[str, pn.Fst]] = [
             ("ruki",                 self.ruki),
@@ -356,6 +497,9 @@ class SandhiEngine:
                 @ self.thematic_merger
                 @ self.class9_special
                 @ self.ayadi
+                @ self.perfect_yan_conjunct
+                @ self.perfect_yan_simple
+                @ self.clean_perf_weak
                 @ self.savarna
                 @ self.yan_sandhi
                 @ self.guna_sandhi)
@@ -366,27 +510,31 @@ class SandhiEngine:
             return self._apply_rules_with_trace(fst, self._consonant_rules, "consonant_phase")
         return (fst
                 @ self.d_dh_gemination
-                @ self.bartho_bht
-                @ self.bartho_bhth
+                @ self.dental_palatal_fusion
+                @ self.homorganic_gemination
+                @ self.bartholomae_general
                 @ self.bartho_hth
                 @ self.bartho_hdh
                 @ self.bartho_ht
                 @ self.grassmann_throwback
                 @ self.h_to_k
-                @ self.rj_retroflex
+                @ self.j_retroflex
+                @ self.palatal_sibilant_retroflex
                 @ self.palatal_sandhi
                 @ self.ksha_t_simplify
                 @ self.retro_th
                 @ self.retro_t
                 @ self.retro_dhv
-                @ self.retro_s
+                @ self.sibilant_cluster_tagged
                 @ self.devoicing
                 @ self.nasal_assimilation
                 @ self.nj_cluster_hardening
                 @ self.anusvara
                 @ self.gamya_fix
                 @ self.parasavarna
-                @ self.velar_nasal)
+                @ self.velar_nasal
+                @ self.visarga_stop_fusion
+                @ self.clean_sd_residual)
 
     def long_distance_phase(self, fst: pn.Fst, debug: bool = False) -> pn.Fst:
         """Apply long-distance rules (RUKI, Nati, Visarga, etc.)."""

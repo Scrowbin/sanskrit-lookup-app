@@ -1,6 +1,5 @@
 import pynini as pn
 from alphabet import ALPHABET
-from irregulars import perfect_redupe_overrides
 
 
 class ReduplicationEngine:
@@ -57,22 +56,29 @@ class ReduplicationEngine:
 
         Whitney §590 / Pāṇini 7.4.60: when a root begins with a consonant cluster,
         only the FIRST consonant of the cluster is reduplicated.
-        e.g. kṣip → initial 'k' (not 'kṣ'); śru → initial 'ś' (not 'śr').
-        For vowel-initial roots the first vowel is the syllable nucleus.
+        Pāṇini 7.4.61 (śarpūrvāḥ khayaḥ): if a sibilant (ś, ṣ, s) is followed by
+        a voiceless stop (khay), the stop is reduplicated, not the sibilant.
         """
         vowels = set(ALPHABET.vowels_list)
+        sibilants = {"ś", "ṣ", "s"}
+        voiceless_stops = {"k", "kh", "c", "ch", "ṭ", "ṭh", "t", "th", "p", "ph"}
+        
+        phonemes = ALPHABET.parse_phonemes(root_str)
+        if len(phonemes) >= 2 and phonemes[0] in sibilants and phonemes[1] in voiceless_stops:
+            chosen_cons = phonemes[1]
+        else:
+            chosen_cons = None
+
         syllable = ""
         saw_consonant = False
-        for ch in root_str:
-            if ch in vowels:
-                syllable += ch
+        for ph in phonemes:
+            if ph in vowels:
+                syllable += ph
                 break
             else:
                 if not saw_consonant:
-                    # Take only the FIRST consonant before the root vowel
-                    syllable += ch
+                    syllable += chosen_cons if chosen_cons else ph
                     saw_consonant = True
-                # Any further consonants in the initial cluster are skipped
         return syllable
 
     def _reduce_via_fst(self, syllable: str) -> str:
@@ -88,8 +94,9 @@ class ReduplicationEngine:
 
     def generate_prefix(self, root_str: str) -> str:
         """Return the reduplication prefix for *root_str* (Perfect/Class-3)."""
-        if root_str in perfect_redupe_overrides:
-            return perfect_redupe_overrides[root_str]
+        # Pāṇini 7.4.73: bhavater aḥ (bhū takes a)
+        if root_str == "bhū":
+            return "ba"
 
         syllable = self._extract_initial_syllable(root_str)
         return self._reduce_via_fst(syllable)

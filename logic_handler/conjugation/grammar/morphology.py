@@ -5,15 +5,13 @@ class MorphologyEngine:
     """Suffix-conditioned morphophonemic adjustments applied *after* stem construction.
 
     Order matters — rules are applied left-to-right:
-        1. Passive vowel lengthening  ([PASSIVE] → lengthened vowel)
-        2. Class-4 internal lengthening ([CLASS4] i → ī before +ya)
-        3. Causative passive trigger erased ([CAUS_PASS] → ε)
-           The +a that preceded [CAUS_PASS] already triggered ayadi in sandhi;
-           we erase the tag and the stray 'a' here (a[CAUS_PASS] → ε).
-        4. Class-8 kṛ weak suppletion  (bare "kṛ" → "kur" before +u)
-        5. Class-8 u-contraction: "r+u+" before consonant → "r+"
-           (kur+u+vaḥ → kurvaḥ; kur+u+maḥ → kurmaḥ)
-        6. Erase all remaining abstract tags
+        0. Augment vriddhi / erase [AUG]
+        0.5 [NASAL] insertion (P. 7.1.58–59)
+        1. Samprasāraṇa, passive vowels, class-4 lengthening, causative passive cleanup
+        2. Class-8 suppletion / u-drop, root aorist bhūv, aorist passive vriddhi, intensive
+        3. Class-2 weak (han / vac)
+        4. **Sandhi context tags** ([SD_DCP], [SD_GEM], …) — see ``sd_boundary_tagging``
+        5. Erase remaining morph tags (not [SD_*]; those are stripped in SandhiEngine)
     """
 
     def __init__(self):
@@ -31,10 +29,6 @@ class MorphologyEngine:
                 ("[AUG]a+u",  "au"), ("[AUG]a+ū",  "au"),
                 ("[AUG]a+ṛ",  "ār"), ("[AUG]a+ṝ",  "ār"),
                 ("[AUG]a+a",  "ā"),  ("[AUG]a+ā",  "ā"),
-
-                # this shit is pre gemini
-                # ("[AUG]a+e",  "e"),   # a+e → e (already guna-form; rare)
-                # ("[AUG]a+o",  "o"),   # a+o → o (already guna-form; rare)
 
                 # If StemBuilder already applied Guna, the augment meets e, o, or ar.
                 # Pāṇini dictates the augment still forces Vriddhi here.
@@ -241,6 +235,60 @@ class MorphologyEngine:
             sig
         )
 
+        # ── 7.5 Sandhi context tags (tag-gated phonology; see sandhi.py) ─────────
+        # Whitney §213–219 (dental+palatal, ś+t); §231 (gemination); §249 (sibilant
+        # clusters); visarga before stops (internal).
+        self.sd_insert_ssr = pn.cdrewrite(
+            pn.string_map([
+                ("ś+t", "ś[SD_SSR]+t"), ("ś+th", "ś[SD_SSR]+th"),
+            ]),
+            "", "", sig,
+        )
+        self.sd_insert_dcp = pn.cdrewrite(
+            pn.string_map([
+                ("t+c", "t[SD_DCP]+c"), ("t+ch", "t[SD_DCP]+ch"),
+                ("d+c", "d[SD_DCP]+c"), ("d+ch", "d[SD_DCP]+ch"),
+                ("dh+c", "dh[SD_DCP]+c"), ("dh+ch", "dh[SD_DCP]+ch"),
+            ]),
+            "", "", sig,
+        )
+        self.sd_insert_gem = pn.cdrewrite(
+            pn.string_map([
+                ("t+t", "t[SD_GEM]+t"), ("d+d", "d[SD_GEM]+d"),
+                ("p+p", "p[SD_GEM]+p"), ("b+b", "b[SD_GEM]+b"),
+                ("k+k", "k[SD_GEM]+k"), ("g+g", "g[SD_GEM]+g"),
+                ("ṭ+ṭ", "ṭ[SD_GEM]+ṭ"), ("ḍ+ḍ", "ḍ[SD_GEM]+ḍ"),
+                ("c+c", "c[SD_GEM]+c"), ("j+j", "j[SD_GEM]+j"),
+                ("l+l", "l[SD_GEM]+l"), ("r+r", "r[SD_GEM]+r"),
+                ("y+y", "y[SD_GEM]+y"), ("v+v", "v[SD_GEM]+v"),
+            ]),
+            "", "", sig,
+        )
+        self.sd_insert_sib = pn.cdrewrite(
+            pn.string_map([
+                ("ṣ+s", "ṣ[SD_SIB]+s"), ("ś+s", "ś[SD_SIB]+s"),
+                ("s+ṣ", "s[SD_SIB]+ṣ"), ("ṣ+ś", "ṣ[SD_SIB]+ś"),
+            ]),
+            "", "", sig,
+        )
+        self.sd_insert_lar = pn.cdrewrite(
+            pn.string_map([
+                ("ḥ+k", "ḥ[SD_LAR]+k"), ("ḥ+kh", "ḥ[SD_LAR]+kh"),
+                ("ḥ+g", "ḥ[SD_LAR]+g"), ("ḥ+gh", "ḥ[SD_LAR]+gh"),
+                ("ḥ+c", "ḥ[SD_LAR]+c"), ("ḥ+ch", "ḥ[SD_LAR]+ch"),
+                ("ḥ+t", "ḥ[SD_LAR]+t"), ("ḥ+th", "ḥ[SD_LAR]+th"),
+                ("ḥ+p", "ḥ[SD_LAR]+p"), ("ḥ+ph", "ḥ[SD_LAR]+ph"),
+            ]),
+            "", "", sig,
+        )
+        self.sd_boundary_tagging = (
+            self.sd_insert_ssr
+            @ self.sd_insert_dcp
+            @ self.sd_insert_gem
+            @ self.sd_insert_sib
+            @ self.sd_insert_lar
+        ).optimize()
+
         all_tags = pn.union(
             "[PASSIVE]", "[CLASS4]", "[CLASS8]", "[CAUS_PASS]",
             "[STRONG]",  "[WEAK]",   "[VRIDDHI]", "[CLASS2_WEAK]",
@@ -255,6 +303,12 @@ class MorphologyEngine:
             rules = [
                 ("augment_vriddhi",          self.augment_vriddhi),
                 ("augment_erase",            self.augment_erase),
+                ("nasal_m_insertion",        self.nasal_m_insertion),
+                ("nasal_n_insertion",        self.nasal_n_insertion),
+                ("nasal_retroflex_insertion", self.nasal_retroflex_insertion),
+                ("nasal_velar_insertion",    self.nasal_velar_insertion),
+                ("nasal_palatal_insertion",  self.nasal_palatal_insertion),
+                ("nasal_vowel_fallback",     self.nasal_vowel_fallback),
                 ("samprasarana",             self.samprasarana),
                 ("passive_vowels",           self.passive_vowels),
                 ("class4_lengthening",       self.class4_lengthening),
@@ -269,6 +323,7 @@ class MorphologyEngine:
                 ("class2_weak_cons",         self.class2_weak_cons),
                 ("class2_weak_vowel",        self.class2_weak_vowel),
                 ("class2_weak_vac",          self.class2_weak_vac),
+                ("sd_boundary_tagging",      self.sd_boundary_tagging),
                 ("clean_tags",               self.clean_tags),
             ]
             print("  [morphology]")
@@ -310,5 +365,6 @@ class MorphologyEngine:
             @ self.class2_weak_cons
             @ self.class2_weak_vowel
             @ self.class2_weak_vac
+            @ self.sd_boundary_tagging
             @ self.clean_tags
         )

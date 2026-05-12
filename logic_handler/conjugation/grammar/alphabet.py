@@ -12,6 +12,8 @@ class SanskritAlphabet:
         [CLASS4]  – triggers Class-4 internal vowel lengthening
         [CLASS8]  – triggers kṛ → kur / kar suppletion
         [PASSIVE] – triggers passive vowel lengthening
+        [SD_DCP], [SD_GEM], [SD_SSR], [SD_SIB], [SD_LAR] – sandhi context markers
+        (inserted in MorphologyEngine, consumed in SandhiEngine; see morphology.py)
     """
 
     def __init__(self):
@@ -58,7 +60,11 @@ class SanskritAlphabet:
 
         # ── Abstract morphophonological tags that live inside FST strings ──────
         # IMPORTANT: keep this list in sync with every tag emitted by stem_rules.py
-        # and consumed (erased) by morphology.py.
+        # and consumed (erased) by morphology.py / sandhi.py.
+        #
+        # Sandhi context tags [SD_*]: inserted by MorphologyEngine immediately
+        # before sandhi (see sd_insert_* rules); consumed or stripped by
+        # SandhiEngine (never erased in morphology.clean_tags).
         self.tags_list = [
             "[STRONG]",
             "[WEAK]",
@@ -75,6 +81,15 @@ class SanskritAlphabet:
             "[SAMP]",
             "[AUG]",
             "[NASAL]",
+            "[PERF_WEAK]",
+            "[CLASS9]",
+            # --- Sandhi pipeline (morphology inserts → sandhi consumes / clean_sd_residual) ---
+            "[SD_DCP]",   # dental + palatal fusion (t/d/dh + c/ch → cc/cch)
+            "[SD_GEM]",   # homorganic gemination across '+'
+            "[SD_SSR]",   # ś/ṣ + dental stop → retroflex cluster (ś+t → ṣṭ)
+            "[SD_SIB]",   # sibilant + sibilant (e.g. ṣ+s → kṣ)
+            "[SD_LAR]",   # visarga before stop (ḥ + C → C); internal only
+            "[EOS]",
         ]
         # ── Pynini FST atoms ─────────────────────────────────────────────────
         self.vowels = pn.union(*self.vowels_list)
@@ -96,7 +111,6 @@ class SanskritAlphabet:
             + ["+"]  # morpheme boundary
         )
         self.alpha = pn.union(*all_chars)
-        self.alpha = pn.union(self.alpha, "[EOS]").closure()
         self.sigma_star = pn.closure(self.alpha)
 
     def parse_phonemes(self, s: str) -> list:
