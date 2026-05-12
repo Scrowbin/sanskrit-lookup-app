@@ -27,6 +27,19 @@ _SAMPRASARANA_ROOTS = frozenset({
     "grah", "jyā", "vay", "vyadh", "vaś", "vyac", "vraśc", "prach", "bhrajj"
 })
 
+# After the _SAMPRASARANA_ROOTS set:
+_MRJ_CLASS_ROOTS = frozenset({
+    "mṛj", "sṛj", "bhrajj", "rāj", "bhrāj", "vraj", "majj",
+})
+
+_RUH_CLASS_ROOTS = frozenset({
+    "vah", "sah", "mih", "rih", "guh", "ruh", "nah", "dah", "dih",
+})
+
+_GRASSMANN_ROOTS = frozenset({
+    "duh", "dah", "dih", "druh", "bandh", "bādh", "budh", "dabh",
+})
+
 # Roots that are genuinely Aniṭ but whose CSV entries do NOT have an anudātta
 # accent (\\) on any character other than a suffix-~ — so the position-aware
 # parser cannot auto-detect them.  Keep this set as small as possible; every
@@ -121,6 +134,9 @@ class RootObject:
     takes_periphrastic_perfect: bool
     permitted_voices: set
     takes_samprasarana: bool
+    is_mrj_class: bool = False     # j → ṣ before dentals (Whitney §219)
+    is_ruh_class: bool = False     # h + dental → vowel lengthening + lingual (Whitney §222)
+    is_initial_aspirate: bool = False  # Grassmann's Law (Whitney §155)
 
     @property
     def is_set(self) -> bool:
@@ -252,10 +268,13 @@ class DhatupathaAnalyzer:
             clean = _clean(entry['raw'])
             for cand in candidates:
                 if clean.startswith(cand):
+                    fallback_cls = entry['class_num']
+                    print(
+                        f"WARNING: Root '{root_str}' class {class_num} not found; "
+                        f"falling back to class {fallback_cls} entry. "
+                        f"Voice/anit data may be incorrect."
+                    )
                     return entry
-                if cand.endswith('h') and clean.startswith(cand[:-1] + 'H'):
-                    return entry
-
         return None
 
     # ── Raw-string parsers ─────────────────────────────────────────────────────
@@ -573,6 +592,9 @@ class DhatupathaAnalyzer:
             takes_periphrastic_perfect=self._check_periphrastic(root_str),
             permitted_voices=permitted_voices,
             takes_samprasarana=(root_str in _SAMPRASARANA_ROOTS),
+            is_mrj_class=(root_str in _MRJ_CLASS_ROOTS),
+            is_ruh_class=(root_str in _RUH_CLASS_ROOTS),
+            is_initial_aspirate=(root_str in _GRASSMANN_ROOTS),
             **flags,
         )
 

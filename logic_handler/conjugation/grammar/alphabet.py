@@ -83,6 +83,11 @@ class SanskritAlphabet:
             "[NASAL]",
             "[PERF_WEAK]",
             "[CLASS9]",
+            "[MRJ]",
+            "[RUH_H]",
+            "[GRASSMANN]",
+            "[NO_RUKI]",
+            "[PRAGRHYA]",
             # --- Sandhi pipeline (morphology inserts → sandhi consumes / clean_sd_residual) ---
             "[SD_DCP]",   # dental + palatal fusion (t/d/dh + c/ch → cc/cch)
             "[SD_GEM]",   # homorganic gemination across '+'
@@ -110,8 +115,9 @@ class SanskritAlphabet:
             + self.tags_list
             + ["+"]  # morpheme boundary
         )
+        
         self.alpha = pn.union(*all_chars)
-        self.sigma_star = pn.closure(self.alpha)
+        self.sigma_star = pn.closure(self.alpha).optimize()
 
     def parse_phonemes(self, s: str) -> list:
         """Tokenize an IAST string into Sanskrit phonemes."""

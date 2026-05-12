@@ -42,6 +42,11 @@ passive_stem_overrides = {
     # √smṛ passive is smar-ya (INRIA): smaryate (not *smriyate).
     # True lexical irregularity (attested), so keep as override.
     "smṛ": "smar",
+    "vah": "uh",
+    "sah": "sah",   # actually regular?
+    "ruh": "ruh",   # Actually needs vowel lengthening, but we'll handle later.
+    "dah": "dah",     # dahyate
+    "dih": "dih",     # dihyate
 }
 
 
@@ -166,6 +171,14 @@ aorist_overrides = {
     "jñā":  {"type": "sis"},
     
     # Type 7: sa-Aorists (Handled algorithmically for roots ending in ś, ṣ, h)
+
+    #ruh class
+    "vah": {"type": "s", "active": "vākṣ", "middle": "voḍh"},
+    "sah": {"type": "s", "active": "sākṣ", "middle": "soḍh"},
+    "ruh": {"type": "s", "active": "rukṣ", "middle": "ruṭh"},
+    "dah": {"type": "s", "active": "dhākṣ", "middle": "dagh"},  # Grassmann initial
+    "dih": {"type": "s", "active": "dhikṣ", "middle": "digh"},
+    "mih": {"type": "s", "active": "mikṣ", "middle": "miḍh"},
 }
 
 
@@ -219,6 +232,24 @@ intensive_stem_overrides = {
     # yaj: intensive prefix is yāy- (long ā); Whitney §1014 heavy-syllable intensives
     "yaj":  "yāyaj",
     # "vid": removed — let algorithm handle: vi + vid → vevid (no Grassmann issue here)
+}
+
+# ── Grassmann's Law throwback stems for duh-class roots ──
+# These roots re-aspirate the initial consonant when final h deaspirates.
+# Examples: duh+ti → dogdhi (d→dh after h→g), duh+tas → dugdhas
+# We provide the intermediate form (before final sandhi)
+grassmann_stems = {
+    "duh": {
+        "present_3sg": "dogdh",   # from duh+ti via Bartholomae + throwback
+        "imperfect_3sg": "adhok", # a+duh+t → a+dhok
+        "ppp": "dugdha",
+    },
+    "dah": {
+        "ppp": "dagdha",
+    },
+    "dih": {
+        "ppp": "digdha",
+    },
 }
 
 

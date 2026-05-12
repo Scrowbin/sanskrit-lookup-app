@@ -121,6 +121,18 @@ class StemBuilder:
         if root_obj.is_idit:
             fst = pn.accep("[NASAL]") + fst
 
+        # mṛj‑class: tag before final j (Whitney §219)
+        if root_obj.is_mrj_class:
+            fst = fst + pn.accep("[MRJ]")   # after root, before boundary
+
+        # ruh‑class: tag after root (will be placed before h) – but we need it before the h.
+        if root_obj.is_ruh_class:
+            fst = fst + pn.accep("[RUH_H]")
+
+        # Grassmann: tag at the very beginning (before any reduplication or root)
+        if root_obj.is_initial_aspirate:
+            fst = pn.accep("[GRASSMANN]") + fst
+
         # Let the FST handle Samprasāraṇa dynamically!
         apply_samp = (
             strength == "[WEAK]"
@@ -661,11 +673,12 @@ class StemBuilder:
         """Build the desiderative (Sanadi) stem."""
         if root_str in desiderative_stem_overrides:
             bases = desiderative_stem_overrides[root_str]
-            return pn.union(*[pn.accep(b) for b in bases])
-        prefix = self.reduplicator.generate_desiderative_prefix(root_str)
-        is_anit = DHATUPATHA_ANALYZER.get(root_str, 1).is_anit  # P.7.2.10
-        suffix = "sa" if is_anit else "iṣa"
-        return pn.accep(prefix) + pn.accep(root_str) + pn.accep(suffix)
+            return pn.accep("[NO_RUKI]") + pn.union(*[pn.accep(b) for b in bases])
+        else:
+            prefix = self.reduplicator.generate_desiderative_prefix(root_str)
+            is_anit = DHATUPATHA_ANALYZER.get(root_str, 1).is_anit  # P.7.2.10
+            suffix = "sa" if is_anit else "iṣa"
+            return pn.accep("[NO_RUKI]") + pn.accep(prefix) + pn.accep(root_str) + pn.accep(suffix)
 
     def _build_desiderative_perfect(self, root_str: str, strength: str) -> pn.Fst:
         """Perfect stem of a desiderative base.

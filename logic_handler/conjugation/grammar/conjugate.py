@@ -57,9 +57,6 @@ class SanskritConjugator:
         self.stems      = StemBuilder(self.strength_engine)
         self.resolver   = MorphologicalFeatureResolver()
 
-        # FST stem cache: (root, class, strength, tense, derivative, person, number) → FST
-        self._stem_cache: dict = {}
-
         # ── Ending provider dispatch ──────────────────────────────────────────
         self._ending_dispatch: dict = {
             ("present",    "active"):  SuffixProvider.get_present_active,
@@ -94,7 +91,7 @@ class SanskritConjugator:
     # ──────────────────────────────────────────────────────────────────────────
     # Internal helpers
     # ──────────────────────────────────────────────────────────────────────────
-
+    @lru_cache(maxsize=4096)
     def _get_stem(
         self,
         root_str: str,
@@ -105,14 +102,11 @@ class SanskritConjugator:
         person: str | None = None,
         number: str | None = None,
     ) -> pn.Fst:
-        key = (root_str, class_num, strength, tense, derivative, person, number)
-        if key not in self._stem_cache:
-            self._stem_cache[key] = self.stems.build(
-                root_str, class_num, strength,
-                tense=tense, derivative=derivative,
-                person=person, number=number,
-            )
-        return self._stem_cache[key]
+        return self.stems.build(
+            root_str, class_num, strength,
+            tense=tense, derivative=derivative,
+            person=person, number=number,
+        )
 
     def _fetch_endings(
         self,

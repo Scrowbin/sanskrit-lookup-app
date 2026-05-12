@@ -20,9 +20,12 @@ class MorphologyEngine:
 
     def _build_rules(self, sig):
         # ── 0. Augment vriddhi coalescence ──────────────────────────────
-        # Whitney §135 / Pāṇini 6.1.87-89: augment a + vowel-initial stem
-        # yields vriddhi coalescence, NOT guna.
-        # [AUG]a+i/ī → ai, [AUG]a+u/ū → au, [AUG]a+ṛ/ṝ → ār, [AUG]a+a/ā → ā
+        # Augment vṛddhi coalescence (Whitney §135-136, Pāṇini 6.1.87-89)
+        # NOTE: The pipeline applies guna BEFORE prepending the augment in conjugate.py.
+        # The augment_vriddhi rule therefore must handle both raw vowels AND guna-ed vowels:
+        #   [AUG]a+i → ai  (raw vowel)
+        #   [AUG]a+e → ai  (guna-ed i/ī, a+i → e → augment meets e)
+        # Both produce identical output, but the phonological path differs.
         self.augment_vriddhi = pn.cdrewrite(
             pn.string_map([
                 ("[AUG]a+i",  "ai"), ("[AUG]a+ī",  "ai"),
@@ -335,13 +338,12 @@ class MorphologyEngine:
                 try:
                     print(f"    ✅ {name}: '{fst.string()}'")
                 except Exception:
-                    try:
-                        sp = pn.shortestpath(fst).string()
-                        print(f"    ⚠️  {name}: ambiguous, shortest='{sp}'")
-                    except Exception:
-                        print(f"    ⚠️  {name}: ambiguous")
+                    # Ambiguous – don't resolve; just note it.
+                    print(f"    ⚠️  {name}: ambiguous (no unique string)")
             return fst
-        return (
+        
+        # Apply all rules, then explicitly add the end-of-string marker
+        fst = (
             fst
             @ self.augment_vriddhi
             @ self.augment_erase
@@ -368,3 +370,6 @@ class MorphologyEngine:
             @ self.sd_boundary_tagging
             @ self.clean_tags
         )
+        # CRITICAL FIX: ensure [EOS] exists at the end of the string before sandhi
+        fst = fst + pn.accep("+[EOS]")
+        return fst
