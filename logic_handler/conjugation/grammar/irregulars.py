@@ -223,8 +223,10 @@ intensive_stem_overrides = {
 
 
 # ── Krdanta Overrides ────────────────────────────────────────────────────────
-# Used for suppletive/irregular kṛdanta forms that cannot be derived algorithmically.
-# Samprasāraṇa roots (vac, yaj, svap etc.) have suppletive PPP/absolutive stems.
+# Suppletive / irregular kṛdanta forms only. Validate shrinking candidates with:
+#   python validate_krdantas_parts.py
+# (parts.csv mode=past vs krdantas.py). √gam / √dīv remain until productive PPP /
+# class-4 stems match INRIA without overrides.
 krdanta_overrides = {
     # √gam (cl.1) — suppletive past stem 'gat' (not 'gant')
     "gam": {

@@ -63,7 +63,13 @@ class KrdantaEngine:
             
         return output
 
-    def generate_block(self, root_str: str, class_num: int, preverb_str: str = "") -> str:
+    def generate_block(
+        self,
+        root_str: str,
+        class_num: int,
+        preverb_str: str = "",
+        derivative: str | None = None,
+    ) -> str:
         out = ["Participles"]
         
         # 1. Past Passive Participle (-ta / -tā)

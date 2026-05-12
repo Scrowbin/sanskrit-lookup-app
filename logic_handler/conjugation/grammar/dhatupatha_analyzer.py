@@ -1,7 +1,9 @@
 import csv
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+
 from alphabet import ALPHABET
+from corpus_lexical_hints import load_adverb_primary_gerund_set_hints
 
 # ── Transliteration ────────────────────────────────────────────────────────────
 IAST_TO_SLP1 = {
@@ -150,6 +152,8 @@ class DhatupathaAnalyzer:
         self._mw_voice: dict[tuple, set[str]] = {}
         # MW homonym index: (slp1_root, class_str) -> hom string
         self._mw_hom: dict[tuple, str] = {}
+        # Primary gerund in adverbs.csv → seṭ (True) / aniṭ (False); see corpus_lexical_hints.
+        self._adverb_gerund_set_hint: dict[str, bool] = load_adverb_primary_gerund_set_hints()
         self._load()
         self._load_mw_roots()
 
@@ -328,6 +332,11 @@ class DhatupathaAnalyzer:
         return is_nit, is_ngit, has_svarita_on_suffix
 
     @staticmethod
+    def _missing_dhatupatha_entry(entry: dict | None) -> bool:
+        """True iff no Dhātupāṭha row — then use adverbs.csv for seṭ/aniṭ hint."""
+        return entry is None
+
+    @staticmethod
     def _raw_has_anudatta_on_suffix(raw: str) -> bool:
         """True if \\ appears after a '~' (anudātta on anubandha → Ātmanepada)."""
         for idx, ch in enumerate(raw):
@@ -499,6 +508,16 @@ class DhatupathaAnalyzer:
             or root_str in _KNOWN_ANIT_ROOTS
             or root_str.endswith("ā")   # P. 7.2.10
         )
+
+        # Cross-reference adverbs.csv primary gerund (…itvā vs …tvā) when there is
+        # no Dhātupāṭha row (PHONOLOGY_AUDIT §6.8 / gerund iṭ, P. 7.2.56–58).
+        if not root_str.endswith("ā") and root_str not in _KNOWN_ANIT_ROOTS:
+            if self._missing_dhatupatha_entry(entry):
+                hint = self._adverb_gerund_set_hint.get(root_str)
+                if hint is not None:
+                    # True = corpus gerund has connecting i → seṭ → not aniṭ
+                    # False = …ktvā / …tvā without iṭ → aniṭ
+                    is_anit = not hint
 
         # ── Voice ─────────────────────────────────────────────────────────────
         # Three-tier priority system:
