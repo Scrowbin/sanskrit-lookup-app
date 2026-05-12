@@ -86,3 +86,63 @@ dat_pl = weak_blind + pn.cross("[Dat][Pl]", "bhyas")
 abl_pl = weak_blind + pn.cross("[Abl][Pl]", "bhyas")
 gen_pl = weak_blind + pn.cross("[Gen][Pl]", "ām")
 loc_pl = weak_blind + pn.cross("[Loc][Pl]", "su")  # bhāvant -> bhāvatsu
+
+
+ant_masc_paradigm = pn.union(
+    nom_sg_ant,
+    nom_sg_mvant,
+    voc_sg_ant,
+    voc_sg_mvant,
+    acc_sg_m,
+    nom_du_m,
+    acc_du_m,
+    voc_du_m,
+    nom_pl_m,
+    voc_pl_m,
+    acc_pl_m,
+    ins_sg,
+    dat_sg,
+    abl_sg,
+    gen_sg,
+    loc_sg,
+    ins_du,
+    dat_du,
+    abl_du,
+    gen_du,
+    loc_du,
+    ins_pl,
+    dat_pl,
+    abl_pl,
+    gen_pl,
+    loc_pl,
+).optimize()
+
+ant_neut_paradigm = pn.union(
+    nom_sg_n,
+    acc_sg_n,
+    voc_sg_n,
+    nom_du_n,
+    acc_du_n,
+    voc_du_n,
+    nom_pl_n,
+    acc_pl_n,
+    voc_pl_n,
+    ins_sg,
+    dat_sg,
+    abl_sg,
+    gen_sg,
+    loc_sg,
+    ins_du,
+    dat_du,
+    abl_du,
+    gen_du,
+    loc_du,
+    ins_pl,
+    dat_pl,
+    abl_pl,
+    gen_pl,
+    loc_pl,
+).optimize()
+
+# Combined active participle / possessive paradigm
+ant_stem_paradigm = pn.union(ant_masc_paradigm, ant_neut_paradigm).optimize()

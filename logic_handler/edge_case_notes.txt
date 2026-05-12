@@ -4,8 +4,8 @@ A single irregular i-stem noun,[32] sakhi ,[R][q] has a stem in -i but declines 
 
 our format should be:
 
-word[STEM][Nom / Acc / Ins] [Sg Pl Du]
-
+word[STEM] [MASC] [Nom / Acc / Ins] [Sg Pl Du] [EOS]
+4 []s
 
 Inria L's 
 

@@ -1,133 +1,339 @@
 import pynini as pn
 
+mf_blind = pn.cross(pn.union("[Masc]", "[Fem]"), "")
 """
 e-stem (e.g., se)
 """
-# its also ay stem but they are essentially the same
-nom_sg_e = pn.cross("e[E_STEM][Nom][Sg]", "es")
-acc_sg_e = pn.cross("e[E_STEM][Acc][Sg]", "ayam")
-ins_sg_e = pn.cross("e[E_STEM][Ins][Sg]", "ayā")
-dat_sg_e = pn.cross("e[E_STEM][Dat][Sg]", "aye")
-abl_sg_e = pn.cross("e[E_STEM][Abl][Sg]", "es")
-gen_sg_e = pn.cross("e[E_STEM][Gen][Sg]", "es")
-loc_sg_e = pn.cross("e[E_STEM][Loc][Sg]", "ayi")
-voc_sg_e = pn.cross("[E_STEM][Voc][Sg]", "")
+# Singular
+nom_sg_e = pn.cross("e[E_STEM]", "es") + mf_blind + pn.cross("[Nom][Sg]", "")
+acc_sg_e = pn.cross("e[E_STEM]", "ayam") + mf_blind + pn.cross("[Acc][Sg]", "")
+ins_sg_e = pn.cross("e[E_STEM]", "ayā") + mf_blind + pn.cross("[Ins][Sg]", "")
+dat_sg_e = pn.cross("e[E_STEM]", "aye") + mf_blind + pn.cross("[Dat][Sg]", "")
+abl_sg_e = pn.cross("e[E_STEM]", "es") + mf_blind + pn.cross("[Abl][Sg]", "")
+gen_sg_e = pn.cross("e[E_STEM]", "es") + mf_blind + pn.cross("[Gen][Sg]", "")
+loc_sg_e = pn.cross("e[E_STEM]", "ayi") + mf_blind + pn.cross("[Loc][Sg]", "")
+voc_sg_e = (
+    pn.cross("e[E_STEM]", "e") + mf_blind + pn.cross("[Voc][Sg]", "")
+)  # Note: voc sg is usually just the stem 'e'
 
-nom_du_e = pn.cross("e[E_STEM][Nom][Du]", "ayau")
-acc_du_e = pn.cross("e[E_STEM][Acc][Du]", "ayau")
-voc_du_e = pn.cross("e[E_STEM][Voc][Du]", "ayau")
-ins_du_e = pn.cross("[E_STEM][Ins][Du]", "bhyām")
-dat_du_e = pn.cross("[E_STEM][Dat][Du]", "bhyām")
-abl_du_e = pn.cross("[E_STEM][Abl][Du]", "bhyām")
-gen_du_e = pn.cross("e[E_STEM][Gen][Du]", "ayos")
-loc_du_e = pn.cross("e[E_STEM][Loc][Du]", "ayos")
+# Dual
+nom_du_e = pn.cross("e[E_STEM]", "ayau") + mf_blind + pn.cross("[Nom][Du]", "")
+acc_du_e = pn.cross("e[E_STEM]", "ayau") + mf_blind + pn.cross("[Acc][Du]", "")
+voc_du_e = pn.cross("e[E_STEM]", "ayau") + mf_blind + pn.cross("[Voc][Du]", "")
 
-nom_pl_e = pn.cross("e[E_STEM][Nom][Pl]", "ayas")
-acc_pl_e = pn.cross("e[E_STEM][Acc][Pl]", "ayas")
-voc_pl_e = pn.cross("e[E_STEM][Voc][Pl]", "ayas")
-ins_pl_e = pn.cross("[E_STEM][Ins][Pl]", "bhis")
-dat_pl_e = pn.cross("[E_STEM][Dat][Pl]", "bhyas")
-abl_pl_e = pn.cross("[E_STEM][Abl][Pl]", "bhyas")
-gen_pl_e = pn.cross("e[E_STEM][Gen][Pl]", "ayām")
-loc_pl_e = pn.cross("[E_STEM][Loc][Pl]", "su")
+ins_du_e = pn.cross("e[E_STEM]", "e") + mf_blind + pn.cross("[Ins][Du]", "bhyām")
+dat_du_e = pn.cross("e[E_STEM]", "e") + mf_blind + pn.cross("[Dat][Du]", "bhyām")
+abl_du_e = pn.cross("e[E_STEM]", "e") + mf_blind + pn.cross("[Abl][Du]", "bhyām")
+
+gen_du_e = pn.cross("e[E_STEM]", "ayos") + mf_blind + pn.cross("[Gen][Du]", "")
+loc_du_e = pn.cross("e[E_STEM]", "ayos") + mf_blind + pn.cross("[Loc][Du]", "")
+
+# Plural
+nom_pl_e = pn.cross("e[E_STEM]", "ayas") + mf_blind + pn.cross("[Nom][Pl]", "")
+acc_pl_e = pn.cross("e[E_STEM]", "ayas") + mf_blind + pn.cross("[Acc][Pl]", "")
+voc_pl_e = pn.cross("e[E_STEM]", "ayas") + mf_blind + pn.cross("[Voc][Pl]", "")
+
+ins_pl_e = pn.cross("e[E_STEM]", "e") + mf_blind + pn.cross("[Ins][Pl]", "bhis")
+dat_pl_e = pn.cross("e[E_STEM]", "e") + mf_blind + pn.cross("[Dat][Pl]", "bhyas")
+abl_pl_e = pn.cross("e[E_STEM]", "e") + mf_blind + pn.cross("[Abl][Pl]", "bhyas")
+
+gen_pl_e = pn.cross("e[E_STEM]", "ayām") + mf_blind + pn.cross("[Gen][Pl]", "")
+loc_pl_e = pn.cross("e[E_STEM]", "e") + mf_blind + pn.cross("[Loc][Pl]", "su")
+
 
 """
 o-stem (e.g., go)
 """
 # Singular
-nom_sg_o = pn.cross("o[O_STEM][Nom][Sg]", "aus")  # go -> gaus
-acc_sg_o = pn.cross("o[O_STEM][Acc][Sg]", "ām")  # go -> gām (Irregular!)
-ins_sg_o = pn.cross("o[O_STEM][Ins][Sg]", "avā")  # go -> gavā (o -> av)
-dat_sg_o = pn.cross("o[O_STEM][Dat][Sg]", "ave")  # go -> gave (o -> av)
-abl_sg_o = pn.cross("o[O_STEM][Abl][Sg]", "os")  # go -> gos
-gen_sg_o = pn.cross("o[O_STEM][Gen][Sg]", "os")  # go -> gos
-loc_sg_o = pn.cross("o[O_STEM][Loc][Sg]", "avi")  # go -> gavi (o -> av)
-voc_sg_o = pn.cross("o[O_STEM][Voc][Sg]", "aus")  # go -> gaus
+nom_sg_o = (
+    pn.cross("o[O_STEM]", "aus") + mf_blind + pn.cross("[Nom][Sg]", "")
+)  # go -> gaus
+acc_sg_o = (
+    pn.cross("o[O_STEM]", "ām") + mf_blind + pn.cross("[Acc][Sg]", "")
+)  # go -> gām
+ins_sg_o = (
+    pn.cross("o[O_STEM]", "avā") + mf_blind + pn.cross("[Ins][Sg]", "")
+)  # go -> gavā
+dat_sg_o = (
+    pn.cross("o[O_STEM]", "ave") + mf_blind + pn.cross("[Dat][Sg]", "")
+)  # go -> gave
+abl_sg_o = (
+    pn.cross("o[O_STEM]", "os") + mf_blind + pn.cross("[Abl][Sg]", "")
+)  # go -> gos
+gen_sg_o = (
+    pn.cross("o[O_STEM]", "os") + mf_blind + pn.cross("[Gen][Sg]", "")
+)  # go -> gos
+loc_sg_o = (
+    pn.cross("o[O_STEM]", "avi") + mf_blind + pn.cross("[Loc][Sg]", "")
+)  # go -> gavi
+voc_sg_o = (
+    pn.cross("o[O_STEM]", "aus") + mf_blind + pn.cross("[Voc][Sg]", "")
+)  # go -> gaus
 
 # Dual
-nom_du_o = pn.cross("o[O_STEM][Nom][Du]", "āvau")  # go -> gāvau (o -> āv)
-acc_du_o = pn.cross("o[O_STEM][Acc][Du]", "āvau")
-voc_du_o = pn.cross("o[O_STEM][Voc][Du]", "āvau")
+nom_du_o = (
+    pn.cross("o[O_STEM]", "āvau") + mf_blind + pn.cross("[Nom][Du]", "")
+)  # go -> gāvau
+acc_du_o = pn.cross("o[O_STEM]", "āvau") + mf_blind + pn.cross("[Acc][Du]", "")
+voc_du_o = pn.cross("o[O_STEM]", "āvau") + mf_blind + pn.cross("[Voc][Du]", "")
 
-ins_du_o = pn.cross("[O_STEM][Ins][Du]", "bhyām")  # go + bhyām
-dat_du_o = pn.cross("[O_STEM][Dat][Du]", "bhyām")
-abl_du_o = pn.cross("[O_STEM][Abl][Du]", "bhyām")
+ins_du_o = (
+    pn.cross("o[O_STEM]", "o") + mf_blind + pn.cross("[Ins][Du]", "bhyām")
+)  # go + bhyām
+dat_du_o = pn.cross("o[O_STEM]", "o") + mf_blind + pn.cross("[Dat][Du]", "bhyām")
+abl_du_o = pn.cross("o[O_STEM]", "o") + mf_blind + pn.cross("[Abl][Du]", "bhyām")
 
-gen_du_o = pn.cross("o[O_STEM][Gen][Du]", "avos")  # go -> gavos (o -> av)
-loc_du_o = pn.cross("o[O_STEM][Loc][Du]", "avos")
+gen_du_o = (
+    pn.cross("o[O_STEM]", "avos") + mf_blind + pn.cross("[Gen][Du]", "")
+)  # go -> gavos
+loc_du_o = pn.cross("o[O_STEM]", "avos") + mf_blind + pn.cross("[Loc][Du]", "")
 
 # Plural
-nom_pl_o = pn.cross("o[O_STEM][Nom][Pl]", "āvas")  # go -> gāvas (o -> āv)
-acc_pl_o = pn.cross("o[O_STEM][Acc][Pl]", "ās")  # go -> gās (Irregular!)
-voc_pl_o = pn.cross("o[O_STEM][Voc][Pl]", "āvas")
+nom_pl_o = (
+    pn.cross("o[O_STEM]", "āvas") + mf_blind + pn.cross("[Nom][Pl]", "")
+)  # go -> gāvas
+acc_pl_o = (
+    pn.cross("o[O_STEM]", "ās") + mf_blind + pn.cross("[Acc][Pl]", "")
+)  # go -> gās
+voc_pl_o = pn.cross("o[O_STEM]", "āvas") + mf_blind + pn.cross("[Voc][Pl]", "")
 
-ins_pl_o = pn.cross("[O_STEM][Ins][Pl]", "bhis")  # go + bhis
-dat_pl_o = pn.cross("[O_STEM][Dat][Pl]", "bhyas")
-abl_pl_o = pn.cross("[O_STEM][Abl][Pl]", "bhyas")
+ins_pl_o = (
+    pn.cross("o[O_STEM]", "o") + mf_blind + pn.cross("[Ins][Pl]", "bhis")
+)  # go + bhis
+dat_pl_o = pn.cross("o[O_STEM]", "o") + mf_blind + pn.cross("[Dat][Pl]", "bhyas")
+abl_pl_o = pn.cross("o[O_STEM]", "o") + mf_blind + pn.cross("[Abl][Pl]", "bhyas")
 
-gen_pl_o = pn.cross("o[O_STEM][Gen][Pl]", "avām")  # go -> gavām (o -> av)
-loc_pl_o = pn.cross("[O_STEM][Loc][Pl]", "su")  # go + su (Strict underlying dental)
+gen_pl_o = (
+    pn.cross("o[O_STEM]", "avām") + mf_blind + pn.cross("[Gen][Pl]", "")
+)  # go -> gavām
+loc_pl_o = (
+    pn.cross("o[O_STEM]", "o") + mf_blind + pn.cross("[Loc][Pl]", "su")
+)  # go + su
+
 
 """
 au-stem (e.g., nau)
 """
 # Singular
-nom_sg_au = pn.cross("[AU_STEM][Nom][Sg]", "s")  # nau -> naus
-acc_sg_au = pn.cross("au[AU_STEM][Acc][Sg]", "āvam")  # nau -> nāvam (au -> āv)
-ins_sg_au = pn.cross("au[AU_STEM][Ins][Sg]", "āvā")  # nau -> nāvā
-dat_sg_au = pn.cross("au[AU_STEM][Dat][Sg]", "āve")  # nau -> nāve
-abl_sg_au = pn.cross("au[AU_STEM][Abl][Sg]", "āvas")  # nau -> nāvas
-gen_sg_au = pn.cross("au[AU_STEM][Gen][Sg]", "āvas")  # nau -> nāvas
-loc_sg_au = pn.cross("au[AU_STEM][Loc][Sg]", "āvi")  # nau -> nāvi
-voc_sg_au = pn.cross("[AU_STEM][Voc][Sg]", "s")  # nau -> naus
+nom_sg_au = (
+    pn.cross("au[AU_STEM]", "aus") + mf_blind + pn.cross("[Nom][Sg]", "")
+)  # nau -> naus
+acc_sg_au = (
+    pn.cross("au[AU_STEM]", "āvam") + mf_blind + pn.cross("[Acc][Sg]", "")
+)  # nau -> nāvam
+ins_sg_au = (
+    pn.cross("au[AU_STEM]", "āvā") + mf_blind + pn.cross("[Ins][Sg]", "")
+)  # nau -> nāvā
+dat_sg_au = (
+    pn.cross("au[AU_STEM]", "āve") + mf_blind + pn.cross("[Dat][Sg]", "")
+)  # nau -> nāve
+abl_sg_au = (
+    pn.cross("au[AU_STEM]", "āvas") + mf_blind + pn.cross("[Abl][Sg]", "")
+)  # nau -> nāvas
+gen_sg_au = (
+    pn.cross("au[AU_STEM]", "āvas") + mf_blind + pn.cross("[Gen][Sg]", "")
+)  # nau -> nāvas
+loc_sg_au = (
+    pn.cross("au[AU_STEM]", "āvi") + mf_blind + pn.cross("[Loc][Sg]", "")
+)  # nau -> nāvi
+voc_sg_au = (
+    pn.cross("au[AU_STEM]", "aus") + mf_blind + pn.cross("[Voc][Sg]", "")
+)  # nau -> naus
 
 # Dual
-nom_du_au = pn.cross("au[AU_STEM][Nom][Du]", "āvau")  # nau -> nāvau
-acc_du_au = pn.cross("au[AU_STEM][Acc][Du]", "āvau")
-voc_du_au = pn.cross("au[AU_STEM][Voc][Du]", "āvau")
-ins_du_au = pn.cross("[AU_STEM][Ins][Du]", "bhyām")  # nau + bhyām
-dat_du_au = pn.cross("[AU_STEM][Dat][Du]", "bhyām")
-abl_du_au = pn.cross("[AU_STEM][Abl][Du]", "bhyām")
-gen_du_au = pn.cross("au[AU_STEM][Gen][Du]", "āvos")  # nau -> nāvos
-loc_du_au = pn.cross("au[AU_STEM][Loc][Du]", "āvos")
+nom_du_au = (
+    pn.cross("au[AU_STEM]", "āvau") + mf_blind + pn.cross("[Nom][Du]", "")
+)  # nau -> nāvau
+acc_du_au = pn.cross("au[AU_STEM]", "āvau") + mf_blind + pn.cross("[Acc][Du]", "")
+voc_du_au = pn.cross("au[AU_STEM]", "āvau") + mf_blind + pn.cross("[Voc][Du]", "")
+
+ins_du_au = (
+    pn.cross("au[AU_STEM]", "au") + mf_blind + pn.cross("[Ins][Du]", "bhyām")
+)  # nau + bhyām
+dat_du_au = pn.cross("au[AU_STEM]", "au") + mf_blind + pn.cross("[Dat][Du]", "bhyām")
+abl_du_au = pn.cross("au[AU_STEM]", "au") + mf_blind + pn.cross("[Abl][Du]", "bhyām")
+
+gen_du_au = (
+    pn.cross("au[AU_STEM]", "āvos") + mf_blind + pn.cross("[Gen][Du]", "")
+)  # nau -> nāvos
+loc_du_au = pn.cross("au[AU_STEM]", "āvos") + mf_blind + pn.cross("[Loc][Du]", "")
 
 # Plural
-nom_pl_au = pn.cross("au[AU_STEM][Nom][Pl]", "āvas")  # nau -> nāvas
-acc_pl_au = pn.cross("au[AU_STEM][Acc][Pl]", "āvas")  # nau -> nāvas
-voc_pl_au = pn.cross("au[AU_STEM][Voc][Pl]", "āvas")
-ins_pl_au = pn.cross("[AU_STEM][Ins][Pl]", "bhis")  # nau + bhis
-dat_pl_au = pn.cross("[AU_STEM][Dat][Pl]", "bhyas")
-abl_pl_au = pn.cross("[AU_STEM][Abl][Pl]", "bhyas")
-gen_pl_au = pn.cross("au[AU_STEM][Gen][Pl]", "āvām")  # nau -> nāvām
-loc_pl_au = pn.cross("[AU_STEM][Loc][Pl]", "su")  # nau + su
+nom_pl_au = (
+    pn.cross("au[AU_STEM]", "āvas") + mf_blind + pn.cross("[Nom][Pl]", "")
+)  # nau -> nāvas
+acc_pl_au = (
+    pn.cross("au[AU_STEM]", "āvas") + mf_blind + pn.cross("[Acc][Pl]", "")
+)  # nau -> nāvas
+voc_pl_au = pn.cross("au[AU_STEM]", "āvas") + mf_blind + pn.cross("[Voc][Pl]", "")
+
+ins_pl_au = (
+    pn.cross("au[AU_STEM]", "au") + mf_blind + pn.cross("[Ins][Pl]", "bhis")
+)  # nau + bhis
+dat_pl_au = pn.cross("au[AU_STEM]", "au") + mf_blind + pn.cross("[Dat][Pl]", "bhyas")
+abl_pl_au = pn.cross("au[AU_STEM]", "au") + mf_blind + pn.cross("[Abl][Pl]", "bhyas")
+
+gen_pl_au = (
+    pn.cross("au[AU_STEM]", "āvām") + mf_blind + pn.cross("[Gen][Pl]", "")
+)  # nau -> nāvām
+loc_pl_au = (
+    pn.cross("au[AU_STEM]", "au") + mf_blind + pn.cross("[Loc][Pl]", "su")
+)  # nau + su
 
 
-# '''
-# ai-stem (e.g., rai)
-# '''
-# nom_sg_ai = pn.cross("ai[AI_STEM][Nom][Sg]", "ās")
-# acc_sg_ai = pn.cross("ai[AI_STEM][Acc][Sg]", "āyam")
-# ins_sg_ai = pn.cross("ai[AI_STEM][Ins][Sg]", "āyā")
-# dat_sg_ai = pn.cross("ai[AI_STEM][Dat][Sg]", "āye")
-# abl_sg_ai = pn.cross("ai[AI_STEM][Abl][Sg]", "āyas")
-# gen_sg_ai = pn.cross("ai[AI_STEM][Gen][Sg]", "āyas")
-# loc_sg_ai = pn.cross("ai[AI_STEM][Loc][Sg]", "āyi")
-# voc_sg_ai = pn.cross("ai[AI_STEM][Voc][Sg]", "ās")
-#
-# nom_du_ai = pn.cross("ai[AI_STEM][Nom][Du]", "āyau")
-# acc_du_ai = pn.cross("ai[AI_STEM][Acc][Du]", "āyau")
-# voc_du_ai = pn.cross("ai[AI_STEM][Voc][Du]", "āyau")
-# ins_du_ai = pn.cross("ai[AI_STEM][Ins][Du]", "ābhyām")
-# dat_du_ai = pn.cross("ai[AI_STEM][Dat][Du]", "ābhyām")
-# abl_du_ai = pn.cross("ai[AI_STEM][Abl][Du]", "ābhyām")
-# gen_du_ai = pn.cross("ai[AI_STEM][Gen][Du]", "āyos")
-# loc_du_ai = pn.cross("ai[AI_STEM][Loc][Du]", "āyos")
-#
-# nom_pl_ai = pn.cross("ai[AI_STEM][Nom][Pl]", "āyas")
-# acc_pl_ai = pn.cross("ai[AI_STEM][Acc][Pl]", "āyas")
-# voc_pl_ai = pn.cross("ai[AI_STEM][Voc][Pl]", "āyas")
-# ins_pl_ai = pn.cross("ai[AI_STEM][Ins][Pl]", "ābhis")
-# dat_pl_ai = pn.cross("ai[AI_STEM][Dat][Pl]", "ābhyas")
-# abl_pl_ai = pn.cross("ai[AI_STEM][Abl][Pl]", "ābhyas")
-# gen_pl_ai = pn.cross("ai[AI_STEM][Gen][Pl]", "āyām")
-# loc_pl_ai = pn.cross("ai[AI_STEM][Loc][Pl]", "āsu")
+"""
+ai-stem (e.g., rai)
+"""
+# Singular
+nom_sg_ai = pn.cross("ai[AI_STEM]", "ās") + mf_blind + pn.cross("[Nom][Sg]", "")
+acc_sg_ai = pn.cross("ai[AI_STEM]", "āyam") + mf_blind + pn.cross("[Acc][Sg]", "")
+ins_sg_ai = pn.cross("ai[AI_STEM]", "āyā") + mf_blind + pn.cross("[Ins][Sg]", "")
+dat_sg_ai = pn.cross("ai[AI_STEM]", "āye") + mf_blind + pn.cross("[Dat][Sg]", "")
+abl_sg_ai = pn.cross("ai[AI_STEM]", "āyas") + mf_blind + pn.cross("[Abl][Sg]", "")
+gen_sg_ai = pn.cross("ai[AI_STEM]", "āyas") + mf_blind + pn.cross("[Gen][Sg]", "")
+loc_sg_ai = pn.cross("ai[AI_STEM]", "āyi") + mf_blind + pn.cross("[Loc][Sg]", "")
+voc_sg_ai = pn.cross("ai[AI_STEM]", "ās") + mf_blind + pn.cross("[Voc][Sg]", "")
+
+# Dual
+nom_du_ai = pn.cross("ai[AI_STEM]", "āyau") + mf_blind + pn.cross("[Nom][Du]", "")
+acc_du_ai = pn.cross("ai[AI_STEM]", "āyau") + mf_blind + pn.cross("[Acc][Du]", "")
+voc_du_ai = pn.cross("ai[AI_STEM]", "āyau") + mf_blind + pn.cross("[Voc][Du]", "")
+
+# Before consonant endings, ai -> ā (e.g., rai + bhyām -> rābhyām)
+ins_du_ai = pn.cross("ai[AI_STEM]", "ā") + mf_blind + pn.cross("[Ins][Du]", "bhyām")
+dat_du_ai = pn.cross("ai[AI_STEM]", "ā") + mf_blind + pn.cross("[Dat][Du]", "bhyām")
+abl_du_ai = pn.cross("ai[AI_STEM]", "ā") + mf_blind + pn.cross("[Abl][Du]", "bhyām")
+
+gen_du_ai = pn.cross("ai[AI_STEM]", "āyos") + mf_blind + pn.cross("[Gen][Du]", "")
+loc_du_ai = pn.cross("ai[AI_STEM]", "āyos") + mf_blind + pn.cross("[Loc][Du]", "")
+
+# Plural
+nom_pl_ai = pn.cross("ai[AI_STEM]", "āyas") + mf_blind + pn.cross("[Nom][Pl]", "")
+acc_pl_ai = pn.cross("ai[AI_STEM]", "āyas") + mf_blind + pn.cross("[Acc][Pl]", "")
+voc_pl_ai = pn.cross("ai[AI_STEM]", "āyas") + mf_blind + pn.cross("[Voc][Pl]", "")
+
+# Before consonant endings, ai -> ā
+ins_pl_ai = pn.cross("ai[AI_STEM]", "ā") + mf_blind + pn.cross("[Ins][Pl]", "bhis")
+dat_pl_ai = pn.cross("ai[AI_STEM]", "ā") + mf_blind + pn.cross("[Dat][Pl]", "bhyas")
+abl_pl_ai = pn.cross("ai[AI_STEM]", "ā") + mf_blind + pn.cross("[Abl][Pl]", "bhyas")
+
+gen_pl_ai = pn.cross("ai[AI_STEM]", "āyām") + mf_blind + pn.cross("[Gen][Pl]", "")
+loc_pl_ai = pn.cross("ai[AI_STEM]", "ā") + mf_blind + pn.cross("[Loc][Pl]", "su")
+
+
+# 1. E-STEM CONSOLIDATION (e.g., se)
+e_stem_paradigm = pn.union(
+    nom_sg_e,
+    acc_sg_e,
+    ins_sg_e,
+    dat_sg_e,
+    abl_sg_e,
+    gen_sg_e,
+    loc_sg_e,
+    voc_sg_e,
+    nom_du_e,
+    acc_du_e,
+    voc_du_e,
+    ins_du_e,
+    dat_du_e,
+    abl_du_e,
+    gen_du_e,
+    loc_du_e,
+    nom_pl_e,
+    acc_pl_e,
+    voc_pl_e,
+    ins_pl_e,
+    dat_pl_e,
+    abl_pl_e,
+    gen_pl_e,
+    loc_pl_e,
+).optimize()
+
+# 2. O-STEM CONSOLIDATION (e.g., go)
+o_stem_paradigm = pn.union(
+    nom_sg_o,
+    acc_sg_o,
+    ins_sg_o,
+    dat_sg_o,
+    abl_sg_o,
+    gen_sg_o,
+    loc_sg_o,
+    voc_sg_o,
+    nom_du_o,
+    acc_du_o,
+    voc_du_o,
+    ins_du_o,
+    dat_du_o,
+    abl_du_o,
+    gen_du_o,
+    loc_du_o,
+    nom_pl_o,
+    acc_pl_o,
+    voc_pl_o,
+    ins_pl_o,
+    dat_pl_o,
+    abl_pl_o,
+    gen_pl_o,
+    loc_pl_o,
+).optimize()
+
+# 3. AU-STEM CONSOLIDATION (e.g., nau)
+au_stem_paradigm = pn.union(
+    nom_sg_au,
+    acc_sg_au,
+    ins_sg_au,
+    dat_sg_au,
+    abl_sg_au,
+    gen_sg_au,
+    loc_sg_au,
+    voc_sg_au,
+    nom_du_au,
+    acc_du_au,
+    voc_du_au,
+    ins_du_au,
+    dat_du_au,
+    abl_du_au,
+    gen_du_au,
+    loc_du_au,
+    nom_pl_au,
+    acc_pl_au,
+    voc_pl_au,
+    ins_pl_au,
+    dat_pl_au,
+    abl_pl_au,
+    gen_pl_au,
+    loc_pl_au,
+).optimize()
+
+# 4. AI-STEM CONSOLIDATION (e.g., rai)
+ai_stem_paradigm = pn.union(
+    nom_sg_ai,
+    acc_sg_ai,
+    ins_sg_ai,
+    dat_sg_ai,
+    abl_sg_ai,
+    gen_sg_ai,
+    loc_sg_ai,
+    voc_sg_ai,
+    nom_du_ai,
+    acc_du_ai,
+    voc_du_ai,
+    ins_du_ai,
+    dat_du_ai,
+    abl_du_ai,
+    gen_du_ai,
+    loc_du_ai,
+    nom_pl_ai,
+    acc_pl_ai,
+    voc_pl_ai,
+    ins_pl_ai,
+    dat_pl_ai,
+    abl_pl_ai,
+    gen_pl_ai,
+    loc_pl_ai,
+).optimize()
+
+# 5. MASTER DIPHTHONG UNION
+diphthong_stems_paradigm = pn.union(
+    e_stem_paradigm, o_stem_paradigm, au_stem_paradigm, ai_stem_paradigm
+).optimize()

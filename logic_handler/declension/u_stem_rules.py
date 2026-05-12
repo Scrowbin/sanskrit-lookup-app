@@ -36,6 +36,20 @@ gen_sg_f_u = pn.union(
 loc_sg_f_u = pn.cross("u[U_STEM][Fem][Loc][Sg]", "au")  # dhenú + i -> dhenaú
 voc_sg_f_u = pn.cross("u[U_STEM][Fem][Voc][Sg]", "o")  # dhenú + Ø -> dhenó
 
+# Neuter (e.g., madhu)
+neut_tag = pn.cross("[Neut]", "")
+nom_sg_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Nom][Sg]", "")
+acc_sg_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Acc][Sg]", "")
+ins_sg_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Ins][Sg]", "nā")
+dat_sg_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Dat][Sg]", "ne")
+abl_sg_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Abl][Sg]", "nas")
+gen_sg_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Gen][Sg]", "nas")
+loc_sg_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Loc][Sg]", "ni")
+voc_sg_n_u = (
+    (pn.cross("[U_STEM]", "") | pn.cross("u[U_STEM]", "o"))
+    + neut_tag
+    + pn.cross("[Voc][Sg]", "")
+)
 """
 Dual
 """
@@ -63,6 +77,15 @@ gen_du_f_u = pn.cross("u[U_STEM][Fem][Gen][Du]", "vos")
 loc_du_f_u = pn.cross("u[U_STEM][Fem][Loc][Du]", "vos")
 voc_du_f_u = pn.cross("u[U_STEM][Fem][Voc][Du]", "ū")
 
+# Neuter
+nom_du_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Nom][Du]", "nī")
+acc_du_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Acc][Du]", "nī")
+voc_du_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Voc][Du]", "nī")
+ins_du_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Ins][Du]", "bhyām")
+dat_du_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Dat][Du]", "bhyām")
+abl_du_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Abl][Du]", "bhyām")
+gen_du_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Gen][Du]", "nos")
+loc_du_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Loc][Du]", "nos")
 """
 Plural
 """
@@ -92,6 +115,15 @@ abl_pl_f_u = pn.cross("[U_STEM][Fem][Abl][Pl]", "bhyas")
 gen_pl_f_u = pn.cross("u[U_STEM][Fem][Gen][Pl]", "ūnām")
 loc_pl_f_u = pn.cross("[U_STEM][Fem][Loc][Pl]", "su")
 
+# Neuter
+nom_pl_n_u = pn.cross("u[U_STEM]", "ūni") + neut_tag + pn.cross("[Nom][Pl]", "")
+acc_pl_n_u = pn.cross("u[U_STEM]", "ūni") + neut_tag + pn.cross("[Acc][Pl]", "")
+voc_pl_n_u = pn.cross("u[U_STEM]", "ūni") + neut_tag + pn.cross("[Voc][Pl]", "")
+ins_pl_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Ins][Pl]", "bhis")
+dat_pl_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Dat][Pl]", "bhyas")
+abl_pl_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Abl][Pl]", "bhyas")
+gen_pl_n_u = pn.cross("u[U_STEM]", "ūnām") + neut_tag + pn.cross("[Gen][Pl]", "")
+loc_pl_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Loc][Pl]", "su")
 
 """
 Feminine Ū-STEM (e.g., vadhū)
@@ -135,6 +167,90 @@ gen_pl_f_uu = pn.cross("ū[Ū_STEM][Fem][Gen][Pl]", "ūnām")  # vadhū -> vadh�
 loc_pl_f_uu = pn.cross("[Ū_STEM][Fem][Loc][Pl]", "su")  # vadhū + su (Strict underlying)
 
 # Union Compiler
+masc_u_paradigm = pn.union(
+    nom_sg_m_u,
+    acc_sg_m_u,
+    ins_sg_m_u,
+    dat_sg_m_u,
+    abl_sg_m_u,
+    gen_sg_m_u,
+    loc_sg_m_u,
+    voc_sg_m_u,
+    nom_du_m_u,
+    acc_du_m_u,
+    ins_du_m_u,
+    dat_du_m_u,
+    abl_du_m_u,
+    gen_du_m_u,
+    loc_du_m_u,
+    voc_du_m_u,
+    nom_pl_m_u,
+    acc_pl_m_u,
+    ins_pl_m_u,
+    dat_pl_m_u,
+    abl_pl_m_u,
+    gen_pl_m_u,
+    loc_pl_m_u,
+    voc_pl_m_u,
+).optimize()
+
+# 2. Feminine Short u-stem (e.g., dhenú)
+fem_u_paradigm = pn.union(
+    nom_sg_f_u,
+    acc_sg_f_u,
+    ins_sg_f_u,
+    dat_sg_f_u,
+    abl_sg_f_u,
+    gen_sg_f_u,
+    loc_sg_f_u,
+    voc_sg_f_u,
+    nom_du_f_u,
+    acc_du_f_u,
+    ins_du_f_u,
+    dat_du_f_u,
+    abl_du_f_u,
+    gen_du_f_u,
+    loc_du_f_u,
+    voc_du_f_u,
+    nom_pl_f_u,
+    acc_pl_f_u,
+    voc_pl_f_u,
+    ins_pl_f_u,
+    dat_pl_f_u,
+    abl_pl_f_u,
+    gen_pl_f_u,
+    loc_pl_f_u,
+).optimize()
+
+# 3. Neuter Short u-stem (e.g., madhu)
+neut_u_paradigm = pn.union(
+    nom_sg_n_u,
+    acc_sg_n_u,
+    ins_sg_n_u,
+    dat_sg_n_u,
+    abl_sg_n_u,
+    gen_sg_n_u,
+    loc_sg_n_u,
+    voc_sg_n_u,
+    nom_du_n_u,
+    acc_du_n_u,
+    voc_du_n_u,
+    ins_du_n_u,
+    dat_du_n_u,
+    abl_du_n_u,
+    gen_du_n_u,
+    loc_du_n_u,
+    nom_pl_n_u,
+    acc_pl_n_u,
+    voc_pl_n_u,
+    ins_pl_n_u,
+    dat_pl_n_u,
+    abl_pl_n_u,
+    gen_pl_n_u,
+    loc_pl_n_u,
+).optimize()
+
+# 4. Feminine Long ū-stem (e.g., vadhū)
 fem_uu_paradigm = pn.union(
     nom_sg_f_uu,
     acc_sg_f_uu,
@@ -160,4 +276,9 @@ fem_uu_paradigm = pn.union(
     abl_pl_f_uu,
     gen_pl_f_uu,
     loc_pl_f_uu,
+).optimize()
+
+# 5. Master U/Ū-Stem Transducer
+all_u_stems_paradigm = pn.union(
+    masc_u_paradigm, fem_u_paradigm, neut_u_paradigm, fem_uu_paradigm
 ).optimize()

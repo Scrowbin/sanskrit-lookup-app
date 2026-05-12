@@ -116,3 +116,118 @@ dat_pl_s = s_base + pn.cross("[Dat][Pl]", "bhyas")
 abl_pl_s = s_base + pn.cross("[Abl][Pl]", "bhyas")
 gen_pl_s = s_base + pn.cross("[Gen][Pl]", "ām")
 loc_pl_s = s_base + pn.cross("[Loc][Pl]", "su")
+
+
+t_mf_paradigm = pn.union(
+    nom_sg_t_mf,
+    acc_sg_t_mf,
+    voc_sg_t_mf,
+    nom_du_t_mf,
+    acc_du_t_mf,
+    voc_du_t_mf,
+    nom_pl_t_mf,
+    acc_pl_t_mf,
+    voc_pl_t_mf,
+    ins_sg_t,
+    dat_sg_t,
+    abl_sg_t,
+    gen_sg_t,
+    loc_sg_t,
+    ins_du_t,
+    dat_du_t,
+    abl_du_t,
+    gen_du_t,
+    loc_du_t,
+    ins_pl_t,
+    dat_pl_t,
+    abl_pl_t,
+    gen_pl_t,
+    loc_pl_t,
+)
+
+t_n_paradigm = pn.union(
+    nom_sg_t_n,
+    acc_sg_t_n,
+    voc_sg_t_n,
+    nom_du_t_n,
+    acc_du_t_n,
+    voc_du_t_n,
+    nom_pl_t_n,
+    acc_pl_t_n,
+    voc_pl_t_n,
+    ins_sg_t,
+    dat_sg_t,
+    abl_sg_t,
+    gen_sg_t,
+    loc_sg_t,
+    ins_du_t,
+    dat_du_t,
+    abl_du_t,
+    gen_du_t,
+    loc_du_t,
+    ins_pl_t,
+    dat_pl_t,
+    abl_pl_t,
+    gen_pl_t,
+    loc_pl_t,
+)
+
+t_stem_paradigm = pn.union(t_mf_paradigm, t_n_paradigm).optimize()
+
+# Neuter as-stems (e.g., manas)
+as_n_paradigm = pn.union(
+    nom_sg_s_n,
+    acc_sg_s_n,
+    voc_sg_s_n,
+    nom_du_s_n,
+    acc_du_s_n,
+    voc_du_s_n,
+    nom_pl_as_n,
+    acc_pl_as_n,
+    voc_pl_as_n,
+    ins_sg_s,
+    dat_sg_s,
+    abl_sg_s,
+    gen_sg_s,
+    loc_sg_s,
+    ins_du_s,
+    dat_du_s,
+    abl_du_s,
+    gen_du_s,
+    loc_du_s,
+    ins_pl_s,
+    dat_pl_s,
+    abl_pl_s,
+    gen_pl_s,
+    loc_pl_s,
+)
+
+# Neuter is-stems (e.g., havis)
+is_n_paradigm = pn.union(
+    nom_sg_s_n,
+    acc_sg_s_n,
+    voc_sg_s_n,
+    nom_du_s_n,
+    acc_du_s_n,
+    voc_du_s_n,
+    nom_pl_is_n,
+    acc_pl_is_n,
+    voc_pl_is_n,
+    ins_sg_s,
+    dat_sg_s,
+    abl_sg_s,
+    gen_sg_s,
+    loc_sg_s,
+    ins_du_s,
+    dat_du_s,
+    abl_du_s,
+    gen_du_s,
+    loc_du_s,
+    ins_pl_s,
+    dat_pl_s,
+    abl_pl_s,
+    gen_pl_s,
+    loc_pl_s,
+)
+
+s_stem_paradigm = pn.union(as_n_paradigm, is_n_paradigm).optimize()

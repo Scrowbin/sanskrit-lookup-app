@@ -82,3 +82,65 @@ dat_pl = pada_blind + pn.cross("[Dat][Pl]", "bhyas")
 abl_pl = pada_blind + pn.cross("[Abl][Pl]", "bhyas")
 
 loc_pl = pada_blind + pn.cross("[Loc][Pl]", "su")  # vāc -> vāc#su (-> vākṣu via Ruki)
+
+
+# 6. CONSOLIDATED CONSONANT STEM PARADIGM
+
+# Masculine & Feminine (Standard Consonant Stems like vāc, marut, etc.)
+cons_mf_paradigm = pn.union(
+    nom_sg_mf,
+    voc_sg_mf,
+    acc_sg_mf,
+    nom_du_mf,
+    acc_du_mf,
+    voc_du_mf,
+    nom_pl_mf,
+    acc_pl_mf,
+    voc_pl_mf,
+    ins_sg,
+    dat_sg,
+    abl_sg,
+    gen_sg,
+    loc_sg,
+    ins_du,
+    dat_du,
+    abl_du,
+    gen_du,
+    loc_du,
+    ins_pl,
+    dat_pl,
+    abl_pl,
+    gen_pl,
+    loc_pl,
+).optimize()
+
+# Neuter (Standard Consonant Stems like jagat)
+cons_n_paradigm = pn.union(
+    nom_sg_n,
+    acc_sg_n,
+    voc_sg_n,
+    nom_du_n,
+    acc_du_n,
+    voc_du_n,
+    nom_pl_n,
+    acc_pl_n,
+    voc_pl_n,
+    ins_sg,
+    dat_sg,
+    abl_sg,
+    gen_sg,
+    loc_sg,
+    ins_du,
+    dat_du,
+    abl_du,
+    gen_du,
+    loc_du,
+    ins_pl,
+    dat_pl,
+    abl_pl,
+    gen_pl,
+    loc_pl,
+).optimize()
+
+# Final Master Transducer for all General Consonant Stems
+cons_stem_paradigm = pn.union(cons_mf_paradigm, cons_n_paradigm).optimize()

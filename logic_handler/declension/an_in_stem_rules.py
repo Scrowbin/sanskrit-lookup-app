@@ -52,7 +52,7 @@ acc_du_in_n = pn.cross("[IN_STEM][Neut][Acc][Du]", "ī")
 voc_du_in_n = pn.cross("[IN_STEM][Neut][Voc][Du]", "ī")
 acc_du_in_m = pn.cross("[IN_STEM][Masc][Acc][Du]", "au")
 voc_du_in_m = pn.cross("[IN_STEM][Masc][Voc][Du]", "au")
-
+nom_du_in_m = pn.cross("[IN_STEM][Masc][Nom][Du]", "au")
 gen_du_in = in_vow_base + pn.cross("[Gen][Du]", "os")
 loc_du_in = in_vow_base + pn.cross("[Loc][Du]", "os")
 
@@ -118,3 +118,80 @@ acc_pl_an_m = an_vow_base + pn.cross(
     "[Acc][Pl]", "as"
 )  # rājan -> rājanas (Sandhi will make rājñas)
 gen_pl_an = an_vow_base + pn.cross("[Gen][Pl]", "ām")
+ins_du_an = an_cons_base + pn.cross("[Ins][Du]", "bhyām")  # rājan -> rājabhyām
+dat_du_an = an_cons_base + pn.cross("[Dat][Du]", "bhyām")
+abl_du_an = an_cons_base + pn.cross("[Abl][Du]", "bhyām")
+
+in_stem_paradigm = pn.union(
+    nom_sg_in_m,
+    voc_sg_in_m,
+    nom_sg_in_n,
+    acc_sg_in_n,
+    voc_sg_in_n,
+    nom_pl_in_n,
+    acc_pl_in_n,
+    voc_pl_in_n,
+    ins_du_in,
+    dat_du_in,
+    abl_du_in,
+    ins_pl_in,
+    dat_pl_in,
+    abl_pl_in,
+    loc_pl_in,
+    acc_sg_in_m,
+    ins_sg_in,
+    dat_sg_in,
+    abl_sg_in,
+    gen_sg_in,
+    loc_sg_in,
+    nom_du_in_m,
+    acc_du_in_m,
+    voc_du_in_m,
+    nom_du_in_n,
+    acc_du_in_n,
+    voc_du_in_n,
+    gen_du_in,
+    loc_du_in,
+    nom_pl_in_m,
+    acc_pl_in_m,
+    voc_pl_in_m,
+    gen_pl_in,
+).optimize()
+
+an_stem_paradigm = pn.union(
+    nom_sg_an_m,
+    acc_sg_an_m,
+    nom_du_an_m,
+    acc_du_an_m,
+    voc_du_an_m,
+    nom_pl_an_m,
+    voc_pl_an_m,
+    nom_pl_an_n,
+    acc_pl_an_n,
+    voc_pl_an_n,
+    nom_sg_an_n,
+    acc_sg_an_n,
+    voc_sg_an_n,
+    ins_du_an,
+    dat_du_an,
+    abl_du_an,
+    ins_pl_an,
+    dat_pl_an,
+    abl_pl_an,
+    loc_pl_an,
+    voc_sg_an_m,
+    ins_sg_an,
+    dat_sg_an,
+    abl_sg_an,
+    gen_sg_an,
+    loc_sg_an,
+    nom_du_an_n,
+    acc_du_an_n,
+    voc_du_an_n,
+    gen_du_an,
+    loc_du_an,
+    acc_pl_an_m,
+    gen_pl_an,
+).optimize()
+
+nasal_stems_paradigm = pn.union(in_stem_paradigm, an_stem_paradigm).optimize()

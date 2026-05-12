@@ -87,3 +87,132 @@ gen_sg = weak_blind + pn.cross("[Gen][Sg]", "as")
 loc_sg = weak_blind + pn.cross("[Loc][Sg]", "i")  # vidvāṅs -> viduṣi
 gen_du = weak_blind + pn.cross("[Gen][Du]", "os")  # vidvāṅs -> viduṣos
 loc_du = weak_blind + pn.cross("[Loc][Du]", "os")
+gen_pl = weak_blind + pn.cross("[Gen][Pl]", "ām")  # vidvāṅs -> viduṣām
+
+"""
+7. FEMININE -VĀṄS STEMS (e.g., viduṣī)
+"""
+
+# Feminine Base: Unconditionally collapses 'vāṅs' to the weakest grade 'uṣ'
+fem_base_vas = pn.cross("vāṅs[VAS_STEM]", "uṣ") + pn.cross("[Fem]", "")
+
+# Singular
+nom_sg_f = fem_base_vas + pn.cross("[Nom][Sg]", "ī")  # vidvāṅs -> viduṣī
+acc_sg_f = fem_base_vas + pn.cross("[Acc][Sg]", "īm")  # vidvāṅs -> viduṣīm
+ins_sg_f = fem_base_vas + pn.cross("[Ins][Sg]", "yā")  # vidvāṅs -> viduṣyā
+dat_sg_f = fem_base_vas + pn.cross("[Dat][Sg]", "yai")  # vidvāṅs -> viduṣyai
+abl_sg_f = fem_base_vas + pn.cross("[Abl][Sg]", "yās")
+gen_sg_f = fem_base_vas + pn.cross("[Gen][Sg]", "yās")
+loc_sg_f = fem_base_vas + pn.cross("[Loc][Sg]", "yām")
+voc_sg_f = fem_base_vas + pn.cross("[Voc][Sg]", "i")  # vidvāṅs -> viduṣi (short i!)
+
+# Dual
+nom_du_f = fem_base_vas + pn.cross("[Nom][Du]", "yau")  # vidvāṅs -> viduṣyau
+acc_du_f = fem_base_vas + pn.cross("[Acc][Du]", "yau")
+voc_du_f = fem_base_vas + pn.cross("[Voc][Du]", "yau")
+ins_du_f = fem_base_vas + pn.cross("[Ins][Du]", "ībhyām")  # vidvāṅs -> viduṣībhyām
+dat_du_f = fem_base_vas + pn.cross("[Dat][Du]", "ībhyām")
+abl_du_f = fem_base_vas + pn.cross("[Abl][Du]", "ībhyām")
+gen_du_f = fem_base_vas + pn.cross("[Gen][Du]", "yos")  # vidvāṅs -> viduṣyos
+loc_du_f = fem_base_vas + pn.cross("[Loc][Du]", "yos")
+
+# Plural
+nom_pl_f = fem_base_vas + pn.cross("[Nom][Pl]", "yas")  # vidvāṅs -> viduṣyas
+acc_pl_f = fem_base_vas + pn.cross("[Acc][Pl]", "īs")  # vidvāṅs -> viduṣīs
+voc_pl_f = fem_base_vas + pn.cross("[Voc][Pl]", "yas")
+ins_pl_f = fem_base_vas + pn.cross("[Ins][Pl]", "ībhis")
+dat_pl_f = fem_base_vas + pn.cross("[Dat][Pl]", "ībhyas")
+abl_pl_f = fem_base_vas + pn.cross("[Abl][Pl]", "ībhyas")
+gen_pl_f = fem_base_vas + pn.cross("[Gen][Pl]", "īnām")
+loc_pl_f = fem_base_vas + pn.cross(
+    "[Loc][Pl]", "īsu"
+)  # Underlying 'su' (Sandhi will Ruki it to īṣu)
+
+# 8. FINAL PARADIGM COMPILATIONS FOR -VĀṄS STEMS
+
+# Masculine -vāṅs paradigm (e.g., vidvāṅs)
+vas_masc_paradigm = pn.union(
+    nom_sg_m,
+    acc_sg_m,
+    ins_sg,
+    dat_sg,
+    abl_sg,
+    gen_sg,
+    loc_sg,
+    voc_sg_m,
+    nom_du_m,
+    acc_du_m,
+    ins_du,
+    dat_du,
+    abl_du,
+    gen_du,
+    loc_du,
+    voc_du_m,
+    nom_pl_m,
+    acc_pl_m,
+    ins_pl,
+    dat_pl,
+    abl_pl,
+    gen_pl,
+    loc_pl,
+    voc_pl_m,
+).optimize()
+
+vas_fem_paradigm = pn.union(
+    nom_sg_f,
+    acc_sg_f,
+    ins_sg_f,
+    dat_sg_f,
+    abl_sg_f,
+    gen_sg_f,
+    loc_sg_f,
+    voc_sg_f,
+    nom_du_f,
+    acc_du_f,
+    voc_du_f,
+    ins_du_f,
+    dat_du_f,
+    abl_du_f,
+    gen_du_f,
+    loc_du_f,
+    nom_pl_f,
+    acc_pl_f,
+    voc_pl_f,
+    ins_pl_f,
+    dat_pl_f,
+    abl_pl_f,
+    gen_pl_f,
+    loc_pl_f,
+).optimize()
+# Neuter -vāṅs paradigm (e.g., vidvāṅs)
+vas_neut_paradigm = pn.union(
+    nom_sg_n,
+    acc_sg_n,
+    ins_sg,
+    dat_sg,
+    abl_sg,
+    gen_sg,
+    loc_sg,
+    voc_sg_n,
+    nom_du_n,
+    acc_du_n,
+    ins_du,
+    dat_du,
+    abl_du,
+    gen_du,
+    loc_du,
+    voc_du_n,
+    nom_pl_n,
+    acc_pl_n,
+    ins_pl,
+    dat_pl,
+    abl_pl,
+    gen_pl,
+    loc_pl,
+    voc_pl_n,
+).optimize()
+
+# Master -vāṅs Transducer
+vas_stem_paradigm = pn.union(
+    vas_masc_paradigm, vas_neut_paradigm, vas_fem_paradigm
+).optimize()

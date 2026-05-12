@@ -206,7 +206,8 @@ class StemBuilder:
         phonemes = ALPHABET.parse_phonemes(root_str)
         if not phonemes: return False
         if phonemes[-1] in ALPHABET.vowels_list: return False
-        if len(phonemes) >= 2 and phonemes[-2] in ("i", "u", "ṛ", "ḷ"): move all the unncesarry stem override shit in irregulars.py and implement the actual rules
+        if len(phonemes) >= 2 and phonemes[-2] in ("i", "u", "ṛ", "ḷ"): 
+    #move all the unncesarry stem override shit in irregulars.py and implement the actual rules
             return True
         return False
 

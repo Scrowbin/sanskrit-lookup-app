@@ -5,9 +5,12 @@ TODO : ~~ruki rule~~
 ~~ check for visarga as well  ~~
 ~~ s to ṣ : go -> goṣu ~~
 ~~ verify ant_mant_vant_stems  ~~
-Hardcode kinship/agent words
-rewrite the codebase to accept anygenders, D.R.Y methodology.
-Re compile all the shit + add isolated edge cases.
+~~ Hardcode kinship/agent words ~~
+~~ewrite the codebase to accept anygenders, D.R.Y methodology.~~
+~~ check out  Jhal-to-Jash rule ($t \to d$ before voiced $bh$) ~~
+~~ In the $s$-stem oblique cases (like manas + ā), the output is manasā. However, in the cases like manas + bhyām, the $s$ usually becomes $o$ (for $as$-stems) or $r$ (for $is$-stems). ~~
+Long ū-stem implementaton
+~~ Re compile all the shit ~~ + add isolated edge cases.
 """
 
 
@@ -72,6 +75,7 @@ class SanskritPhonology:
         self._build_nati_rule()
         self._build_ruki_rule()
         self._build_neuter_nasal_insertion()
+        self._build_sandi()
 
     def _build_nati_rule(self):
         """Compiles the Nati (retroflexion) context-dependent rewrite rule."""
@@ -151,6 +155,58 @@ class SanskritPhonology:
         )
 
         self.neuter_nasal_insertion = insert_n.optimize()
+
+    def _build_sandhi(self):
+        # Jhal-to-Jash
+        jhal_to_jash = pn.string_map(
+            [
+                ("k", "g"),
+                ("kh", "g"),
+                ("g", "g"),
+                ("gh", "g"),
+                ("c", "j"),
+                ("ch", "j"),
+                ("j", "j"),
+                ("jh", "j"),
+                ("ṭ", "ḍ"),
+                ("ṭh", "ḍ"),
+                ("ḍ", "ḍ"),
+                ("ḍh", "ḍ"),
+                ("t", "d"),
+                ("th", "d"),
+                ("d", "d"),
+                ("dh", "d"),
+                ("p", "b"),
+                ("ph", "b"),
+                ("b", "b"),
+                ("bh", "b"),
+                ("ś", "j"),
+                ("ṣ", "ḍ"),
+                ("s", "d"),
+                ("h", "gh"),
+            ]
+        )
+        self.apply_jhal_to_jash = pn.cdrewrite(
+            jhal_to_jash,
+            "",  # left context
+            "[EOS]",  # right context
+            self.sigma_star,
+        )
+        as_to_o = pn.cdrewrite(
+            pn.cross("as", "o"),
+            "",  # Left context: Empty (handled by the 'a' in the target)
+            "bh",  # Right context: 'bh' (matches bhyām, bhis, bhyas)
+            self.sigma_star,
+        )
+        is_us_to_r = pn.cdrewrite(
+            pn.cross("s", "r"),
+            pn.union(
+                "i", "u", "ī", "ū"
+            ),  # Left context: i, u (and their long versions)
+            "bh",  # Right context: 'bh'
+            self.sigma_star,
+        )
+        self.apply_s_stem_sandhi = (as_to_o @ is_us_to_r).optimize()
 
 
 phonology = SanskritPhonology()
