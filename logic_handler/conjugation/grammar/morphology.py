@@ -370,6 +370,6 @@ class MorphologyEngine:
             @ self.sd_boundary_tagging
             @ self.clean_tags
         )
-        # CRITICAL FIX: ensure [EOS] exists at the end of the string before sandhi
-        fst = fst + pn.accep("+[EOS]")
+        # CRITICAL FIX: ensure [WORD_END] exists at the end of the string before sandhi
+        fst = fst + pn.accep("+[WORD_END]")
         return fst

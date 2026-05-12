@@ -29,9 +29,9 @@ from functools import lru_cache
 
 from alphabet import ALPHABET
 from vowel_strength import VowelStrengthEngine
-from sandhi import SandhiEngine
+from sandhi import SandhiEngine, phrase_accep
 from stem_rules import StemBuilder
-from endings import SuffixProvider, Suffix
+from endings import SuffixProvider, Suffix, maybe_pragrhya_dual_suffix
 from morphology import MorphologyEngine
 from feature_resolver import MorphologicalFeatureResolver
 from inria_lookup import INRIA_LOOKUP
@@ -220,7 +220,7 @@ class SanskritConjugator:
         if tag not in endings:
             raise ValueError(f"No ending for {tag} in {tense} {voice}.")
 
-        suffix: Suffix = endings[tag]
+        suffix: Suffix = maybe_pragrhya_dual_suffix(endings[tag], number)
         if suffix.is_empty:
             combined = stem
         else:
@@ -244,6 +244,33 @@ class SanskritConjugator:
         
         # We now return a clean list of unique forms directly
         return sorted(list(forms))
+
+    def sandhi_phrase(
+        self,
+        *words: str,
+        classical_external_hiatus: bool = True,
+    ) -> list[str]:
+        """Resolve vowel hiatus across word boundaries (``#``).
+
+        Whitney §113 / §126–131 (subset): adjacent vowels across ``#`` are fused or
+        glide-inserted when ``classical_external_hiatus=True``. Use ``False`` to keep
+        ``#`` as a hiatus-preserving boundary marker until ``clean_boundaries`` strips it.
+
+        Example::
+
+            conjugator.sandhi_phrase("deva", "āgacchati")
+            # → surfaces like ``devāgacchati`` when fusion applies.
+        """
+        if not words:
+            return []
+        fst = phrase_accep(*words)
+        result = self.sandhi.apply_all(
+            fst, classical_external_hiatus=classical_external_hiatus
+        ).optimize()
+        try:
+            return sorted(result.paths().ostrings())
+        except Exception:
+            return []
 
     # ──────────────────────────────────────────────────────────────────────────
     # Periphrastic perfect
@@ -366,7 +393,7 @@ class SanskritConjugator:
         # Step 3 – ending
         endings = self._fetch_endings(f.effective_class, voice, tense, root_str=root_str)
         tag = f"[{person}{number}]"
-        suffix: Suffix = endings.get(tag, Suffix(""))
+        suffix: Suffix = maybe_pragrhya_dual_suffix(endings.get(tag, Suffix("")), number)
         print(f"  3. ending surface='{suffix.surface}' tags={suffix.tags}")
 
         combined = stem + pn.accep("+") + suffix.to_fst()

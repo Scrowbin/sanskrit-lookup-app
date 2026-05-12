@@ -90,7 +90,7 @@ class KrdantaEngine:
         # We strip the final thematic '+a' from the stem.
         # This prevents 'bho+a' + '+ant' -> 'bho+a+ant' (which yields bhavānt).
         # Stripping '+a' leaves 'bho', which when combined with '+ant' yields 'bhavant'.
-        pres_stem_for_ant = pres_stem @ pn.cdrewrite(pn.cross("+a", ""), "", "[EOS]", self.c.stems.sig)
+        pres_stem_for_ant = pres_stem @ pn.cdrewrite(pn.cross("+a", ""), "", "[WORD_END]", self.c.stems.sig)
         
         out.extend(self._build_and_format(
             "Present Active Participle", root_str, class_num, "prp_act", "ant", "antī", preverb_str, pres_stem_for_ant

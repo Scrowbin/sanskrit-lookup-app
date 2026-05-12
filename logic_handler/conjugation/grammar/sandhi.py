@@ -1,6 +1,18 @@
-"""sandhi.py — FST-based Sanskrit internal phonology (stem-boundary sandhi).
+"""sandhi.py — FST-based Sanskrit phonology (internal + optional phrase hiatus).
 
-Pipeline order: vowel_phase → consonant_phase → long_distance_phase.
+Pipeline order:
+
+``external_hiatus_phase`` (optional) → ``vowel_phase`` → ``consonant_phase`` →
+``long_distance_phase``.
+
+**External hiatus** (Whitney §113, §126–131): classical Sanskrit avoids vowel
+hiatus across word boundaries. With ``#`` marking a word edge (see ``alphabet``),
+``apply_all(..., classical_external_hiatus=True)`` fuses ``V#V`` via savarna,
+guṇa, yan, and a small ayādi subset before stripping ``#``. Set
+``classical_external_hiatus=False`` for Vedic-style hiatus preservation at ``#``.
+
+**Pragṛhya** (§138): endings tagged ``[PRAGRHYA]`` block internal hiatus across the
+morpheme ``+``; the tag is erased at the end of ``vowel_phase``.
 Within each phase, rules are ordered by specificity (most specific first).
 
 **Vowel phase** (Whitney §126–131, §244): thematic mergers, class-9 ī-drop,
@@ -33,6 +45,7 @@ class SandhiEngine:
     def __init__(self):
         self.sig = ALPHABET.sigma_star
         self._setup_vowel_rules()
+        self._setup_external_hiatus_rules()
         self._setup_consonant_rules()
         self._setup_long_distance_rules()
         # Erase morpheme boundaries and [CLASS9] at the very end
@@ -40,7 +53,8 @@ class SandhiEngine:
             pn.union(
                 pn.cross("+", ""),
                 pn.cross("[CLASS9]", ""),
-                pn.cross("[EOS]", ""),       # ← added
+                pn.cross("[WORD_END]", ""),
+                pn.cross("#", ""),   # word-boundary marker after optional phrase sandhi
             ),
             "", "", self.sig
         )
@@ -152,6 +166,76 @@ class SandhiEngine:
             pn.cross("ī[CLASS9]+", "+"), "", ALPHABET.vowels, self.sig
         )
 
+    def _setup_external_hiatus_rules(self):
+        """Resolve V#V at word boundary (Whitney §126–131 subset).
+
+        Compose ``word₁ + '#' + word₂`` (see ``fuse_words`` helper below).
+        Runs only when ``apply_all(..., classical_external_hiatus=True)``.
+        """
+        pairs = []
+
+        # Savarna-like coalescence across #
+        pairs.extend([
+            ("a#a", "ā"), ("a#ā", "ā"), ("ā#a", "ā"), ("ā#ā", "ā"),
+            ("i#i", "ī"), ("i#ī", "ī"), ("ī#i", "ī"), ("ī#ī", "ī"),
+            ("u#u", "ū"), ("u#ū", "ū"), ("ū#u", "ū"), ("ū#ū", "ū"),
+            ("ṛ#ṛ", "ṝ"), ("ṛ#ṝ", "ṝ"), ("ṝ#ṛ", "ṝ"), ("ṝ#ṝ", "ṝ"),
+        ])
+
+        # Guṇa: a/ā + i/u/ṛ (+ length variants)
+        pairs.extend([
+            ("a#i", "e"), ("ā#i", "e"), ("a#ī", "e"), ("ā#ī", "e"),
+            ("a#u", "o"), ("ā#u", "o"), ("a#ū", "o"), ("ā#ū", "o"),
+            ("a#ṛ", "ar"), ("ā#ṛ", "ar"), ("a#ṝ", "ar"), ("ā#ṝ", "ar"),
+            ("a#ḷ", "al"), ("ā#ḷ", "āl"), ("a#ḹ", "al"), ("ā#ḹ", "āl"),
+        ])
+
+        # Parallels to thematic merger across boundary
+        pairs.extend([
+            ("a#e", "e"), ("ā#e", "e"),
+            ("a#o", "o"), ("ā#o", "o"),
+            ("a#ai", "ai"), ("ā#ai", "ai"),
+            ("a#au", "au"), ("ā#au", "au"),
+        ])
+
+        _vs = ["a", "ā", "i", "ī", "u", "ū", "ṛ", "ṝ", "ḷ", "ḹ", "e", "ai", "o", "au"]
+        for v in _vs:
+            pairs.extend([
+                (f"i#{v}", f"y{v}"),
+                (f"ī#{v}", f"y{v}"),
+                (f"u#{v}", f"v{v}"),
+                (f"ū#{v}", f"v{v}"),
+                (f"ṛ#{v}", f"r{v}"),
+            ])
+
+        # Ayādi-lite across #: e/o/ai/au before vowel
+        for v in _vs:
+            pairs.extend([
+                (f"e#{v}", f"ay{v}"),
+                (f"o#{v}", f"av{v}"),
+                (f"ai#{v}", f"āy{v}"),
+                (f"au#{v}", f"āv{v}"),
+            ])
+
+        # Deduplicate keys (longest-write-wins order preserved by last assignment)
+        pair_map = {k: v for k, v in pairs}
+        self.external_hiatus_classical = pn.cdrewrite(
+            pn.string_map(list(pair_map.items())),
+            "", "", self.sig
+        )
+
+    def external_hiatus_phase(self, fst: pn.Fst, classical: bool, debug: bool = False) -> pn.Fst:
+        """Apply or skip classical fusion across ``#``."""
+        if not classical:
+            return fst
+        if debug:
+            fst = self._apply_rules_with_trace(
+                fst, [("external_hiatus_classical", self.external_hiatus_classical)],
+                "external_hiatus_phase",
+            )
+            return fst
+        return (fst @ self.external_hiatus_classical).optimize()
+
     def _setup_consonant_rules(self):
         unvoiced_triggers = pn.union(
             "+t", "+th", "+s", "+ṣ",
@@ -259,7 +343,7 @@ class SandhiEngine:
 
         # Grassmann's Law (throwback deaspiuration)
         throwback_triggers = pn.union(
-            "+s", "+ṣ", "+t", "+th", "+c", "+ch", "+dhv", "[EOS]", "+[EOS]"
+            "+s", "+ṣ", "+t", "+th", "+c", "+ch", "+dhv", "[WORD_END]", "+[WORD_END]"
         )
         self.grassmann_throwback = pn.cdrewrite(
             pn.string_map([("b", "bh"), ("d", "dh"), ("g", "gh")]),
@@ -491,56 +575,56 @@ class SandhiEngine:
         # Order: palatal reversion → deaspiration → devoicing → cluster reduction
         #         → sibilant → visarga → single‑consonant enforcement
         
-        # Step 1: Palatal reversion c/j → k before [EOS] (Whitney §142, §217)
+        # Step 1: Palatal reversion c/j → k before [WORD_END] (Whitney §142, §217)
         self.final_palatal_reversion = pn.cdrewrite(
             pn.string_map([
-                ("c+[EOS]", "k+[EOS]"),
-                ("j+[EOS]", "k+[EOS]"),
+                ("c+[WORD_END]", "k+[WORD_END]"),
+                ("j+[WORD_END]", "k+[WORD_END]"),
             ]),
             "", "", self.sig
         )
         
-        # Step 2: Deaspirate aspirates before [EOS] (Whitney §114, §150)
+        # Step 2: Deaspirate aspirates before [WORD_END] (Whitney §114, §150)
         self.final_deaspiration = pn.cdrewrite(
             pn.string_map([
-                ("kh+[EOS]", "k+[EOS]"),
-                ("gh+[EOS]", "g+[EOS]"),
-                ("ch+[EOS]", "c+[EOS]"),
-                ("jh+[EOS]", "j+[EOS]"),
-                ("ṭh+[EOS]", "ṭ+[EOS]"),
-                ("ḍh+[EOS]", "ḍ+[EOS]"),
-                ("th+[EOS]", "t+[EOS]"),
-                ("dh+[EOS]", "d+[EOS]"),
-                ("ph+[EOS]", "p+[EOS]"),
-                ("bh+[EOS]", "b+[EOS]"),
+                ("kh+[WORD_END]", "k+[WORD_END]"),
+                ("gh+[WORD_END]", "g+[WORD_END]"),
+                ("ch+[WORD_END]", "c+[WORD_END]"),
+                ("jh+[WORD_END]", "j+[WORD_END]"),
+                ("ṭh+[WORD_END]", "ṭ+[WORD_END]"),
+                ("ḍh+[WORD_END]", "ḍ+[WORD_END]"),
+                ("th+[WORD_END]", "t+[WORD_END]"),
+                ("dh+[WORD_END]", "d+[WORD_END]"),
+                ("ph+[WORD_END]", "p+[WORD_END]"),
+                ("bh+[WORD_END]", "b+[WORD_END]"),
             ]),
             "", "", self.sig
         )
             
-        # Step 3: Voice sonant stops → surd before [EOS] (Whitney §141‑142)
+        # Step 3: Voice sonant stops → surd before [WORD_END] (Whitney §141‑142)
         self.final_devoicing = pn.cdrewrite(
             pn.string_map([
-                ("g+[EOS]",  "k+[EOS]"),
-                ("d+[EOS]",  "t+[EOS]"),
-                ("b+[EOS]",  "p+[EOS]"),
-                ("ḍ+[EOS]",  "ṭ+[EOS]"),
-                ("gh+[EOS]", "k+[EOS]"),
-                ("dh+[EOS]", "t+[EOS]"),
-                ("bh+[EOS]", "p+[EOS]"),
-                ("ḍh+[EOS]", "ṭ+[EOS]"),
-                ("j+[EOS]",  "k+[EOS]"),   # in case palatal reversion didn't fire
+                ("g+[WORD_END]",  "k+[WORD_END]"),
+                ("d+[WORD_END]",  "t+[WORD_END]"),
+                ("b+[WORD_END]",  "p+[WORD_END]"),
+                ("ḍ+[WORD_END]",  "ṭ+[WORD_END]"),
+                ("gh+[WORD_END]", "k+[WORD_END]"),
+                ("dh+[WORD_END]", "t+[WORD_END]"),
+                ("bh+[WORD_END]", "p+[WORD_END]"),
+                ("ḍh+[WORD_END]", "ṭ+[WORD_END]"),
+                ("j+[WORD_END]",  "k+[WORD_END]"),   # in case palatal reversion didn't fire
             ]),
             "", "", self.sig
         )
         
-        # ṣ → ṭ before [EOS] (Whitney §226)
+        # ṣ → ṭ before [WORD_END] (Whitney §226)
         self.final_s_to_t = pn.cdrewrite(
-            pn.cross("ṣ+[EOS]", "ṭ+[EOS]"),
+            pn.cross("ṣ+[WORD_END]", "ṭ+[WORD_END]"),
             "", "", self.sig
         )
         
         # Step 5: General cluster reduction to single consonant (Whitney §150)
-        # Strategy: repeatedly delete the first of two consonants before [EOS]
+        # Strategy: repeatedly delete the first of two consonants before [WORD_END]
         # until only one remains. We implement this by dropping specific clusters.
         # self.final_cluster_simplify = pn.cdrewrite(
         #     pn.string_map([
@@ -552,17 +636,17 @@ class SandhiEngine:
         #         # Sibilant + stop → stop dropped first? No, sibilant becomes visarga
         #         # These are handled elsewhere
         #     ]),
-        #     "", pn.accep("+[EOS]"), self.sig
+        #     "", pn.accep("+[WORD_END]"), self.sig
         # )
 
         # Visarga: word-final s/ṣ → ḥ
         self.visarga = pn.cdrewrite(
             pn.string_map([
-                ("s+[EOS]",  "ḥ"),
-                ("ṣ+[EOS]",  "ḥ"),
+                ("s+[WORD_END]",  "ḥ"),
+                ("ṣ+[WORD_END]",  "ḥ"),
                 # keep the old patterns for safety (if EOS appears without +)
-                ("s[EOS]",   "ḥ[EOS]"),
-                ("ṣ[EOS]",   "ḥ[EOS]"),
+                ("s[WORD_END]",   "ḥ[WORD_END]"),
+                ("ṣ[WORD_END]",   "ḥ[WORD_END]"),
             ]),
             "", "", self.sig
         )
@@ -570,9 +654,9 @@ class SandhiEngine:
         # Word-final cluster reduction: ṣṭ → ṭ
         self.cluster_reduction = pn.cdrewrite(
             pn.string_map([
-                ("ṣṭ+[EOS]", "ṭ"),
-                ("k+t+[EOS]", "k"),
-                ("gdh+[EOS]", "k"),
+                ("ṣṭ+[WORD_END]", "ṭ"),
+                ("k+t+[WORD_END]", "k"),
+                ("gdh+[WORD_END]", "k"),
             ]),
             "", "", self.sig
         )
@@ -752,10 +836,34 @@ class SandhiEngine:
                 pass   # already deterministic or non‑determinizable – ignore
         return fst
 
-    def apply_all(self, fst: pn.Fst, debug: bool = False) -> pn.Fst:
-        """Run all three sandhi phases in sequence."""
+    def apply_all(
+        self,
+        fst: pn.Fst,
+        debug: bool = False,
+        classical_external_hiatus: bool = False,
+    ) -> pn.Fst:
+        """Run sandhi phases.
+
+        Args:
+            classical_external_hiatus: If True, fuse ``V#V`` at ``#`` word boundaries
+                before internal vowel phase (Whitney §113, §126–131 subset).
+                Use ``False`` for Vedic-style hiatus at ``#``.
+        """
+        fst = self.external_hiatus_phase(fst, classical_external_hiatus, debug)
         return self.long_distance_phase(
             self.consonant_phase(
                 self.vowel_phase(fst, debug), debug
             ), debug
         )
+
+
+def phrase_accep(*words: str) -> pn.Fst:
+    """Join ``words`` with ``#`` for phrase-level hiatus handling.
+
+    Pass the result to ``SandhiEngine.apply_all(..., classical_external_hiatus=True)``
+    to resolve ``V#V`` per Whitney §126–131 (classical). Leave ``classical_external_hiatus=False``
+    to preserve hiatus at ``#`` (Vedic-style hook).
+    """
+    if not words:
+        return pn.epsilon_machine()
+    return pn.accep("#".join(words))

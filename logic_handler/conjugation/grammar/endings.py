@@ -13,6 +13,8 @@ Usage::
     fst      = suffix.to_fst()        # pn.accep("ti")
 """
 from __future__ import annotations
+import re
+
 from irregulars import perfect_stem_overrides
 import pynini as pn
 from dataclasses import dataclass, field
@@ -29,9 +31,11 @@ class Suffix:
     Attributes:
         surface: IAST string that will appear in the final output (may be empty
                  for zero-endings such as imperative 2sg thematic "—").
-        tags: Frozenset of abstract tags that instruct MorphologyEngine to apply
-              additional rules.  Currently supported tags:
-                  ``"AORIST_PASS_3SG"`` — triggers Vriddhi on the stem (ciṇ-ending)
+        tags: Frozenset of abstract tags that instruct MorphologyEngine / SandhiEngine.
+              Supported tags:
+                  ``"AORIST_PASS_3SG"`` — Vriddhi on stem (ciṇ-ending).
+                  ``"PRAGRHYA"`` — Whitney §138: dual (etc.) finals ī/ū/e exempt from
+                  hiatus resolution before a vowel; emit ``[PRAGRHYA]`` before surface.
     """
     surface: str
     tags: frozenset[str] = field(default_factory=frozenset)
@@ -46,6 +50,9 @@ class Suffix:
         base: pn.Fst = pn.accep(self.surface) if self.surface else pn.epsilon_machine()
         if "AORIST_PASS_3SG" in self.tags:
             base = pn.accep("[AORIST_PASS_3SG]") + base
+        if "PRAGRHYA" in self.tags:
+            # Blocks internal vowel fusion across +: vowels cannot see each other across tag.
+            base = pn.accep("[PRAGRHYA]") + base
         return base
 
     @property
@@ -58,6 +65,19 @@ class Suffix:
 def _s(surface: str, *tags: str) -> Suffix:
     """Build a Suffix with optional tags. Keeps table definitions concise."""
     return Suffix(surface, frozenset(tags))
+
+
+# Whitney §138: dual endings in ī / ū / e (etc.) — exempt from hiatus with following vowel.
+_PRAGRHya_DUAL_END = re.compile(r"(ī|ū|e|ai|au)$")
+
+
+def maybe_pragrhya_dual_suffix(suffix: Suffix, number: str) -> Suffix:
+    """Attach PRAGRHYA for dual persons when the ending qualifies (§138)."""
+    if number != "du" or not suffix.surface:
+        return suffix
+    if _PRAGRHya_DUAL_END.search(suffix.surface.strip()):
+        return Suffix(suffix.surface, suffix.tags | frozenset(["PRAGRHYA"]))
+    return suffix
 
 
 # ── SuffixProvider ─────────────────────────────────────────────────────────────

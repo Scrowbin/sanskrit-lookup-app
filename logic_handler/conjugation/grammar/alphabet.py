@@ -94,7 +94,7 @@ class SanskritAlphabet:
             "[SD_SSR]",   # ś/ṣ + dental stop → retroflex cluster (ś+t → ṣṭ)
             "[SD_SIB]",   # sibilant + sibilant (e.g. ṣ+s → kṣ)
             "[SD_LAR]",   # visarga before stop (ḥ + C → C); internal only
-            "[EOS]",
+            "[WORD_END]",  # word-final anchor before sandhi (avoid bracket-E-O-S spelling; breaks pn.cdrewrite)
         ]
         # ── Pynini FST atoms ─────────────────────────────────────────────────
         self.vowels = pn.union(*self.vowels_list)
@@ -113,7 +113,7 @@ class SanskritAlphabet:
             + self.consonants_list
             + self.modifiers_list
             + self.tags_list
-            + ["+"]  # morpheme boundary
+            + ["+", "#"]  # morpheme / word boundary
         )
         
         self.alpha = pn.union(*all_chars)
