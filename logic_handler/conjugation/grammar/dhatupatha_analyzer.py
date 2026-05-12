@@ -31,27 +31,9 @@ _SAMPRASARANA_ROOTS = frozenset({
 # entry here should cite a Whitney/Pāṇini source.
 # Roots now auto-detected from CSV accent (no longer needed here):
 #   hu, mā, hā, kṛ, smṛ, duh, dviṣ, diś, yaj, vah, vad, pac, budh, chid,
-#   śi, zu, du, stṛ, mā (class 3)
-_KNOWN_ANIT_ROOTS = frozenset({
-    # Missing from the CSV entirely (Whitney references)
-    "gam",   # Whitney §735
-    "han",   # Whitney §736
-    "ad",    # Whitney §632 (class 2 adādi)
-    "krī",   # Whitney §671 (class 9)
-    "tud",   # Whitney §687 (class 6 tudādi)
-    "muc",   # Whitney §742 (class 6)
-    "lip",   # Whitney §694 (class 6)
-    "sad",   # Whitney §716 (class 1)
-    "pad",   # Whitney §716 (class 1/4)
-    "bhid",  # Whitney §730 (class 7)
-    "yuj",   # Whitney §730 (class 7)
-    "mṛj",   # Whitney §627 (class 2)
-    "sṛj",   # Whitney §716 (class 6)
-    "vac",   # Whitney §730 (class 2)
-    "vid",   # Whitney §694 (class 2, 'know' sense)
-    "sthā",  # Whitney §672 (class 1)
-    "śak",   # Whitney §694 (class 5)
-})
+#   śi, zu, du, stṛ, mā (class 3), gam (ga\mx~), sthā (sTA\)
+# Reserved empty set: add only roots that lack a parseable root-syllable \ in CSV.
+_KNOWN_ANIT_ROOTS = frozenset()
 
 # Ubhayapada roots whose MW/Huet unprefixed-roots.csv entry is incomplete
 # (lists only 'para', missing the 'atma' row).  Every entry is cited from
@@ -121,6 +103,7 @@ class RootObject:
     is_idit: bool
     is_irit: bool
     is_uuit: bool
+    is_lrit: bool         # ḷ-it (ḷx~ suffix): nasal infix in cl.6 (P. 7.1.59)
     is_udit: bool
     is_duit: bool
     is_edit: bool
@@ -386,6 +369,10 @@ class DhatupathaAnalyzer:
         # ir-it must be checked before i-it
         is_irit = 'ir' in clean or 'i~r' in clean
         is_idit = ('i~' in clean or clean.endswith('i')) and not is_irit
+
+        # ḷ-it (x~) marker (P. 7.1.59): triggers nasal insertion for certain roots
+        is_lrit = 'x~' in clean
+
         is_uuit = 'U~' in clean or clean.endswith('U') and '~' in raw  # ū-it
         is_udit = ('u~' in clean) and not is_uuit                       # short u-it
         is_duit = 'du' in clean                                         # du-it
@@ -410,6 +397,7 @@ class DhatupathaAnalyzer:
             "is_idit":     is_idit,
             "is_irit":     is_irit,
             "is_uuit":     is_uuit,
+            "is_lrit":     is_lrit,
             "is_udit":     is_udit,
             "is_duit":     is_duit,
             "is_edit":     is_edit,
@@ -498,7 +486,7 @@ class DhatupathaAnalyzer:
         raw = entry['raw'] if entry else root_str
 
         _empty_flags = {k: False for k in [
-            "is_idit", "is_irit", "is_uuit", "is_udit", "is_duit",
+            "is_idit", "is_irit", "is_uuit", "is_lrit", "is_udit", "is_duit",
             "is_edit", "is_odit", "is_nit", "is_ngit", "is_pit",
             "is_ssit", "is_ttit", "is_s_opadesa", "is_n_opadesa",
         ]}
@@ -610,8 +598,9 @@ class DhatupathaAnalyzer:
     # ── Legacy helpers ─────────────────────────────────────────────────────────
 
     def get_root_entry(self, root_str: str, class_num: int) -> str | None:
-        """Return raw CSV entry string (legacy API)."""
-        return self._find_raw(root_str, class_num)
+        """Return raw Dhātupāṭha SLP1 string from CSV (legacy API)."""
+        entry = self._find_raw(root_str, class_num)
+        return entry["raw"] if entry else None
 
     def is_anit(self, root_str: str, class_num: int) -> bool:
         """Return True if root is Aniṭ (legacy API)."""

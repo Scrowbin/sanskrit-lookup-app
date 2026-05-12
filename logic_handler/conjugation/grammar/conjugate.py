@@ -150,7 +150,7 @@ class SanskritConjugator:
         derivative: str | None = None,
         use_db: bool = True,
         auxiliary: str = "kṛ",
-    ) -> str:
+    ) -> list[str] | str:
         """Conjugate a Sanskrit root.
 
         Args:
@@ -164,7 +164,9 @@ class SanskritConjugator:
             derivative: None | "causative" | "desiderative" | "intensive" | "denominative"
 
         Returns:
-            IAST form, or multiple forms joined with " OR ".
+            For normal conjugation: sorted ``list[str]`` of distinct IAST surfaces.
+            For ``tense="krdantas"``: a single ``str`` block from the kṛdanta engine.
+            Periphrastic perfect returns ``list[str]`` like the main path.
         """
         if tense == "krdantas":
             return self.get_krdantas_block(root_str, class_num, derivative=derivative, use_db=use_db)        # Block morphologically impossible combinations early
@@ -238,15 +240,7 @@ class SanskritConjugator:
         sandhi_fst = self.sandhi.apply_all(morph_fst)
         result     = sandhi_fst.optimize()
 
-        try:
-            forms = set(result.paths().ostrings())
-        except Exception as e:
-            try:
-                # Log a warning to track cycle issues cleanly, but fallback gracefully
-                print(f"    ⚠️  FST Cycle Detected for {root_str} ({tense}): falling back to shortest path. Error: {e}")
-                forms = {pn.shortestpath(result).string()}
-            except Exception:
-                forms = set()
+        forms = set(result.paths().ostrings())
 
         if use_db:
             db_forms = INRIA_LOOKUP.lookup(root_str, tense, voice, person, number, derivative)
@@ -271,7 +265,7 @@ class SanskritConjugator:
         derivative: str | None = None,
         preverb_str: str = "",
         auxiliary: str = "kṛ",
-    ) -> str:
+    ) -> list[str]:
         """Periphrastic perfect: base-stem + ām + auxiliary (kṛ/bhū/as)."""
         
         # 1. Validate auxiliary and map to its Dhatupatha class
@@ -291,7 +285,7 @@ class SanskritConjugator:
         aux_class = valid_aux[auxiliary]
 
         # 3. Generate the auxiliary (turn off DB to ensure pure generation)
-        aux_str = self.conjugate(
+        aux_out = self.conjugate(
             root_str=auxiliary, 
             class_num=aux_class, 
             person=person, 
@@ -300,16 +294,19 @@ class SanskritConjugator:
             tense="perfect", 
             use_db=False
         )
-        
+        aux_forms = (
+            aux_out if isinstance(aux_out, list) else aux_out.split(" OR ")
+        )
+
         results = []
-        for aux in aux_str.split(" OR "):
+        for aux in aux_forms:
             combined = base_fst + pn.accep("+") + pn.accep(aux)
             if preverb_str:
                 combined = pn.accep(preverb_str) + combined
             for form in self.sandhi.apply_all(combined).optimize().paths().ostrings():
                 results.append(form)
                 
-        return " OR ".join(sorted(set(results))) if results else "CRASHED: No periphrastic forms"
+        return sorted(list(set(results)))
 
     def get_krdantas_block(self, root_str: str, class_num: int, derivative: str | None = None, use_db: bool = False) -> str:
         preverb_str = ""

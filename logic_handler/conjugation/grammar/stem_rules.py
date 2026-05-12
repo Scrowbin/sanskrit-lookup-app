@@ -7,7 +7,7 @@ from irregulars import (
     passive_stem_overrides,
     causative_stem_irregulars,
     perfect_weak_guna_roots, perfect_stem_overrides,
-    aorist_overrides, nasal_roots, desiderative_stem_overrides,
+    aorist_overrides, desiderative_stem_overrides,
     intensive_stem_overrides,
 )
 from dhatupatha_analyzer import DHATUPATHA_ANALYZER
@@ -42,6 +42,14 @@ class StemBuilder:
     [STRONG] / [WEAK] must appear *directly* after the root consonants so the
     guna FST's right-context lookahead fires correctly.  Tags are erased
     immediately after guna is applied — never carried forward.
+
+    Sandhi context tags ``[SD_DCP]``, ``[SD_GEM]``, ``[SD_SSR]``, ``[SD_SIB]``,
+    ``[SD_LAR]`` are **not** emitted here by default: ``MorphologyEngine`` inserts
+    them on morpheme ``+`` patterns immediately before ``clean_tags`` so that
+    ``SandhiEngine`` can apply cluster rules in a **tag-gated** way (see
+    ``alphabet.SanskritAlphabet.tags_list`` and ``morphology.py`` ``sd_insert_*``).
+    For exceptional surfaces, stems may emit these tags explicitly (same as tests
+    in ``grammar/test_phonology.py``).
 
     Seṭ / Aniṭ (future)
     --------------------
@@ -341,8 +349,9 @@ class StemBuilder:
             base = self._build_causative_base(root_str)
             return base + pn.accep("ayi")
 
+        root_obj = DHATUPATHA_ANALYZER.get(root_str, class_num)
         stem = self._apply_guna(root_str, "[STRONG]")
-        is_anit = DHATUPATHA_ANALYZER.is_anit(root_str, class_num)
+        is_anit = root_obj.is_anit
         
         # div -> dīv (Seṭ)
         if root_str == "div":
@@ -618,7 +627,7 @@ class StemBuilder:
             bases = desiderative_stem_overrides[root_str]
             return pn.union(*[pn.accep(b) for b in bases])
         prefix = self.reduplicator.generate_desiderative_prefix(root_str)
-        is_anit = DHATUPATHA_ANALYZER.is_anit(root_str, 1)
+        is_anit = DHATUPATHA_ANALYZER.get(root_str, 1).is_anit  # P.7.2.10
         suffix = "sa" if is_anit else "iṣa"
         return pn.accep(prefix) + pn.accep(root_str) + pn.accep(suffix)
 
@@ -636,7 +645,7 @@ class StemBuilder:
             bases = desiderative_stem_overrides[root_str]
         else:
             prefix = self.reduplicator.generate_desiderative_prefix(root_str)
-            is_anit = DHATUPATHA_ANALYZER.is_anit(root_str, 1)
+            is_anit = DHATUPATHA_ANALYZER.get(root_str, 1).is_anit  # P.7.2.10
             suffix = "sa" if is_anit else "iṣa"
             bases = [prefix + root_str + suffix]
 
@@ -825,11 +834,14 @@ class StemBuilder:
         return pn.accep(root_str) + pn.accep(affix)
 
     def _build_class_6(self, root_str, strength):
-        """Class 6 (Tudādi) - Handles Nasal insertion for the 'muc' group."""
-        # Panini 7.1.59: muc, lip, vid, etc. get a nasal in the present system.
-        # These are traditionally marked with 'ḷ' (L) in the Dhatupatha.
-        # Until DhatupathaAnalyzer handles is_lrit, we use this targeted check.
-        if root_str in {"muc", "vid", "lip", "sic", "kṛt", "khād"}:
+        """Class 6 (Tudādi) - Nasal infix for ḷ-it roots (P. 7.1.59).
+
+        Roots marked with ḷ-it (x~ suffix in the Dhātupāṭha) insert a nasal
+        after the root vowel in the class-6 present stem:
+        muc → muñcati, vid → vindati, lip → limpati, sic → siñcati.
+        """
+        root_obj = DHATUPATHA_ANALYZER.get(root_str, 6)
+        if root_obj.is_lrit:
             vowels = set(ALPHABET.vowels_list)
             insert_idx = -1
             for i, ch in enumerate(root_str):

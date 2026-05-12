@@ -343,4 +343,4 @@ def run_focused_benchmark(csv_file="../data/roots.csv", output_report="benchmark
 if __name__ == "__main__":
     # 3) Optionally run a full sweep and dump failures to CSV
     # Uncomment to run the full benchmark
-    run_focused_benchmark("../data/roots.csv", "benchmark_failures.csv")
+    run_focused_benchmark("data/roots.csv", "benchmark_failures.csv")

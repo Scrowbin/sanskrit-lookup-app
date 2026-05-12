@@ -63,11 +63,8 @@ causative_stem_irregulars = {
 
 
 # ── Class-7: Nasal roots ──────────────────────────────────────────────────────
-nasal_roots = {
-    "muc": "muñc",
-    "vid": "vind",
-    "lip": "limp",
-}
+# nasal_roots removed: nasal insertion is now driven by
+# RootObject.is_lrit (P. 7.1.59) in stem_rules._build_class_6.
 
 
 
@@ -130,9 +127,7 @@ aorist_overrides = {
     "krī":  {"type": "s"},
     "cur":  {"type": "a", "active": "cūcur+a", "middle": "cūcur+a"},  # reduplicated a-aorist
     "kṛ":   {"type": "s", "middle": "kṛ", "middle_type": "root"}, # middle root: akṛta
-    "budh": {"type": "is"},                                        # is-aorist both voices: abodhiṣam/abodhiṣṭa
     "duh":  {"type": "sa", "active": "dhuṣ", "middle": "dhuṣ"},   # sa-aorist: adhukṣat / adhukṣata
-    "gam":  {"type": "root"},
     "dviṣ": {"type": "sa", "active": "dvikṣ", "middle": "dvikṣ"}, # sa-aorist: advikṣat / advikṣata
     "muc":  {"type": "a"},
     "han":  {"type": "is", "active": "vadh", "middle": "vadh"},   # suppletive aorist
@@ -143,7 +138,6 @@ aorist_overrides = {
     "dā":   {"type": "root", "middle": "is"},     # middle: adiṣi (Whitney §879: dā takes is in middle aorist)
     "dhā":  {"type": "root"},
     "gā":   {"type": "root"},
-    "bhū":  {"type": "root"},
 
     # Type 2: a-Aorists (Irregular stems)
     "vac":  {"type": "a", "active": "voca", "middle": "voca"},
