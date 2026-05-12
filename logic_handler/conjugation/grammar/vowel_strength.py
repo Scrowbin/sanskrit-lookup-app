@@ -33,11 +33,10 @@ class VowelStrengthEngine:
         # Apply guna to the vowel that immediately precedes [STRONG].
         # The lookahead is: zero or more consonants (no other vowels) then [STRONG].
         # This correctly handles CV roots like "kṛ[STRONG]" → "kar[STRONG]".
-        _maybe_one_cons = pn.union(pn.accep(""), ALPHABET.consonants)
         self.apply_guna = pn.cdrewrite(
             guna_map,
             "",
-            _maybe_one_cons + "[STRONG]",
+            pn.closure(ALPHABET.consonants) + "[STRONG]",
             sig
         )
 
@@ -47,7 +46,6 @@ class VowelStrengthEngine:
             ("i", "ai"), ("ī", "ai"),
             ("u", "au"), ("ū", "au"),
             ("ṛ", "ār"), ("ṝ", "ār"),
-            ("ḷ", "āl"), ("ḹ", "āl"),
         ])
 
         self.apply_vriddhi = pn.cdrewrite(
