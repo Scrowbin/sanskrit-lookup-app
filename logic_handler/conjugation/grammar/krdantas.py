@@ -63,13 +63,7 @@ class KrdantaEngine:
             
         return output
 
-    def generate_block(
-        self,
-        root_str: str,
-        class_num: int,
-        preverb_str: str = "",
-        derivative: str | None = None,
-    ) -> str:
+    def generate_block(self, root_str: str, class_num: int, preverb_str: str = "") -> str:
         out = ["Participles"]
         
         # 1. Past Passive Participle (-ta / -tā)
@@ -90,15 +84,19 @@ class KrdantaEngine:
         # We strip the final thematic '+a' from the stem.
         # This prevents 'bho+a' + '+ant' -> 'bho+a+ant' (which yields bhavānt).
         # Stripping '+a' leaves 'bho', which when combined with '+ant' yields 'bhavant'.
-        pres_stem_for_ant = pres_stem @ pn.cdrewrite(pn.cross("+a", ""), "", "[EOS]", self.c.stems.sig)
+        pres_stem_for_ant = pres_stem @ pn.cdrewrite(pn.cross("+a", ""), "", "[WORD_END]", self.c.stems.sig)
         
         out.extend(self._build_and_format(
             "Present Active Participle", root_str, class_num, "prp_act", "ant", "antī", preverb_str, pres_stem_for_ant
         ))
         
         # 4. Present Middle Participle
+        is_thematic = class_num in {1, 4, 6, 10}
+        mid_suf_m = "māna" if is_thematic else "āna"
+        mid_suf_f = "mānā" if is_thematic else "ānā"
+        
         out.extend(self._build_and_format(
-            "Present Middle Participle", root_str, class_num, "prp_mid", "māna", "mānā", preverb_str, pres_stem
+            "Present Middle Participle", root_str, class_num, "prp_mid", mid_suf_m, mid_suf_f, preverb_str, pres_stem
         ))
         
         # 5. Present Passive Participle
@@ -108,18 +106,18 @@ class KrdantaEngine:
         ))
         
         # Future stem
-        fut_stem = self.c._get_stem(root_str, class_num, "[STRONG]", "future", None, None, None)
-        # Note: future stem ends in 'sya' or 'iṣya', we need to strip 'a'
-        fut_stem = (fut_stem + pn.accep("+")) @ pn.cdrewrite(pn.cross("a+", ""), "", "", self.c.stems.sig)
+        raw_fut_stem = self.c._get_stem(root_str, class_num, "[STRONG]", "future", None, None, None)
+        # Note: future stem ends in 'sya' or 'iṣya', we need to strip 'a' for active participle
+        fut_stem_for_ant = (raw_fut_stem + pn.accep("+")) @ pn.cdrewrite(pn.cross("a+", ""), "", "", self.c.stems.sig)
         
         # 6. Future Active Participle
         out.extend(self._build_and_format(
-            "Future Active Participle", root_str, class_num, "futp_act", "at", "antī", preverb_str, fut_stem
+            "Future Active Participle", root_str, class_num, "futp_act", "at", "antī", preverb_str, fut_stem_for_ant
         ))
         
         # 7. Future Middle Participle
         out.extend(self._build_and_format(
-            "Future Middle Participle", root_str, class_num, "futp_mid", "amāṇa", "amāṇā", preverb_str, fut_stem
+            "Future Middle Participle", root_str, class_num, "futp_mid", "māna", "mānā", preverb_str, raw_fut_stem
         ))
         
         # 8. Future Passive Participle (Gerundives) - tavya, anīya, ya
@@ -143,11 +141,11 @@ class KrdantaEngine:
         
         phonemes = ALPHABET.parse_phonemes(root_str)
         if root_str == "bhū":
-            act_suffix = "as"
+            act_suffix = "ān"
         elif phonemes and phonemes[-1] in ('u', 'ū', 'ṛ', 'ṝ'):
-            act_suffix = "vas"
+            act_suffix = "vān"
         else:
-            act_suffix = "ivas"
+            act_suffix = "ivān"
             
         out.extend(self._build_and_format(
             "Perfect Active Participle", root_str, class_num, "perf_act", act_suffix, "uṣī", preverb_str, perf_act_base
@@ -167,8 +165,12 @@ class KrdantaEngine:
         out.extend(self._build_and_format(
             "Absolutive", root_str, class_num, "abs_tva", "tvā", "", preverb_str, pn.accep(root_str)
         ))
+        
+        short_vowels = {'a', 'i', 'u', 'ṛ', 'ḷ'}
+        ya_suffix = "tya" if phonemes and phonemes[-1] in short_vowels else "ya"
+        
         out.extend(self._build_and_format(
-            "Absolutive", root_str, class_num, "abs_ya", "ya", "", preverb_str, pn.accep(root_str)
+            "Absolutive", root_str, class_num, "abs_ya", ya_suffix, "", preverb_str, pn.accep(root_str)
         ))
-
+        
         return "\n".join(out)

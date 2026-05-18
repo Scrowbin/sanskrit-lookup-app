@@ -22,30 +22,37 @@ class VowelStrengthEngine:
     def __init__(self):
         sig = ALPHABET.sigma_star
 
-        # ── Guna map: short/long vowel → Guna equivalent ─────────────────────
-        guna_map = pn.string_map([
+        # ── Guna rules (Whitney §240) ─────────────────────────────────────────
+        # 1. Final vowels (short or long) take guna.
+        guna_map_final = pn.string_map([
             ("i", "e"), ("ī", "e"),
             ("u", "o"), ("ū", "o"),
             ("ṛ", "ar"), ("ṝ", "ar"),
-            # 'a' and 'ā' are unchanged by Guna (they ARE Guna)
+            ("ḷ", "al"),
+        ])
+        
+        # 2. Medial vowels take guna ONLY if short AND followed by exactly ONE consonant.
+        # (Prosodically heavy syllables — long vowel or vowel before cluster — block guna).
+        guna_map_medial = pn.string_map([
+            ("i", "e"),
+            ("u", "o"),
+            ("ṛ", "ar"),
+            ("ḷ", "al"),
         ])
 
-        # Apply guna to the vowel that immediately precedes [STRONG].
-        # The lookahead is: zero or more consonants (no other vowels) then [STRONG].
-        # This correctly handles CV roots like "kṛ[STRONG]" → "kar[STRONG]".
-        self.apply_guna = pn.cdrewrite(
-            guna_map,
-            "",
-            pn.closure(ALPHABET.consonants) + "[STRONG]",
-            sig
-        )
+        self.apply_guna = (
+            pn.cdrewrite(guna_map_final, "", "[STRONG]", sig)
+            @ pn.cdrewrite(guna_map_medial, "", ALPHABET.consonants + "[STRONG]", sig)
+        ).optimize()
 
         # ── Vriddhi map ───────────────────────────────────────────────────────
+        # Whitney §235–237; Pāṇini 1.1.1 (vṛddhi of each vowel).
         vriddhi_map = pn.string_map([
             ("a", "ā"),
             ("i", "ai"), ("ī", "ai"),
             ("u", "au"), ("ū", "au"),
             ("ṛ", "ār"), ("ṝ", "ār"),
+            ("ḷ", "āl"),   # Whitney §237: ḷ's vṛddhi is āl (was missing)
         ])
 
         self.apply_vriddhi = pn.cdrewrite(

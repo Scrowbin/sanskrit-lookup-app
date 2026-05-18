@@ -27,6 +27,19 @@ _SAMPRASARANA_ROOTS = frozenset({
     "grah", "jyā", "vay", "vyadh", "vaś", "vyac", "vraśc", "prach", "bhrajj"
 })
 
+# After the _SAMPRASARANA_ROOTS set:
+_MRJ_CLASS_ROOTS = frozenset({
+    "mṛj", "sṛj", "bhrajj", "rāj", "bhrāj", "vraj", "majj",
+})
+
+_RUH_CLASS_ROOTS = frozenset({
+    "vah", "sah", "mih", "rih", "guh", "ruh", "nah", "dah", "dih",
+})
+
+_GRASSMANN_ROOTS = frozenset({
+    "duh", "dah", "dih", "druh", "bandh", "bādh", "budh", "dabh",
+})
+
 # Roots that are genuinely Aniṭ but whose CSV entries do NOT have an anudātta
 # accent (\\) on any character other than a suffix-~ — so the position-aware
 # parser cannot auto-detect them.  Keep this set as small as possible; every
@@ -35,7 +48,10 @@ _SAMPRASARANA_ROOTS = frozenset({
 #   hu, mā, hā, kṛ, smṛ, duh, dviṣ, diś, yaj, vah, vad, pac, budh, chid,
 #   śi, zu, du, stṛ, mā (class 3), gam (ga\mx~), sthā (sTA\)
 # Reserved empty set: add only roots that lack a parseable root-syllable \ in CSV.
-_KNOWN_ANIT_ROOTS = frozenset()
+_KNOWN_ANIT_ROOTS = frozenset({
+    "bhrajj", # bhrasj is Aniṭ (Pāṇini 7.2.10, Whitney §236)
+    "nī",     # universally Aniṭ (Whitney §900) but lacks clear anudātta in some CSV versions
+})
 
 # Ubhayapada roots whose MW/Huet unprefixed-roots.csv entry is incomplete
 # (lists only 'para', missing the 'atma' row).  Every entry is cited from
@@ -121,6 +137,9 @@ class RootObject:
     takes_periphrastic_perfect: bool
     permitted_voices: set
     takes_samprasarana: bool
+    is_mrj_class: bool = False     # j → ṣ before dentals (Whitney §219)
+    is_ruh_class: bool = False     # h + dental → vowel lengthening + lingual (Whitney §222)
+    is_initial_aspirate: bool = False  # Grassmann's Law (Whitney §155)
 
     @property
     def is_set(self) -> bool:
@@ -247,13 +266,28 @@ class DhatupathaAnalyzer:
                 if cand.endswith('h') and clean.startswith(cand[:-1] + 'H'):
                     return entry
 
-        # Pass 2: any class
+        # Pass 2: any class (cross-class fallback — PHONOLOGY_AUDIT §6.8).
+        # Logs a warning so callers know the data may be wrong for this class.
         for entry in self._entries:
             clean = _clean(entry['raw'])
             for cand in candidates:
                 if clean.startswith(cand):
+                    fallback_cls = entry['class_num']
+                    import warnings
+                    warnings.warn(
+                        f"DhatupathaAnalyzer: root '{root_str}' class {class_num} not found; "
+                        f"using class-{fallback_cls} entry — voice/aniṭ data may be wrong.",
+                        stacklevel=4,
+                    )
                     return entry
                 if cand.endswith('h') and clean.startswith(cand[:-1] + 'H'):
+                    fallback_cls = entry['class_num']
+                    import warnings
+                    warnings.warn(
+                        f"DhatupathaAnalyzer: root '{root_str}' class {class_num} not found; "
+                        f"using class-{fallback_cls} entry.",
+                        stacklevel=4,
+                    )
                     return entry
 
         return None
@@ -295,8 +329,8 @@ class DhatupathaAnalyzer:
 
     @staticmethod
     def _raw_is_vet(raw: str) -> bool:
-        """Svarita '~' marker → Veṭ (optionally Seṭ)."""
-        return '~' in raw
+        """ū-dit marker (U~) → Veṭ (optionally Seṭ). Pāṇini 7.2.44."""
+        return 'U~' in raw
 
     @staticmethod
     def _raw_voice_info(raw: str) -> tuple[bool, bool, bool]:
@@ -449,28 +483,22 @@ class DhatupathaAnalyzer:
 
     def _raw_aorist_type(self, root_str: str, raw: str, flags: dict) -> str:
         """Derive aorist class from anubandhas + phonology."""
-        # Work on a cleaned string for suffix analysis
-        cleaned = raw.replace('\\', '').replace('^', '').replace('~', '')
-        suffix_part = cleaned
-        # Strip registered it-consonants from the tail
-        for it in ('Y', 'N', 'p'):
-            if suffix_part.endswith(it):
-                suffix_part = suffix_part[:-1]
-
         phonemes = ALPHABET.parse_phonemes(root_str)
 
-        # ṣ-it suffix → aṅ-Aorist (P. 3.1.59)
+        # Pāṇini 3.1.59: ṣ-it (z) → aṅ-Aorist
         if flags.get("is_ssit"):
             return 'a'
 
-        # ḷ-it (x) → a-aorist
-        if suffix_part.endswith('x'):
+        # Pāṇini 3.1.55: lṛ-dit (ḷ-it / x~) → aṅ-Aorist
+        if flags.get("is_lrit"):
             return 'a'
-        # ṛ-it (f suffix, not the root vowel) → a-aorist
-        if suffix_part.endswith('f') and phonemes and phonemes[-1] != 'ṛ':
+
+        # Pāṇini 3.1.55: du-it → aṅ-Aorist
+        if flags.get("is_duit"):
             return 'a'
-        # m-suffix anubandha → a-aorist (gam, muc class)
-        if suffix_part.endswith('m') and phonemes and phonemes[-1] != 'm':
+
+        # Pāṇini 3.1.57: ir-it → aṅ-Aorist (optionally, mapped to 'a' default)
+        if flags.get("is_irit"):
             return 'a'
 
         is_anit = self._raw_is_anit(raw)
@@ -573,6 +601,9 @@ class DhatupathaAnalyzer:
             takes_periphrastic_perfect=self._check_periphrastic(root_str),
             permitted_voices=permitted_voices,
             takes_samprasarana=(root_str in _SAMPRASARANA_ROOTS),
+            is_mrj_class=(root_str in _MRJ_CLASS_ROOTS),
+            is_ruh_class=(root_str in _RUH_CLASS_ROOTS),
+            is_initial_aspirate=(root_str in _GRASSMANN_ROOTS),
             **flags,
         )
 
@@ -587,7 +618,7 @@ class DhatupathaAnalyzer:
         2. Vowel-initial roots with a heavy syllable (except a/ā).
         3. Explicitly mandated Pāṇinian exceptions.
         """
-        explicit_periphrastic = {"uṣ", "jāgṛ", "vid", "cakās", "daridrā", "ay", "day", "ās"}
+        explicit_periphrastic = {"uṣ", "jāgṛ", "cakās", "daridrā", "ay", "day", "ās"}
         if root_str in explicit_periphrastic:
             return True
 

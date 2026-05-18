@@ -120,17 +120,27 @@ class MorphologyEngine:
         )
 
         # ── 2.5. Samprasāraṇa ────────────────────────────────────────────────
-        # Converts semivowels to vowels in weak contexts for specific roots (e.g. vac -> uc)
+        # Converts semivowels to vowels in weak contexts (Whitney §252; Pāṇini 6.1.13–15).
+        # Tag [SAMP] is prepended to the whole root by build() when the root
+        # takes samprasāraṇa; it marks the position for the below rules.
+        #
+        # Pattern: [SAMP] + optional initial consonant(s) + semivowel(y/v/r) + a
+        # → initial consonant(s) + corresponding vowel (i/u/ṛ).
+        # Specific cluster rules run BEFORE the generic tag-initial rules so they
+        # take priority when an initial consonant precedes the semivowel.
         self.samprasarana = pn.cdrewrite(
             pn.string_map([
-                ("[SAMP]ya", "i"),   # yaj -> i + j -> ij
-                ("[SAMP]va", "u"),   # vap -> u + p -> up
-                ("[SAMP]ra", "ṛ"),   # grah -> gṛh
-                
-                # Handle cases where a consonant precedes the semivowel (e.g., svap)
-                # s + [SAMP]va -> su
-                ("s[SAMP]va", "su"), 
-                ("p[SAMP]ra", "pṛ"), 
+                # ── Roots with initial consonant cluster before semivowel ────
+                ("[SAMP]sva", "su"),  # svap → sup (s stays, v→u, a drops)
+                ("[SAMP]śva", "śu"),  # śvap → śup (if attested)
+                ("[SAMP]pra", "pṛ"),  # prach → pṛch
+                ("[SAMP]gra", "gṛ"),  # grah → gṛh
+                ("[SAMP]bra", "bṛ"),  # brajj → bṛjj
+                ("[SAMP]dra", "dṛ"),  # druh-type if used
+                # ── Simple roots: [SAMP] immediately before semivowel ─────────
+                ("[SAMP]ya", "i"),    # yaj → ij, yam → im
+                ("[SAMP]va", "u"),    # vap → up, vac → uc
+                ("[SAMP]ra", "ṛ"),    # rah/ran-type
             ]),
             "", "", sig
         )
@@ -153,8 +163,9 @@ class MorphologyEngine:
 
         # ── 4. Class-8 kṛ weak suppletion ─────────────────────────────────────
         # In weak forms of kṛ (class 8), the root becomes "kur" before -u-.
+        _any_weak_opt = pn.closure(pn.union("[WEAK]", "[PERF_WEAK]"), 0, 1)
         self.class8_suppletion = pn.cdrewrite(
-            pn.cross("kṛ", "kur"),
+            pn.cross("kṛ", "kur") + pn.cross(_any_weak_opt, ""),
             "",
             "+u+",    # only fires before the class-8 weak affix (+u+)
             sig
@@ -201,37 +212,56 @@ class MorphologyEngine:
             "", "", sig
         )
 
-        # ── 7. Class 2 Weak overrides ───────────────────────────────────────
-        # han: 'n' drops before stops (t, th, s, etc.) but STAYS before nasals (m, n).
-        # Whitney §636: han before consonant endings: ha- (stops) but han- (nasals).
-        # Rule A: han[CLASS2_WEAK]+ before a STOP consonant → ha+
+        # ── 7. Athematic Zero-Grade (Rule 253 / P. 6.4.98, 6.4.111, 6.4.37, 6.4.34) ─
+        # Whitney §253: Short 'a' loss in weak syllables.
+        _any_weak = pn.union("[WEAK]+", "[PERF_WEAK]+")
+        
+        # Rule A: as drops 'a' before ANY ending (santi, stas).
+        self.zero_grade_as = pn.cdrewrite(
+            pn.cross("as", "s") + pn.cross(_any_weak, "+"),
+            "", "", sig
+        )
+        
+        # Rule B: gam, jan, khan, ghas, han drop 'a' before VOWEL endings.
+        _a_drop_roots = pn.union(
+            pn.cross("gam", "gm"),
+            pn.cross("jan", "jñ"),
+            pn.cross("khan", "khn"),
+            pn.cross("ghas", "kṣ"),
+            pn.cross("han", "ghn"),
+            pn.cross("vac", "uc"),
+        )
+        self.zero_grade_a_drop_vowel = pn.cdrewrite(
+            _a_drop_roots + pn.cross(_any_weak, "+"),
+            "",
+            ALPHABET.vowels,
+            sig
+        )
+
+        # Rule C: han drops 'n' before STOP consonants (t, th, s, etc.) but retains it before nasals.
         _stops = pn.union("t", "th", "d", "dh", "k", "kh", "g", "gh",
                           "p", "ph", "b", "bh", "c", "j", "s", "ś", "ṣ")
-        self.class2_weak_cons = pn.cdrewrite(
-            pn.cross("han[CLASS2_WEAK]+", "ha+"),
+        self.zero_grade_han_cons = pn.cdrewrite(
+            pn.cross("han", "ha") + pn.cross(_any_weak, "+"),
             "",
             _stops,
             sig
         )
-        # Rule B: han[CLASS2_WEAK]+ before a NASAL → han+ (n retained)
+        
+        # Rule D: han retains 'n' before NASALS.
         _nasals = pn.union("m", "n", "ṇ", "ṅ")
-        self.class2_weak_nasal = pn.cdrewrite(
-            pn.cross("han[CLASS2_WEAK]+", "han+"),
+        self.zero_grade_han_nasal = pn.cdrewrite(
+            pn.cross("han", "han") + pn.cross(_any_weak, "+"),
             "",
             _nasals,
             sig
         )
-        # Rule C: han[CLASS2_WEAK]+ before a VOWEL → ghn+ (Grassmann throwback)
-        self.class2_weak_vowel = pn.cdrewrite(
-            pn.cross("han[CLASS2_WEAK]+", "ghn+"),
+        
+        # Rule E: śās -> śiṣ before CONSONANTS (P. 6.4.34).
+        self.zero_grade_sas_cons = pn.cdrewrite(
+            pn.cross("śās", "śiṣ") + pn.cross(_any_weak, "+"),
             "",
-            ALPHABET.vowels,
-            sig
-        )
-        self.class2_weak_vac = pn.cdrewrite(
-            pn.cross("vac[CLASS2_WEAK]+", "uc+"),
-            "",
-            ALPHABET.vowels,
+            ALPHABET.consonants,
             sig
         )
 
@@ -293,7 +323,10 @@ class MorphologyEngine:
             "[PASSIVE]", "[CLASS4]", "[CLASS8]", "[CAUS_PASS]",
             "[STRONG]",  "[WEAK]",   "[VRIDDHI]", "[CLASS2_WEAK]",
             "[ROOT_AORIST]", "[AORIST]", "[AORIST_PASS_3SG]", "[INTENSIVE_ACTIVE]",
-            "[SAMP]", "[AUG]", "[NASAL]"
+            "[SAMP]", "[AUG]", "[NASAL]",
+            # Safety net: these are consumed by sandhi/vowel rules in most contexts,
+            # but must be erased here if they reach a non-triggering environment.
+            "[NO_RUKI]", "[RUH_H]", "[PERF_WEAK]",
         )
         self.clean_tags = pn.cdrewrite(pn.cross(all_tags, ""), "", "", sig)
 
@@ -319,10 +352,11 @@ class MorphologyEngine:
                 ("root_aorist_bhuv",         self.root_aorist_bhuv),
                 ("aorist_pass_vriddhi",      self.aorist_pass_vriddhi),
                 ("intensive_i_it",           self.intensive_i_it),
-                ("class2_weak_nasal",        self.class2_weak_nasal),
-                ("class2_weak_cons",         self.class2_weak_cons),
-                ("class2_weak_vowel",        self.class2_weak_vowel),
-                ("class2_weak_vac",          self.class2_weak_vac),
+                ("zero_grade_as",            self.zero_grade_as),
+                ("zero_grade_a_drop_vowel",  self.zero_grade_a_drop_vowel),
+                ("zero_grade_han_cons",      self.zero_grade_han_cons),
+                ("zero_grade_han_nasal",     self.zero_grade_han_nasal),
+                ("zero_grade_sas_cons",      self.zero_grade_sas_cons),
                 ("sd_boundary_tagging",      self.sd_boundary_tagging),
                 ("clean_tags",               self.clean_tags),
             ]
@@ -361,10 +395,11 @@ class MorphologyEngine:
             @ self.root_aorist_bhuv
             @ self.aorist_pass_vriddhi
             @ self.intensive_i_it
-            @ self.class2_weak_nasal
-            @ self.class2_weak_cons
-            @ self.class2_weak_vowel
-            @ self.class2_weak_vac
+            @ self.zero_grade_as
+            @ self.zero_grade_a_drop_vowel
+            @ self.zero_grade_han_cons
+            @ self.zero_grade_han_nasal
+            @ self.zero_grade_sas_cons
             @ self.sd_boundary_tagging
             @ self.clean_tags
         )

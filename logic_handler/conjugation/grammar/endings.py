@@ -13,6 +13,8 @@ Usage::
     fst      = suffix.to_fst()        # pn.accep("ti")
 """
 from __future__ import annotations
+import re
+
 from irregulars import perfect_stem_overrides
 import pynini as pn
 from dataclasses import dataclass, field
@@ -29,9 +31,11 @@ class Suffix:
     Attributes:
         surface: IAST string that will appear in the final output (may be empty
                  for zero-endings such as imperative 2sg thematic "—").
-        tags: Frozenset of abstract tags that instruct MorphologyEngine to apply
-              additional rules.  Currently supported tags:
-                  ``"AORIST_PASS_3SG"`` — triggers Vriddhi on the stem (ciṇ-ending)
+        tags: Frozenset of abstract tags that instruct MorphologyEngine / SandhiEngine.
+              Supported tags:
+                  ``"AORIST_PASS_3SG"`` — Vriddhi on stem (ciṇ-ending).
+                  ``"PRAGRHYA"`` — Whitney §138: dual (etc.) finals ī/ū/e exempt from
+                  hiatus resolution before a vowel; emit ``[PRAGRHYA]`` before surface.
     """
     surface: str
     tags: frozenset[str] = field(default_factory=frozenset)
@@ -43,9 +47,16 @@ class Suffix:
         in the correct left-to-right position relative to the stem.
         For zero-endings (imperative 2sg thematic), returns an epsilon machine.
         """
-        base: pn.Fst = pn.accep(self.surface) if self.surface else pn.epsilon_machine()
+        if "|" in self.surface:
+            alts = self.surface.split("|")
+            base = pn.union(*[pn.accep(a) for a in alts])
+        else:
+            base = pn.accep(self.surface)
         if "AORIST_PASS_3SG" in self.tags:
             base = pn.accep("[AORIST_PASS_3SG]") + base
+        if "PRAGRHYA" in self.tags:
+            # Blocks internal vowel fusion across +: vowels cannot see each other across tag.
+            base = pn.accep("[PRAGRHYA]") + base
         return base
 
     @property
@@ -58,6 +69,19 @@ class Suffix:
 def _s(surface: str, *tags: str) -> Suffix:
     """Build a Suffix with optional tags. Keeps table definitions concise."""
     return Suffix(surface, frozenset(tags))
+
+
+# Whitney §138: dual endings in ī / ū / e (etc.) — exempt from hiatus with following vowel.
+_PRAGRHya_DUAL_END = re.compile(r"(ī|ū|e|ai|au)$")
+
+
+def maybe_pragrhya_dual_suffix(suffix: Suffix, number: str) -> Suffix:
+    """Attach PRAGRHYA for dual persons when the ending qualifies (§138)."""
+    if number != "du" or not suffix.surface:
+        return suffix
+    if _PRAGRHya_DUAL_END.search(suffix.surface.strip()):
+        return Suffix(suffix.surface, suffix.tags | frozenset(["PRAGRHYA"]))
+    return suffix
 
 
 # ── SuffixProvider ─────────────────────────────────────────────────────────────
@@ -157,28 +181,27 @@ class SuffixProvider:
     def get_imperative_active(class_num: int = 1, root_str=None, **kwargs) -> dict[str, Suffix]:
         if is_thematic(class_num) or class_num in (5, 8, 9):
             return {
-                "[3sg]": _s("tu"),   "[3du]": _s("tām"),  "[3pl]": _s("ntu"),
-                "[2sg]": _s(""),     "[2du]": _s("tam"),  "[2pl]": _s("ta"),
-                "[1sg]": _s("āni"),  "[1du]": _s("āva"),  "[1pl]": _s("āma"),
+                "[3sg]": _s("tu|tāt"), "[3du]": _s("tām"),  "[3pl]": _s("ntu"),
+                "[2sg]": _s("|tāt"),   "[2du]": _s("tam"),  "[2pl]": _s("ta"),
+                "[1sg]": _s("āni"),    "[1du]": _s("āva"),  "[1pl]": _s("āma"),
             }
-        # √ad has irregular 2sg imperative addhi (not *adhi).
         if root_str == "ad":
             return {
-                "[3sg]": _s("tu"),  "[3du]": _s("tām"), "[3pl]": _s("antu"),
-                "[2sg]": _s("dhi"), "[2du]": _s("tam"), "[2pl]": _s("ta"),
-                "[1sg]": _s("āni"), "[1du]": _s("āva"), "[1pl]": _s("āma"),
+                "[3sg]": _s("tu|tāt"),  "[3du]": _s("tām"), "[3pl]": _s("antu"),
+                "[2sg]": _s("dhi|tāt"), "[2du]": _s("tam"), "[2pl]": _s("ta"),
+                "[1sg]": _s("āni"),     "[1du]": _s("āva"), "[1pl]": _s("āma"),
             }
         if class_num == 3:
             sg2 = "dhi" if root_str in ("hu", "ad") else "hi"
             return {
-                "[3sg]": _s("tu"),  "[3du]": _s("tām"), "[3pl]": _s("atu"),
-                "[2sg]": _s(sg2),   "[2du]": _s("tam"), "[2pl]": _s("ta"),
-                "[1sg]": _s("āni"), "[1du]": _s("āva"), "[1pl]": _s("āma"),
+                "[3sg]": _s("tu|tāt"),     "[3du]": _s("tām"), "[3pl]": _s("atu"),
+                "[2sg]": _s(f"{sg2}|tāt"), "[2du]": _s("tam"), "[2pl]": _s("ta"),
+                "[1sg]": _s("āni"),        "[1du]": _s("āva"), "[1pl]": _s("āma"),
             }
         return {
-            "[3sg]": _s("tu"),   "[3du]": _s("tām"),  "[3pl]": _s("antu"),
-            "[2sg]": _s("hi"),   "[2du]": _s("tam"),  "[2pl]": _s("ta"),
-            "[1sg]": _s("āni"),  "[1du]": _s("āva"),  "[1pl]": _s("āma"),
+            "[3sg]": _s("tu|tāt"), "[3du]": _s("tām"),  "[3pl]": _s("antu"),
+            "[2sg]": _s("hi|tāt"), "[2du]": _s("tam"),  "[2pl]": _s("ta"),
+            "[1sg]": _s("āni"),    "[1du]": _s("āva"),  "[1pl]": _s("āma"),
         }
 
     @staticmethod

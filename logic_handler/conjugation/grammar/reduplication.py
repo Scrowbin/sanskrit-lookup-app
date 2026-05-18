@@ -98,6 +98,16 @@ class ReduplicationEngine:
         if root_str == "bhū":
             return "ba"
 
+        if root_str and root_str[0] in ALPHABET.vowels_list:
+            # Most vowel-initial roots take the periphrastic perfect (Whitney §1070).
+            # The morphological pipeline should catch this earlier.
+            import warnings
+            warnings.warn(
+                f"ReduplicationEngine: generating prefix for vowel-initial root '{root_str}'. "
+                f"This root likely requires the periphrastic perfect instead.",
+                stacklevel=2
+            )
+
         syllable = self._extract_initial_syllable(root_str)
         return self._reduce_via_fst(syllable)
 
@@ -119,11 +129,17 @@ class ReduplicationEngine:
         target_vowel = "u" if root_vowel in ("u", "ū") else "i"
         new_syllable = consonants + target_vowel
         
-        return self._reduce_via_fst(new_syllable)
+        # Add [NO_RUKI] tag (Whitney §184d: prefix 's' does not trigger RUKI on root 's')
+        # The tag breaks the RUKI rule context.
+        return self._reduce_via_fst(new_syllable) + "[NO_RUKI]"
 
     def generate_intensive_prefix(self, root_str: str) -> str:
-        """Return the reduplication prefix for Intensive.
-        Rule: prefix vowel is the guna of the root vowel (or lengthened 'a')."""
+        """Return the reduplication prefix for Intensive (Whitney §1002).
+        Handles three subtypes:
+        1. ṛ/ṝ roots get 'arī' (e.g. kṛ -> carīkṛ, nṛt -> narīnṛt)
+        2. Nasal roots (am/an) get 'aṃ' (e.g. gam -> jaṅgam, kram -> caṅkram)
+        3. Others get strong vowel (a -> ā, i/ī -> e, u/ū -> o)
+        """
         syllable = self._extract_initial_syllable(root_str)
         vowels = set(ALPHABET.vowels_list)
         consonants = ""
@@ -134,11 +150,19 @@ class ReduplicationEngine:
                 break
             consonants += ch
         
-        # Intensive prefix vowels are strong:
-        # a -> ā, i/ī -> e, u/ū -> o, ṛ -> ar
-        guna_map = {"a": "ā", "ā": "ā", "i": "e", "ī": "e", "u": "o", "ū": "o", "ṛ": "ar", "ṝ": "ar"}
-        target_vowel = guna_map.get(root_vowel, root_vowel)
+        phonemes = ALPHABET.parse_phonemes(root_str)
         
+        # Subtype 2: Nasal final (Whitney §1002d)
+        if phonemes and phonemes[-1] in ('m', 'n') and root_vowel == 'a':
+            target_vowel = "aṃ"
+        # Subtype 1: ṛ/ṝ root (Whitney §1002c)
+        elif 'ṛ' in phonemes or 'ṝ' in phonemes:
+            target_vowel = "arī"
+        # Subtype 3: Standard strong vowel (Whitney §1002a)
+        else:
+            guna_map = {"a": "ā", "ā": "ā", "i": "e", "ī": "e", "u": "o", "ū": "o", "ṛ": "ar", "ṝ": "ar"}
+            target_vowel = guna_map.get(root_vowel, root_vowel)
+            
         return self._reduce_via_fst(consonants + target_vowel)
 
     def generate_aorist_prefix(self, root_str: str) -> str:

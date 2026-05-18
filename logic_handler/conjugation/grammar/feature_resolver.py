@@ -13,7 +13,7 @@ from dhatupatha_analyzer import DHATUPATHA_ANALYZER
 _PERIPHRASTIC_DERIVATIVES: frozenset[str] = frozenset({"causative", "denominative"})
 
 # Tenses that require the augment "a+" prefix.
-_AUGMENTED_TENSES: frozenset[str] = frozenset({"imperfect", "conditional", "aorist"})
+_AUGMENTED_TENSES: frozenset[str] = frozenset({"imperfect", "conditional", "aorist", "pluperfect"})
 
 # Priority-ordered (predicate, strength_tag) table.
 # Each predicate: (class_num, person, number, voice, tense) → bool.
@@ -25,9 +25,9 @@ _STRENGTH_RULES: list[tuple] = [
     # Aorist / Injunctive: active = strong, middle = weak
     (lambda c, p, n, v, t: t in ("aorist", "injunctive") and v == "active",        "[STRONG]"),
     (lambda c, p, n, v, t: t in ("aorist", "injunctive") and v == "middle",        "[WEAK]"),
-    # Perfect: sg active = strong; everything else = weak
-    (lambda c, p, n, v, t: t == "perfect" and v == "active" and n == "sg",         "[STRONG]"),
-    (lambda c, p, n, v, t: t == "perfect",                                          "[WEAK]"),
+    # Perfect / Pluperfect: sg active = strong; everything else = weak
+    (lambda c, p, n, v, t: t in ("perfect", "pluperfect") and v == "active" and n == "sg", "[STRONG]"),
+    (lambda c, p, n, v, t: t in ("perfect", "pluperfect"),                                 "[WEAK]"),
     # Thematic classes: cl 1/10 always strong, cl 4/6 always weak
     (lambda c, p, n, v, t: c in (1, 10),                                           "[STRONG]"),
     (lambda c, p, n, v, t: c in (4, 6),                                            "[WEAK]"),
@@ -135,10 +135,10 @@ class MorphologicalFeatureResolver:
                 effective_class = 3
                 effective_derivative = "intensive_active"
 
-        elif derivative == "denominative":
+        elif derivative in ("denominative", "denominative_aya", "denominative_ya"):
             strength = "[WEAK]"
             effective_class = 1
-            effective_derivative = "denominative"
+            effective_derivative = derivative
 
         elif voice == "passive":
             strength = "[WEAK]"
@@ -155,7 +155,7 @@ class MorphologicalFeatureResolver:
 
         else:
             strength = _evaluate_strength(class_num, person, number, voice, tense)
-            effective_class = class_num
+            effective_class = 3 if tense == "pluperfect" else class_num
             effective_derivative = derivative
 
         augment = tense in _AUGMENTED_TENSES

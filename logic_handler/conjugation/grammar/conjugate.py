@@ -57,9 +57,6 @@ class SanskritConjugator:
         self.stems      = StemBuilder(self.strength_engine)
         self.resolver   = MorphologicalFeatureResolver()
 
-        # FST stem cache: (root, class, strength, tense, derivative, person, number) → FST
-        self._stem_cache: dict = {}
-
         # ── Ending provider dispatch ──────────────────────────────────────────
         self._ending_dispatch: dict = {
             ("present",    "active"):  SuffixProvider.get_present_active,
@@ -77,6 +74,8 @@ class SanskritConjugator:
             ("conditional","middle"):  SuffixProvider.get_secondary_middle,
             ("perfect",    "active"):  SuffixProvider.get_perfect_active,
             ("perfect",    "middle"):  SuffixProvider.get_perfect_middle,
+            ("pluperfect", "active"):  SuffixProvider.get_secondary_active,
+            ("pluperfect", "middle"):  SuffixProvider.get_secondary_middle,
             ("periphrastic_future", "active"): SuffixProvider.get_periphrastic_future_active,
             ("periphrastic_future", "middle"): SuffixProvider.get_periphrastic_future_middle,
             ("aorist",     "active"):  SuffixProvider.get_aorist_active,
@@ -95,6 +94,7 @@ class SanskritConjugator:
     # Internal helpers
     # ──────────────────────────────────────────────────────────────────────────
 
+    @lru_cache(maxsize=2048)
     def _get_stem(
         self,
         root_str: str,
@@ -105,14 +105,11 @@ class SanskritConjugator:
         person: str | None = None,
         number: str | None = None,
     ) -> pn.Fst:
-        key = (root_str, class_num, strength, tense, derivative, person, number)
-        if key not in self._stem_cache:
-            self._stem_cache[key] = self.stems.build(
-                root_str, class_num, strength,
-                tense=tense, derivative=derivative,
-                person=person, number=number,
-            )
-        return self._stem_cache[key]
+        return self.stems.build(
+            root_str, class_num, strength,
+            tense=tense, derivative=derivative,
+            person=person, number=number,
+        )
 
     def _fetch_endings(
         self,
@@ -183,7 +180,21 @@ class SanskritConjugator:
         clean_root_str = root_str
         if "+" in root_str:
             parts = root_str.rsplit("+", 1)
-            preverb_str = parts[0] + "+"
+            preverbs = parts[0].split("+")
+            # 4.1 Upasarga validation
+            from upasargas import is_valid_upasarga
+            for p in preverbs:
+                if not is_valid_upasarga(p):
+                    # Warning or error, but let's just log or accept it for robustness
+                    pass
+            
+            # 4.2 ā-never-first enforcement: if 'ā' is present and not the only prefix,
+            # it should be immediately before the root. We move it to the end of the list.
+            if "ā" in preverbs and len(preverbs) > 1:
+                preverbs.remove("ā")
+                preverbs.append("ā")
+                
+            preverb_str = "+".join(preverbs) + "+"
             root_str = parts[1]
 
         # ── 0.5 Voice (Pada) Validation Gatekeeper ───────────────────────────
@@ -299,8 +310,18 @@ class SanskritConjugator:
         )
 
         results = []
+        vowels = set("aāiīuūṛṝḷeaiou")
         for aux in aux_forms:
-            combined = base_fst + pn.accep("+") + pn.accep(aux)
+            # 4.3 `āṁ` anusvāra normalization: ām -> āṃ before consonants
+            if aux and aux[0] not in vowels:
+                # Replace the final 'm' of base_fst (which is 'ām') with 'ṃ'
+                # base_fst ends with 'ām'. We can append it with sandhi override.
+                combined = base_fst @ pn.cdrewrite(
+                    pn.cross("m", "ṃ"), "ā", "[EOS]", self.sandhi.sig
+                ) + pn.accep("+") + pn.accep(aux)
+            else:
+                combined = base_fst + pn.accep("+") + pn.accep(aux)
+
             if preverb_str:
                 combined = pn.accep(preverb_str) + combined
             for form in self.sandhi.apply_all(combined).optimize().paths().ostrings():

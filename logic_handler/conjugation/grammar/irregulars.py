@@ -11,13 +11,10 @@ class_1_irregulars = {
 }
 
 # ── Class 2: Irregular stems ──────────────────────────────────────────────────
-# mṛj: now handled algorithmically in _build_class_2 via Whitney §212 Vriddhi rule.
-# han and vac remain because their weak forms require the CLASS2_WEAK tag logic
-# in MorphologyEngine (three-way split for han; vowel-grade uc for vac).
-class_2_irregulars = {
-    "han": {"strong": "han", "weak_cons": "ha", "weak_vowel": "ghn"},
-    "vac": {"strong": "vac", "weak_cons": "vac", "weak_vowel": "uc"},
-}
+# mṛj: handled algorithmically in _build_class_2 via Whitney §212 Vriddhi rule.
+# han and vac zero-grades are now handled algorithmically in morphology.py 
+# via Rule 253 zero-grade logic gated by the [WEAK] tag.
+class_2_irregulars = {}
 
 # ── Class 3: Irregular stems ──────────────────────────────────────────────────
 # ā-final roots (dā, dhā, …) are now handled algorithmically in _build_class_3
@@ -55,9 +52,12 @@ passive_stem_overrides = {
 #   krī       → ī-final + vriddhi + p (Whitney §1042)→ krāpayati
 #   labh      → nasal-insertion rule (Pāṇini 7.3.36) → lambhayati
 #
-# True suppletive remaining:
 causative_stem_irregulars = {
     "han": "ghāt",   # ghātayati — aspirate throwback + Vriddhi; Grassmann-driven
+    "ruh": "rop",    # ropayati (Whitney §1042o)
+    "dū": "dāv",     # dāvayati (Whitney §1042n)
+    "dṛp": "darp",   # darpayati (Whitney §1042o)
+    "knūy": "knop",  # knopayati (Whitney §1042o)
 }
 
 
@@ -199,6 +199,11 @@ desiderative_stem_overrides = {
     "nī":   ["ninīṣa"],
     "bhid": ["bibhitsa"],
     "kṣip": ["cikṣipsa", "cikṣīṣa"],
+    # Exceptions that keep 'ā' (Whitney §1028b)
+    "sthā": ["tiṣṭhāsa"],
+    "jñā":  ["jijñāsa"],
+    "ghrā": ["jighrāsa"],
+    "gā":   ["jigāsa"],
 }
 
 # ── Intensive (yaṅ) stem overrides ───────────────────────────────────────────
@@ -206,7 +211,7 @@ desiderative_stem_overrides = {
 # Used when generate_intensive_prefix() gives wrong prefix.
 # Middle voice: stem + ya; Active voice: stem + [INTENSIVE_ACTIVE]
 intensive_stem_overrides = {
-    "gam":  "jaṅgam",  # nasal insertion: ga+gam → jaṅgam (not jagam)
+    # "gam":  "jaṅgam",  # nasal insertion: ga+gam → jaṅgam (not jagam)
     "dviṣ": "dedviṣ",  # prefix drops 'v': di + dviṣ → dedviṣ (not dvedveṣ)
     "hu":   "johav",   # Whitney §1006: 'usually makes its intensive stem johav, before all endings'
     "han":  "jaṅghan",
@@ -214,7 +219,7 @@ intensive_stem_overrides = {
     "pā":   "pepīy",
     # Whitney §1002 / INRIA: kṛ intensive uses carkar- base (not cekṛ-)
     # The forms attest: carkarīmi, carkarīṣi, carkarti, carkarvaḥ etc.
-    "kṛ":   "carkar",
+    # "kṛ":   "carkar",
     # "kṣip": removed — let algorithm handle kśip → cekṣip
     # yaj: intensive prefix is yāy- (long ā); Whitney §1014 heavy-syllable intensives
     "yaj":  "yāyaj",

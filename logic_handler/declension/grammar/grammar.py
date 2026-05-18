@@ -18,7 +18,7 @@ class SanskritPhonology:
     def __init__(self):
         # 1. DEFINE SIGMA AND SIGMA STAR
         self.sigma = pn.union(*"abcdefghijklmnopqrstuvwxyzāīūṛṝḷḹeaiouḥṃṅñṇnṃśṣs")
-        self.sigma = pn.union(self.sigma, "[EOS]")
+        self.sigma = pn.union(self.sigma, "[WORD_END]")
         self.sigma_star = self.sigma.closure()
 
         # 2. VOWELS
@@ -129,7 +129,7 @@ class SanskritPhonology:
 
     def apply_visarga(self):
         eos_conversion = pn.cdrewrite(
-            pn.cross(pn.union("s", "r"), "ḥ"), "", "[EOS]", self.sigma
+            pn.cross(pn.union("s", "r"), "ḥ"), "", "[WORD_END]", self.sigma
         )
         return eos_conversion.optimize()
 
@@ -189,7 +189,7 @@ class SanskritPhonology:
         self.apply_jhal_to_jash = pn.cdrewrite(
             jhal_to_jash,
             "",  # left context
-            "[EOS]",  # right context
+            "[WORD_END]",  # right context
             self.sigma_star,
         )
         as_to_o = pn.cdrewrite(
