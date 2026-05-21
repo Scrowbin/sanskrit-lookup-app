@@ -224,6 +224,14 @@ intensive_stem_overrides = {
     # yaj: intensive prefix is yāy- (long ā); Whitney §1014 heavy-syllable intensives
     "yaj":  "yāyaj",
     # "vid": removed — let algorithm handle: vi + vid → vevid (no Grassmann issue here)
+
+    # Whitney §1002c — Type II intensives: consonant-copy prefix.
+    # The root-final consonant is echoed after the prefix vowel (short a),
+    # then undergoes sandhi with the following root-initial consonant.
+    # car  (√car)  → prefix 'car' + root 'car' → caṇcar  (r+c assimilation → ṇc)
+    # cal  (√cal)  → prefix 'cal' + root 'cal' → caṇcal  (l+c assimilation → ṇc)
+    "car":  "caṇcar",
+    "cal":  "caṇcal",
 }
 
 

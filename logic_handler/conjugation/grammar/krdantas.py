@@ -63,7 +63,7 @@ class KrdantaEngine:
             
         return output
 
-    def generate_block(self, root_str: str, class_num: int, preverb_str: str = "") -> str:
+    def generate_block(self, root_str: str, class_num: int, preverb_str: str = "", derivative: str | None = None) -> str:
         out = ["Participles"]
         
         # 1. Past Passive Participle (-ta / -tā)
@@ -140,9 +140,7 @@ class KrdantaEngine:
         perf_mid_base = self.c.stems._build_perfect_krdanta_base(root_str, class_num, "middle")
         
         phonemes = ALPHABET.parse_phonemes(root_str)
-        if root_str == "bhū":
-            act_suffix = "ān"
-        elif phonemes and phonemes[-1] in ('u', 'ū', 'ṛ', 'ṝ'):
+        if root_str == "bhū" or (phonemes and phonemes[-1] in ('u', 'ū', 'ṛ', 'ṝ')):
             act_suffix = "vān"
         else:
             act_suffix = "ivān"
@@ -161,16 +159,30 @@ class KrdantaEngine:
             "Infinitive", root_str, class_num, "inf", "tum", "", preverb_str, peri_base
         ))
         
-        # Absolutive
-        out.extend(self._build_and_format(
-            "Absolutive", root_str, class_num, "abs_tva", "tvā", "", preverb_str, pn.accep(root_str)
-        ))
-        
+        # Absolutive selection (Whitney §990):
+        # • Unprefixed roots → -tvā only
+        # • Prefixed (preverb present): consonant-final root → -tya; vowel-final → -ya
+        is_prefixed = bool(preverb_str)
         short_vowels = {'a', 'i', 'u', 'ṛ', 'ḷ'}
-        ya_suffix = "tya" if phonemes and phonemes[-1] in short_vowels else "ya"
-        
+        root_final = phonemes[-1] if phonemes else ''
+        root_ends_in_vowel = root_final in set(ALPHABET.vowels_list)
+
+        # -tvā absolutive: only for unprefixed roots
+        if not is_prefixed:
+            out.extend(self._build_and_format(
+                "Absolutive (-tvā)", root_str, class_num, "abs_tva", "tvā", "", preverb_str, pn.accep(root_str)
+            ))
+
+        # -ya / -tya absolutive
+        if is_prefixed:
+            # Prefixed: -tya for consonant-final, -ya for vowel-final (Whitney §990)
+            abs_ya_suffix = "ya" if root_ends_in_vowel else "tya"
+        else:
+            # Unprefixed: plain -ya (indeclinable gerundive complement)
+            abs_ya_suffix = "ya"
+
         out.extend(self._build_and_format(
-            "Absolutive", root_str, class_num, "abs_ya", ya_suffix, "", preverb_str, pn.accep(root_str)
+            f"Absolutive ({'-' + abs_ya_suffix})", root_str, class_num, "abs_ya", abs_ya_suffix, "", preverb_str, pn.accep(root_str)
         ))
         
         return "\n".join(out)

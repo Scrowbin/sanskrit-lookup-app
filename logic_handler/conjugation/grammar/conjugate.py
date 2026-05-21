@@ -166,13 +166,19 @@ class SanskritConjugator:
             Periphrastic perfect returns ``list[str]`` like the main path.
         """
         if tense == "krdantas":
-            return self.get_krdantas_block(root_str, class_num, derivative=derivative, use_db=use_db)        # Block morphologically impossible combinations early
-        if voice == "passive" and tense in (
-            "perfect", "future", "periphrastic_future", "conditional", "benedictive"
-        ):
+            return self.get_krdantas_block(root_str, class_num, derivative=derivative, use_db=use_db)
+        
+        # Whitney §530-531: Outside the present-system, the middle voice doubles as
+        # passive. Auto-alias passive → middle for tenses with no distinct passive
+        # paradigm, rather than raising an error. Periphrastic future is excluded
+        # entirely (no passive or middle paradigm exists for it).
+        _no_distinct_passive = {"perfect", "future", "conditional", "benedictive"}
+        if voice == "passive" and tense in _no_distinct_passive:
+            voice = "middle"  # silent alias per Whitney §530
+        elif voice == "passive" and tense == "periphrastic_future":
             raise ValueError(
-                f"Impossible combination: voice='{voice}' tense='{tense}'. "
-                "These tenses have no distinct passive morphological paradigm."
+                "Impossible combination: voice='passive' tense='periphrastic_future'. "
+                "The periphrastic future has no passive or middle paradigm."
             )
 
         # ── 0. Parse Preverbs (Upasargas) ────────────────────────────────────

@@ -188,6 +188,42 @@ class SandhiEngine:
             "+ṭ", "+ṭh",
         )
 
+        # Whitney §117a — Sonantization: plain surd mute → voiced before a voiced
+        # obstruent or h at a morpheme boundary (regressive assimilation).
+        # Complements `devoicing` (voiced→surd before surd) for full surd/sonant harmony.
+        # `+h` is included because h is phonologically voiced and sonantizes a preceding
+        # surd in internal preverb junctions (e.g. ut+han → ud+han, Whitney §163).
+        # Ordering: FIRST so that the resulting sonant is seen by subsequent rules
+        # (d_dh_gemination, bartholomae, etc.).
+        _voiced_triggers = pn.union(
+            "+g", "+gh", "+j", "+jh",
+            "+ḍ", "+ḍh", "+d", "+dh",
+            "+b", "+bh", "+h",
+        )
+        self.sonantization_117a = pn.cdrewrite(
+            pn.string_map([
+                ("k", "g"), ("c", "j"), ("ṭ", "ḍ"), ("t", "d"), ("p", "b"),
+            ]),
+            "", _voiced_triggers, self.sig
+        )
+
+        # Whitney §163 — Mute before h: after sonantization, the voiced mute +h
+        # cluster obligatorily aspirates: the h "transfers" onto the preceding
+        # consonant, yielding a voiced aspirate + voiced aspirate geminate.
+        # e.g. d+h → ddh, g+h → gdh (via gdh cluster), b+h → bdh.
+        # Must run AFTER sonantization_117a (so t→d already), BEFORE d_dh_gemination.
+        # Whitney §163; Pāṇini 8.2.37.
+        self.mute_before_h_163 = pn.cdrewrite(
+            pn.string_map([
+                ("d+h", "ddh"),
+                ("g+h", "gdh"),
+                ("b+h", "bdh"),
+                ("ḍ+h", "ḍḍh"),
+                ("j+h", "jjh"),
+            ]),
+            "", "", self.sig
+        )
+
         # Homorganic stop+aspirate assimilation at morpheme boundary:
         # ad + dhi → addhi (cf. standard internal sandhi; needed for imperative 2sg).
         # Whitney §228; Pāṇini 8.4.46 (anaṅ).
@@ -235,6 +271,8 @@ class SandhiEngine:
         # Bartholomae (aspirate assimilation):
         # Voiced aspirates (bh, dh, gh, jh) + t/th -> bd, dd, gd, jd + dh.
         # This MUST run before h+t to prevent h+t from matching the 'h' in 'dh'.
+        # Must also run BEFORE deaspiration_153 so that dh+t → ddh fires before
+        # deaspiration strips dh → d.
         self.bartholomae_general = pn.cdrewrite(
             pn.string_map([
                 ("bh+t", "bdh"), ("bh+th", "bdh"),
@@ -256,6 +294,48 @@ class SandhiEngine:
             pn.string_map([("b", "bh"), ("d", "dh"), ("g", "gh")]),
             "", ALPHABET.vowels + pn.union("gh", "dh", "bh", "h", "gdh") + throwback_triggers,
             self.sig
+        )
+
+        # Whitney §153 — Internal deaspiration before non-nasal mutes / sibilants.
+        # Rule: An aspirate mute loses aspiration when followed by a non-nasal mute
+        # or sibilant in internal combination. Only sonant (voiced) aspirates are
+        # the practically relevant class (Whitney §153b); surd aspirates are
+        # already handled by devoicing (which strips both voice and aspiration).
+        #
+        # Ordering:
+        #   • AFTER ruh_class_dental  — ruh-class h+dental must convert first.
+        #   • AFTER bartholomae_general — dh+t→ddh must fire before dh→d.
+        #   • AFTER bartho_ht — h+t→gdh must fire before h-sequence is touched.
+        #   • BEFORE h_to_k — h+s path goes through h_to_k; deaspiration handles
+        #     the mute cases only.
+        #   • BEFORE devoicing — devoicing sees the already-de-aspirated plain
+        #     sonant (d, b, g, ḍ) and can then devoice it before surds.
+        #
+        # Trigger set: every non-nasal mute (gutturals, palatals, retroflexes,
+        # dentals, labials — excluding nasals ṅ ñ ṇ n m) plus sibilants (ś ṣ s).
+        _non_nasal_mutes_and_sibilants = pn.union(
+            # gutturals (excl. ṅ)
+            "+k", "+kh", "+g", "+gh",
+            # palatals (excl. ñ)
+            "+c", "+ch", "+j", "+jh",
+            # retroflexes (excl. ṇ)
+            "+ṭ", "+ṭh", "+ḍ", "+ḍh",
+            # dentals (excl. n)
+            "+t", "+th", "+d", "+dh",
+            # labials (excl. m)
+            "+p", "+ph", "+b", "+bh",
+            # sibilants
+            "+ś", "+ṣ", "+s",
+        )
+        self.deaspiration_153 = pn.cdrewrite(
+            pn.string_map([
+                ("gh", "g"),
+                ("jh", "j"),
+                ("ḍh", "ḍ"),
+                ("dh", "d"),
+                ("bh", "b"),
+            ]),
+            "", _non_nasal_mutes_and_sibilants, self.sig
         )
 
         # h → k before +s/+ṣ (after a vowel or sonorant).
@@ -535,6 +615,8 @@ class SandhiEngine:
             ("guna_sandhi",        self.guna_sandhi),
         ]
         self._consonant_rules: list[tuple[str, pn.Fst]] = [
+            ("sonantization_117a", self.sonantization_117a),  # §117a — surd→voiced before voiced/h
+            ("mute_before_h_163",  self.mute_before_h_163),   # §163 — mute+h → voiced aspirate
             ("d_dh_gemination",   self.d_dh_gemination),
             ("dental_palatal_fusion", self.dental_palatal_fusion),
             ("ruh_class_dental",   self.ruh_class_dental),       # §2.8 Whitney §222
@@ -544,6 +626,7 @@ class SandhiEngine:
             ("bartho_hdh",         self.bartho_hdh),
             ("bartho_ht",          self.bartho_ht),
             ("grassmann_throwback",self.grassmann_throwback),
+            ("deaspiration_153",   self.deaspiration_153),   # §153 Whitney — after Bartholomae, before devoicing
             ("h_to_k",             self.h_to_k),
             ("j_retroflex",        self.j_retroflex),
             ("sha_sonant_aspirate", self.sha_sonant_aspirate),   # §2.6 Whitney §218
@@ -644,6 +727,8 @@ class SandhiEngine:
         if debug:
             return self._apply_rules_with_trace(fst, self._consonant_rules, "consonant_phase")
         return (fst
+                @ self.sonantization_117a      # §117a — surd mute → voiced before voiced obstruent/h
+                @ self.mute_before_h_163       # §163 — voiced mute + h → voiced aspirate geminate
                 @ self.d_dh_gemination
                 @ self.dental_palatal_fusion
                 @ self.ruh_class_dental             # §2.8 Whitney §222 — before bartholomae
@@ -653,6 +738,7 @@ class SandhiEngine:
                 @ self.bartho_hdh
                 @ self.bartho_ht
                 @ self.grassmann_throwback
+                @ self.deaspiration_153          # §153 Whitney — after Bartholomae, before devoicing
                 @ self.h_to_k
                 @ self.j_retroflex
                 @ self.sha_sonant_aspirate          # §2.6 Whitney §218 — before palatal_sandhi

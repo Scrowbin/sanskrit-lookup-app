@@ -191,6 +191,18 @@ class SuffixProvider:
                 "[2sg]": _s("dhi|tāt"), "[2du]": _s("tam"), "[2pl]": _s("ta"),
                 "[1sg]": _s("āni"),     "[1du]": _s("āva"), "[1pl]": _s("āma"),
             }
+        # Whitney §636 — class 2 (adādi/root-class) imperative 2sg:
+        # 'dhi' after consonant-final stem, 'hi' after vowel-final stem.
+        # Applies to all athematic non-nasal non-3 classes (primarily class 2).
+        if class_num == 2:
+            from alphabet import ALPHABET as _A
+            phonemes = _A.parse_phonemes(root_str or "")
+            sg2 = "dhi" if (phonemes and phonemes[-1] not in _A.vowels_list) else "hi"
+            return {
+                "[3sg]": _s("tu|tāt"),       "[3du]": _s("tām"), "[3pl]": _s("antu"),
+                "[2sg]": _s(f"{sg2}|tāt"),   "[2du]": _s("tam"), "[2pl]": _s("ta"),
+                "[1sg]": _s("āni"),           "[1du]": _s("āva"), "[1pl]": _s("āma"),
+            }
         if class_num == 3:
             sg2 = "dhi" if root_str in ("hu", "ad") else "hi"
             return {
