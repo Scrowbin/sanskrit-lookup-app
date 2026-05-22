@@ -95,6 +95,7 @@ class SandhiEngine:
                 ("a+o",  "o"),  ("ā+o",  "o"),
                 ("a+ai", "ai"), ("ā+ai", "ai"),
                 ("a+au", "au"), ("ā+au", "au"),
+                ("a+ata", "ata"), ("ā+ata", "ata"),
             ]),
             "", "", self.sig
         )
@@ -180,6 +181,8 @@ class SandhiEngine:
         self.class9_special = pn.cdrewrite(
             pn.cross("ī[CLASS9]+", "+"), "", ALPHABET.vowels, self.sig
         )
+        # Strip [CLASS9] everywhere else so it doesn't block RUKI later.
+        self.clean_class9 = pn.cdrewrite(pn.cross("[CLASS9]", ""), "", "", self.sig)
 
     def _setup_consonant_rules(self):
         unvoiced_triggers = pn.union(
@@ -243,15 +246,52 @@ class SandhiEngine:
         # ruh-class h + dental → lengthened vowel + ḍh.
         # Whitney §222: h of ruh, muh, snih, etc., when followed by t, th, dh.
         # Left-context includes the root vowel to apply lengthening properly.
-        # Must run BEFORE Bartholomae so duh-class h doesn't intercept it.
+        # We use pn.union with pn.cross instead of pn.string_map to ensure [RUH_H]
+        # is compiled correctly by pn.accep.
         self.ruh_class_dental = pn.cdrewrite(
-            pn.string_map([
-                ("uh[RUH_H]+t", "ūḍh"), ("uh[RUH_H]+th", "ūḍh"), ("uh[RUH_H]+dh", "ūḍh"),
-                ("ah[RUH_H]+t", "āḍh"), ("ah[RUH_H]+th", "āḍh"), ("ah[RUH_H]+dh", "āḍh"),
-                ("ih[RUH_H]+t", "īḍh"), ("ih[RUH_H]+th", "īḍh"), ("ih[RUH_H]+dh", "īḍh"),
-            ]),
+            pn.union(
+                pn.cross(pn.accep("uh[RUH_H]+t"), pn.accep("ūḍh")),
+                pn.cross(pn.accep("uh[RUH_H]+th"), pn.accep("ūḍh")),
+                pn.cross(pn.accep("uh[RUH_H]+dh"), pn.accep("ūḍh")),
+                pn.cross(pn.accep("ah[RUH_H]+t"), pn.accep("āḍh")),
+                pn.cross(pn.accep("ah[RUH_H]+th"), pn.accep("āḍh")),
+                pn.cross(pn.accep("ah[RUH_H]+dh"), pn.accep("āḍh")),
+                pn.cross(pn.accep("ih[RUH_H]+t"), pn.accep("īḍh")),
+                pn.cross(pn.accep("ih[RUH_H]+th"), pn.accep("īḍh")),
+                pn.cross(pn.accep("ih[RUH_H]+dh"), pn.accep("īḍh")),
+                pn.cross(pn.accep("ṛh[RUH_H]+t"), pn.accep("ṝḍh")),
+                pn.cross(pn.accep("ṛh[RUH_H]+th"), pn.accep("ṝḍh")),
+                pn.cross(pn.accep("ṛh[RUH_H]+dh"), pn.accep("ṝḍh")),
+                # Long vowels remain unchanged
+                pn.cross(pn.accep("ūh[RUH_H]+t"), pn.accep("ūḍh")),
+                pn.cross(pn.accep("ūh[RUH_H]+th"), pn.accep("ūḍh")),
+                pn.cross(pn.accep("ūh[RUH_H]+dh"), pn.accep("ūḍh")),
+                pn.cross(pn.accep("āh[RUH_H]+t"), pn.accep("āḍh")),
+                pn.cross(pn.accep("āh[RUH_H]+th"), pn.accep("āḍh")),
+                pn.cross(pn.accep("āh[RUH_H]+dh"), pn.accep("āḍh")),
+                pn.cross(pn.accep("īh[RUH_H]+t"), pn.accep("īḍh")),
+                pn.cross(pn.accep("īh[RUH_H]+th"), pn.accep("īḍh")),
+                pn.cross(pn.accep("īh[RUH_H]+dh"), pn.accep("īḍh")),
+                pn.cross(pn.accep("ṝh[RUH_H]+t"), pn.accep("ṝḍh")),
+                pn.cross(pn.accep("ṝh[RUH_H]+th"), pn.accep("ṝḍh")),
+                pn.cross(pn.accep("ṝh[RUH_H]+dh"), pn.accep("ṝḍh")),
+                # Diphthongs remain unchanged
+                pn.cross(pn.accep("oh[RUH_H]+t"), pn.accep("oḍh")),
+                pn.cross(pn.accep("oh[RUH_H]+th"), pn.accep("oḍh")),
+                pn.cross(pn.accep("oh[RUH_H]+dh"), pn.accep("oḍh")),
+                pn.cross(pn.accep("eh[RUH_H]+t"), pn.accep("eḍh")),
+                pn.cross(pn.accep("eh[RUH_H]+th"), pn.accep("eḍh")),
+                pn.cross(pn.accep("eh[RUH_H]+dh"), pn.accep("eḍh")),
+                pn.cross(pn.accep("auh[RUH_H]+t"), pn.accep("auḍh")),
+                pn.cross(pn.accep("auh[RUH_H]+th"), pn.accep("auḍh")),
+                pn.cross(pn.accep("auh[RUH_H]+dh"), pn.accep("auḍh")),
+                pn.cross(pn.accep("aih[RUH_H]+t"), pn.accep("aiḍh")),
+                pn.cross(pn.accep("aih[RUH_H]+th"), pn.accep("aiḍh")),
+                pn.cross(pn.accep("aih[RUH_H]+dh"), pn.accep("aiḍh")),
+            ),
             "", "", self.sig
         )
+        self.clean_ruh_h = pn.cdrewrite(pn.cross("[RUH_H]", ""), "", "", self.sig)
 
         # Homorganic gemination across morpheme boundary: **tag-gated** ([SD_GEM]).
         # Whitney §231; sonorants included for reduplication / intensive edges.
@@ -268,6 +308,17 @@ class SandhiEngine:
             "", "", self.sig
         )
 
+        # Pāṇini 8.2.26 (jhalo jhali): s drops between two jhal letters.
+        # This handles s-aorist deletion for roots ending in stops (e.g. budh+s+ta -> budh+ta).
+        _jhal = pn.union(
+            "k", "kh", "g", "gh", "c", "ch", "j", "jh",
+            "ṭ", "ṭh", "ḍ", "ḍh", "t", "th", "d", "dh",
+            "p", "ph", "b", "bh", "ś", "ṣ", "s", "h"
+        )
+        self.jhalo_jhali = pn.cdrewrite(
+            pn.cross("+s", ""), _jhal, "+" + _jhal, self.sig
+        )
+
         # Bartholomae (aspirate assimilation):
         # Voiced aspirates (bh, dh, gh, jh) + t/th -> bd, dd, gd, jd + dh.
         # This MUST run before h+t to prevent h+t from matching the 'h' in 'dh'.
@@ -282,13 +333,15 @@ class SandhiEngine:
             ]),
             "", "", self.sig
         )
-        self.bartho_hth = pn.cdrewrite(pn.cross("h+th", "gdh"), "", "", self.sig)
-        self.bartho_hdh = pn.cdrewrite(pn.cross("h+dh", "gdh"), "", "", self.sig)
-        self.bartho_ht  = pn.cdrewrite(pn.cross("h+t",  "gdh"), "", "", self.sig)
+        # Must use left-context to ensure we match a genuine 'h', not the 'h' inside 'dh', 'bh', etc.
+        _h_left = pn.union(ALPHABET.vowels, "r", "l", "y", "v", "n", "m", "ṅ", "ñ", "ṇ")
+        self.bartho_hth = pn.cdrewrite(pn.cross("h+th", "gdh"), _h_left, "", self.sig)
+        self.bartho_hdh = pn.cdrewrite(pn.cross("h+dh", "gdh"), _h_left, "", self.sig)
+        self.bartho_ht  = pn.cdrewrite(pn.cross("h+t",  "gdh"), _h_left, "", self.sig)
 
         # Grassmann's Law (throwback deaspiration).
         throwback_triggers = pn.union(
-            "+s", "+ṣ", "+t", "+th", "+c", "+ch", "+dhv", "[EOS]"
+            "+s", "+ṣ", "+t", "+th", "+c", "+ch", "[EOS]"
         )
         self.grassmann_throwback = pn.cdrewrite(
             pn.string_map([("b", "bh"), ("d", "dh"), ("g", "gh")]),
@@ -352,10 +405,10 @@ class SandhiEngine:
         # Implemented via the [MRJ] tag injected in stem_rules.py.
         self.j_retroflex = pn.cdrewrite(
             pn.string_map([
-                ("j[MRJ]+t", "ṣṭ"), ("j[MRJ]+th", "ṣṭh"),
-                ("jj[MRJ]+t", "ṣṭ"), ("jj[MRJ]+th", "ṣṭh"),
-                ("c[MRJ]+t", "ṣṭ"), ("c[MRJ]+th", "ṣṭh"),
-                ("ś[MRJ]+t", "ṣṭ"), ("ś[MRJ]+th", "ṣṭh"),
+                ("j[MRJ]+t", "ṣṭ"), ("j[MRJ]+th", "ṣṭh"), ("j[MRJ]+dh", "ḍḍh"),
+                ("jj[MRJ]+t", "ṣṭ"), ("jj[MRJ]+th", "ṣṭh"), ("jj[MRJ]+dh", "ḍḍh"),
+                ("c[MRJ]+t", "ṣṭ"), ("c[MRJ]+th", "ṣṭh"), ("c[MRJ]+dh", "ḍḍh"),
+                ("ś[MRJ]+t", "ṣṭ"), ("ś[MRJ]+th", "ṣṭh"), ("ś[MRJ]+dh", "ḍḍh"),
             ]),
             "", "", self.sig
         )
@@ -438,11 +491,12 @@ class SandhiEngine:
             "", "", self.sig
         )
         
-        # m → ṃ (anusvāra) before semivowels (y, r, l, v) and sibilants (ś, ṣ, s, h).
-        # Whitney §117c / §212; Pāṇini 8.3.2 (anusvāra before semivowels / sibilants).
+        # m → ṃ (anusvāra) before sibilants (ś, ṣ, s, h) internally.
+        # Whitney §212; Pāṇini 8.3.24 (naś cāpadāntasya jhali): internally, m and n become anusvāra ONLY before jhal (fricatives here).
+        # (External sandhi converts m to anusvāra before semivowels too, but this is internal sandhi!)
         self.anusvara = pn.cdrewrite(
             pn.cross("m+", "ṃ+"),
-            "", pn.union("y", "r", "l", "v", "ś", "ṣ", "s", "h"), self.sig
+            "", pn.union("ś", "ṣ", "s", "h"), self.sig
         )
         # REMOVED: gamya_fix — it was reverting anusvāra back to m, producing
         # wrong forms. Whitney §993 explicitly gives saṃgamya WITH anusvāra.
@@ -551,9 +605,9 @@ class SandhiEngine:
         )
 
         # Post-RUKI retroflex assimilation (Whitney §198; Pāṇini 8.4.41).
-        self.retro_post_ruki_th  = pn.cdrewrite(pn.cross("ṣ+th",  "ṣṭh"), "", "", self.sig)
-        self.retro_post_ruki_t   = pn.cdrewrite(pn.cross("ṣ+t",   "ṣṭ"),  "", "", self.sig)
-        self.retro_post_ruki_dhv = pn.cdrewrite(pn.cross("ṣ+dhv", "ḍhv"), "", "", self.sig)
+        self.retro_post_ruki_th  = pn.cdrewrite(pn.string_map([("ṣ+th", "ṣṭh"), ("ṣth", "ṣṭh")]), "", "", self.sig)
+        self.retro_post_ruki_t   = pn.cdrewrite(pn.string_map([("ṣ+t", "ṣṭ"), ("ṣt", "ṣṭ")]), "", "", self.sig)
+        self.retro_post_ruki_dhv = pn.cdrewrite(pn.string_map([("ṣ+dhv", "ḍhv"), ("ṣdhv", "ḍhv")]), "", "", self.sig)
         # After RUKI, sigmatic aorist k+ṣ+t/th should still simplify to kt/kth.
         # Whitney §221; Pāṇini 8.4.65.
         self.ksha_t_simplify_post_ruki = pn.cdrewrite(
@@ -580,7 +634,7 @@ class SandhiEngine:
         # Visarga: word-final s → ḥ (Whitney §170–172; Pāṇini 8.3.15).
         # Note: ṣ removed from visarga rule since it becomes ṭ at word-final.
         self.visarga = pn.cdrewrite(
-            pn.string_map([("s", "ḥ")]),
+            pn.string_map([("s", "ḥ"), ("r", "ḥ")]),
             "", pn.union("[EOS]", "+[EOS]"), self.sig
         )
 
@@ -597,6 +651,15 @@ class SandhiEngine:
             ]),
             "", pn.union("[EOS]", "+[EOS]"), self.sig
         )
+        
+        # r+t optionally drops t (Whitney 150a), but INRIA expects full 'rt' for many intensive imperfects like acarkart.
+        self.cluster_reduction_rt = pn.cdrewrite(
+            pn.union(pn.cross("r+t", "r"), pn.cross("r+t", "rt")),
+            "", pn.union("[EOS]", "+[EOS]"), self.sig
+        )
+        
+        self.cluster_reduction = (self.cluster_reduction @ self.cluster_reduction_rt).optimize()
+
 
     # ──────────────────────────────────────────────────────────────────────────
     # Named rule lists (for per-rule debug tracing)
@@ -606,6 +669,7 @@ class SandhiEngine:
         self._vowel_rules: list[tuple[str, pn.Fst]] = [
             ("thematic_merger",    self.thematic_merger),
             ("class9_special",     self.class9_special),
+            ("clean_class9",       self.clean_class9),
             ("ayadi",              self.ayadi),
             ("perfect_yan_conjunct", self.perfect_yan_conjunct),
             ("perfect_yan_simple",   self.perfect_yan_simple),
@@ -652,6 +716,7 @@ class SandhiEngine:
         self._long_distance_rules: list[tuple[str, pn.Fst]] = [
             ("visarga",              self.visarga),              # §170 Word-final s → ḥ (must run before ruki)
             ("cluster_reduction",    self.cluster_reduction),
+            ("cluster_reduction_rt", self.cluster_reduction_rt),
             ("permitted_finals",     self.permitted_finals),     # §2.1 Word-final normalization
             ("ruki",                 self.ruki),
             ("ruki_r_revert",        self.ruki_r_revert),        # §3.1 Whitney §181a
@@ -714,6 +779,7 @@ class SandhiEngine:
         return (fst
                 @ self.thematic_merger
                 @ self.class9_special
+                @ self.clean_class9
                 @ self.ayadi
                 @ self.perfect_yan_conjunct
                 @ self.perfect_yan_simple
@@ -732,7 +798,9 @@ class SandhiEngine:
                 @ self.d_dh_gemination
                 @ self.dental_palatal_fusion
                 @ self.ruh_class_dental             # §2.8 Whitney §222 — before bartholomae
+                @ self.clean_ruh_h                  # MUST strip [RUH_H] so it doesn't block h_to_k
                 @ self.homorganic_gemination
+                @ self.jhalo_jhali
                 @ self.bartholomae_general
                 @ self.bartho_hth
                 @ self.bartho_hdh
@@ -768,8 +836,8 @@ class SandhiEngine:
                 fst, self._long_distance_rules, "long_distance_phase"
             )
         return (fst
-                @ self.visarga                    # §170: s -> ḥ at EOS (must run before RUKI to prevent RUKI on final s)
                 @ self.cluster_reduction          # P. 8.2.23: Reduce word-final cluster before changing permitted finals
+                @ self.visarga                    # §170: s/r -> ḥ at EOS (must run before RUKI to prevent RUKI on final s)
                 @ self.permitted_finals           # §2.1 Whitney §141–150
                 @ self.ruki
                 @ self.ruki_r_revert              # Whitney §181a: ṣ→s when followed by r

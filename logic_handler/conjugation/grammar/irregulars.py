@@ -103,7 +103,7 @@ perfect_stem_overrides = {
     "bhū": {"strong": "babhūv", "weak": "babhūv"},
     "div": {"strong": "didīv",  "strong_3sg": "didev",   "weak": "didīv"},
     # han: Grassmann's law throwback (jaghan/jaghn). Truly suppletive.
-    "han": {"strong": "jaghan", "weak": "jaghn"},
+    "han": {"strong": "jaghan", "strong_3sg": "jaghān", "weak": "jaghn"},
     # vid: perfect-as-present veda (Whitney §801); truly suppletive.
     "vid": {"strong": "vived", "strong_3sg": "vived", "weak": "vivid", "weak2": "vid"},
 }
@@ -115,21 +115,18 @@ perfect_stem_overrides = {
 # Maps root_str -> dict of {"type": aorist_type, "active": stem, "middle": stem}
 # Types: "root", "a", "reduplicated", "s", "is", "sa"
 aorist_overrides = {
+    "yuj":  {"type": "s_or_a"},
     "bhū":  {"type": "root"},
     "ad":   {"type": "a", "active": "ghasa", "middle": "ghasa"},  # Suppletive a-aorist
     "hu":   {"type": "s"},                                         # s-aorist
     "div":  {"type": "is", "active": "dīv", "middle": "dīv"},     # is-aorist; iṣ is in endings
     "su":   {"type": "s"},                                         # s-aorist
     "tud":  {"type": "s"},                                         # s-aorist aniṭ (tut+s)
-    # yuj shows sigmatic aorist alternatives (e.g. ayokṣīt / ayaukṣīt).
-    "yuj":  {"type": "s"},
     "tan":  {"type": "s"},
     "krī":  {"type": "s"},
     "cur":  {"type": "a", "active": "cūcur+a", "middle": "cūcur+a"},  # reduplicated a-aorist
     "kṛ":   {"type": "s", "middle": "kṛ", "middle_type": "root"}, # middle root: akṛta
-    "duh":  {"type": "sa", "active": "dhuṣ", "middle": "dhuṣ"},   # sa-aorist: adhukṣat / adhukṣata
-    "dviṣ": {"type": "sa", "active": "dvikṣ", "middle": "dvikṣ"}, # sa-aorist: advikṣat / advikṣata
-    "muc":  {"type": "a"},
+
     "han":  {"type": "is", "active": "vadh", "middle": "vadh"},   # suppletive aorist
     
     # Type 1: Root Aorists
@@ -142,10 +139,6 @@ aorist_overrides = {
     # Type 2: a-Aorists (Irregular stems)
     "vac":  {"type": "a", "active": "voca", "middle": "voca"},
     "dṛś":  {"type": "a", "active": "darśa", "middle": "darśa"},
-    "gam":  {"type": "a", "active": "gama", "middle": "gama"},
-    "sad":  {"type": "a", "active": "sada", "middle": "sada"},
-    "lip":  {"type": "a", "active": "lipa", "middle": "lipa"},
-    "śak":  {"type": "a", "active": "śaka", "middle": "śaka"},
 
     # Type 3: Reduplicated Aorists (Handled algorithmically for causatives)
 
@@ -156,8 +149,8 @@ aorist_overrides = {
 
     # Pāṇini allows optional s or iṣ aorist for certain roots like budh.
     "budh": {"type": "s_or_is"},
-    # Whitney 881a: A few roots take optionally the s- or the iṣ-aorist.
-    # The default analyzer returns "is" for budh, so we override it to allow both.
+    # Whitney §881a: budh takes either the s-aorist or iṣ-aorist.
+    # Dual-dispatch in conjugate._conjugate_aorist_dual handles both types.
 
     # Type 5: is-Aorists (Algorithmically handled)
     
@@ -213,17 +206,17 @@ desiderative_stem_overrides = {
 intensive_stem_overrides = {
     # "gam":  "jaṅgam",  # nasal insertion: ga+gam → jaṅgam (not jagam)
     "dviṣ": "dedviṣ",  # prefix drops 'v': di + dviṣ → dedviṣ (not dvedveṣ)
-    "hu":   "johav",   # Whitney §1006: 'usually makes its intensive stem johav, before all endings'
     "han":  "jaṅghan",
     "vṛ":   "varīvṛ",
     "pā":   "pepīy",
     # Whitney §1002 / INRIA: kṛ intensive uses carkar- base (not cekṛ-)
     # The forms attest: carkarīmi, carkarīṣi, carkarti, carkarvaḥ etc.
-    # "kṛ":   "carkar",
+    "kṛ":   "carkar",
     # "kṣip": removed — let algorithm handle kśip → cekṣip
     # yaj: intensive prefix is yāy- (long ā); Whitney §1014 heavy-syllable intensives
     "yaj":  "yāyaj",
-    # "vid": removed — let algorithm handle: vi + vid → vevid (no Grassmann issue here)
+    # budh: Whitney §1002i - Grassmann roots restore the original aspirate in the prefix
+    "budh": {"strong": "bobhodh", "weak": "bobhudh", "middle": "bobhudh"},
 
     # Whitney §1002c — Type II intensives: consonant-copy prefix.
     # The root-final consonant is echoed after the prefix vowel (short a),
@@ -265,5 +258,43 @@ krdanta_overrides = {
         "abs_tva": {"m": "dyūtvā\nAbsolutive\ndīvitvā"},
         "abs_ya": {"m": "-dyūya"}
     },
-
+    # ── Samprasāraṇa PPP overrides (Whitney §252, Pāṇini 6.1.13-15) ─────────
+    # These roots undergo suppletive stem changes in -ta/-tvā participles that
+    # involve simultaneous samprasāraṇa + cluster sandhi, not derivable by the
+    # generic root+ta algorithm.
+    "vac": {
+        "ppp":     {"m": "ukta",    "f": "uktā"},       # va→u, c+t→kt
+        "pp_act":  {"m": "uktavat", "f": "uktavatī"},
+        "abs_tva": {"m": "uktvā"},
+        "abs_ya":  {"m": "-ucya"},
+    },
+    "yaj": {
+        "ppp":     {"m": "iṣṭa",    "f": "iṣṭā"},      # ya→i, j+t→ṣṭ
+        "pp_act":  {"m": "iṣṭavat", "f": "iṣṭavatī"},
+        "abs_tva": {"m": "iṣṭvā"},
+        "abs_ya":  {"m": "-ijya"},
+    },
+    "svap": {
+        "ppp":     {"m": "supta",    "f": "suptā"},     # sva→su, p+t→pt
+        "pp_act":  {"m": "suptavat", "f": "suptavatī"},
+        "abs_tva": {"m": "suptvā"},
+    },
+    "vap": {
+        "ppp":     {"m": "upta",    "f": "uptā"},       # va→u, p+t→pt
+        "pp_act":  {"m": "uptavat", "f": "uptavatī"},
+        "abs_tva": {"m": "uptvā"},
+    },
+    "vah": {
+        "ppp":     {"m": "ūḍha",    "f": "ūḍhā"},      # va→u→ū, h+t→ḍh (§155)
+        "pp_act":  {"m": "ūḍhavat", "f": "ūḍhavatī"},
+    },
+    "grah": {
+        "ppp":     {"m": "gṛhīta",    "f": "gṛhītā"},   # gra→gṛ, seṭ +ī+ta
+        "pp_act":  {"m": "gṛhītavat", "f": "gṛhītavatī"},
+        "abs_tva": {"m": "gṛhītvā"},
+    },
+    "prach": {
+        "ppp":     {"m": "pṛṣṭa",    "f": "pṛṣṭā"},    # pra→pṛ, ch+t→ṣṭ
+        "pp_act":  {"m": "pṛṣṭavat", "f": "pṛṣṭavatī"},
+    },
 }

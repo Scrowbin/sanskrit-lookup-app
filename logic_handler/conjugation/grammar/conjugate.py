@@ -117,6 +117,7 @@ class SanskritConjugator:
         voice: str,
         tense: str,
         root_str: str | None = None,
+        derivative: str | None = None,
     ) -> dict[str, Suffix]:
         if voice == "passive":
             if tense in ("aorist", "injunctive"):
@@ -129,7 +130,7 @@ class SanskritConjugator:
         provider = self._ending_dispatch.get(key)
         if provider is None:
             raise ValueError(f"No ending table for tense='{tense}' voice='{voice}'.")
-        return provider(class_num=class_num, root_str=root_str, tense=tense)
+        return provider(class_num=class_num, root_str=root_str, tense=tense, derivative=derivative)
 
     # ──────────────────────────────────────────────────────────────────────────
     # Main entry point
@@ -215,6 +216,17 @@ class SanskritConjugator:
                 )
 
         # ── 1. Resolve morphological features ────────────────────────────────
+        # s_or_is dual-dispatch (Whitney §881a): roots like budh that take either
+        # the s-aorist or iṣ-aorist need two separate stem+ending pairings.
+        if tense in ("aorist", "injunctive"):
+            from irregulars import aorist_overrides
+            info = aorist_overrides.get(root_str)
+            if info and info.get("type") and "_or_" in info.get("type"):
+                return self._conjugate_aorist_dual(
+                    root_str, class_num, person, number, voice, tense,
+                    derivative, preverb_str,
+                )
+
         f = self.resolver.resolve(
             root_str, class_num, person, number, voice, tense, derivative
         )
@@ -238,7 +250,7 @@ class SanskritConjugator:
             stem = pn.accep("[AUG]a+") + stem
 
         # ── 4. Fetch ending and combine ───────────────────────────────────────
-        endings = self._fetch_endings(f.effective_class, voice, tense, root_str=root_str)
+        endings = self._fetch_endings(f.effective_class, voice, tense, root_str=root_str, derivative=f.effective_derivative)
         tag = f"[{person}{number}]"
         if tag not in endings:
             raise ValueError(f"No ending for {tag} in {tense} {voice}.")
@@ -267,6 +279,72 @@ class SanskritConjugator:
         
         # We now return a clean list of unique forms directly
         return sorted(list(forms))
+
+    # ──────────────────────────────────────────────────────────────────────────
+    # Dual-dispatch aorist (s_or_is)
+    # ──────────────────────────────────────────────────────────────────────────
+
+    def _conjugate_aorist_dual(
+        self,
+        root_str: str,
+        class_num: int,
+        person: str,
+        number: str,
+        voice: str,
+        tense: str,
+        derivative: str | None,
+        preverb_str: str,
+    ) -> list[str]:
+        """Dual-dispatch for s_or_is aorist roots (Whitney §881a).
+
+        Runs the full stem→ending→sandhi pipeline twice: once with the
+        s-aorist type and once with the iṣ-aorist type, then unions the
+        results.  This avoids stem/ending cross-contamination that occurs
+        when ``pn.union(build_s, build_is)`` is paired with a single
+        ending set.
+        """
+        from irregulars import aorist_overrides
+
+        info = aorist_overrides[root_str]
+        original_type = info.get("type", "")
+        forced_types = original_type.split("_or_")
+        all_forms: set[str] = set()
+
+        for forced_type in forced_types:
+            aorist_overrides[root_str] = {**info, "type": forced_type}
+            try:
+                f = self.resolver.resolve(
+                    root_str, class_num, person, number, voice, tense, derivative
+                )
+                stem = self.stems.build(
+                    root_str, f.effective_class, f.strength, tense=tense,
+                    derivative=f.effective_derivative, person=person, number=number,
+                )
+                if f.augment:
+                    stem = pn.accep("[AUG]a+") + stem
+                endings = self._fetch_endings(
+                    f.effective_class, voice, tense, root_str=root_str, derivative=f.effective_derivative,
+                )
+                tag = f"[{person}{number}]"
+                if tag not in endings:
+                    continue
+                suffix: Suffix = endings[tag]
+                combined = (
+                    stem if suffix.is_empty
+                    else stem + pn.accep("+") + suffix.to_fst()
+                )
+                if preverb_str:
+                    combined = pn.accep(preverb_str) + combined
+                morph_fst = self.morphology.apply_all(combined)
+                sandhi_fst = self.sandhi.apply_all(morph_fst)
+                result = sandhi_fst.optimize()
+                all_forms.update(result.paths().ostrings())
+            except Exception:
+                pass  # skip if one sub-type fails
+            finally:
+                aorist_overrides[root_str]["type"] = original_type  # restore original
+
+        return sorted(list(all_forms))
 
     # ──────────────────────────────────────────────────────────────────────────
     # Periphrastic perfect
@@ -390,14 +468,14 @@ class SanskritConjugator:
 
         # Step 2 – augment
         if f.augment:
-            stem = pn.accep("a+") + stem
+            stem = pn.accep("[AUG]a+") + stem
             try:
                 print(f"  2. augmented stem: '{stem.optimize().string()}'")
             except Exception:
                 print(f"  2. augmented stem: ambiguous / empty")
 
         # Step 3 – ending
-        endings = self._fetch_endings(f.effective_class, voice, tense, root_str=root_str)
+        endings = self._fetch_endings(f.effective_class, voice, tense, root_str=root_str, derivative=f.effective_derivative)
         tag = f"[{person}{number}]"
         suffix: Suffix = endings.get(tag, Suffix(""))
         print(f"  3. ending surface='{suffix.surface}' tags={suffix.tags}")

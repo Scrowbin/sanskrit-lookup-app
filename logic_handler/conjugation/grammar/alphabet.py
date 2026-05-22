@@ -95,6 +95,7 @@ class SanskritAlphabet:
             "[SD_SIB]",   # sibilant + sibilant (e.g. ṣ+s → kṣ)
             "[SD_LAR]",   # visarga before stop (ḥ + C → C); internal only
             "[WORD_END]",  # word-final anchor before sandhi (avoid bracket-E-O-S spelling; breaks pn.cdrewrite)
+            "[EOS]",
         ]
         # ── Pynini FST atoms ─────────────────────────────────────────────────
         self.vowels = pn.union(*self.vowels_list)

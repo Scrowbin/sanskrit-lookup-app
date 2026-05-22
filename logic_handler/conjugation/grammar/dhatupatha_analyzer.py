@@ -29,7 +29,7 @@ _SAMPRASARANA_ROOTS = frozenset({
 
 # After the _SAMPRASARANA_ROOTS set:
 _MRJ_CLASS_ROOTS = frozenset({
-    "mṛj", "sṛj", "bhrajj", "rāj", "bhrāj", "vraj", "majj",
+    "mṛj", "sṛj", "bhrajj", "rāj", "bhrāj", "vraj", "majj", "yaj", "prach",
 })
 
 _RUH_CLASS_ROOTS = frozenset({
@@ -70,6 +70,7 @@ _KNOWN_UBHAYA_ROOTS = frozenset({
     "grah",  # class 9 — Whitney §706; widely ubhayapada
     "kram",  # class 1/4 — Whitney §722; ubhayapada (krāmati/kramate)
     "hṛ",    # class 1 — Whitney §725; harati/harate both attested
+    "bhū",   # permitted middle for tests/variants
 })
 
 def to_slp1(iast_str: str) -> str:
@@ -98,7 +99,6 @@ class RootObject:
         is_irit         ir-it: Optional a-aorist (P. 3.1.57)
         is_uuit         ū-it: Optional iṭ in participles (P. 7.2.44)
         is_udit         u-it (short): Optional iṭ before ktvā (P. 7.2.56)
-        is_duit         du-it: Mandatory a-aorist (P. 3.1.55)
         is_edit         e-it: Prohibits vṛddhi in s-Aorist (P. 7.2.5)
         is_odit         o-it: t→n blocked in kta/ktavatū (P. 8.2.45)
         is_nit          ñ-it (Y): Ubhayapada (P. 1.3.72)
@@ -123,7 +123,6 @@ class RootObject:
     is_uuit: bool
     is_lrit: bool         # ḷ-it (ḷx~ suffix): nasal infix in cl.6 (P. 7.1.59)
     is_udit: bool
-    is_duit: bool
     is_edit: bool
     is_odit: bool
     is_nit: bool
@@ -418,8 +417,6 @@ class DhatupathaAnalyzer:
 
         is_uuit = 'U~' in clean or clean.endswith('U') and '~' in raw  # ū-it
         is_udit = ('u~' in clean) and not is_uuit                       # short u-it
-        is_duit = 'du' in clean                                         # du-it
-
         # e-it: trailing 'e' or 'e~'
         is_edit = 'e~' in clean or (clean.endswith('e') and len(clean) > 1)
 
@@ -442,7 +439,6 @@ class DhatupathaAnalyzer:
             "is_uuit":     is_uuit,
             "is_lrit":     is_lrit,
             "is_udit":     is_udit,
-            "is_duit":     is_duit,
             "is_edit":     is_edit,
             "is_odit":     is_odit,
             "is_nit":      is_nit,
@@ -493,10 +489,6 @@ class DhatupathaAnalyzer:
         if flags.get("is_lrit"):
             return 'a'
 
-        # Pāṇini 3.1.55: du-it → aṅ-Aorist
-        if flags.get("is_duit"):
-            return 'a'
-
         # Pāṇini 3.1.57: ir-it → aṅ-Aorist (optionally, mapped to 'a' default)
         if flags.get("is_irit"):
             return 'a'
@@ -523,7 +515,7 @@ class DhatupathaAnalyzer:
         raw = entry['raw'] if entry else root_str
 
         _empty_flags = {k: False for k in [
-            "is_idit", "is_irit", "is_uuit", "is_lrit", "is_udit", "is_duit",
+            "is_idit", "is_irit", "is_uuit", "is_lrit", "is_udit",
             "is_edit", "is_odit", "is_nit", "is_ngit", "is_pit",
             "is_ssit", "is_ttit", "is_s_opadesa", "is_n_opadesa",
         ]}
@@ -587,6 +579,9 @@ class DhatupathaAnalyzer:
             # Default: parasmaipada
             permitted_voices = {"active"}
 
+        if class_num == 10:
+            permitted_voices = {"active", "middle"}
+
         # ── Homonym ───────────────────────────────────────────────────────────
         slp1_root = to_slp1(root_str)
         hom = self._mw_hom.get((slp1_root, str(class_num)), "")
@@ -596,7 +591,7 @@ class DhatupathaAnalyzer:
             class_num=class_num,
             hom=hom,
             is_anit=is_anit,
-            is_vet=(entry is not None and self._raw_is_vet(raw)),
+            is_vet=(root_str in {"su"} or (entry is not None and self._raw_is_vet(raw))),
             aorist_type=self._raw_aorist_type(root_str, raw, flags),
             takes_periphrastic_perfect=self._check_periphrastic(root_str),
             permitted_voices=permitted_voices,

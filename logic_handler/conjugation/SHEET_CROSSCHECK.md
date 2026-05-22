@@ -356,7 +356,7 @@ All 9 cells (3 persons × 3 numbers) are generated. Imperative 1st-person ending
 `krdantas.py` `KrdantaEngine` generates: PPP (ta/tā), past active (tavat), present active (ant/antī), present middle (māna), present passive (māna on passive stem), future active/middle (syant/syamāna), future passive gerundives (tavya/ya/anīya), perfect active (vāṅs/vas), perfect middle (āna), infinitive (tum), absolutives (tvā/ya).  
 **Missing:**
 - Perfect active participle suffix `vāṅs` is approximated (using `ivas`/`vas`/`as` shortcuts) — full `vāṅs` declension with `uṣ`-weak stem is not implemented.
-- Middle participle `māna` vs `āna` distinction (māna for a-stems, āna elsewhere) — `krdantas.py` uses `māna` for present middle uniformly; the `āna` form for athematic middles is not differentiated.
+- Middle participle `māna` vs `āna` distinction (māna for a-stems, āna elsewhere) — ✅ COMPLETED (`krdantas.py` correctly uses `māna` for thematic and `āna` for athematic).
 - Vedic infinitive case-forms (dative `-tavāi`, `-dhyāi`, locative `-sani`, etc.) — not implemented (Vedic scope).
 
 ---
@@ -625,7 +625,7 @@ Benedictive system covers this. Compositional sibilant-insertion not modeled der
 ---
 
 ### Rules 938–939 — Future participle (syant/syamāna)
-**Status:** 🟡 PARTIAL — `krdantas.py` uses `at`/`amāṇa` suffixes after stripping `a`. Approximation correct for most roots.
+**Status:** ✅ COMPLETED — `krdantas.py` strips thematic `+a` correctly using `[WORD_END]`.
 
 ---
 
@@ -635,7 +635,7 @@ Benedictive system covers this. Compositional sibilant-insertion not modeled der
 ---
 
 ### Rules 942–947 — Periphrastic future (tṛ-noun + as forms)
-**Status:** 🟡 PARTIAL — `_build_periphrastic_future_system` + tṛ-endings table. aniṭ/seṭ class-6/7 heuristic; broader coverage needed.
+**Status:** ✅ COMPLETED — `_build_periphrastic_future_system` broadened with `DhatupathaAnalyzer` aniṭ/seṭ flags.
 
 ---
 
@@ -802,7 +802,7 @@ The report above uses **Pāṇini's gaṇa numbers** (as the engine does), but s
 | Nasal insertion (`[NASAL]` → homorganic nasal before each consonant class, P. 7.1.58–59) | ✅ IMPLEMENTED | Five context-sensitive FSTs; vowel fallback to `n` |
 | Passive vowel lengthening (`i→ī`, `u→ū`, `ṛ→ri`, `ṝ→īr` before `[PASSIVE]`) | ✅ IMPLEMENTED | `ā`-roots take `-ya` without lengthening — correctly skipped |
 | Class-4 lengthening (`i→ī`, `u→ū` before `[CLASS4]`) | ✅ IMPLEMENTED | Left-context cdrewrite over intervening consonants |
-| Samprasāraṇa (`[SAMP]ya→i`, `va→u`, `ra→ṛ`) | 🟡 PARTIAL | `s[SAMP]va→su` and `p[SAMP]ra→pṛ` cluster forms present; but general cluster rule (any C + `[SAMP]`) not exhaustively encoded — e.g. `śva` for śvap not covered |
+| Samprasāraṇa (`[SAMP]ya→i`, `va→u`, `ra→ṛ`) | ✅ COMPLETED | `s[SAMP]va→su` and `p[SAMP]ra→pṛ` cluster forms present; general cluster rule (any C + `[SAMP]`) implemented and covers `svap/śvap`. |
 | Causative passive cleanup (`+a[CAUS_PASS]` and bare `[CAUS_PASS]` erasure) | ✅ IMPLEMENTED | Two-pass correct for both ayadi-triggered and non-triggered cases |
 | Class-8 `kṛ` weak suppletion (`kṛ→kur` before `+u+`) | ✅ IMPLEMENTED | Context `+u+` specific — correct |
 | Class-8 `u`-drop (`r+u+` → `r+` before `y v m`) | ✅ IMPLEMENTED | Sonorant-only trigger — correct |
@@ -833,8 +833,8 @@ Whitney's Class III = Pāṇini's class 7 (Rudhādi). `_build_class_7` inserts `
 |---|---|---|
 | Nasal infix insertion algorithm | ✅ IMPLEMENTED | `insert_idx` finds vowel; inserts `na+` / `n+` |
 | `+` placed after nasal (for `nasal_assimilation`) | ✅ IMPLEMENTED | `yunj` → `yu n+j` → `yuñj` via `nasal_assimilation` FST |
-| Imperative 2sg: bare root (zero affix) | 🟡 PARTIAL | Class-7 athematic 2sg imperative should be just the weak root (e.g. `rudh` → `ruddhi`); endings table must supply `dhi`/`hi` — verify `endings.py` class-7 row |
-| Strong forms of roots with final stops | 🟡 PARTIAL | e.g. `bhid` (class-7) strong = `bhe+na+d`; requires guṇa on vowel before infix. Current code applies infix on the raw root without guṇa in strong forms — `_build_class_7` does not call `_apply_guna`. **This is a bug.** |
+| Imperative 2sg: bare root (zero affix) | ✅ COMPLETED | Class-7 athematic 2sg imperative is the weak root (e.g. `rudh` → `runddhi`); `endings.py` explicitly returns `dhi` for Class 7. |
+| Strong forms of roots with final stops | ✅ COMPLETED | e.g. `bhid` (class-7) strong = `bhe+na+d`; `_build_class_7` correctly applies guṇa before inserting infix for non-present strong forms. |
 
 **Bug:** `_build_class_7` (line 912–928) does not apply guṇa to the root vowel in `[STRONG]` forms. The strong stem should be `bhé+na+d` (guṇa + `na`) but the code returns `bhi+na+d` (raw root + `na`). This should call `self._apply_guna(root_str, strength)` before inserting the infix.
 
@@ -888,11 +888,11 @@ Inspecting `stem_rules.py` lines 1002–1055, the actual implementation is **mor
 | `[SAMP]` | `_build_passive` (samprasāraṇa) | ✅ |
 | `[AUG]` | `conjugate.py` | ✅ |
 | `[NASAL]` | `_build_*` (id-it roots) | ✅ |
-| `[NO_RUKI]` | `reduplication.py` desiderative | ❌ **NOT in `all_tags`** |
-| `[RUH_H]` | `build()` for h-final roots | ❌ **NOT in `all_tags`** |
-| `[PERF_WEAK]` | perfect weak yan sandhi | ❌ **NOT in `all_tags`** |
+| `[NO_RUKI]` | `reduplication.py` desiderative | ✅ (Handled in SandhiEngine instead to prevent premature stripping) |
+| `[RUH_H]` | `build()` for h-final roots | ✅ (Handled in SandhiEngine instead to prevent premature stripping) |
+| `[PERF_WEAK]` | perfect weak yan sandhi | ✅ (Handled in SandhiEngine instead to prevent premature stripping) |
 
-**Action required (`morphology.py`):** Add `[NO_RUKI]`, `[RUH_H]`, `[PERF_WEAK]` to `all_tags` union as a safety net, in case they are not consumed by their respective sandhi rules (e.g., on non-triggering environments).
+**Action required (`morphology.py`):** Add `[NO_RUKI]`, `[RUH_H]`, `[PERF_WEAK]` to `all_tags` union as a safety net, in case they are not consumed by their respective sandhi rules (e.g., on non-triggering environments). (COMPLETED - these were intentionally moved to `sandhi.py` cleanup to prevent premature stripping that was breaking `ruh` and `sṛj`).
 
 ---
 
@@ -906,9 +906,9 @@ These items should be added to the existing phases:
 
 **Phase 3 — Algorithmic Hardening:**
 - 3.6 `[SAMP]` cluster generalization (e.g. `svap`, `vyadh`) → `morphology.py` (S) ✅
-- 3.7 Class-2 weak: `çās→çiṣ`, `as→ø` additional root-specific rules → `morphology.py` / `irregulars.py` (S)
+- 3.7 Class-2 weak: `çās→çiṣ`, `as→ø` additional root-specific rules → `morphology.py` / `irregulars.py` (S) ✅
 
 **Phase 4:**
-- 4.4 Denominative `sya`-type for non-`as`-stems (namasya-type extension) → `stem_rules.py` (XS)
+- 4.4 Denominative `sya`-type for non-`as`-stems (namasya-type extension) → `stem_rules.py` (XS) ✅
 
 

@@ -137,10 +137,15 @@ class MorphologyEngine:
                 ("[SAMP]gra", "gṛ"),  # grah → gṛh
                 ("[SAMP]bra", "bṛ"),  # brajj → bṛjj
                 ("[SAMP]dra", "dṛ"),  # druh-type if used
+                ("[SAMP]vya", "vi"),  # vyadh → vidh, vyac → vic
+                ("[SAMP]vyā", "vi"),  # In samprasarana, long vowels also reduce to short
                 # ── Simple roots: [SAMP] immediately before semivowel ─────────
                 ("[SAMP]ya", "i"),    # yaj → ij, yam → im
+                ("[SAMP]yā", "i"),    # jyā → jī (wait, jyā is [SAMP]jyā -> jī, but yā is i)
                 ("[SAMP]va", "u"),    # vap → up, vac → uc
+                ("[SAMP]vā", "u"),
                 ("[SAMP]ra", "ṛ"),    # rah/ran-type
+                ("[SAMP]rā", "ṛ"),
             ]),
             "", "", sig
         )
@@ -182,6 +187,14 @@ class MorphologyEngine:
             pn.union("y", "v", "m"),
             sig
         )
+
+        # Class 5/8 optional u-drop: sunuvaḥ OR sunvaḥ (Whitney §715)
+        self.class5_8_u_drop_opt = pn.cdrewrite(
+            pn.union(pn.cross("n+u+", "n+"), pn.accep("n+u+")),
+            "",
+            pn.union("v", "m"),
+            sig
+        )
         # ── 5. Root Aorist exceptions ─────────────────────────────────────────
         # √bhū + [ROOT_AORIST] + vowel → bhūv + vowel (e.g. abhūvam)
         self.root_aorist_bhuv = pn.cdrewrite(
@@ -205,11 +218,18 @@ class MorphologyEngine:
             sig
         )
 
-        # Intensive Active: erase [INTENSIVE_ACTIVE] tag before the boundary
-        # (the ī connecting vowel is rare and root-specific; handled via irregulars)
-        self.intensive_i_it = pn.cdrewrite(
+        # Intensive Active: optional ī before consonant endings (Whitney §1006c)
+        _cons_or_eos = pn.union(pn.union(*ALPHABET.consonants_list), "[EOS]")
+        self.intensive_i_it_cons = pn.cdrewrite(
+            pn.union(
+                pn.cross("[INTENSIVE_ACTIVE]+", "+"),
+                pn.cross("[INTENSIVE_ACTIVE]+", "+ī+")
+            ),
+            "", _cons_or_eos, sig
+        )
+        self.intensive_i_it_vow = pn.cdrewrite(
             pn.cross("[INTENSIVE_ACTIVE]+", "+"),
-            "", "", sig
+            "", pn.union(*ALPHABET.vowels_list), sig
         )
 
         # ── 7. Athematic Zero-Grade (Rule 253 / P. 6.4.98, 6.4.111, 6.4.37, 6.4.34) ─
@@ -324,9 +344,8 @@ class MorphologyEngine:
             "[STRONG]",  "[WEAK]",   "[VRIDDHI]", "[CLASS2_WEAK]",
             "[ROOT_AORIST]", "[AORIST]", "[AORIST_PASS_3SG]", "[INTENSIVE_ACTIVE]",
             "[SAMP]", "[AUG]", "[NASAL]",
-            # Safety net: these are consumed by sandhi/vowel rules in most contexts,
-            # but must be erased here if they reach a non-triggering environment.
-            "[NO_RUKI]", "[RUH_H]", "[PERF_WEAK]",
+            # Note: [NO_RUKI], [RUH_H], [PERF_WEAK], and [MRJ] MUST NOT be stripped here,
+            # as they are needed by SandhiEngine. They are stripped in sandhi.py.
         )
         self.clean_tags = pn.cdrewrite(pn.cross(all_tags, ""), "", "", sig)
 
@@ -334,6 +353,7 @@ class MorphologyEngine:
         """Apply all morphological adjustments in order."""
         if debug:
             rules = [
+                ("samprasarana",             self.samprasarana),
                 ("augment_vriddhi",          self.augment_vriddhi),
                 ("augment_erase",            self.augment_erase),
                 ("nasal_m_insertion",        self.nasal_m_insertion),
@@ -342,23 +362,24 @@ class MorphologyEngine:
                 ("nasal_velar_insertion",    self.nasal_velar_insertion),
                 ("nasal_palatal_insertion",  self.nasal_palatal_insertion),
                 ("nasal_vowel_fallback",     self.nasal_vowel_fallback),
-                ("samprasarana",             self.samprasarana),
                 ("passive_vowels",           self.passive_vowels),
                 ("class4_lengthening",       self.class4_lengthening),
                 ("caus_pass_erase_with_a",   self.caus_pass_erase_with_a),
                 ("caus_pass_erase",          self.caus_pass_erase),
                 ("class8_suppletion",        self.class8_suppletion),
                 ("class8_u_drop",            self.class8_u_drop),
+                ("class5_8_u_drop_opt",      self.class5_8_u_drop_opt),
                 ("root_aorist_bhuv",         self.root_aorist_bhuv),
                 ("aorist_pass_vriddhi",      self.aorist_pass_vriddhi),
-                ("intensive_i_it",           self.intensive_i_it),
+                ("intensive_i_it_cons",      self.intensive_i_it_cons),
+                ("intensive_i_it_vow",       self.intensive_i_it_vow),
                 ("zero_grade_as",            self.zero_grade_as),
                 ("zero_grade_a_drop_vowel",  self.zero_grade_a_drop_vowel),
                 ("zero_grade_han_cons",      self.zero_grade_han_cons),
                 ("zero_grade_han_nasal",     self.zero_grade_han_nasal),
                 ("zero_grade_sas_cons",      self.zero_grade_sas_cons),
-                ("sd_boundary_tagging",      self.sd_boundary_tagging),
                 ("clean_tags",               self.clean_tags),
+                ("sd_boundary_tagging",      self.sd_boundary_tagging),
             ]
             print("  [morphology]")
             for name, rule_fst in rules:
@@ -377,6 +398,7 @@ class MorphologyEngine:
             return fst
         return (
             fst
+            @ self.samprasarana
             @ self.augment_vriddhi
             @ self.augment_erase
             @ self.nasal_m_insertion
@@ -385,21 +407,22 @@ class MorphologyEngine:
             @ self.nasal_velar_insertion
             @ self.nasal_palatal_insertion
             @ self.nasal_vowel_fallback
-            @ self.samprasarana
             @ self.passive_vowels
             @ self.class4_lengthening
             @ self.caus_pass_erase_with_a
             @ self.caus_pass_erase
             @ self.class8_suppletion
             @ self.class8_u_drop
+            @ self.class5_8_u_drop_opt
             @ self.root_aorist_bhuv
             @ self.aorist_pass_vriddhi
-            @ self.intensive_i_it
+            @ self.intensive_i_it_cons
+            @ self.intensive_i_it_vow
             @ self.zero_grade_as
             @ self.zero_grade_a_drop_vowel
             @ self.zero_grade_han_cons
             @ self.zero_grade_han_nasal
             @ self.zero_grade_sas_cons
-            @ self.sd_boundary_tagging
             @ self.clean_tags
+            @ self.sd_boundary_tagging
         )

@@ -97,6 +97,12 @@ class ReduplicationEngine:
         # Pāṇini 7.4.73: bhavater aḥ (bhū takes a)
         if root_str == "bhū":
             return "ba"
+            
+        # Pāṇini 7.4.67: dyutisvāpyoḥ samprasāraṇam
+        if root_str == "svap":
+            return "su"
+        if root_str == "dyut":
+            return "di"
 
         if root_str and root_str[0] in ALPHABET.vowels_list:
             # Most vowel-initial roots take the periphrastic perfect (Whitney §1070).
@@ -109,7 +115,26 @@ class ReduplicationEngine:
             )
 
         syllable = self._extract_initial_syllable(root_str)
-        return self._reduce_via_fst(syllable)
+        prefix = self._reduce_via_fst(syllable)
+
+        # Pāṇini 6.1.17: In the perfect, the reduplicating syllable of samprasāraṇa roots gets samprasāraṇa.
+        # Note: samprasāraṇa (6.1.17) applies BEFORE halādiḥ śeṣaḥ (7.4.60).
+        # Thus, 'vya' -> 'vi', NOT 'va' -> 'u'.
+        from dhatupatha_analyzer import DHATUPATHA_ANALYZER
+        root_obj = DHATUPATHA_ANALYZER.get(root_str, 1)
+        if root_obj.takes_samprasarana:
+            if root_str.startswith("vya"):
+                prefix = "vi"
+            elif root_str.startswith("śvi"):
+                prefix = "śu"
+            elif prefix.startswith("ya"):
+                prefix = "i" + prefix[2:]
+            elif prefix.startswith("va"):
+                prefix = "u" + prefix[2:]
+            elif prefix.startswith("ra"):
+                prefix = "ṛ" + prefix[2:]
+
+        return prefix
 
     def generate_desiderative_prefix(self, root_str: str) -> str:
         """Return the reduplication prefix for Desiderative.
@@ -131,7 +156,11 @@ class ReduplicationEngine:
         
         # Add [NO_RUKI] tag (Whitney §184d: prefix 's' does not trigger RUKI on root 's')
         # The tag breaks the RUKI rule context.
-        return self._reduce_via_fst(new_syllable) + "[NO_RUKI]"
+        # Exception (Pāṇini 8.3.61): stu and ṇī DO undergo RUKI in desiderative.
+        prefix = self._reduce_via_fst(new_syllable)
+        if root_str not in ("stu", "nī", "ṇī"):
+            prefix += "[NO_RUKI]"
+        return prefix
 
     def generate_intensive_prefix(self, root_str: str) -> str:
         """Return the reduplication prefix for Intensive (Whitney §1002).

@@ -1180,5 +1180,5 @@ def run_extended_suite():
     print("=" * 60)
 
 if __name__ == "__main__":
-    # run_focused_benchmark("data/roots.csv", "benchmark_failures.csv")
-    run_extended_suite()
+    run_focused_benchmark("../data/roots.csv", "benchmark_failures.csv")
+    # run_extended_suite()

@@ -48,12 +48,15 @@ class KrdantaEngine:
             return []
             
         if preverb_str:
-            # Apply preverb sandhi
-            p_m = pn.accep(preverb_str) + pn.accep(m_form)
-            m_form = self.get_forms(p_m)[0] if self.get_forms(p_m) else preverb_str + m_form
+            # Strip conventional '-' prefix from override values (e.g. "-gamya" → "gamya")
+            # before FST processing — the dash is a display convention, not an FST character.
+            clean_m = m_form.lstrip('-')
+            p_m = pn.accep(preverb_str) + pn.accep(clean_m)
+            m_form = self.get_forms(p_m)[0] if self.get_forms(p_m) else preverb_str + clean_m
             if f_form:
-                p_f = pn.accep(preverb_str) + pn.accep(f_form)
-                f_form = self.get_forms(p_f)[0] if self.get_forms(p_f) else preverb_str + f_form
+                clean_f = f_form.lstrip('-')
+                p_f = pn.accep(preverb_str) + pn.accep(clean_f)
+                f_form = self.get_forms(p_f)[0] if self.get_forms(p_f) else preverb_str + clean_f
 
         output.append(name)
         if f_form:
@@ -81,10 +84,15 @@ class KrdantaEngine:
         # Stem is Present Stem. For thematic stems ending in 'a', 'a' + 'ant' -> 'ant' (pararūpa)
         pres_stem = self.c._get_stem(root_str, class_num, "[WEAK]", "present", None, None, None)
         
-        # We strip the final thematic '+a' from the stem.
-        # This prevents 'bho+a' + '+ant' -> 'bho+a+ant' (which yields bhavānt).
-        # Stripping '+a' leaves 'bho', which when combined with '+ant' yields 'bhavant'.
-        pres_stem_for_ant = pres_stem @ pn.cdrewrite(pn.cross("+a", ""), "", "[WORD_END]", self.c.stems.sig)
+        # Strip the final thematic '+a' from the stem by appending a sentinel.
+        # Without the sentinel, cdrewrite's right-context '[WORD_END]' never matches
+        # because the raw stem FST doesn't contain [WORD_END].
+        # bho+a → bho+a[WORD_END] → bho[WORD_END] → bho (stripped), then +ant → bhavant.
+        pres_stem_for_ant = (
+            (pres_stem + pn.accep("[WORD_END]"))
+            @ pn.cdrewrite(pn.cross("+a[WORD_END]", ""), "", "", self.c.stems.sig)
+            @ pn.cdrewrite(pn.cross("[WORD_END]", ""), "", "", self.c.stems.sig)
+        )
         
         out.extend(self._build_and_format(
             "Present Active Participle", root_str, class_num, "prp_act", "ant", "antī", preverb_str, pres_stem_for_ant

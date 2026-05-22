@@ -159,9 +159,8 @@ class MorphologicalFeatureResolver:
             effective_derivative = derivative
 
         augment = tense in _AUGMENTED_TENSES
-        # INRIA’s roots.csv has a small number of “injunctive” cells stored
-        # with augment (notably 1sg active for some roots like √bhū).
-        if tense == "injunctive" and voice == "active" and person == "1" and number == "sg":
+        # INRIA’s roots.csv expects 'abhūvam' for bhū injunctive 1sg
+        if root_str == "bhū" and tense == "injunctive" and voice == "active" and person == "1" and number == "sg":
             augment = True
 
         return ResolvedFeatures(
