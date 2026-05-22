@@ -118,10 +118,12 @@ class SandhiEngine:
         )
 
         # 3. Guna sandhi: a/ā + i/u/ṛ → e/o/ar; a/ā + ḷ → al/āl.
-        # Whitney §127; Pāṇini 6.1.87 (guṇa sandhi). Whitney §244 for ḷ (a+ḷ→al).
+        # Whitney §127; Pāṇini 6.1.87 (guṇa sandhi).
+        # Exception: P. 6.1.96 usy apadāntāt (a/ā + us -> us). Our ending is uḥ.
         self.guna_sandhi = pn.cdrewrite(
             pn.string_map([
                 ("a+i", "e"),  ("a+ī", "e"),  ("ā+i", "e"),  ("ā+ī", "e"),
+                ("a+uḥ", "uḥ"),("ā+uḥ", "uḥ"),("a+us", "us"),("ā+us", "us"),
                 ("a+u", "o"),  ("a+ū", "o"),  ("ā+u", "o"),  ("ā+ū", "o"),
                 ("a+ṛ", "ar"), ("a+ṝ", "ar"), ("ā+ṛ", "ar"), ("ā+ṝ", "ar"),
                 ("a+ḷ", "al"), ("a+ḹ", "al"), ("ā+ḷ", "āl"), ("ā+ḹ", "āl"),
@@ -315,8 +317,12 @@ class SandhiEngine:
             "ṭ", "ṭh", "ḍ", "ḍh", "t", "th", "d", "dh",
             "p", "ph", "b", "bh", "ś", "ṣ", "s", "h"
         )
+        _abstract_tags_opt = pn.closure(pn.union(*ALPHABET.tags_list), 0)
         self.jhalo_jhali = pn.cdrewrite(
-            pn.cross("+s", ""), _jhal, "+" + _jhal, self.sig
+            pn.cross("+s", "") + pn.cross(_abstract_tags_opt, ""), 
+            _jhal + _abstract_tags_opt, 
+            "+" + _jhal, 
+            self.sig
         )
 
         # Bartholomae (aspirate assimilation):
@@ -495,7 +501,7 @@ class SandhiEngine:
         # Whitney §212; Pāṇini 8.3.24 (naś cāpadāntasya jhali): internally, m and n become anusvāra ONLY before jhal (fricatives here).
         # (External sandhi converts m to anusvāra before semivowels too, but this is internal sandhi!)
         self.anusvara = pn.cdrewrite(
-            pn.cross("m+", "ṃ+"),
+            pn.string_map([("m+", "ṃ+"), ("n+", "ṃ+")]),
             "", pn.union("ś", "ṣ", "s", "h"), self.sig
         )
         # REMOVED: gamya_fix — it was reverting anusvāra back to m, producing
@@ -647,7 +653,8 @@ class SandhiEngine:
                 ("gdh", "k"),
                 ("t+t", "t"),
                 ("d+t", "t"),
-                ("ddh", "t"), # Bartholomae's law word-final e.g. abubodh+t -> abuboddh -> abubot
+                ("ddh", "t"), # Bartholomae's law word-final e.g. abubodh+t -> abubot
+                ("n+t", "n"), # word-final nt -> n
             ]),
             "", pn.union("[EOS]", "+[EOS]"), self.sig
         )

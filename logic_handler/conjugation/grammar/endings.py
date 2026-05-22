@@ -153,7 +153,7 @@ class SuffixProvider:
                 "[2sg]": _s("s"),   "[2du]": _s("tam"),  "[2pl]": _s("ta"),
                 "[1sg]": _s("m"),   "[1du]": _s("āva"),  "[1pl]": _s("āma"),
             }
-        third_pl = "uḥ" if class_num == 3 else "an"
+        third_pl = "uḥ" if (class_num == 3 or (kwargs.get("tense") == "aorist" and root_str and root_str.endswith("ā"))) else "an"
         # √ad cl-2 imperfect uses connecting-vowel endings
         if root_str == "ad":
             return {
@@ -428,11 +428,11 @@ class SuffixProvider:
             aorist_type = info["type"] if info else DHATUPATHA_ANALYZER.get_aorist_type(root_str, class_num)
 
         if aorist_type in ("a", "reduplicated"):
-            return SuffixProvider.get_secondary_active(class_num=1)
+            return SuffixProvider.get_secondary_active(class_num=1, root_str=root_str, **kwargs)
         if aorist_type == "sa":
-            return SuffixProvider.get_secondary_active(class_num=1) # sa-aorist active is just like a-stem
+            return SuffixProvider.get_secondary_active(class_num=1, root_str=root_str, **kwargs) # sa-aorist active is just like a-stem
         if aorist_type == "root":
-            return SuffixProvider.get_secondary_active(class_num=2)
+            return SuffixProvider.get_secondary_active(class_num=2, root_str=root_str, **kwargs)
         if aorist_type == "is":
             return {
                 "[3sg]": _s("īt"),    "[3du]": _s("iṣṭām"), "[3pl]": _s("iṣus"),
@@ -469,7 +469,7 @@ class SuffixProvider:
         if aorist_type == "sa":
             # Whitney §917: sa-aorist middle takes i (not e) and āthām, ātām (not ethām, etām)
             return {
-                "[3sg]": _s("ta"),    "[3du]": _s("ātām"),  "[3pl]": _s("ata"),
+                "[3sg]": _s("ta"),    "[3du]": _s("ātām"),  "[3pl]": _s("anta"),
                 "[2sg]": _s("thās"),  "[2du]": _s("āthām"), "[2pl]": _s("dhvam"),
                 "[1sg]": _s("i"),     "[1du]": _s("āvahi"), "[1pl]": _s("āmahi"),
             }

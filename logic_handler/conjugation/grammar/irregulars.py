@@ -130,9 +130,9 @@ aorist_overrides = {
     "han":  {"type": "is", "active": "vadh", "middle": "vadh"},   # suppletive aorist
     
     # Type 1: Root Aorists
-    "pā":   {"type": "root", "middle": "is"},     # middle: apeṣi (Whitney §879: pā takes is in middle aorist)
+    "pā":   {"type": "root", "middle_type": "is"},     # middle: apeṣi (Whitney §879: pā takes is in middle aorist)
     "sthā": {"type": "root"},
-    "dā":   {"type": "root", "middle": "is"},     # middle: adiṣi (Whitney §879: dā takes is in middle aorist)
+    "dā":   {"type": "root", "middle_type": "is"},     # middle: adiṣi (Whitney §879: dā takes is in middle aorist)
     "dhā":  {"type": "root"},
     "gā":   {"type": "root"},
 
@@ -208,7 +208,7 @@ intensive_stem_overrides = {
     "dviṣ": "dedviṣ",  # prefix drops 'v': di + dviṣ → dedviṣ (not dvedveṣ)
     "han":  "jaṅghan",
     "vṛ":   "varīvṛ",
-    "pā":   "pepīy",
+    "pā":   "pāpī",
     # Whitney §1002 / INRIA: kṛ intensive uses carkar- base (not cekṛ-)
     # The forms attest: carkarīmi, carkarīṣi, carkarti, carkarvaḥ etc.
     "kṛ":   "carkar",

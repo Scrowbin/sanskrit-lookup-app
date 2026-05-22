@@ -76,6 +76,7 @@ class SanskritAlphabet:
             "[ROOT_AORIST]",
             "[AORIST]",
             "[AORIST_PASS_3SG]",
+            "[SA_AORIST]",
             "[INTENSIVE_ACTIVE]",
             "[CLASS2_WEAK]",
             "[SAMP]",

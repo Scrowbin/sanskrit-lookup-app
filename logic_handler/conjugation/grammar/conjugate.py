@@ -102,13 +102,14 @@ class SanskritConjugator:
         strength: str,
         tense: str,
         derivative: str | None,
+        voice: str = "active",
         person: str | None = None,
         number: str | None = None,
     ) -> pn.Fst:
         return self.stems.build(
             root_str, class_num, strength,
             tense=tense, derivative=derivative,
-            person=person, number=number,
+            person=person, number=number, voice=voice
         )
 
     def _fetch_endings(
@@ -239,7 +240,7 @@ class SanskritConjugator:
         # ── 2. Build / fetch stem FST ─────────────────────────────────────────
         stem = self._get_stem(
             root_str, f.effective_class, f.strength, tense,
-            f.effective_derivative, person, number,
+            f.effective_derivative, voice=voice, person=person, number=number
         )
 
         # ── 3. Augmentation (a- prefix for past tenses) ──────────────────────────────
@@ -459,7 +460,7 @@ class SanskritConjugator:
         # Step 1 – stem
         stem = self._get_stem(
             root_str, f.effective_class, f.strength, tense,
-            f.effective_derivative, person, number,
+            f.effective_derivative, voice=voice, person=person, number=number
         )
         try:
             print(f"  1. stem: '{stem.optimize().string()}'")

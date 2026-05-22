@@ -114,6 +114,8 @@ class StemBuilder:
         derivative=None,
         person=None,
         number=None,
+        voice="active",
+        **kwargs
     ):
         root_str = root_str.strip()
         root_obj = DHATUPATHA_ANALYZER.get(root_str, class_num)
@@ -205,7 +207,7 @@ class StemBuilder:
             if builder is None:
                 raise ValueError(f"Tense '{tense}' not supported.")
             fst = builder(
-                root_str, class_num, strength, tense, person=person, number=number
+                root_str, class_num, strength, tense, person=person, number=number, voice=voice, **kwargs
             )
 
         # Pāṇini 8.2.31 ho ḍhaḥ (h -> ḍh) & 8.2.32 dāder dhātor ghaḥ (d...h -> gh).
@@ -464,20 +466,19 @@ class StemBuilder:
         elif root_str in aorist_overrides:
             info = aorist_overrides[root_str]
             # Check for middle-specific type override (Whitney §879)
-            if voice == "middle" and "middle" in info:
-                middle_type = info["middle"]
-                if middle_type == "is":
-                    # iṣ-aorist middle: bare root (guna if vowel-final) + iṣ in endings
-                    phonemes = ALPHABET.parse_phonemes(root_str)
-                    ends_in_vowel = phonemes and phonemes[-1] in ALPHABET.vowels_list
-                    if ends_in_vowel:
-                        return self._apply_guna(root_str, "[STRONG]")
-                    return pn.accep(root_str)
-            # Explicit active/middle stems are complete bases — return as-is, no suffix
-            voice_key = "active" if strength == "[STRONG]" else "middle"
-            if voice_key in info and isinstance(info[voice_key], str):
-                return pn.accep(info[voice_key])
-            a_type = info["type"]
+            if voice == "middle" and "middle_type" in info:
+                middle_val = info["middle_type"]
+                if middle_val in ("s", "is", "sa", "sis", "root", "a"):
+                    a_type = middle_val
+                elif middle_val == "is_stem": # fallback if we meant literal stem?
+                    pass 
+                else:
+                    return pn.accep(middle_val)
+            else:
+                voice_key = "active" if strength == "[STRONG]" else "middle"
+                if voice_key in info and isinstance(info[voice_key], str) and info[voice_key] not in ("s", "is", "sa", "sis", "root", "a"):
+                    return pn.accep(info[voice_key])
+                a_type = info["type"]
         else:
             a_type = DHATUPATHA_ANALYZER.get_aorist_type(root_str, class_num)
 
@@ -530,7 +531,7 @@ class StemBuilder:
             return fst + pn.accep("+is")
 
         elif a_type == "sa":
-            return pn.accep(root_str) + pn.accep("+sa")
+            return pn.accep(root_str) + pn.accep("+sa[SA_AORIST]")
 
         elif a_type == "sis":
             return pn.accep(root_str)
@@ -553,7 +554,11 @@ class StemBuilder:
                         phonemes[i] = short_map.get(ph, ph)
                 base_str = "".join(phonemes)
                 
-            prefix = self.reduplicator.generate_aorist_prefix(base_str)
+            if root_str == "sthā" and (derivative == "causative" or class_num == 10):
+                prefix = "ti"
+                base_str = "sthip"
+            else:
+                prefix = self.reduplicator.generate_aorist_prefix(base_str)
             return pn.accep(prefix) + pn.accep(base_str) + pn.accep("+a")
 
         elif a_type == "a":

@@ -210,14 +210,20 @@ class ReduplicationEngine:
         pre_vowel_cons = ""
         found_vowel = False
         
-        for ch in root_str:
-            if ch in vowels:
-                root_vowel = ch
+        phonemes = ALPHABET.parse_phonemes(root_str)
+        for ph in phonemes:
+            if ph in vowels:
+                root_vowel = ph
                 found_vowel = True
             elif found_vowel:
-                post_vowel_cons += ch
-            else:
-                pre_vowel_cons += ch
+                post_vowel_cons += ph
+                
+        # pre_vowel_cons must come from the REDUPLICATED syllable!
+        pre_vowel_cons = ""
+        for ph in ALPHABET.parse_phonemes(syllable):
+            if ph in vowels:
+                break
+            pre_vowel_cons += ph
                 
         # Determine weight
         is_heavy = (root_vowel in long_vowels) or (len(post_vowel_cons) > 1)
@@ -237,8 +243,8 @@ class ReduplicationEngine:
         fst = pn.accep(pre_vowel_cons + base_v)
         res = (
             fst
-            @ self.palatalize
             @ self.deaspirate
+            @ self.palatalize
             # Aorist reduplication preserves the long vowel if lengthened!
             @ self.r_to_a
         ).optimize()

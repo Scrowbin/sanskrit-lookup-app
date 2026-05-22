@@ -205,16 +205,44 @@ class MorphologyEngine:
         )
 
         # ── 6. Erase all abstract tags ─────────────────────────────────────────
-        # Aorist Passive 3sg Vriddhi (e.g. bhū → bhāv before [AORIST_PASS_3SG])
-        vriddhi_map = pn.string_map([
-            ("a", "ā"), ("i", "ai"), ("ī", "ai"), ("u", "au"), ("ū", "au"), ("ṛ", "ār")
+        # Aorist Passive 3sg Vriddhi (Pāṇini 7.2.1, 7.2.3) and Guṇa (Pāṇini 7.3.86)
+        # Final vowels take vṛddhi (e.g. bhū → bhāv).
+        vriddhi_map_final = pn.string_map([
+            ("a", "ā"), ("i", "ai"), ("ī", "ai"), ("u", "au"), ("ū", "au"), ("ṛ", "ār"), ("ṝ", "ār")
         ])
-        # Lookahead allows any structural tags or boundaries before the 3sg marker
         tag_or_boundary = pn.union(*ALPHABET.tags_list, "+")
-        self.aorist_pass_vriddhi = pn.cdrewrite(
-            vriddhi_map,
+        
+        self.aorist_pass_vriddhi_final = pn.cdrewrite(
+            vriddhi_map_final,
             "",
-            pn.closure(ALPHABET.consonants) + tag_or_boundary.star + "[AORIST_PASS_3SG]",
+            tag_or_boundary.star + "[AORIST_PASS_3SG]",
+            sig
+        )
+        
+        # Medial 'a' takes vṛddhi (e.g. pac → pāc, gam → gām).
+        self.aorist_pass_vriddhi_medial_a = pn.cdrewrite(
+            pn.cross("a", "ā"),
+            "",
+            pn.closure(ALPHABET.consonants, 1) + tag_or_boundary.star + "[AORIST_PASS_3SG]",
+            sig
+        )
+        
+        # Medial short 'i', 'u', 'ṛ' take guṇa (e.g. budh → bodh, vid → ved).
+        guna_map_medial = pn.string_map([
+            ("i", "e"), ("u", "o"), ("ṛ", "ar")
+        ])
+        self.aorist_pass_guna_medial = pn.cdrewrite(
+            guna_map_medial,
+            "",
+            pn.closure(ALPHABET.consonants, 1) + tag_or_boundary.star + "[AORIST_PASS_3SG]",
+            sig
+        )
+        
+        # Pāṇini 7.3.33: āto yuk ciṇkṛtoḥ (ā takes yuk before ciṇ)
+        self.aorist_pass_yuk = pn.cdrewrite(
+            pn.cross("ā", "āy"),
+            "",
+            tag_or_boundary.star + "[AORIST_PASS_3SG]",
             sig
         )
 
@@ -258,7 +286,33 @@ class MorphologyEngine:
             sig
         )
 
-        # Rule C: han drops 'n' before STOP consonants (t, th, s, etc.) but retains it before nasals.
+        # Rule B.1: Pāṇini 6.4.64 āto lopa iṭi ca (ā drops before iṭ)
+        # Roots ending in ā drop it before i/ī. e.g. tasthā+iṭ+tha -> tasthitha.
+        # This applies across all roots.
+        self.a_drop_before_i = pn.cdrewrite(
+            pn.cross("ā+", "+"),
+            "",
+            pn.union("i", "ī"),
+            sig
+        )
+        
+        # Rule B.2: Pāṇini 7.3.72 kasyāci ca (ksa drops a before ac)
+        # sa-aorist (ksa) drops its final 'a' before vowel endings
+        self.sa_aorist_a_drop = pn.cdrewrite(
+            pn.cross("a", ""),
+            "",
+            "[SA_AORIST]+" + pn.union(*ALPHABET.vowels_list),
+            sig
+        )
+
+        # Rule C: han becomes ja before hi (imperative 2sg) (Pāṇini 6.4.36)
+        self.zero_grade_han_hi = pn.cdrewrite(
+            pn.cross("han", "ja") + pn.cross(_any_weak, "+"),
+            "", "hi",
+            sig
+        )
+
+        # Rule C.1: han drops 'n' before STOP consonants (t, th, s, etc.) but retains it before nasals.
         _stops = pn.union("t", "th", "d", "dh", "k", "kh", "g", "gh",
                           "p", "ph", "b", "bh", "c", "j", "s", "ś", "ṣ")
         self.zero_grade_han_cons = pn.cdrewrite(
@@ -342,7 +396,7 @@ class MorphologyEngine:
         all_tags = pn.union(
             "[PASSIVE]", "[CLASS4]", "[CLASS8]", "[CAUS_PASS]",
             "[STRONG]",  "[WEAK]",   "[VRIDDHI]", "[CLASS2_WEAK]",
-            "[ROOT_AORIST]", "[AORIST]", "[AORIST_PASS_3SG]", "[INTENSIVE_ACTIVE]",
+            "[ROOT_AORIST]", "[AORIST]", "[AORIST_PASS_3SG]", "[SA_AORIST]", "[INTENSIVE_ACTIVE]",
             "[SAMP]", "[AUG]", "[NASAL]",
             # Note: [NO_RUKI], [RUH_H], [PERF_WEAK], and [MRJ] MUST NOT be stripped here,
             # as they are needed by SandhiEngine. They are stripped in sandhi.py.
@@ -370,11 +424,17 @@ class MorphologyEngine:
                 ("class8_u_drop",            self.class8_u_drop),
                 ("class5_8_u_drop_opt",      self.class5_8_u_drop_opt),
                 ("root_aorist_bhuv",         self.root_aorist_bhuv),
-                ("aorist_pass_vriddhi",      self.aorist_pass_vriddhi),
+                ("aorist_pass_vriddhi_final",     self.aorist_pass_vriddhi_final),
+                ("aorist_pass_vriddhi_medial_a",  self.aorist_pass_vriddhi_medial_a),
+                ("aorist_pass_guna_medial",       self.aorist_pass_guna_medial),
+                ("aorist_pass_yuk",          self.aorist_pass_yuk),
                 ("intensive_i_it_cons",      self.intensive_i_it_cons),
                 ("intensive_i_it_vow",       self.intensive_i_it_vow),
                 ("zero_grade_as",            self.zero_grade_as),
                 ("zero_grade_a_drop_vowel",  self.zero_grade_a_drop_vowel),
+                ("a_drop_before_i",          self.a_drop_before_i),
+                ("sa_aorist_a_drop",         self.sa_aorist_a_drop),
+                ("zero_grade_han_hi",        self.zero_grade_han_hi),
                 ("zero_grade_han_cons",      self.zero_grade_han_cons),
                 ("zero_grade_han_nasal",     self.zero_grade_han_nasal),
                 ("zero_grade_sas_cons",      self.zero_grade_sas_cons),
@@ -415,11 +475,17 @@ class MorphologyEngine:
             @ self.class8_u_drop
             @ self.class5_8_u_drop_opt
             @ self.root_aorist_bhuv
-            @ self.aorist_pass_vriddhi
+            @ self.aorist_pass_vriddhi_final
+            @ self.aorist_pass_vriddhi_medial_a
+            @ self.aorist_pass_guna_medial
+            @ self.aorist_pass_yuk
             @ self.intensive_i_it_cons
             @ self.intensive_i_it_vow
             @ self.zero_grade_as
             @ self.zero_grade_a_drop_vowel
+            @ self.a_drop_before_i
+            @ self.sa_aorist_a_drop
+            @ self.zero_grade_han_hi
             @ self.zero_grade_han_cons
             @ self.zero_grade_han_nasal
             @ self.zero_grade_sas_cons
