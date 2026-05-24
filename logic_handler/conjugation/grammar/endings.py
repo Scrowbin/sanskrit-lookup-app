@@ -110,7 +110,8 @@ class SuffixProvider:
                 "[2sg]": _s("si"),   "[2du]": _s("thaḥ"), "[2pl]": _s("tha"),
                 "[1sg]": _s("āmi"),  "[1du]": _s("āvaḥ"), "[1pl]": _s("āmaḥ"),
             }
-        third_pl = "ati" if class_num == 3 else "anti"
+        jhaksh_roots = {"jakṣ", "jāgṛ", "daridrā", "cakās", "śās", "dīdhī", "vevī"}
+        third_pl = "ati" if (class_num == 3 or (root_str in jhaksh_roots)) else "anti"
         endings = {
             "[3sg]": _s("ti"),   "[3du]": _s("taḥ"),    "[3pl]": _s(third_pl),
             "[2sg]": _s("si"),   "[2du]": _s("thaḥ"),   "[2pl]": _s("tha"),
@@ -236,8 +237,10 @@ class SuffixProvider:
             from alphabet import ALPHABET as _A
             phonemes = _A.parse_phonemes(root_str or "")
             sg2 = "dhi" if (phonemes and phonemes[-1] not in _A.vowels_list) else "hi"
+            jhaksh_roots = {"jakṣ", "jāgṛ", "daridrā", "cakās", "śās", "dīdhī", "vevī"}
+            third_pl = "atu" if root_str in jhaksh_roots else "antu"
             endings = {
-                "[3sg]": _s("tu|tāt"),       "[3du]": _s("tām"), "[3pl]": _s("antu"),
+                "[3sg]": _s("tu|tāt"),       "[3du]": _s("tām"), "[3pl]": _s(third_pl),
                 "[2sg]": _s(f"{sg2}|tāt"),   "[2du]": _s("tam"), "[2pl]": _s("ta"),
                 "[1sg]": _s("āni"),           "[1du]": _s("āva"), "[1pl]": _s("āma"),
             }

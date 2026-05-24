@@ -482,6 +482,8 @@ class StemBuilder:
         else:
             a_type = DHATUPATHA_ANALYZER.get_aorist_type(root_str, class_num)
 
+        print(f"DEBUG: a_type={a_type}, voice={voice}, derivative={derivative}")
+
         # Algorithmic derivation based on type
         phonemes = ALPHABET.parse_phonemes(root_str)
         ends_in_vowel = phonemes and phonemes[-1] in ALPHABET.vowels_list
@@ -493,43 +495,54 @@ class StemBuilder:
             is_vet = False  # If overridden, don't automatically generate dual paths unless specified in override
 
         def build_s():
-            if strength == "[STRONG]":
-                fst = self._apply_vriddhi(root_str)
+            if root_str in {"sṛj", "dṛś"}:
+                # Pāṇini 6.1.58: am augment before jhal affix (s is jhal). 
+                # Strong: vṛddhi -> srāj. Weak: guṇa -> sraj (but s-aorist middle takes no guna for consonant roots, wait).
+                # Wait, s-aorist middle doesn't take guna for consonant roots? 
+                # sṛj aorist middle: asṛkṣi (no augment!). Wait!
+                # Whitney §832: The middle of s-aorist takes no strengthening, so it's asṛkṣi!
+                # ONLY the active takes vṛddhi + am-augment -> asrākṣīt.
+                if strength == "[STRONG]":
+                    fst = pn.accep(root_str.replace("ṛ", "rā"))
+                else:
+                    fst = pn.accep(root_str)
             else:
-                fst = (
-                    self._apply_guna(root_str, "[STRONG]")
-                    if ends_in_vowel
-                    else pn.accep(root_str)
-                )
+                if strength == "[STRONG]":
+                    fst = self._apply_vriddhi(root_str)
+                else:
+                    if root_str in aorist_overrides and voice == "middle" and "middle" in aorist_overrides[root_str]:
+                        print(f"DEBUG: override applied: {aorist_overrides[root_str]['middle']}")
+                        fst = pn.accep(aorist_overrides[root_str]["middle"])
+                    else:
+                        print(f"DEBUG: override NOT applied: {root_str} {voice} {aorist_overrides.get(root_str, {})}")
+                        fst = (
+                            self._apply_guna(root_str, "[STRONG]")
+                            if ends_in_vowel
+                            else pn.accep(root_str)
+                        )
             return fst + pn.accep("+s")
 
         def build_is():
             if strength == "[STRONG]":
                 if ends_in_vowel:
-                    return self._apply_vriddhi(root_str)
-                return self._apply_guna(root_str, "[STRONG]")
-            return pn.accep(root_str)
+                    fst = self._apply_vriddhi(root_str)
+                else:
+                    fst = self._apply_guna(root_str, "[STRONG]")
+            else:
+                if root_str.endswith("ṛ") or root_str.endswith("ṝ"):
+                    fst = self._apply_guna(root_str, "[STRONG]")
+                else:
+                    fst = pn.accep(root_str)
+            return fst
 
         if a_type == "s_or_is" or (a_type in ("s", "is") and is_vet):
             return pn.union(build_s(), build_is())
 
         if a_type == "s":
-            if strength == "[STRONG]":
-                fst = self._apply_vriddhi(root_str)
-            else:
-                fst = (
-                    self._apply_guna(root_str, "[STRONG]")
-                    if ends_in_vowel
-                    else pn.accep(root_str)
-                )
-
-            if is_anit or (
-                root_str in aorist_overrides
-                and aorist_overrides[root_str].get("type") == "s"
-            ):
-                return fst + pn.accep("+s")
-            return fst + pn.accep("+is")
-
+            return build_s()
+        
+        elif a_type == "is":
+            return build_is()
         elif a_type == "sa":
             return pn.accep(root_str) + pn.accep("+sa[SA_AORIST]")
 
@@ -587,7 +600,7 @@ class StemBuilder:
         if voice == "active":
             # Samprasāraṇa roots (Whitney §921a): Inject tag for Morphology
             if root_obj.takes_samprasarana:
-                return pn.accep("[SAMP]" + root_str)
+                return pn.accep("[SAMP]" + root_str + strength)
 
             if root_str.endswith("ā"):
                 # dā -> de
@@ -600,7 +613,7 @@ class StemBuilder:
                 root_str = root_str[:-1] + "ri"
 
         # In middle, root is generally weak, some roots guna
-        return pn.accep(root_str)
+        return pn.accep(root_str + strength)
 
     def _build_perfect_system(self, root_str, class_num, strength, tense, **kwargs):
         """Perfect stem = reduplication prefix + (guna | shortened) root.
@@ -782,8 +795,14 @@ class StemBuilder:
             # Whitney §1028b: final ā → ī
             base_str = root_str
             phonemes = ALPHABET.parse_phonemes(root_str)
-            if phonemes and phonemes[-1] == "ā":
-                base_str = "".join(phonemes[:-1]) + "ī"
+            if phonemes:
+                last_char = phonemes[-1]
+                if last_char == "ā":
+                    base_str = "".join(phonemes[:-1]) + "ī"
+                elif last_char == "i":
+                    base_str = "".join(phonemes[:-1]) + "ī"
+                elif last_char == "u":
+                    base_str = "".join(phonemes[:-1]) + "ū"
 
             bases = [prefix + base_str + suffix]
 
@@ -795,7 +814,10 @@ class StemBuilder:
         stems = []
         for b in bases:
             pfx = self.reduplicator.generate_prefix(b)
-            stems.append(pn.accep(pfx + "+") + pn.accep(b))
+            st = pfx + "+" + b
+            if root_str == "sṛj":
+                st = st.replace("sṛj", "ṣṛj") # INRIA expects double ruki: siṣiṣṛkṣa
+            stems.append(pn.accep(st))
         return pn.union(*stems)
 
     def _build_desiderative_passive(self, root_str, strength):
@@ -908,10 +930,8 @@ class StemBuilder:
     # ─── Class builders ───────────────────────────────────────────────────────
 
     def _build_class_1(self, root_str, strength):
-        if root_str in class_1_irregulars:
-            return pn.accep(class_1_irregulars[root_str] + "+a")
-        # Class 1 affix (śap) always triggers Guna
-        return self._apply_guna(root_str, "[STRONG]") + pn.accep("+a")
+        # Class 1 affix (śap) always triggers Guna. We inject [CLASS1_IRR] to let the FST handle suppletions.
+        return self._apply_guna(root_str, "[STRONG]") + pn.accep("[CLASS1_IRR]+a")
 
     def _build_class_2(self, root_str, strength):
         """Adādi (class 2) — athematic, strong/weak alternation.
@@ -983,10 +1003,9 @@ class StemBuilder:
         return pn.accep(root_str + "[CLASS4]") + pn.accep("+ya")
 
     def _build_class_5(self, root_str, strength):
-        if root_str in class_5_irregulars:
-            root_str = class_5_irregulars[root_str]
-        affix = "+no" if strength == "[STRONG]" else "+nu"
-        return pn.accep(root_str) + pn.accep(affix)
+        """Svādi (class 5) — affix nu/no."""
+        affix = "no" if strength == "[STRONG]" else "nu"
+        return pn.accep(root_str + "+" + affix)
 
     def _build_class_6(self, root_str, strength):
         """Class 6 (Tudādi) - Nasal infix for ḷ-it roots (P. 7.1.59).

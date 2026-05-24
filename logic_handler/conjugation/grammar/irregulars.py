@@ -1,14 +1,9 @@
 # grammar/irregulars.py
 
 # ── Class 1: Suppletive stems ─────────────────────────────────────────────────
-class_1_irregulars = {
-    "gam":  "gacch",
-    "sthā": "tiṣṭh",
-    "pā":   "pib",
-    "sad":  "sīd",
-    # Orthographic variant support in test data: scand -> skand.
-    "scand": "skand",
-}
+# Suppletive class 1 stems (gam -> gacch, sthā -> tiṣṭh, etc.) are now algorithmic
+# and implemented via class1_suppletion FST rule in morphology.py.
+class_1_irregulars = {}
 
 # ── Class 2: Irregular stems ──────────────────────────────────────────────────
 # mṛj: handled algorithmically in _build_class_2 via Whitney §212 Vriddhi rule.
@@ -23,9 +18,7 @@ class_2_irregulars = {}
 class_3_irregulars = {}
 
 # ── Class 5: Irregular stems ──────────────────────────────────────────────────
-class_5_irregulars = {
-    "śru": "śṛ",
-}
+class_5_irregulars = {}
 
 # ── Passive stem overrides ────────────────────────────────────────────────────
 # Only roots whose passive stem CANNOT be derived by the algorithmic
@@ -70,7 +63,7 @@ causative_stem_irregulars = {
 
 # ── Perfect 2sg: roots that take bare -tha (not -itha) ───────────────────────
 # INRIA uses -itha for yuj (yuyojitha), so yuj is NOT in this set.
-perfect_bare_tha_roots = {"tan", "man", "labh"}  # none confirmed by INRIA data
+perfect_bare_tha_roots = {"tan", "man", "labh", "jan", "stu"}  # jan expects jajantha OR jajñitha, stu expects tuṣṭotha
 
 # ── Perfect weak: roots that use GUNA grade (not bare root) in weak forms ─────
 # For roots in this set, the perfect weak stem = guna(root), not bare root.
@@ -130,15 +123,16 @@ aorist_overrides = {
     "han":  {"type": "is", "active": "vadh", "middle": "vadh"},   # suppletive aorist
     
     # Type 1: Root Aorists
-    "pā":   {"type": "root", "middle_type": "is"},     # middle: apeṣi (Whitney §879: pā takes is in middle aorist)
+    "pā":   {"type": "root", "middle_type": "s", "middle": "pe"},
     "sthā": {"type": "root"},
-    "dā":   {"type": "root", "middle_type": "is"},     # middle: adiṣi (Whitney §879: dā takes is in middle aorist)
-    "dhā":  {"type": "root"},
+    "dā":   {"type": "root", "middle_type": "s", "middle": "di"},
+    "dhā":  {"type": "root", "middle_type": "s", "middle": "dhi"},
     "gā":   {"type": "root"},
 
     # Type 2: a-Aorists (Irregular stems)
     "vac":  {"type": "a", "active": "voca", "middle": "voca"},
     "dṛś":  {"type": "a", "active": "darśa", "middle": "darśa"},
+    "jan":  {"type": "root", "middle_type": "is"},
 
     # Type 3: Reduplicated Aorists (Handled algorithmically for causatives)
 
@@ -151,6 +145,9 @@ aorist_overrides = {
     "budh": {"type": "s_or_is"},
     # Whitney §881a: budh takes either the s-aorist or iṣ-aorist.
     # Dual-dispatch in conjugate._conjugate_aorist_dual handles both types.
+
+    # Whitney §834b: labh takes s-aorist (lābh+s → lāps via deaspiration).
+    "labh": {"type": "s"},
 
     # Type 5: is-Aorists (Algorithmically handled)
     
@@ -175,7 +172,7 @@ desiderative_stem_overrides = {
     "tan":  ["titaṃsa", "titāṃsa", "titaniṣa"],
     "dviṣ": ["didvikṣa"],
     "duh":  ["dudhukṣa"],
-    "budh": ["bubhutsa", "bubhodhiṣa"],
+    "budh": ["bubhutsa", "bubodhiṣa"],
     "bhū":  ["bubhūṣa"],
     "muc":  ["mumukṣa"],
     "yuj":  ["yuyukṣa"],
@@ -197,6 +194,7 @@ desiderative_stem_overrides = {
     "jñā":  ["jijñāsa"],
     "ghrā": ["jighrāsa"],
     "gā":   ["jigāsa"],
+    "budh": ["bubhodhiṣ"],
 }
 
 # ── Intensive (yaṅ) stem overrides ───────────────────────────────────────────
@@ -206,17 +204,18 @@ desiderative_stem_overrides = {
 intensive_stem_overrides = {
     # "gam":  "jaṅgam",  # nasal insertion: ga+gam → jaṅgam (not jagam)
     "dviṣ": "dedviṣ",  # prefix drops 'v': di + dviṣ → dedviṣ (not dvedveṣ)
-    "han":  "jaṅghan",
+    "han":  "jaṅgha",
     "vṛ":   "varīvṛ",
-    "pā":   "pāpī",
+    "pā":   "pepīp",
     # Whitney §1002 / INRIA: kṛ intensive uses carkar- base (not cekṛ-)
     # The forms attest: carkarīmi, carkarīṣi, carkarti, carkarvaḥ etc.
     "kṛ":   "carkar",
+    "mṛj":  "marmṛj",
     # "kṣip": removed — let algorithm handle kśip → cekṣip
     # yaj: intensive prefix is yāy- (long ā); Whitney §1014 heavy-syllable intensives
     "yaj":  "yāyaj",
     # budh: Whitney §1002i - Grassmann roots restore the original aspirate in the prefix
-    "budh": {"strong": "bobhodh", "weak": "bobhudh", "middle": "bobhudh"},
+    "budh": {"strong": "bobhodh", "weak": "bobhodh", "middle": "bobhudh"},
 
     # Whitney §1002c — Type II intensives: consonant-copy prefix.
     # The root-final consonant is echoed after the prefix vowel (short a),

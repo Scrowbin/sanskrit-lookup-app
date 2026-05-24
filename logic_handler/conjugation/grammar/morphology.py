@@ -166,6 +166,32 @@ class MorphologyEngine:
             pn.cross("[CAUS_PASS]", ""), "", "", sig
         )
 
+        # ── 3.5. Class-1 suppletive stems ─────────────────────────────────────
+        # Pāṇini 7.3.78: gam -> gacch before ŚaP (class 1 suffix)
+        self.class1_suppletion = pn.cdrewrite(
+            pn.string_map([
+                ("gam[CLASS1_IRR]", "gacch"),
+                ("sthā[CLASS1_IRR]", "tiṣṭh"),
+                ("pā[CLASS1_IRR]", "pib"),
+                ("sad[CLASS1_IRR]", "sīd"),
+                ("scand[CLASS1_IRR]", "skand"),
+            ]),
+            "", "", sig
+        )
+        # Erase [CLASS1_IRR] if it didn't trigger suppletion
+        self.class1_irr_erase = pn.cdrewrite(
+            pn.cross("[CLASS1_IRR]", ""), "", "", sig
+        )
+
+        # ── 3.8. Class-5 śru weak suppletion ──────────────────────────────────
+        # Pāṇini 7.3.80 (śṛṇo ca): śru -> śṛ before class-5 affix nu/no
+        self.class5_suppletion = pn.cdrewrite(
+            pn.cross("śru", "śṛ"),
+            "",
+            pn.union("+nu", "+no"),
+            sig
+        )
+
         # ── 4. Class-8 kṛ weak suppletion ─────────────────────────────────────
         # In weak forms of kṛ (class 8), the root becomes "kur" before -u-.
         _any_weak_opt = pn.closure(pn.union("[WEAK]", "[PERF_WEAK]"), 0, 1)
@@ -246,18 +272,13 @@ class MorphologyEngine:
             sig
         )
 
-        # Intensive Active: optional ī before consonant endings (Whitney §1006c)
-        _cons_or_eos = pn.union(pn.union(*ALPHABET.consonants_list), "[EOS]")
-        self.intensive_i_it_cons = pn.cdrewrite(
-            pn.union(
-                pn.cross("[INTENSIVE_ACTIVE]+", "+"),
-                pn.cross("[INTENSIVE_ACTIVE]+", "+ī+")
-            ),
-            "", _cons_or_eos, sig
-        )
-        self.intensive_i_it_vow = pn.cdrewrite(
+        # Intensive Active: The optional ī before consonant endings (Whitney §1006c)
+        # is now handled directly in conjugate.py because the stem must revert to weak grade,
+        # which cannot be done cleanly in a generic string-replacement FST.
+        # We simply erase [INTENSIVE_ACTIVE] tag here.
+        self.intensive_active_erase = pn.cdrewrite(
             pn.cross("[INTENSIVE_ACTIVE]+", "+"),
-            "", pn.union(*ALPHABET.vowels_list), sig
+            "", "", sig
         )
 
         # ── 7. Athematic Zero-Grade (Rule 253 / P. 6.4.98, 6.4.111, 6.4.37, 6.4.34) ─
@@ -277,7 +298,6 @@ class MorphologyEngine:
             pn.cross("khan", "khn"),
             pn.cross("ghas", "kṣ"),
             pn.cross("han", "ghn"),
-            pn.cross("vac", "uc"),
         )
         self.zero_grade_a_drop_vowel = pn.cdrewrite(
             _a_drop_roots + pn.cross(_any_weak, "+"),
@@ -305,10 +325,11 @@ class MorphologyEngine:
             sig
         )
 
-        # Rule C: han becomes ja before hi (imperative 2sg) (Pāṇini 6.4.36)
+        # Rule C: han becomes ja before dhi (imperative 2sg) (Pāṇini 6.4.36)
+        # Class 2 uses 'dhi', so we must also change 'dhi' to 'hi' in the same stroke.
         self.zero_grade_han_hi = pn.cdrewrite(
-            pn.cross("han", "ja") + pn.cross(_any_weak, "+"),
-            "", "hi",
+            pn.cross("han", "ja") + pn.cross(_any_weak, "+") + pn.cross("dhi", "hi"),
+            "", "",
             sig
         )
 
@@ -331,11 +352,20 @@ class MorphologyEngine:
             sig
         )
         
-        # Rule E: śās -> śiṣ before CONSONANTS (P. 6.4.34).
+        # Rule E: śās -> śā before dhi (P. 6.4.35)
+        self.zero_grade_sas_dhi = pn.cdrewrite(
+            pn.cross("śās", "śā") + pn.cross(_any_weak, "+"),
+            "",
+            pn.accep("dhi"),
+            sig
+        )
+
+        # Rule F: śās -> śiṣ before weak endings starting with consonants (except dhi) OR before 'an' (P. 6.4.34).
+        sas_context = pn.difference(ALPHABET.consonants, pn.accep("dh")) | pn.accep("an")
         self.zero_grade_sas_cons = pn.cdrewrite(
             pn.cross("śās", "śiṣ") + pn.cross(_any_weak, "+"),
             "",
-            ALPHABET.consonants,
+            sas_context,
             sig
         )
 
@@ -420,16 +450,18 @@ class MorphologyEngine:
                 ("class4_lengthening",       self.class4_lengthening),
                 ("caus_pass_erase_with_a",   self.caus_pass_erase_with_a),
                 ("caus_pass_erase",          self.caus_pass_erase),
+                ("class1_suppletion",        self.class1_suppletion),
+                ("class1_irr_erase",         self.class1_irr_erase),
+                ("class5_suppletion",        self.class5_suppletion),
                 ("class8_suppletion",        self.class8_suppletion),
                 ("class8_u_drop",            self.class8_u_drop),
                 ("class5_8_u_drop_opt",      self.class5_8_u_drop_opt),
                 ("root_aorist_bhuv",         self.root_aorist_bhuv),
                 ("aorist_pass_vriddhi_final",     self.aorist_pass_vriddhi_final),
                 ("aorist_pass_vriddhi_medial_a",  self.aorist_pass_vriddhi_medial_a),
-                ("aorist_pass_guna_medial",       self.aorist_pass_guna_medial),
+                ("aorist_pass_guna_medial",  self.aorist_pass_guna_medial),
                 ("aorist_pass_yuk",          self.aorist_pass_yuk),
-                ("intensive_i_it_cons",      self.intensive_i_it_cons),
-                ("intensive_i_it_vow",       self.intensive_i_it_vow),
+                ("intensive_active_erase",   self.intensive_active_erase),
                 ("zero_grade_as",            self.zero_grade_as),
                 ("zero_grade_a_drop_vowel",  self.zero_grade_a_drop_vowel),
                 ("a_drop_before_i",          self.a_drop_before_i),
@@ -471,6 +503,9 @@ class MorphologyEngine:
             @ self.class4_lengthening
             @ self.caus_pass_erase_with_a
             @ self.caus_pass_erase
+            @ self.class1_suppletion
+            @ self.class1_irr_erase
+            @ self.class5_suppletion
             @ self.class8_suppletion
             @ self.class8_u_drop
             @ self.class5_8_u_drop_opt
@@ -479,8 +514,7 @@ class MorphologyEngine:
             @ self.aorist_pass_vriddhi_medial_a
             @ self.aorist_pass_guna_medial
             @ self.aorist_pass_yuk
-            @ self.intensive_i_it_cons
-            @ self.intensive_i_it_vow
+            @ self.intensive_active_erase
             @ self.zero_grade_as
             @ self.zero_grade_a_drop_vowel
             @ self.a_drop_before_i
@@ -488,6 +522,7 @@ class MorphologyEngine:
             @ self.zero_grade_han_hi
             @ self.zero_grade_han_cons
             @ self.zero_grade_han_nasal
+            @ self.zero_grade_sas_dhi
             @ self.zero_grade_sas_cons
             @ self.clean_tags
             @ self.sd_boundary_tagging

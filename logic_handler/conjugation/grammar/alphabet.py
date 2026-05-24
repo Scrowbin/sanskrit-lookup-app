@@ -69,6 +69,7 @@ class SanskritAlphabet:
             "[STRONG]",
             "[WEAK]",
             "[VRIDDHI]",
+            "[CLASS1_IRR]",
             "[CLASS4]",
             "[CLASS8]",
             "[PASSIVE]",

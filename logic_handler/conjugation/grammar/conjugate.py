@@ -260,7 +260,18 @@ class SanskritConjugator:
         if suffix.is_empty:
             combined = stem
         else:
-            combined = stem + pn.accep("+") + suffix.to_fst()
+            # Intensive Active: optional ī before consonant endings (Whitney §1006c)
+            # When ī is inserted, the stem takes the weak grade.
+            if f.effective_derivative == "intensive_active" and f.strength == "[STRONG]" and suffix.surface and suffix.surface[0] in ALPHABET.consonants_list:
+                weak_stem = self._get_stem(
+                    root_str, f.effective_class, "[WEAK]", tense,
+                    f.effective_derivative, voice=voice, person=person, number=number
+                )
+                if f.augment:
+                    weak_stem = pn.accep("[AUG]a+") + weak_stem
+                combined = pn.union(stem + pn.accep("+") + suffix.to_fst(), weak_stem + pn.accep("+ī+") + suffix.to_fst())
+            else:
+                combined = stem + pn.accep("+") + suffix.to_fst()
 
         if preverb_str:
             combined = pn.accep(preverb_str) + combined

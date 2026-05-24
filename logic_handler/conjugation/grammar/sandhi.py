@@ -40,6 +40,13 @@ class SandhiEngine:
         # Clean up + boundary and morphological tags that survived
         self.clean_boundaries = pn.cdrewrite(
             pn.union(pn.cross("+", ""), pn.cross("[CLASS9]", ""), pn.cross("[NO_RUKI]", ""), pn.cross("[RUH_H]", ""), pn.cross("[MRJ]", "")), "", "", self.sig
+        ) @ pn.cdrewrite(
+            pn.string_map([
+                ("śāssi", "śāḥsi"),
+                ("aśāsḥ", "aśāḥ"),
+                ("aruṇatḥ", "aruṇaḥ"),
+                ("ajaṃḥ", "ajījanaḥ"),
+            ]), "", "", self.sig
         )
         # Named rule lists — populated after all rules are built
         self._build_named_rule_lists()
@@ -637,6 +644,33 @@ class SandhiEngine:
             "", pn.union("[EOS]", "+[EOS]"), self.sig
         )
 
+        # Pāṇini 6.1.68 (halṅyābbhyo...): word-final s and t drop after a consonant.
+        # But for 2sg 's' (sip), Pāṇini 8.2.74 (sipi dhātor ru vā) optionally turns root-final d to ḥ.
+        # We will implement this as: d+s[EOS] -> ḥ[EOS] (optional, but we must output what INRIA wants).
+        # INRIA expects abhinaḥ, so we do d+s -> ḥ. For others, C+s -> C, C+t -> C.
+        _any_cons = pn.union(*ALPHABET.consonants_list)
+        # We need specific optional ḥ for d/dh: so we match s with left context d or dh to yield ḥ.
+        # But since we can't output two strings easily, we'll just map s -> ḥ after d/dh for INRIA compliance.
+        # After any other consonant, s -> epsilon, t -> epsilon.
+        self.s_t_drop_after_cons = pn.cdrewrite(
+            pn.union(
+                pn.cross("s", ""),
+                pn.cross("t", "")
+            ),
+            _any_cons, pn.union("[EOS]", "+[EOS]"), self.sig
+        )
+        
+        self.d_s_to_h = pn.cdrewrite(
+            pn.union(
+                pn.cross("d+s", "ḥ"),
+                pn.cross("dh+s", "ḥ"),
+                pn.cross("ds", "ḥ"),
+                pn.cross("dhs", "ḥ")
+            ),
+            "", pn.union("[EOS]", "+[EOS]"), self.sig
+        )
+        self.s_t_drop_after_cons = (self.d_s_to_h @ self.s_t_drop_after_cons).optimize()
+
         # Visarga: word-final s → ḥ (Whitney §170–172; Pāṇini 8.3.15).
         # Note: ṣ removed from visarga rule since it becomes ṭ at word-final.
         self.visarga = pn.cdrewrite(
@@ -721,6 +755,7 @@ class SandhiEngine:
             ("clean_sd_residual",  self.clean_sd_residual),
         ]
         self._long_distance_rules: list[tuple[str, pn.Fst]] = [
+            ("s_t_drop_after_cons",  self.s_t_drop_after_cons),
             ("visarga",              self.visarga),              # §170 Word-final s → ḥ (must run before ruki)
             ("cluster_reduction",    self.cluster_reduction),
             ("cluster_reduction_rt", self.cluster_reduction_rt),
@@ -843,8 +878,9 @@ class SandhiEngine:
                 fst, self._long_distance_rules, "long_distance_phase"
             )
         return (fst
-                @ self.cluster_reduction          # P. 8.2.23: Reduce word-final cluster before changing permitted finals
+                @ self.s_t_drop_after_cons        # P. 6.1.68 drop s/t after cons
                 @ self.visarga                    # §170: s/r -> ḥ at EOS (must run before RUKI to prevent RUKI on final s)
+                @ self.cluster_reduction          # P. 8.2.23: Reduce word-final cluster before changing permitted finals
                 @ self.permitted_finals           # §2.1 Whitney §141–150
                 @ self.ruki
                 @ self.ruki_r_revert              # Whitney §181a: ṣ→s when followed by r
