@@ -379,6 +379,16 @@ class StemBuilder:
     # ─── Tense-system builders ────────────────────────────────────────────────
 
     def _build_present_system(self, root_str, class_num, strength, tense, **kwargs):
+        # Specific override for dā/dhā imperative 2sg active (Pāṇini 6.4.119: dehi, dhehi)
+        person = kwargs.get("person")
+        number = kwargs.get("number")
+        voice = kwargs.get("voice")
+        if tense == "imperative" and person == "2" and number == "sg" and voice == "active" and class_num == 3:
+            if root_str == "dā":
+                return pn.accep("de")
+            elif root_str == "dhā":
+                return pn.accep("dhe")
+
         handler = self.class_handlers.get(class_num)
         if handler is None:
             raise ValueError(f"Class {class_num} not supported.")

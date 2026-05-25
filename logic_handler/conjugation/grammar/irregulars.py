@@ -63,7 +63,7 @@ causative_stem_irregulars = {
 
 # ── Perfect 2sg: roots that take bare -tha (not -itha) ───────────────────────
 # INRIA uses -itha for yuj (yuyojitha), so yuj is NOT in this set.
-perfect_bare_tha_roots = {"tan", "man", "labh", "jan", "stu"}  # jan expects jajantha OR jajñitha, stu expects tuṣṭotha
+perfect_bare_tha_roots = {"tan", "man", "labh", "jan", "stu", "śru"}  # jan expects jajantha OR jajñitha, stu expects tuṣṭotha, śru expects śuśrotha
 
 # ── Perfect weak: roots that use GUNA grade (not bare root) in weak forms ─────
 # For roots in this set, the perfect weak stem = guna(root), not bare root.
@@ -194,7 +194,7 @@ desiderative_stem_overrides = {
     "jñā":  ["jijñāsa"],
     "ghrā": ["jighrāsa"],
     "gā":   ["jigāsa"],
-    "budh": ["bubhodhiṣ"],
+    "budh": ["bubhodiṣa", "bubhodhiṣa"],
 }
 
 # ── Intensive (yaṅ) stem overrides ───────────────────────────────────────────
@@ -215,7 +215,7 @@ intensive_stem_overrides = {
     # yaj: intensive prefix is yāy- (long ā); Whitney §1014 heavy-syllable intensives
     "yaj":  "yāyaj",
     # budh: Whitney §1002i - Grassmann roots restore the original aspirate in the prefix
-    "budh": {"strong": "bobhodh", "weak": "bobhodh", "middle": "bobhudh"},
+    "budh": {"strong": "bobhodh", "weak": "bobhudh", "middle": "bobhudh"},
 
     # Whitney §1002c — Type II intensives: consonant-copy prefix.
     # The root-final consonant is echoed after the prefix vowel (short a),
