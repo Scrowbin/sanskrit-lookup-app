@@ -756,9 +756,9 @@ class SandhiEngine:
         ]
         self._long_distance_rules: list[tuple[str, pn.Fst]] = [
             ("s_t_drop_after_cons",  self.s_t_drop_after_cons),
-            ("visarga",              self.visarga),              # §170 Word-final s → ḥ (must run before ruki)
             ("cluster_reduction",    self.cluster_reduction),
             ("cluster_reduction_rt", self.cluster_reduction_rt),
+            ("visarga",              self.visarga),              # §170 Word-final s/r → ḥ
             ("permitted_finals",     self.permitted_finals),     # §2.1 Word-final normalization
             ("ruki",                 self.ruki),
             ("ruki_r_revert",        self.ruki_r_revert),        # §3.1 Whitney §181a
@@ -879,8 +879,9 @@ class SandhiEngine:
             )
         return (fst
                 @ self.s_t_drop_after_cons        # P. 6.1.68 drop s/t after cons
-                @ self.visarga                    # §170: s/r -> ḥ at EOS (must run before RUKI to prevent RUKI on final s)
                 @ self.cluster_reduction          # P. 8.2.23: Reduce word-final cluster before changing permitted finals
+                @ self.cluster_reduction_rt
+                @ self.visarga                    # §170: s/r -> ḥ at EOS (must run after cluster reduction)
                 @ self.permitted_finals           # §2.1 Whitney §141–150
                 @ self.ruki
                 @ self.ruki_r_revert              # Whitney §181a: ṣ→s when followed by r

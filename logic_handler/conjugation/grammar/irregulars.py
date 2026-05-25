@@ -140,6 +140,7 @@ aorist_overrides = {
     "bhid": {"type": "s"},                                        
     "kṣip": {"type": "s"},
     "nī":   {"type": "s"},
+    "muc":  {"type": "s"},
 
     # Pāṇini allows optional s or iṣ aorist for certain roots like budh.
     "budh": {"type": "s_or_is"},
