@@ -617,20 +617,46 @@ class StemBuilder:
         if voice == "active":
             # Samprasāraṇa roots (Whitney §921a): Inject tag for Morphology
             if root_obj.takes_samprasarana:
-                return pn.accep("[SAMP]" + root_str + strength)
+                return pn.accep("[SAMP]" + root_str)
 
             if root_str.endswith("ā"):
-                # dā -> de
-                root_str = root_str[:-1] + "e"
+                # Whitney §838: ā-final roots use e-grade (dā→de, sthā→sthe)
+                # Some also allow ī-grade (dā→dī). Union both.
+                e_form = pn.accep(root_str[:-1] + "e")
+                ii_form = pn.accep(root_str[:-1] + "ī")
+                return pn.union(pn.accep(root_str), e_form, ii_form)
             elif root_str.endswith("i"):
-                root_str = root_str[:-1] + "ī"
+                # Whitney §922: i-final roots lengthen
+                return pn.accep(root_str[:-1] + "ī")
             elif root_str.endswith("u"):
-                root_str = root_str[:-1] + "ū"
+                # Whitney §922: u-final roots lengthen
+                return pn.accep(root_str[:-1] + "ū")
             elif root_str.endswith("ṛ") or root_str.endswith("ṝ"):
-                root_str = root_str[:-1] + "ri"
+                # Whitney §922: ṛ-final roots take guna (ṛ→ar) in benedictive active
+                return pn.accep(root_str[:-1] + "ar")
+            elif root_str == "div":
+                # Pāṇini 8.2.77: div lengthens to dīv before consonants
+                return pn.accep("dīv")
+            elif root_str == "śās":
+                # śās becomes śiṣ in benedictive active (since it's a kit affix, unlike the ṅit optative active where it remains śās)
+                return pn.accep("śiṣ")
+            # All other roots: use root as-is, NO strength tag
+            # (strength/[WEAK] would trigger zero-grade, corrupting long vowels like dīv→div)
+            return pn.accep(root_str)
 
-        # In middle, root is generally weak, some roots guna
-        return pn.accep(root_str + strength)
+        # Middle voice (Ātmanepada)
+        is_anit = root_obj.is_anit
+        # Whitney §912: roots in u and ū (except stu and su) take iṭ and guna.
+        phonemes = ALPHABET.parse_phonemes(root_str)
+        if not is_anit and phonemes and phonemes[-1] in ("u", "ū") and root_str not in ("stu", "su"):
+            stem = self._apply_guna(root_str, "[STRONG]") + pn.accep("+i")
+        elif not is_anit:
+            # Other seṭ roots also take iṭ in benedictive middle (P. 7.2.79)
+            stem = pn.accep(root_str) + pn.accep("+i")
+        else:
+            stem = pn.accep(root_str)
+            
+        return stem
 
     def _build_perfect_system(self, root_str, class_num, strength, tense, **kwargs):
         """Perfect stem = reduplication prefix + (guna | shortened) root.

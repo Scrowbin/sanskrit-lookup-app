@@ -71,7 +71,7 @@ perfect_bare_tha_roots = {"tan", "man", "labh", "jan", "stu", "śru"}  # jan exp
 # giving a connecting 'av'/'ay':
 #   hu  → weak guna 'ho' → ayadi → 'hav' → 'juhaviva'  (not 'juhviva')
 #   su  → weak guna 'so' → ayadi → 'sav' → 'suṣaviva'  (not 'suṣviva')
-perfect_weak_guna_roots = set()  # hu/su now fully handled by perfect_stem_overrides
+perfect_weak_guna_roots = set()
 
 # ── Perfect suppletive stems ──────────────────────────────────────────────────
 # Roots with completely irregular perfect stems (not derivable by rule).
@@ -94,7 +94,7 @@ perfect_stem_overrides = {
     "smṛ": {"strong": "sasmar", "weak": "sasmar"},
 
     "bhū": {"strong": "babhūv", "weak": "babhūv"},
-    "div": {"strong": "didīv",  "strong_3sg": "didev",   "weak": "didīv"},
+    "dīv": {"strong": "didīv",  "strong_3sg": "didev",   "weak": "didiv"},
     # han: Grassmann's law throwback (jaghan/jaghn). Truly suppletive.
     "han": {"strong": "jaghan", "strong_3sg": "jaghān", "weak": "jaghn"},
     # vid: perfect-as-present veda (Whitney §801); truly suppletive.
@@ -195,6 +195,10 @@ desiderative_stem_overrides = {
     "jñā":  ["jijñāsa"],
     "ghrā": ["jighrāsa"],
     "gā":   ["jigāsa"],
+    # Whitney §1028e: nind drops nasal in desiderative → ninitsa (nid+sa, d+s→ts)
+    "nind": ["ninitsa"],
+    # Whitney §1031: svap undergoes samprasāraṇa (sva→su) → suṣupsa
+    "svap": ["suṣupsa"],
 
 }
 
@@ -204,8 +208,7 @@ desiderative_stem_overrides = {
 # Middle voice: stem + ya; Active voice: stem + [INTENSIVE_ACTIVE]
 intensive_stem_overrides = {
     # "gam":  "jaṅgam",  # nasal insertion: ga+gam → jaṅgam (not jagam)
-    "dviṣ": "dedviṣ",  # prefix drops 'v': di + dviṣ → dedviṣ (not dvedveṣ)
-    "han":  "jaṅgha",
+    "han":  {"strong": "jaṅgha", "weak": "jaṅgha", "middle": "jaṅghan"},
     "vṛ":   "varīvṛ",
     "pā":   "pepīp",
     # Whitney §1002 / INRIA: kṛ intensive uses carkar- base (not cekṛ-)
@@ -225,6 +228,8 @@ intensive_stem_overrides = {
     # cal  (√cal)  → prefix 'cal' + root 'cal' → caṇcal  (l+c assimilation → ṇc)
     "car":  "caṇcar",
     "cal":  "caṇcal",
+    # Whitney §1002g: svap intensive uses samprasāraṇa soṣup (sva→su, o-grade, RUKI s→ṣ)
+    "svap": "soṣup",
 }
 
 

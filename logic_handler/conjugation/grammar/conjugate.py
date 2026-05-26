@@ -169,6 +169,31 @@ class SanskritConjugator:
         """
         if tense == "krdantas":
             return self.get_krdantas_block(root_str, class_num, derivative=derivative, use_db=use_db)
+            
+        if derivative == "intensive":
+            if voice == "active":
+                # Whitney §1006a: Active intensive can be both yaṅluganta (no ya) and yaṅanta (with ya).
+                # We generate both variants and union them.
+                luganta = self._conjugate_internal(root_str, class_num, person, number, voice, tense, "intensive_luganta", use_db, auxiliary)
+                anta = self._conjugate_internal(root_str, class_num, person, number, voice, tense, "intensive_anta", use_db, auxiliary)
+                return sorted(list(set(luganta) | set(anta)))
+            else:
+                return self._conjugate_internal(root_str, class_num, person, number, voice, tense, "intensive_anta", use_db, auxiliary)
+                
+        return self._conjugate_internal(root_str, class_num, person, number, voice, tense, derivative, use_db, auxiliary)
+
+    def _conjugate_internal(
+        self,
+        root_str: str,
+        class_num: int,
+        person: str,
+        number: str,
+        voice: str = "active",
+        tense: str = "present",
+        derivative: str | None = None,
+        use_db: bool = True,
+        auxiliary: str = "kṛ",
+    ) -> list[str] | str:
         
         # Whitney §530-531: Outside the present-system, the middle voice doubles as
         # passive. Auto-alias passive → middle for tenses with no distinct passive
@@ -228,12 +253,6 @@ class SanskritConjugator:
                     derivative, preverb_str,
                 )
                 
-        if derivative == "intensive":
-            if voice == "active":
-                derivative = "intensive_luganta"
-            else:
-                derivative = "intensive_anta"
-
         f = self.resolver.resolve(
             root_str, class_num, person, number, voice, tense, derivative
         )
@@ -268,14 +287,29 @@ class SanskritConjugator:
         else:
             # Intensive Active: optional ī before consonant endings (Whitney §1006c)
             # When ī is inserted, the stem takes the weak grade.
-            if f.effective_derivative == "intensive_active_luganta" and f.strength == "[STRONG]" and suffix.surface and suffix.surface[0] in ALPHABET.consonants_list:
+            # Whitney §1006c also allows ī to take guna to 'e' (e.g. cekṣipemi).
+            # Whitney §1016 also allows a thematic 'a' without lengthening in 1st person (e.g. cekṣipami, cekṣipāti).
+            if f.effective_derivative == "intensive_active_luganta" and suffix.surface:
                 weak_stem = self._get_stem(
                     root_str, f.effective_class, "[WEAK]", tense,
                     f.effective_derivative, voice=voice, person=person, number=number
                 )
                 if f.augment:
                     weak_stem = pn.accep("[AUG]a+") + weak_stem
-                combined = pn.union(stem + pn.accep("+") + suffix.to_fst(), weak_stem + pn.accep("+ī+") + suffix.to_fst())
+                
+                # We union the raw stem, and the weak stem with thematic a.
+                insertions = [
+                    stem + pn.accep("+") + suffix.to_fst(),
+                    weak_stem + pn.accep("+a+") + suffix.to_fst()
+                ]
+                
+                # The ī and e variants are only inserted before consonant endings (Whitney §1006c).
+                if suffix.surface[0] in ALPHABET.consonants_list:
+                    insertions.append(weak_stem + pn.accep("+ī+") + suffix.to_fst())
+                    if f.strength == "[STRONG]":
+                        insertions.append(weak_stem + pn.accep("+e+") + suffix.to_fst())
+                
+                combined = pn.union(*insertions)
             else:
                 combined = stem + pn.accep("+") + suffix.to_fst()
 

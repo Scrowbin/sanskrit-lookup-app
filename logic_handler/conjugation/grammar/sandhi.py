@@ -620,7 +620,15 @@ class SandhiEngine:
         # Post-RUKI retroflex assimilation (Whitney §198; Pāṇini 8.4.41).
         self.retro_post_ruki_th  = pn.cdrewrite(pn.string_map([("ṣ+th", "ṣṭh"), ("ṣth", "ṣṭh")]), "", "", self.sig)
         self.retro_post_ruki_t   = pn.cdrewrite(pn.string_map([("ṣ+t", "ṣṭ"), ("ṣt", "ṣṭ")]), "", "", self.sig)
-        self.retro_post_ruki_dhv = pn.cdrewrite(pn.string_map([("ṣ+dhv", "ḍhv"), ("ṣdhv", "ḍhv")]), "", "", self.sig)
+        self.retro_post_ruki_dhv = pn.cdrewrite(
+            pn.string_map([
+                ("ṣ+dhv", "ḍhv"), 
+                ("ṣdhv", "ḍhv"),
+                ("ṣī+dhv", "ṣīḍhv"),
+                ("ṣīdhv", "ṣīḍhv")
+            ]), 
+            "", "", self.sig
+        )
         # After RUKI, sigmatic aorist k+ṣ+t/th should still simplify to kt/kth.
         # Whitney §221; Pāṇini 8.4.65.
         self.ksha_t_simplify_post_ruki = pn.cdrewrite(

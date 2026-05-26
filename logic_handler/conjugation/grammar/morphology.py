@@ -360,10 +360,11 @@ class MorphologyEngine:
             sig
         )
 
-        # Rule F: śās -> śiṣ before weak endings starting with consonants (except dhi) OR before 'an' (P. 6.4.34).
-        sas_context = pn.difference(ALPHABET.consonants, pn.accep("dh")) | pn.accep("an")
+        # Rule F: śās -> śiṣ before weak endings starting with consonants (except dhi and y) OR before 'an' (P. 6.4.34).
+        # Whitney §639: śās becomes śiṣ before weak consonant-endings (except y). Alternative forms with śās are attested.
+        sas_context = pn.difference(ALPHABET.consonants, pn.union(pn.accep("dh"), pn.accep("y"))) | pn.accep("an")
         self.zero_grade_sas_cons = pn.cdrewrite(
-            pn.cross("śās", "śiṣ") + pn.cross(_any_weak, "+"),
+            pn.union(pn.cross("śās", "śiṣ"), pn.cross("śās", "śās")) + pn.cross(_any_weak, "+"),
             "",
             sas_context,
             sig

@@ -162,7 +162,8 @@ class SuffixProvider:
                 "[2sg]": _s("s"),   "[2du]": _s("tam"),  "[2pl]": _s("ta"),
                 "[1sg]": _s("m"),   "[1du]": _s("āva"),  "[1pl]": _s("āma"),
             }
-        third_pl = "uḥ" if (class_num == 3 or (kwargs.get("tense") == "aorist" and root_str and root_str.endswith("ā"))) else "an"
+        jhaksh_roots = {"jakṣ", "jāgṛ", "daridrā", "cakās", "śās", "dīdhī", "vevī"}
+        third_pl = "uḥ" if (class_num == 3 or root_str in jhaksh_roots or (kwargs.get("tense") == "aorist" and root_str and root_str.endswith("ā"))) else "an"
         # √ad cl-2 imperfect uses connecting-vowel endings
         if root_str == "ad":
             return {

@@ -6,39 +6,7 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="repla
 from conjugate import SanskritConjugator
 
 # ── Value mappings from roots.csv → engine API ────────────────────────────────
-
-MODE_MAP = {
-    "pres": "present",
-    "ipft": "imperfect",
-    "impv": "imperative",
-    "opt": "optative",
-    "ben": "benedictive",
-    "sfut": "future",
-    "cond": "conditional",
-    "perf": "perfect",
-    "pfut": "periphrastic_future",
-    "aor": "aorist",
-    "inj": "injunctive",
-}
-
-VOICE_MAP = {
-    "para": "active",
-    "atma": "middle",
-    "pass": "passive",
-}
-
-NUMBER_MAP = {
-    "s": "sg",
-    "d": "du",
-    "p": "pl",
-}
-
-DERIV_MAP = {
-    "": "primary",
-    "caus": "causative",
-    "desid": "desiderative",
-    "intens": "intensive",
-}
+# (Legacy maps removed since verbs_clean.csv uses engine-native terms directly)
 
 IMPOSSIBLE = {
     # passive has no perfect / future system
@@ -69,9 +37,9 @@ def normalize(form: str) -> str:
 
 
 def run_focused_benchmark(
-    csv_file="../data/roots.csv", output_report="benchmark_failures.csv"
+    csv_file="../data/verbs_clean.csv", output_report="benchmark_failures.csv"
 ):
-    print("Loading INRIA database...")
+    print(f"Loading database from {csv_file}...")
     t_start = time.perf_counter()
 
     inria_db = {}
@@ -82,22 +50,26 @@ def run_focused_benchmark(
             class_val = (
                 int(class_str) if class_str and class_str.isdigit() else class_str
             )
+            
+            derivation = row.get("derivation", "primary")
+            if class_str == "11":
+                class_val = "denom"
+                derivation = "denominative"
+            elif class_str == "":
+                class_val = None
 
             key = (
-                normalize_root(row["root_IAST"]),
+                normalize_root(row["stem_iast"]),
                 class_val,
-                MODE_MAP.get(row["mode"], row["mode"]),
-                VOICE_MAP.get(row["voice"], row["voice"]),
+                row["tense"],
+                row["voice"],
                 row["person"],
-                NUMBER_MAP.get(row["number"], row["number"]),
-                "denominative"
-                if row.get("class") == "denom"
-                else DERIV_MAP.get(row.get("modification", ""), "primary"),
+                row["number"],
+                derivation,
             )
-            # roots.csv stores pausa forms with trailing -s (e.g. tiṣṭhāvas).
-            # Our engine produces the visarga form (tiṣṭhāvaḥ). normalize()
-            # converts trailing s/r → ḥ so both sides are comparable.
-            form = normalize(row["form_IAST"])
+            
+            # Convert trailing s/r → ḥ so both sides are comparable.
+            form = normalize(row["form_iast"])
             bucket = inria_db.setdefault(key, [])
             if form not in bucket:
                 bucket.append(form)
@@ -170,11 +142,10 @@ def run_focused_benchmark(
 
     UNSUPPORTED_DERIVATIONS = set()  # add e.g. "desiderative" here to skip and flag it
 
-    # ── Grammar space (derived from the maps above) ────────────────────────────
-    ALL_TENSES = list(MODE_MAP.values())
-    ALL_VOICES = list(VOICE_MAP.values())
+    ALL_TENSES = ["present", "imperfect", "imperative", "optative", "benedictive", "future", "conditional", "perfect", "periphrastic_future", "aorist", "injunctive"]
+    ALL_VOICES = ["active", "middle", "passive"]
     ALL_PERSONS = ["1", "2", "3"]
-    ALL_NUMBERS = list(NUMBER_MAP.values())
+    ALL_NUMBERS = ["sg", "du", "pl"]
 
     api = SanskritConjugator()
 
@@ -1180,5 +1151,5 @@ def run_extended_suite():
     print("=" * 60)
 
 if __name__ == "__main__":
-    run_focused_benchmark("../data/roots.csv", "benchmark_failures.csv")
+    run_focused_benchmark("../data/verbs_clean.csv", "benchmark_failures.csv")
     # run_extended_suite()

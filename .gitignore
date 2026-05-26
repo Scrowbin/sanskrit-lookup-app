@@ -1,6 +1,8 @@
 # Logs
 logs
 *.log
+*.txt
+*.md
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -10,6 +12,9 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+dist_python
+build_python
+release
 *.local
 .__pycache__
 

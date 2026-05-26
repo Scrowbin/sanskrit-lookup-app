@@ -183,7 +183,24 @@ class ReduplicationEngine:
         
         # Subtype 2: Nasal final (Whitney §1002d)
         if phonemes and phonemes[-1] in ('m', 'n') and root_vowel == 'a':
-            target_vowel = "aṃ"
+            # Use homorganic nasal matching the root's first consonant
+            # (INRIA convention: ṅ before velars, ñ before palatals, etc.)
+            first_cons = phonemes[0] if phonemes else ''
+            velar = {'k', 'kh', 'g', 'gh'}
+            palatal = {'c', 'ch', 'j', 'jh'}
+            retroflex = {'ṭ', 'ṭh', 'ḍ', 'ḍh'}
+            dental = {'t', 'th', 'd', 'dh'}
+            if first_cons in velar:
+                nasal = "ṅ"
+            elif first_cons in palatal:
+                nasal = "ñ"
+            elif first_cons in retroflex:
+                nasal = "ṇ"
+            elif first_cons in dental:
+                nasal = "n"
+            else:
+                nasal = "ṃ"  # fallback
+            target_vowel = "a" + nasal
         # Subtype 1: ṛ/ṝ root (Whitney §1002c)
         elif 'ṛ' in phonemes or 'ṝ' in phonemes:
             target_vowel = "arī"
