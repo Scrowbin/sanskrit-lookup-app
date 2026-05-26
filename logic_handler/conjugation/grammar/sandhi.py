@@ -442,7 +442,7 @@ class SandhiEngine:
                 ("j[MRJ]", "k"), ("c[MRJ]", "k"), ("jj[MRJ]", "k"),
                 ("ś[MRJ]", "k"), ("ch[MRJ]", "k")
             ]),
-            "", unvoiced_triggers, self.sig
+            "", _non_nasal_mutes_and_sibilants, self.sig
         )
 
         # General devoicing
@@ -523,8 +523,8 @@ class SandhiEngine:
         self.retro_th  = pn.cdrewrite(pn.cross("ṣ+th", "ṣṭh"), "", "", self.sig)
         self.retro_t   = pn.cdrewrite(pn.cross("ṣ+t",  "ṣṭ"),  "", "", self.sig)
         self.retro_dhv = pn.cdrewrite(pn.cross("ṣ+dhv", "ḍhv"), "", "", self.sig)
+        
         # ṣ + dh → ḍḍh (Whitney §226b; double lingual aspirate).
-        # Must run BEFORE retro_t and retro_th so ṣ+dh doesn't mis-apply as ṣṭh.
         self.retro_dh  = pn.cdrewrite(pn.cross("ṣ+dh",  "ḍḍh"), "", "", self.sig)
         # Sigmatic aorist clusters like -kṣ+t- surface as -kt- (yuj: ayokta),
         # not as retroflex -kṣṭ-. Whitney §221; Pāṇini 8.4.65 (kṣ+t→kt).
@@ -654,6 +654,8 @@ class SandhiEngine:
         # After any other consonant, s -> epsilon, t -> epsilon.
         self.s_t_drop_after_cons = pn.cdrewrite(
             pn.union(
+                pn.cross("+s", ""),
+                pn.cross("+t", ""),
                 pn.cross("s", ""),
                 pn.cross("t", "")
             ),
@@ -662,13 +664,18 @@ class SandhiEngine:
         
         self.d_s_to_h = pn.cdrewrite(
             pn.union(
-                pn.cross("d+s", "ḥ"),
-                pn.cross("dh+s", "ḥ"),
-                pn.cross("ds", "ḥ"),
-                pn.cross("dhs", "ḥ")
+                pn.cross("t+s", "ḥ"), pn.cross("t+s", "t"),
+                pn.cross("th+s", "ḥ"), pn.cross("th+s", "t"),
+                pn.cross("d+s", "ḥ"), pn.cross("d+s", "t"),
+                pn.cross("dh+s", "ḥ"), pn.cross("dh+s", "t"),
+                pn.cross("ts", "ḥ"), pn.cross("ts", "t"),
+                pn.cross("ths", "ḥ"), pn.cross("ths", "t"),
+                pn.cross("ds", "ḥ"), pn.cross("ds", "t"),
+                pn.cross("dhs", "ḥ"), pn.cross("dhs", "t")
             ),
             "", pn.union("[EOS]", "+[EOS]"), self.sig
         )
+        # Note: s_t_drop_after_cons handles other consonants.
         self.s_t_drop_after_cons = (self.d_s_to_h @ self.s_t_drop_after_cons).optimize()
 
         # Visarga: word-final s → ḥ (Whitney §170–172; Pāṇini 8.3.15).
@@ -720,12 +727,11 @@ class SandhiEngine:
             ("guna_sandhi",        self.guna_sandhi),
         ]
         self._consonant_rules: list[tuple[str, pn.Fst]] = [
-            ("sonantization_117a", self.sonantization_117a),  # §117a — surd→voiced before voiced/h
-            ("mute_before_h_163",  self.mute_before_h_163),   # §163 — mute+h → voiced aspirate
             ("d_dh_gemination",   self.d_dh_gemination),
             ("dental_palatal_fusion", self.dental_palatal_fusion),
             ("ruh_class_dental",   self.ruh_class_dental),       # §2.8 Whitney §222
             ("homorganic_gemination", self.homorganic_gemination),
+            ("jhalo_jhali",        self.jhalo_jhali),
             ("bartholomae_general", self.bartholomae_general),
             ("bartho_hth",         self.bartho_hth),
             ("bartho_hdh",         self.bartho_hdh),
@@ -737,6 +743,8 @@ class SandhiEngine:
             ("sha_sonant_aspirate", self.sha_sonant_aspirate),   # §2.6 Whitney §218
             ("palatal_sibilant_retroflex", self.palatal_sibilant_retroflex),
             ("palatal_sandhi",     self.palatal_sandhi),
+            ("sonantization_117a", self.sonantization_117a),  # §117a — surd→voiced before voiced/h
+            ("mute_before_h_163",  self.mute_before_h_163),   # §163 — mute+h → voiced aspirate
             ("ksha_t_simplify",    self.ksha_t_simplify),
             ("retro_dh",           self.retro_dh),               # §2.9 Whitney §226b
             ("retro_th",           self.retro_th),
@@ -835,8 +843,6 @@ class SandhiEngine:
         if debug:
             return self._apply_rules_with_trace(fst, self._consonant_rules, "consonant_phase")
         return (fst
-                @ self.sonantization_117a      # §117a — surd mute → voiced before voiced obstruent/h
-                @ self.mute_before_h_163       # §163 — voiced mute + h → voiced aspirate geminate
                 @ self.d_dh_gemination
                 @ self.dental_palatal_fusion
                 @ self.ruh_class_dental             # §2.8 Whitney §222 — before bartholomae
@@ -854,11 +860,12 @@ class SandhiEngine:
                 @ self.sha_sonant_aspirate          # §2.6 Whitney §218 — before palatal_sandhi
                 @ self.palatal_sibilant_retroflex
                 @ self.palatal_sandhi
+                @ self.sonantization_117a      # §117a — surd mute → voiced before voiced obstruent/h
+                @ self.mute_before_h_163       # §163 — voiced mute + h → voiced aspirate geminate
                 @ self.ksha_t_simplify
                 @ self.retro_dh                     # §2.9 Whitney §226b — before retro_t/th
                 @ self.retro_th
                 @ self.retro_t
-                @ self.retro_dhv
                 @ self.sibilant_cluster_tagged
                 @ self.devoicing
                 @ self.nasal_assimilation

@@ -160,9 +160,9 @@ class StemBuilder:
             else:
                 fst = self._build_desiderative(root_str, strength)
             if tense in ("future", "conditional", "periphrastic_future"):
-                # Desiderative future/conditional uses -ya- after dropping final -a:
-                # bubhūṣyati, pipāsyati (Whitney 1032).
-                suffix = "i" if tense == "periphrastic_future" else "ya"
+                # Desiderative future/conditional takes -iṣya- after dropping final -a:
+                # bubhūṣiṣyati, pipāsiṣyati.
+                suffix = "i" if tense == "periphrastic_future" else "iṣya"
                 fst = (fst + pn.accep("+")) @ pn.cdrewrite(
                     pn.cross("a+", ""), "", "", self.sig
                 ) + pn.accep(suffix)
@@ -182,8 +182,10 @@ class StemBuilder:
             fst = self._build_aorist_passive_3sg(root_str)
         elif derivative == "intensive_middle":
             fst = self._build_intensive(root_str, strength, voice="middle")
-        elif derivative == "intensive_active":
-            fst = self._build_intensive(root_str, strength, voice="active")
+        elif derivative == "intensive_active_luganta":
+            fst = self._build_intensive(root_str, strength, voice="active_luganta")
+        elif derivative == "intensive_active_anta":
+            fst = self._build_intensive(root_str, strength, voice="active_anta")
         elif derivative and derivative.startswith("denominative"):
             fst = self._build_denominative(root_str, derivative)
             if tense in (
@@ -433,9 +435,14 @@ class StemBuilder:
         self, root_str, class_num, strength, tense, **kwargs
     ):
         """Periphrastic Future (Luṭ): stem + (i) + tā/tār/tās endings."""
-        if class_num == 10:
+        derivative = kwargs.get("derivative")
+        if derivative == "causative" or class_num == 10:
             base = self._build_causative_base(root_str)
             return base + pn.accep("ayi")
+        if derivative == "desiderative":
+            base = self._build_desiderative(root_str, "[STRONG]")
+            # Desiderative bases take 'i' augment in periphrastic forms
+            return (base + pn.accep("[WORD_END]")) @ pn.cdrewrite(pn.cross("a[WORD_END]", ""), "", "", self.sig) @ pn.cdrewrite(pn.cross("[WORD_END]", ""), "", "", self.sig) + pn.accep("i")
 
         root_obj = DHATUPATHA_ANALYZER.get(root_str, class_num)
         stem = self._apply_guna(root_str, "[STRONG]")
@@ -950,6 +957,14 @@ class StemBuilder:
         - Strong: Guna for most roots; Vriddhi for ṛ-vowel roots (mṛj → mārj).
         - Weak: Bare root with [WEAK] tag for systematic zero-grade in morphology.
         """
+        if root_str == "vac":
+            if strength == "[STRONG]":
+                return self._apply_guna(root_str, strength)
+            else:
+                # Whitney §219a: vac makes as middle 2d pl. vagdhve or vaḍḍhve.
+                # We can union a special tag or stem if needed, but let's just let it be vac[WEAK]
+                return pn.accep(root_str + "[WEAK]")
+
         # Whitney §212: ṛ-vowel class-2 roots take Vriddhi in strong forms.
         # e.g. mṛj → mārj (Vriddhi of ṛ = ār), not *merj (Guna = er).
         if strength == "[STRONG]":
@@ -1113,33 +1128,36 @@ class StemBuilder:
                 stem_base = override
         else:
             prefix = self.reduplicator.generate_intensive_prefix(root_str)
-            stem_base = prefix + root_str if voice == "middle" else None
-            if voice != "middle":
+            stem_base = prefix + root_str if voice in ("middle", "active_anta") else None
+            if voice not in ("middle", "active_anta"):
                 prefix = self.reduplicator.generate_intensive_prefix(root_str)
                 stem_base = prefix  # will be used below
 
-        if voice == "middle":
+        if voice in ("middle", "active_anta"):
             if root_str in intensive_stem_overrides:
                 return pn.accep(stem_base) + pn.accep("+ya")
             prefix = self.reduplicator.generate_intensive_prefix(root_str)
             return pn.accep(prefix) + pn.accep(root_str) + pn.accep("+ya")
         else:
-            # Active: Guna grade + [INTENSIVE_ACTIVE] tag.
+            # Active luganta: Guna grade + [INTENSIVE_ACTIVE] tag.
             # Morphology erases [INTENSIVE_ACTIVE]+ → +, then sandhi's ayadi fires:
-            # joho[INTENSIVE_ACTIVE]+vaḥ → joho+vaḥ → johavaḥ
             if root_str in intensive_stem_overrides:
                 return pn.accep(stem_base) + pn.accep("[INTENSIVE_ACTIVE]")
             
             prefix = self.reduplicator.generate_intensive_prefix(root_str)
             # Apply strength to root
-            base_stem = pn.accep(prefix) + self._apply_guna(root_str, strength)
-            
-            # Whitney §1006: hu optionally uses 'johav' / 'joho' throughout
             if root_str == "hu":
-                base_stem = pn.union(base_stem, pn.accep("johav"), pn.accep("joho"))
-            # Similarly, bhū intensive optionally takes guṇa ('bobho') and 'bobhav' throughout
+                if strength == "[STRONG]":
+                    base_stem = pn.accep(prefix) + pn.accep("ho")
+                else:
+                    base_stem = pn.accep(prefix) + pn.accep("hav")
             elif root_str == "bhū":
-                base_stem = pn.union(base_stem, pn.accep("bobhav"), pn.accep("bobho"))
+                if strength == "[STRONG]":
+                    base_stem = pn.accep(prefix) + pn.accep("bho")
+                else:
+                    base_stem = pn.accep(prefix) + pn.union(pn.accep("bho"), pn.accep("bhav"))
+            else:
+                base_stem = pn.accep(prefix) + self._apply_guna(root_str, strength)
                 
             return base_stem + pn.accep("[INTENSIVE_ACTIVE]")
 
@@ -1156,9 +1174,7 @@ class StemBuilder:
         if derivative == "desiderative":
             base = self._build_desiderative(root_str, "[STRONG]")
             # Strip final 'a' and add 'ām'
-            return (base + pn.accep("+")) @ pn.cdrewrite(
-                pn.cross("a+", ""), "", "", self.sig
-            ) + pn.accep("ām")
+            return (base + pn.accep("[WORD_END]")) @ pn.cdrewrite(pn.cross("a[WORD_END]", ""), "", "", self.sig) @ pn.cdrewrite(pn.cross("[WORD_END]", ""), "", "", self.sig) + pn.accep("ām")
         if derivative == "intensive":
             # Intensive periphrastic is rare but uses the intensive stem + ām
             # For simplicity, using intensive_middle (thematic) as base

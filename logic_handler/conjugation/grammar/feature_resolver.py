@@ -123,17 +123,21 @@ class MorphologicalFeatureResolver:
                 "desiderative_passive" if voice == "passive" else "desiderative"
             )
 
-        elif derivative == "intensive":
+        elif derivative in ("intensive", "intensive_luganta", "intensive_anta"):
             if voice == "middle":
                 strength = "[WEAK]"
                 effective_class = 1
                 effective_derivative = "intensive_middle"
             else:
-                # Active intensive: athematic class-3 endings with strength
-                # evaluated against class-2 rules (like any athematic)
-                strength = _evaluate_strength(2, person, number, voice, tense)
-                effective_class = 3
-                effective_derivative = "intensive_active"
+                if derivative == "intensive_anta":
+                    strength = "[WEAK]"
+                    effective_class = 1
+                    effective_derivative = "intensive_active_anta"
+                else:
+                    # Active intensive luganta: athematic class-3 endings with strength
+                    strength = _evaluate_strength(3, person, number, voice, tense)
+                    effective_class = 3
+                    effective_derivative = "intensive_active_luganta"
 
         elif derivative in ("denominative", "denominative_aya", "denominative_ya"):
             strength = "[WEAK]"

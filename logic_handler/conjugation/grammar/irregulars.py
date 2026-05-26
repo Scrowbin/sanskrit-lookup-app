@@ -173,7 +173,7 @@ desiderative_stem_overrides = {
     "tan":  ["titaṃsa", "titāṃsa", "titaniṣa"],
     "dviṣ": ["didvikṣa"],
     "duh":  ["dudhukṣa"],
-    "budh": ["bubhutsa", "bubodhiṣa"],
+    "budh": ["bubhutsa", "bubhodiṣa", "bubhodhiṣa"],
     "bhū":  ["bubhūṣa"],
     "muc":  ["mumukṣa"],
     "yuj":  ["yuyukṣa"],
@@ -195,7 +195,7 @@ desiderative_stem_overrides = {
     "jñā":  ["jijñāsa"],
     "ghrā": ["jighrāsa"],
     "gā":   ["jigāsa"],
-    "budh": ["bubhodiṣa", "bubhodhiṣa"],
+
 }
 
 # ── Intensive (yaṅ) stem overrides ───────────────────────────────────────────

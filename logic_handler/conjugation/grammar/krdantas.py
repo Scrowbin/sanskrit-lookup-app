@@ -20,11 +20,9 @@ class KrdantaEngine:
         except Exception:
             return []
 
-    def _build_and_format(self, name: str, root_str: str, class_num: int, type_key: str, suffix_m: str, suffix_f: str = "", preverb_str: str = "", stem_fst=None) -> list[str]:
-        output = []
-        
-        # Check override
-        if root_str in krdanta_overrides and type_key in krdanta_overrides[root_str]:
+    def _build_and_format(self, name: str, root_str: str, class_num: int, type_key: str, suffix_m: str, suffix_f: str = "", preverb_str: str = "", stem_fst=None, derivative=None) -> dict | None:
+        # Avoid overrides for derivatives, as overrides are for primary roots.
+        if derivative is None and root_str in krdanta_overrides and type_key in krdanta_overrides[root_str]:
             override = krdanta_overrides[root_str][type_key]
             m_form = override.get("m", "")
             f_form = override.get("f", "")
@@ -45,7 +43,7 @@ class KrdantaEngine:
                 f_form = f_forms[0] if f_forms else ""
 
         if not m_form:
-            return []
+            return None
             
         if preverb_str:
             # Strip conventional '-' prefix from override values (e.g. "-gamya" → "gamya")
@@ -58,113 +56,178 @@ class KrdantaEngine:
                 p_f = pn.accep(preverb_str) + pn.accep(clean_f)
                 f_form = self.get_forms(p_f)[0] if self.get_forms(p_f) else preverb_str + clean_f
 
-        output.append(name)
         if f_form:
-            output.append(f"{m_form} m. n. {f_form} f.")
+            return {"name": name, "form": f"{m_form} m. n. {f_form} f."}
         else:
-            output.append(f"{m_form}")
-            
-        return output
+            return {"name": name, "form": m_form}
 
-    def generate_block(self, root_str: str, class_num: int, preverb_str: str = "", derivative: str | None = None) -> str:
-        out = ["Participles"]
+    def generate_block(self, root_str: str, class_num: int, preverb_str: str = "", derivative: str | None = None) -> dict:
+        if derivative == "causative":
+            class_num = 10
+        
+        participles = []
+        indeclinables = []
+        
+        def add_p(item):
+            if item:
+                participles.append(item)
+                
+        def add_i(item):
+            if item:
+                indeclinables.append(item)
+                
+        if derivative in ("intensive", "intensive_luganta", "intensive_anta"):
+            # 1. Present Active Participle (Luganta)
+            luganta_stem = self.c._get_stem(root_str, class_num, "[WEAK]", "present", "intensive_luganta", None, None)
+            add_p(self._build_and_format(
+                "Present Active Participle", root_str, class_num, "prp_act", "at", "atī", preverb_str, luganta_stem, "intensive_luganta"
+            ))
+            
+            # 2. Present Middle Participle (Anta)
+            anta_stem = self.c._get_stem(root_str, class_num, "[WEAK]", "present", "intensive_anta", None, None)
+            add_p(self._build_and_format(
+                "Present Middle Participle", root_str, class_num, "prp_mid", "māna", "mānā", preverb_str, anta_stem, "intensive_anta"
+            ))
+            
+            # 3. Periphrastic Perfect (ām)
+            luganta_strong = self.c._get_stem(root_str, class_num, "[STRONG]", "present", "intensive_luganta", None, None)
+            add_i(self._build_and_format(
+                "Periphrastic Perfect", root_str, class_num, "peri_perf_anta", "ām", "", preverb_str, anta_stem, "intensive_anta"
+            ))
+            add_i(self._build_and_format(
+                "Periphrastic Perfect", root_str, class_num, "peri_perf_luganta", "ām", "", preverb_str, luganta_strong, "intensive_luganta"
+            ))
+            
+            return {
+                "participles": participles,
+                "indeclinables": indeclinables
+            }
+        
         
         # 1. Past Passive Participle (-ta / -tā)
-        # Samprasāraṇa roots (vac, yaj, svap etc.) are handled via krdanta_overrides.
-        out.extend(self._build_and_format(
-            "Past Passive Participle", root_str, class_num, "ppp", "ta", "tā", preverb_str
+        ppp_stem = None
+        if derivative == "causative":
+            ppp_stem = self.c.stems._build_causative_base(root_str) + pn.accep("i")
+        elif derivative == "desiderative":
+            ppp_stem = (self.c.stems._build_desiderative(root_str, "[WEAK]") + pn.accep("+")) @ pn.cdrewrite(pn.cross("a+", ""), "", "", self.c.stems.sig) + pn.accep("i")
+            
+        add_p(self._build_and_format(
+            "Past Passive Participle", root_str, class_num, "ppp", "ta", "tā", preverb_str, ppp_stem, derivative
         ))
         
         # 2. Past Active Participle (-tavat / -tavatī)
-        out.extend(self._build_and_format(
-            "Past Active Participle", root_str, class_num, "pp_act", "tavat", "tavatī", preverb_str
+        add_p(self._build_and_format(
+            "Past Active Participle", root_str, class_num, "pp_act", "tavat", "tavatī", preverb_str, ppp_stem, derivative
         ))
         
         # 3. Present Active Participle
-        # Stem is Present Stem. For thematic stems ending in 'a', 'a' + 'ant' -> 'ant' (pararūpa)
-        pres_stem = self.c._get_stem(root_str, class_num, "[WEAK]", "present", None, None, None)
+        pres_stem = self.c._get_stem(root_str, class_num, "[WEAK]", "present", derivative, "active", None, None)
         
-        # Strip the final thematic '+a' from the stem by appending a sentinel.
-        # Without the sentinel, cdrewrite's right-context '[WORD_END]' never matches
-        # because the raw stem FST doesn't contain [WORD_END].
-        # bho+a → bho+a[WORD_END] → bho[WORD_END] → bho (stripped), then +ant → bhavant.
         pres_stem_for_ant = (
             (pres_stem + pn.accep("[WORD_END]"))
             @ pn.cdrewrite(pn.cross("+a[WORD_END]", ""), "", "", self.c.stems.sig)
+            @ pn.cdrewrite(pn.cross("a[WORD_END]", ""), "", "", self.c.stems.sig)
             @ pn.cdrewrite(pn.cross("[WORD_END]", ""), "", "", self.c.stems.sig)
         )
         
-        out.extend(self._build_and_format(
-            "Present Active Participle", root_str, class_num, "prp_act", "ant", "antī", preverb_str, pres_stem_for_ant
+        add_p(self._build_and_format(
+            "Present Active Participle", root_str, class_num, "prp_act", "at", "antī", preverb_str, pres_stem_for_ant, derivative
         ))
         
         # 4. Present Middle Participle
-        is_thematic = class_num in {1, 4, 6, 10}
+        is_thematic = (class_num in {1, 4, 6, 10}) or (derivative is not None)
         mid_suf_m = "māna" if is_thematic else "āna"
         mid_suf_f = "mānā" if is_thematic else "ānā"
         
-        out.extend(self._build_and_format(
-            "Present Middle Participle", root_str, class_num, "prp_mid", mid_suf_m, mid_suf_f, preverb_str, pres_stem
+        add_p(self._build_and_format(
+            "Present Middle Participle", root_str, class_num, "prp_mid", mid_suf_m, mid_suf_f, preverb_str, pres_stem, derivative
         ))
         
         # 5. Present Passive Participle
-        pass_stem = self.c.stems._build_passive(root_str, class_num)
-        out.extend(self._build_and_format(
-            "Present Passive Participle", root_str, class_num, "prp_pass", "māna", "mānā", preverb_str, pass_stem
+        if derivative == "causative":
+            pass_stem = self.c.stems._build_causative_base(root_str) + pn.accep("ya")
+        elif derivative == "desiderative":
+            pass_stem = self.c.stems._build_desiderative_passive(root_str, "[WEAK]")
+        else:
+            pass_stem = self.c.stems._build_passive(root_str, class_num)
+            
+        add_p(self._build_and_format(
+            "Present Passive Participle", root_str, class_num, "prp_pass", "māna", "mānā", preverb_str, pass_stem, derivative
         ))
         
         # Future stem
-        raw_fut_stem = self.c._get_stem(root_str, class_num, "[STRONG]", "future", None, None, None)
-        # Note: future stem ends in 'sya' or 'iṣya', we need to strip 'a' for active participle
+        raw_fut_stem = self.c._get_stem(root_str, class_num, "[STRONG]", "future", derivative, "active", None, None)
         fut_stem_for_ant = (raw_fut_stem + pn.accep("+")) @ pn.cdrewrite(pn.cross("a+", ""), "", "", self.c.stems.sig)
         
         # 6. Future Active Participle
-        out.extend(self._build_and_format(
-            "Future Active Participle", root_str, class_num, "futp_act", "at", "antī", preverb_str, fut_stem_for_ant
+        add_p(self._build_and_format(
+            "Future Active Participle", root_str, class_num, "futp_act", "at", "antī", preverb_str, fut_stem_for_ant, derivative
         ))
         
         # 7. Future Middle Participle
-        out.extend(self._build_and_format(
-            "Future Middle Participle", root_str, class_num, "futp_mid", "māna", "mānā", preverb_str, raw_fut_stem
-        ))
+        if not derivative:
+            add_p(self._build_and_format(
+                "Future Middle Participle", root_str, class_num, "futp_mid", "māna", "mānā", preverb_str, raw_fut_stem, derivative
+            ))
         
         # 8. Future Passive Participle (Gerundives) - tavya, anīya, ya
-        # tavya uses the periphrastic future base
-        peri_base = self.c.stems._build_periphrastic_future_system(root_str, class_num, "[STRONG]", "periphrastic_future")
-        strong_root = self.c.stems._apply_guna(root_str, "[STRONG]")
+        peri_base = self.c.stems._build_periphrastic_future_system(root_str, class_num, "[STRONG]", "periphrastic_future", derivative=derivative)
         
-        out.extend(self._build_and_format(
-            "Future Passive Participle", root_str, class_num, "fpp_tavya", "tavya", "tavyā", preverb_str, peri_base
+        # for aniya/ya, strong_root for primary is guna. For derivative, it's just the base stem (e.g. causative base, or desiderative base)
+        if derivative == "causative":
+            strong_root = self.c.stems._build_causative_base(root_str)
+        elif derivative == "desiderative":
+            strong_root = self.c.stems._build_desiderative(root_str, "[STRONG]")
+        else:
+            strong_root = self.c.stems._apply_guna(root_str, "[STRONG]")
+        
+        add_p(self._build_and_format(
+            "Future Passive Participle", root_str, class_num, "fpp_tavya", "tavya", "tavyā", preverb_str, peri_base, derivative
         ))
-        out.extend(self._build_and_format(
-            "Future Passive Participle", root_str, class_num, "fpp_ya", "ya", "yā", preverb_str, strong_root
+        
+        # Strip final 'a' from causative/desiderative bases before vowel-initial affixes like anīya and ya
+        # (Though causative 'ya' drops the 'aya' completely in Pāṇini. 'bhāvya', not 'bhāvayaya').
+        # Actually for causative 'ya', the suffix is 'ya' and the base is just 'bhāv'.
+        if derivative == "causative":
+            ya_base = (self.c.stems._build_causative_base(root_str) + pn.accep("[WORD_END]")) @ pn.cdrewrite(pn.cross("+[WORD_END]", ""), "", "", self.c.stems.sig) @ pn.cdrewrite(pn.cross("[WORD_END]", ""), "", "", self.c.stems.sig)
+            aniya_base = ya_base # bhāv + anīya -> bhāvanīya
+        elif derivative == "desiderative":
+            ya_base = (strong_root + pn.accep("+")) @ pn.cdrewrite(pn.cross("a+", ""), "", "", self.c.stems.sig)
+            aniya_base = ya_base
+        else:
+            ya_base = strong_root
+            aniya_base = strong_root
+            
+        add_p(self._build_and_format(
+            "Future Passive Participle", root_str, class_num, "fpp_aniya", "anīya", "anīyā", preverb_str, aniya_base, derivative
         ))
-        out.extend(self._build_and_format(
-            "Future Passive Participle", root_str, class_num, "fpp_aniya", "anīya", "anīyā", preverb_str, strong_root
+        add_p(self._build_and_format(
+            "Future Passive Participle", root_str, class_num, "fpp_ya", "ya", "yā", preverb_str, ya_base, derivative
         ))
         
         # 9. Perfect Participles
-        perf_act_base = self.c.stems._build_perfect_krdanta_base(root_str, class_num, "active")
-        perf_mid_base = self.c.stems._build_perfect_krdanta_base(root_str, class_num, "middle")
-        
         phonemes = ALPHABET.parse_phonemes(root_str)
-        if root_str == "bhū" or (phonemes and phonemes[-1] in ('u', 'ū', 'ṛ', 'ṝ')):
-            act_suffix = "vān"
-        else:
-            act_suffix = "ivān"
+        if not derivative:
+            perf_act_base = self.c.stems._build_perfect_krdanta_base(root_str, class_num, "active")
+            perf_mid_base = self.c.stems._build_perfect_krdanta_base(root_str, class_num, "middle")
             
-        out.extend(self._build_and_format(
-            "Perfect Active Participle", root_str, class_num, "perf_act", act_suffix, "uṣī", preverb_str, perf_act_base
-        ))
-        out.extend(self._build_and_format(
-            "Perfect Middle Participle", root_str, class_num, "perf_mid", "āna", "ānā", preverb_str, perf_mid_base
-        ))
+            if root_str == "bhū" or (phonemes and phonemes[-1] in ('u', 'ū', 'ṛ', 'ṝ')):
+                act_suffix = "vān"
+            else:
+                act_suffix = "ivān"
+                
+            add_p(self._build_and_format(
+                "Perfect Active Participle", root_str, class_num, "perf_act", act_suffix, "uṣī", preverb_str, perf_act_base, derivative
+            ))
+            add_p(self._build_and_format(
+                "Perfect Middle Participle", root_str, class_num, "perf_mid", "āna", "ānā", preverb_str, perf_mid_base, derivative
+            ))
         
-        out.append("Indeclinable forms")
+        # Indeclinable forms
         
         # Infinitive (uses periphrastic base)
-        out.extend(self._build_and_format(
-            "Infinitive", root_str, class_num, "inf", "tum", "", preverb_str, peri_base
+        add_i(self._build_and_format(
+            "Infinitive", root_str, class_num, "inf", "tum", "", preverb_str, peri_base, derivative
         ))
         
         # Absolutive selection (Whitney §990):
@@ -177,20 +240,32 @@ class KrdantaEngine:
 
         # -tvā absolutive: only for unprefixed roots
         if not is_prefixed:
-            out.extend(self._build_and_format(
-                "Absolutive (-tvā)", root_str, class_num, "abs_tva", "tvā", "", preverb_str, pn.accep(root_str)
+            tva_stem = peri_base if derivative else pn.accep(root_str)
+            add_i(self._build_and_format(
+                "Absolutive", root_str, class_num, "abs_tva", "tvā", "", preverb_str, tva_stem, derivative
             ))
 
         # -ya / -tya absolutive
-        if is_prefixed:
-            # Prefixed: -tya for consonant-final, -ya for vowel-final (Whitney §990)
-            abs_ya_suffix = "ya" if root_ends_in_vowel else "tya"
-        else:
-            # Unprefixed: plain -ya (indeclinable gerundive complement)
-            abs_ya_suffix = "ya"
-
-        out.extend(self._build_and_format(
-            f"Absolutive ({'-' + abs_ya_suffix})", root_str, class_num, "abs_ya", abs_ya_suffix, "", preverb_str, pn.accep(root_str)
-        ))
+        # For unprefixed queries, we still want to generate the -ya absolutive with a hyphen to indicate it requires a preverb.
+        abs_ya_suffix = "ya" if root_ends_in_vowel else "tya"
+        abs_ya_stem = ya_base if derivative else pn.accep(root_str)
         
-        return "\n".join(out)
+        # If there's no preverb in the query, prepend a hyphen to the output format inside _build_and_format?
+        # Alternatively, we just add it to the final string. But _build_and_format returns a dict.
+        # Let's intercept the form after generation.
+        ya_form_dict = self._build_and_format("Absolutive", root_str, class_num, "abs_ya", abs_ya_suffix, "", preverb_str, abs_ya_stem, derivative)
+        if not is_prefixed and ya_form_dict:
+            ya_form_dict["form"] = "-" + ya_form_dict["form"]
+        add_i(ya_form_dict)
+        
+        # Periphrastic Perfect (for derivatives)
+        if derivative:
+            peri_perf_base = self.c.stems._build_periphrastic_base(root_str, class_num, derivative)
+            add_i(self._build_and_format(
+                "Periphrastic Perfect", root_str, class_num, "peri_perf", "", "", preverb_str, peri_perf_base, derivative
+            ))
+        
+        return {
+            "participles": participles,
+            "indeclinables": indeclinables
+        }

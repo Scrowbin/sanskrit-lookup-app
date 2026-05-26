@@ -34,9 +34,12 @@ def _conj(c: SanskritConjugator, root_str, cls, person, number, voice, tense, de
     return c.conjugate(root_str, cls, person, number, voice, tense,
                        derivative=derivative, use_db=False)
 
-def _forms(result: str):
-    """Split 'A OR B' result into a set."""
+def _forms(result):
+    """Normalize result into a set of forms."""
+    if isinstance(result, list):
+        return set(result)
     return {f.strip() for f in result.split(" OR ")}
+
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -184,8 +187,8 @@ PHASE3 = [
     ("putra",  "optative",  "3", "sg", "active", "putrīyet"),
     ("putra",  "optative",  "3", "pl", "active", "putrīyeyuḥ"),
     ("putra",  "future",    "3", "sg", "active", "putrīyiṣyati"),
-    # Periphrastic perfect: base+āñ+cakāra (m+c → ñc via Parasavarṇa)
-    ("putra",  "perfect",   "3", "sg", "active", "putrīyāñcakāra"),
+    # Periphrastic perfect: base+āṃ+cakāra (anusvāra valid before c per 8.4.59)
+    ("putra",  "perfect",   "3", "sg", "active", "putrīyāṃcakāra"),
     # ā-stems → ī+ya
     ("mālā",   "present",   "3", "sg", "active", "mālīyati"),
     # i-stems → ī+ya
@@ -273,16 +276,20 @@ class SuiteRunner:
         print(f"  {title}")
         print("═" * 68)
 
-    def _record(self, label: str, expected: str, ok: bool, got: str):
+    def _record(self, label: str, expected: str, ok: bool, got):
         if ok:
             print(f"  ✅  {label:<50} → {expected}")
             self.total_pass += 1
         else:
-            snippet = got[:80].replace("\n", " ↵ ")
+            if isinstance(got, list):
+                got_str = " OR ".join(got)
+            else:
+                got_str = str(got)
+            snippet = got_str[:80].replace("\n", " ↵ ")
             print(f"  ❌  {label:<50}  expected='{expected}'")
             print(f"       got: '{snippet}'")
             self.total_fail += 1
-            self.all_failures.append((label, expected, got))
+            self.all_failures.append((label, expected, got_str))
 
     # ── Phase 1 ───────────────────────────────────────────────────────────────
     def run_phase1(self):

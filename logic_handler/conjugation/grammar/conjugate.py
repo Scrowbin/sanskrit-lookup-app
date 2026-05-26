@@ -227,6 +227,12 @@ class SanskritConjugator:
                     root_str, class_num, person, number, voice, tense,
                     derivative, preverb_str,
                 )
+                
+        if derivative == "intensive":
+            if voice == "active":
+                derivative = "intensive_luganta"
+            else:
+                derivative = "intensive_anta"
 
         f = self.resolver.resolve(
             root_str, class_num, person, number, voice, tense, derivative
@@ -262,7 +268,7 @@ class SanskritConjugator:
         else:
             # Intensive Active: optional ī before consonant endings (Whitney §1006c)
             # When ī is inserted, the stem takes the weak grade.
-            if f.effective_derivative == "intensive_active" and f.strength == "[STRONG]" and suffix.surface and suffix.surface[0] in ALPHABET.consonants_list:
+            if f.effective_derivative == "intensive_active_luganta" and f.strength == "[STRONG]" and suffix.surface and suffix.surface[0] in ALPHABET.consonants_list:
                 weak_stem = self._get_stem(
                     root_str, f.effective_class, "[WEAK]", tense,
                     f.effective_derivative, voice=voice, person=person, number=number

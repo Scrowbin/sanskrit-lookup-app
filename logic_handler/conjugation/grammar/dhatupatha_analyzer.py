@@ -52,6 +52,7 @@ _KNOWN_ANIT_ROOTS = frozenset({
     "bhrajj", # bhrasj is Aniṭ (Pāṇini 7.2.10, Whitney §236)
     "nī",     # universally Aniṭ (Whitney §900) but lacks clear anudātta in some CSV versions
     "vid",    # class 2/6 is Aniṭ in future (vetsyati) (Whitney §900)
+    "smṛ",
 })
 
 # Ubhayapada roots whose MW/Huet unprefixed-roots.csv entry is incomplete

@@ -124,6 +124,14 @@ class SuffixProvider:
                 if suf.surface[0] not in ("a", "ā", "i", "ī", "u", "ū", "ṛ", "ṝ", "e", "ai", "o", "au", "y"):
                     endings[key] = _s("i" + suf.surface, suf.tags)
                     
+        is_intensive = kwargs.get('derivative') == 'intensive_active_luganta'
+        if class_num == 3 and is_intensive:
+            # Pāṇini 7.3.94: yaṅo vā. Optional ī augment before halādi pit sārvadhātuka affixes.
+            for key in ["[1sg]", "[2sg]", "[3sg]"]:
+                suf = endings[key]
+                if suf.surface[0] not in ("a", "ā", "i", "ī", "u", "ū", "ṛ", "ṝ", "e", "ai", "o", "au", "y"):
+                    endings[key] = _s(suf.surface + "|ī" + suf.surface, suf.tags)
+
         return endings
 
     @staticmethod
@@ -180,6 +188,15 @@ class SuffixProvider:
                     else:
                         endings[key] = _s("i" + suf.surface, suf.tags)
                         
+        is_intensive = kwargs.get('derivative') == 'intensive_active_luganta'
+        if class_num == 3 and is_intensive:
+            # Pāṇini 7.3.94: yaṅo vā. Optional ī augment before halādi pit sārvadhātuka affixes.
+            # In imperfect, 2sg 's' and 3sg 't' can optionally take ī (e.g. abobhavīs / abobhos).
+            for key in ["[2sg]", "[3sg]"]:
+                suf = endings[key]
+                if suf.surface[0] not in ("a", "ā", "i", "ī", "u", "ū", "ṛ", "ṝ", "e", "ai", "o", "au", "y"):
+                    endings[key] = _s(suf.surface + "|ī" + suf.surface, suf.tags)
+
         return endings
 
     @staticmethod
@@ -204,9 +221,9 @@ class SuffixProvider:
     def get_imperative_active(class_num: int = 1, root_str=None, **kwargs) -> dict[str, Suffix]:
         if is_thematic(class_num):
             return {
-                "[3sg]": _s("tu|tāt"), "[3du]": _s("tām"),  "[3pl]": _s("ntu"),
-                "[2sg]": _s("|tāt"),   "[2du]": _s("tam"),  "[2pl]": _s("ta"),
-                "[1sg]": _s("āni"),    "[1du]": _s("āva"),  "[1pl]": _s("āma"),
+                "[3sg]": _s("tu"),  "[3du]": _s("tām"),  "[3pl]": _s("ntu"),
+                "[2sg]": _s(""),   "[2du]": _s("tam"),  "[2pl]": _s("ta"),
+                "[1sg]": _s("āni"), "[1du]": _s("āva"),  "[1pl]": _s("āma"),
             }
         
         if class_num in (5, 8):
@@ -214,21 +231,21 @@ class SuffixProvider:
             phonemes = _A.parse_phonemes(root_str or "")
             # Class 8 always drops 'hi' (tanu, manu). Class 5 drops 'hi' only for vowel roots (sunu).
             if class_num == 8 or (phonemes and phonemes[-1] in _A.vowels_list):
-                sg2 = "|tāt"
+                sg2 = ""
             else:
-                sg2 = "hi|tāt"
+                sg2 = "hi"
             if root_str == "kṛ":
-                sg2 = "|tāt"
+                sg2 = ""
             return {
-                "[3sg]": _s("tu|tāt"), "[3du]": _s("tām"),  "[3pl]": _s("antu"),
-                "[2sg]": _s(sg2),      "[2du]": _s("tam"),  "[2pl]": _s("ta"),
-                "[1sg]": _s("āni"),    "[1du]": _s("āva"),  "[1pl]": _s("āma"),
+                "[3sg]": _s("tu"),  "[3du]": _s("tām"),  "[3pl]": _s("antu"),
+                "[2sg]": _s(sg2),   "[2du]": _s("tam"),  "[2pl]": _s("ta"),
+                "[1sg]": _s("āni"), "[1du]": _s("āva"),  "[1pl]": _s("āma"),
             }
         if root_str == "ad":
             return {
-                "[3sg]": _s("tu|tāt"),  "[3du]": _s("tām"), "[3pl]": _s("antu"),
-                "[2sg]": _s("dhi|tāt"), "[2du]": _s("tam"), "[2pl]": _s("ta"),
-                "[1sg]": _s("āni"),     "[1du]": _s("āva"), "[1pl]": _s("āma"),
+                "[3sg]": _s("tu"),   "[3du]": _s("tām"), "[3pl]": _s("antu"),
+                "[2sg]": _s("dhi"),  "[2du]": _s("tam"), "[2pl]": _s("ta"),
+                "[1sg]": _s("āni"),  "[1du]": _s("āva"), "[1pl]": _s("āma"),
             }
         # Whitney §636 — class 2 (adādi/root-class) imperative 2sg:
         # 'dhi' after consonant-final stem, 'hi' after vowel-final stem.
@@ -240,9 +257,9 @@ class SuffixProvider:
             jhaksh_roots = {"jakṣ", "jāgṛ", "daridrā", "cakās", "śās", "dīdhī", "vevī"}
             third_pl = "atu" if root_str in jhaksh_roots else "antu"
             endings = {
-                "[3sg]": _s("tu|tāt"),       "[3du]": _s("tām"), "[3pl]": _s(third_pl),
-                "[2sg]": _s(f"{sg2}|tāt"),   "[2du]": _s("tam"), "[2pl]": _s("ta"),
-                "[1sg]": _s("āni"),           "[1du]": _s("āva"), "[1pl]": _s("āma"),
+                "[3sg]": _s("tu"),   "[3du]": _s("tām"), "[3pl]": _s(third_pl),
+                "[2sg]": _s(sg2),    "[2du]": _s("tam"), "[2pl]": _s("ta"),
+                "[1sg]": _s("āni"),  "[1du]": _s("āva"), "[1pl]": _s("āma"),
             }
             # Pāṇini 7.2.76: rudādibhyaḥ sārvadhātuke
             if root_str in {"rud", "svap", "śvas", "an", "jakṣ"}:
@@ -259,40 +276,29 @@ class SuffixProvider:
                     endings[key] = _s("|".join(new_surfaces), suf.tags)
             return endings
         if class_num == 3:
-            is_intensive = kwargs.get('derivative') == 'intensive_active'
+            is_intensive = kwargs.get('derivative') == 'intensive_active_luganta'
             if is_intensive:
                 from alphabet import ALPHABET as _A
                 # Intensive stem ending in consonant takes 'dhi' (e.g. carkar-dhi)
-                # But wait, we don't have the stem here, only the root. kṛ -> carkar (cons). hu -> johav/joho. 
-                # Actually, any intensive of a consonant root or kṛ ends in a consonant or takes 'dhi'.
-                # To be safe, just use 'dhi|hi' for intensives and let sandhi or FST handle it, or check root:
-                phonemes = _A.parse_phonemes(root_str or "")
-                ends_in_vowel = phonemes and phonemes[-1] in _A.vowels_list
-                # For kṛ, it's carkar (cons). For hu, it's johav (cons) / joho (vowel).
-                # To be completely safe and dynamic, we can provide both 'dhi|hi' for all intensives, 
-                # but 'dhi' is only allowed after consonants according to Sanskrit rules.
-                # Actually, let's just supply 'dhi|hi' and let the FST graph match the valid one?
-                # No, FST will just output both.
-                # carkar ends in r. hu intensive can end in v (johav) or o (joho). 
-                sg2 = "dhi|hi" if is_intensive else ("dhi" if root_str in ("hu", "ad") else "hi")
+                sg2 = "dhi|hi" 
             else:
                 sg2 = "dhi" if root_str in ("hu", "ad") else "hi"
                 
             return {
-                "[3sg]": _s("tu|tāt"),     "[3du]": _s("tām"), "[3pl]": _s("atu"),
-                "[2sg]": _s(f"{sg2}|tāt"), "[2du]": _s("tam"), "[2pl]": _s("ta"),
-                "[1sg]": _s("āni"),        "[1du]": _s("āva"), "[1pl]": _s("āma"),
+                "[3sg]": _s("tu"),   "[3du]": _s("tām"), "[3pl]": _s("atu"),
+                "[2sg]": _s(sg2),    "[2du]": _s("tam"), "[2pl]": _s("ta"),
+                "[1sg]": _s("āni"),  "[1du]": _s("āva"), "[1pl]": _s("āma"),
             }
         if class_num == 7:
             return {
-                "[3sg]": _s("tu|tāt"),  "[3du]": _s("tām"), "[3pl]": _s("antu"),
-                "[2sg]": _s("dhi|tāt"), "[2du]": _s("tam"), "[2pl]": _s("ta"),
-                "[1sg]": _s("āni"),     "[1du]": _s("āva"), "[1pl]": _s("āma"),
+                "[3sg]": _s("tu"),   "[3du]": _s("tām"), "[3pl]": _s("antu"),
+                "[2sg]": _s("dhi"),  "[2du]": _s("tam"), "[2pl]": _s("ta"),
+                "[1sg]": _s("āni"),  "[1du]": _s("āva"), "[1pl]": _s("āma"),
             }
         return {
-            "[3sg]": _s("tu|tāt"), "[3du]": _s("tām"),  "[3pl]": _s("antu"),
-            "[2sg]": _s("hi|tāt"), "[2du]": _s("tam"),  "[2pl]": _s("ta"),
-            "[1sg]": _s("āni"),    "[1du]": _s("āva"),  "[1pl]": _s("āma"),
+            "[3sg]": _s("tu"),  "[3du]": _s("tām"),  "[3pl]": _s("antu"),
+            "[2sg]": _s("hi"),  "[2du]": _s("tam"),  "[2pl]": _s("ta"),
+            "[1sg]": _s("āni"), "[1du]": _s("āva"),  "[1pl]": _s("āma"),
         }
 
     @staticmethod
