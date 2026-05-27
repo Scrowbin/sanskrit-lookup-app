@@ -117,7 +117,7 @@ class SanskritPhonology:
         self.apply_nati_fst = pn.cdrewrite(
             pn.cross("n", "ṇ"),
             triggers + allowed,
-            self.vowels,
+            pn.union(self.vowels, "m", "y", "v", "n"),
             self.sigma_star,
         )
 
@@ -137,7 +137,7 @@ class SanskritPhonology:
         tau = pn.cross("s", "ṣ")
 
         ruki_sounds = ["r", "ṛ", "ṝ", "u", "ū", "k", "i", "ī", "e", "o"]
-        lambda_ctx = pn.union(*ruki_sounds).optimize()
+        lambda_ctx = (pn.union(*ruki_sounds) + pn.union("ḥ", "ṃ", "")).optimize()
         self.apply_ruki_rule_fst = pn.cdrewrite(
             tau, lambda_ctx, "", self.sigma_star
         ).optimize()

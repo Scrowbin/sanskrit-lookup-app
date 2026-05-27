@@ -116,17 +116,17 @@ go_paradigm = pn.union(
     pn.cross("go", "gāvau") + mf_blind + pn.cross("[Nom][Du]", ""),
     pn.cross("go", "gāvau") + mf_blind + pn.cross("[Acc][Du]", ""),
     pn.cross("go", "gāvau") + mf_blind + pn.cross("[Voc][Du]", ""),
-    pn.cross("go", "gॉbhyām") + mf_blind + pn.cross("[Ins][Du]", ""),  # gobhyām
-    pn.cross("go", "gॉbhyām") + mf_blind + pn.cross("[Dat][Du]", ""),
-    pn.cross("go", "gॉbhyām") + mf_blind + pn.cross("[Abl][Du]", ""),
+    pn.cross("go", "gobhyām") + mf_blind + pn.cross("[Ins][Du]", ""),  # gobhyām
+    pn.cross("go", "gobhyām") + mf_blind + pn.cross("[Dat][Du]", ""),
+    pn.cross("go", "gobhyām") + mf_blind + pn.cross("[Abl][Du]", ""),
     pn.cross("go", "gavos") + mf_blind + pn.cross("[Gen][Du]", ""),
     pn.cross("go", "gavos") + mf_blind + pn.cross("[Loc][Du]", ""),
     pn.cross("go", "gāvaḥ") + mf_blind + pn.cross("[Nom][Pl]", ""),
     pn.cross("go", "gāḥ") + mf_blind + pn.cross("[Acc][Pl]", ""),
     pn.cross("go", "gāvaḥ") + mf_blind + pn.cross("[Voc][Pl]", ""),
-    pn.cross("go", "gॉbhiḥ") + mf_blind + pn.cross("[Ins][Pl]", ""),
-    pn.cross("go", "gॉbhyas") + mf_blind + pn.cross("[Dat][Pl]", ""),
-    pn.cross("go", "gॉbhyas") + mf_blind + pn.cross("[Abl][Pl]", ""),
+    pn.cross("go", "gobhiḥ") + mf_blind + pn.cross("[Ins][Pl]", ""),
+    pn.cross("go", "gobhyas") + mf_blind + pn.cross("[Dat][Pl]", ""),
+    pn.cross("go", "gobhyas") + mf_blind + pn.cross("[Abl][Pl]", ""),
     pn.cross("go", "gavām") + mf_blind + pn.cross("[Gen][Pl]", ""),
     pn.cross("go", "goṣu") + mf_blind + pn.cross("[Loc][Pl]", ""),
 ).optimize()
