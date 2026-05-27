@@ -150,9 +150,9 @@ voc_du_s_n = s_base_vowel + pn.cross("[Voc][Du]", "ī")
 
 # Plural base triggers nasal infixation and lengthening
 n_pl_base = pn.union(
-    pn.cross("as[S_STEM]", "āṃs"),
-    pn.cross("is[S_STEM]", "īṃṣ"),
-    pn.cross("us[S_STEM]", "ūṃṣ"),
+    pn.cross("as[S_STEM]", "āṃs") + pn.cross("[Neut]", ""),
+    pn.cross("is[S_STEM]", "īṃṣ") + pn.cross("[Neut]", ""),
+    pn.cross("us[S_STEM]", "ūṃṣ") + pn.cross("[Neut]", ""),
     yas_strong_n,
 )
 nom_pl_s_n = n_pl_base + pn.cross("[Nom][Pl]", "i")
@@ -182,8 +182,17 @@ abl_pl_s = s_base_bh + pn.cross("[Abl][Pl]", "bhyas")
 
 gen_pl_s = s_base_vowel + pn.cross("[Gen][Pl]", "ām")
 
-# Leaves 's' alone before vowel endings so your Ruki engine can catch havis+su -> haviṣṣu
-loc_pl_s = s_base_vowel + pn.cross("[Loc][Pl]", "su")
+# Locative plural can have visarga (aḥsu/iḥṣu/uḥṣu) or sibilant doubling (assu/iṣṣu/uṣṣu).
+# We generate both options!
+loc_pl_s = pn.union(
+    s_base_vowel + pn.cross("[Loc][Pl]", "su"),
+    pn.union(
+        pn.cross("as[S_STEM]", "aḥ") + pn.cross(any_g, "") + pn.cross("[Loc][Pl]", "su"),
+        pn.cross("is[S_STEM]", "iḥ") + pn.cross(any_g, "") + pn.cross("[Loc][Pl]", "su"),
+        pn.cross("us[S_STEM]", "uḥ") + pn.cross(any_g, "") + pn.cross("[Loc][Pl]", "su"),
+        pn.cross("yas[YAS_STEM]", "yaḥ") + pn.cross(any_g, "") + pn.cross("[Loc][Pl]", "su"),
+    )
+)
 
 # Master Union
 s_stem_paradigm = pn.union(

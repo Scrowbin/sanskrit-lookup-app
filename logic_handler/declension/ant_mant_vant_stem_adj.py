@@ -50,11 +50,11 @@ nom_sg_n = weak_n + pn.cross("[Nom][Sg]", "")  # bhāvant -> bhāvat
 acc_sg_n = weak_n + pn.cross("[Acc][Sg]", "")
 voc_sg_n = weak_n + pn.cross("[Voc][Sg]", "")
 
-# Note: Pure participles ([ANT_STEM]) can optionally form bhāvanti here,
-# but bhāvantī is universally accepted for all three. Verified.
-nom_du_n = strong_n + pn.cross("[Nom][Du]", "ī")  # bhāvant -> bhāvantī
-acc_du_n = strong_n + pn.cross("[Acc][Du]", "ī")
-voc_du_n = strong_n + pn.cross("[Voc][Du]", "ī")
+# Neuter dual Nom/Acc/Voc:
+# Can be either strong (e.g. bhāvantī) or weak (e.g. bhāvatī). We generate both!
+nom_du_n = (weak_n | strong_n) + pn.cross("[Nom][Du]", "ī")
+acc_du_n = (weak_n | strong_n) + pn.cross("[Acc][Du]", "ī")
+voc_du_n = (weak_n | strong_n) + pn.cross("[Voc][Du]", "ī")
 
 # --- Strong Cases (Nom/Acc/Voc Pl) ---
 # Penultimate vowel remains short for general mat/vat/ant adjectives (except mahat)

@@ -25,7 +25,7 @@ Usage::
 
 from __future__ import annotations
 
-import os, sys
+import os, sys, re
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 if _HERE not in sys.path:
@@ -170,11 +170,11 @@ class DeclensionEngine:
         if stem.endswith("yas") and not stem.endswith("ayas"):
             return "[YAS_STEM]"
         if stem.endswith("as"):
-            return "[AS_STEM]"
+            return "[S_STEM]"
         if stem.endswith("is"):
-            return "[IS_STEM]"
+            return "[S_STEM]"
         if stem.endswith("us"):
-            return "[US_STEM]"
+            return "[S_STEM]"
         if stem.endswith("au"):
             return "[AU_STEM]"
         if stem.endswith("ai"):
@@ -338,6 +338,7 @@ class DeclensionEngine:
         case: str,
         number: str,
         gender_tag: str,
+        stem_tag: str = "",
     ) -> str:
         """Apply phonological post-processing to one raw output form.
 
@@ -361,7 +362,7 @@ class DeclensionEngine:
         form = form.replace("#", "")
 
         # 2. Neuter plural nasal insertion (consonant stems):
-        #    vowel + stop + 'i' → vowel + n + stop + 'i'  (e.g. jagati → jaganti)
+        #    vowel + stop + 'i' → vowel + homorganic nasal + stop + 'i'
         if (
             gender_tag == "[Neut]"
             and number == "Pl"
@@ -372,10 +373,40 @@ class DeclensionEngine:
             pre = form[:-1]
             if pre and pre[-1] in _NOM_STOPS:
                 # Guard: skip if a nasal was already pre-inserted by the FST
-                # (ṭ-stem neuter plural: pn.cross("ṭ[T_STEM]","nṭi") already has 'n')
                 already_has_nasal = len(pre) >= 2 and pre[-2] in "mnṃṅñṇ"
                 if not already_has_nasal:
-                    form = pre[:-1] + "n" + pre[-1] + "i"
+                    c = pre[-1]
+                    nasal = "n"
+                    if c in "cj":
+                        nasal = "ñ"
+                    elif c in "ṭḍ":
+                        nasal = "ṇ"
+                    elif c in "kg":
+                        nasal = "ṅ"
+                    elif c in "pb":
+                        nasal = "m"
+                    form = pre[:-1] + nasal + c + "i"
+
+        # 2b. Weak an-stem weakening: drop penultimate 'a' before vowel-initial endings
+        # if the consonant before 'an' is not part of a cluster ending in 'v' or 'm'.
+        # Match pattern: (any character)(consonant)an(ending)
+        # Oblique weak endings: ā, e, aḥ, as, i, ī, oḥ, os, ām.
+        if stem_tag == "[AN_STEM]":
+            match = re.search(r'(.)([kgcjṭḍtdpbmnyrlvśṣsh])an(ā|e|aḥ|as|i|ī|oḥ|os|ām)$', form)
+            if match:
+                prev_char = match.group(1)
+                consonant = match.group(2)
+                ending = match.group(3)
+                
+                # Check if it's a consonant cluster ending in 'v' or 'm'
+                is_consonant = lambda char: char not in "aāiīuūṛṝeo" and char.isalpha()
+                is_vm_cluster = consonant in ("v", "m") and is_consonant(prev_char)
+                
+                if not is_vm_cluster:
+                    stem_part = form[:-len(ending) - 3]
+                    # Palatalization: dental n -> ñ when after palatal c/j
+                    n_char = "ñ" if consonant in "cj" else "n"
+                    form = stem_part + consonant + n_char + ending
 
         # 3. S-stem oblique sandhi (FST is safe here — no [WORD_END] needed)
         try:
@@ -424,18 +455,24 @@ class DeclensionEngine:
         ``special_cases.all_irregular_nouns_paradigm`` whose FSTs embed the
         full stem string directly rather than using a stem-type tag.
         """
-        raw_forms: list[str] = []
+        raw_forms_with_tags: list[tuple[str, str]] = []
         for ann in filter(None, [annotated, extra_annotated]):
             try:
                 result_fst = (pn.accep(ann) @ self._master).optimize()
-                raw_forms.extend(result_fst.paths().ostrings())
+                stem_tag = ""
+                for t in ["[AN_STEM]", "[IN_STEM]", "[A_STEM]", "[Ā_STEM]", "[I_STEM]", "[I_bar_STEM]", "[U_STEM]", "[Ū_STEM]", "[R_STEM]", "[C_STEM]"]:
+                    if t in ann:
+                        stem_tag = t
+                        break
+                for r in result_fst.paths().ostrings():
+                    raw_forms_with_tags.append((r, stem_tag))
             except Exception:
                 pass
 
         out: list[str] = []
-        for raw in raw_forms:
+        for raw, stem_tag in raw_forms_with_tags:
             if raw is not None:
-                surface = self._postprocess(raw, case, number, gender_tag)
+                surface = self._postprocess(raw, case, number, gender_tag, stem_tag)
                 if surface:
                     out.append(surface)
         return sorted(set(out))
@@ -487,12 +524,57 @@ class DeclensionEngine:
             tag = stem_type if stem_type.startswith("[") else f"[{stem_type}]"
 
         queries = []
-        if stem.endswith("a") and gender_tag == "[Fem]" and stem_type in (STEM_TYPE_AUTO, None, ""):
+        if stem.endswith("aka") and gender_tag == "[Fem]" and stem_type in (STEM_TYPE_AUTO, None, ""):
+            # Stems ending in -aka form their feminine in -ikā (e.g. akarmikā)
+            # We also query the standard -akā and -akī variants for complete coverage.
+            queries.append((stem[:-3] + "ikā", "[Ā_STEM]"))
+            queries.append((stem[:-1] + "ā", "[Ā_STEM]"))
+            queries.append((stem[:-1] + "ī", "[I_bar_STEM]"))
+        elif stem.endswith("a") and gender_tag == "[Fem]" and stem_type in (STEM_TYPE_AUTO, None, ""):
             # Query both feminine ā-stem and feminine ī-stem
             queries.append((stem[:-1] + "ā", "[Ā_STEM]"))
             queries.append((stem[:-1] + "ī", "[I_bar_STEM]"))
+        elif stem.endswith("i") and gender_tag == "[Fem]" and stem_type in (STEM_TYPE_AUTO, None, ""):
+            # Query both feminine i-stem and feminine ī-stem
+            queries.append((stem, "[I_STEM]"))
+            queries.append((stem[:-1] + "ī", "[I_bar_STEM]"))
+        elif stem.endswith("u") and gender_tag == "[Fem]" and stem_type in (STEM_TYPE_AUTO, None, ""):
+            # Query both feminine u-stem and feminine ū-stem
+            queries.append((stem, "[U_STEM]"))
+            queries.append((stem[:-1] + "ū", "[Ū_STEM]"))
+        elif stem.endswith("yas") and not stem.endswith("ayas") and gender_tag == "[Fem]" and stem_type in (STEM_TYPE_AUTO, None, ""):
+            # Comparative yas-stems form their feminine in ī (e.g. aṃhīyasī)
+            queries.append((stem + "ī", "[I_bar_STEM]"))
+        elif stem.endswith("ṛ") and gender_tag == "[Fem]" and stem_type in (STEM_TYPE_AUTO, None, ""):
+            # Kinship feminine nouns (mātṛ, etc.) decline in the R-stem kinship paradigm;
+            # Agent nouns form feminine in rī (e.g. kartrī) and decline as I_bar_STEM.
+            is_kin = any(stem.endswith(k) for k in ["mātṛ", "duhitṛ", "yātṛ", "nanāndṛ", "svasṛ"])
+            if is_kin:
+                queries.append((stem, tag))
+            else:
+                queries.append((stem[:-1] + "rī", "[I_bar_STEM]"))
+        elif stem.endswith("an") and gender_tag == "[Fem]" and stem_type in (STEM_TYPE_AUTO, None, ""):
+            # Feminine of an-stems drops n to form an ā-stem (e.g. akarmā), or drops an to add nī (e.g. rājñī).
+            queries.append((stem[:-2] + "ā", "[Ā_STEM]"))
+            queries.append((stem[:-2] + "nī", "[I_bar_STEM]"))
+        elif stem.endswith(("añc", "ac", "āc")) and gender_tag == "[Fem]" and stem_type in (STEM_TYPE_AUTO, None, ""):
+            # Directional stems in -añc/-ac/-āc form their feminine in -ī (declined as I_bar_STEM)
+            # using weakened stem forms (e.g. pratīcī, samīcī, viṣūcī, akudhricī, udīcī, prācī).
+            queries.append((re.sub(r'y(a|ā)?ñ?c$', 'īcī', stem), "[I_bar_STEM]"))
+            queries.append((re.sub(r'y(a|ā)?ñ?c$', 'icī', stem), "[I_bar_STEM]"))
+            queries.append((re.sub(r'v(a|ā)?ñ?c$', 'ūcī', stem), "[I_bar_STEM]"))
+            queries.append((re.sub(r'añ?c$', 'īcī', stem), "[I_bar_STEM]"))
+            queries.append((re.sub(r'āñ?c$', 'ācī', stem), "[I_bar_STEM]"))
+            queries.append((re.sub(r'āñ?c$', 'īcī', stem), "[I_bar_STEM]"))
+            queries.append((stem, tag))
         else:
             queries.append((stem, tag))
+
+        # Check for irregular an-stems that also query their i-stem counterparts (akṣan/akṣi, etc.)
+        for irreg_an, corresponding_i in [("akṣan", "akṣi"), ("asthan", "asthi"), ("dadhan", "dadhi"), ("sakthan", "sakthi")]:
+            if stem == irreg_an or stem.endswith(irreg_an):
+                stem_i = stem[:-len(irreg_an)] + corresponding_i
+                queries.append((stem_i, "[I_STEM]"))
 
         results: dict[tuple[str, str], list[str]] = {}
         for case in CASES:
@@ -511,9 +593,11 @@ class DeclensionEngine:
             curr_gender_tag = gender_tag
             # ṛ-stems use subtype pseudo-gender tags instead of Masc/Fem/Neut
             if curr_tag == "[R_STEM]":
-                curr_gender_tag = {"agt": "[Agt]", "kin": "[Kin]", "neut": "[Neut]"}.get(
-                    r_subtype, "[Agt]"
-                )
+                if curr_gender_tag == "[Neut]":
+                    curr_gender_tag = "[Neut]"
+                else:
+                    is_kin = any(curr_stem.endswith(k) for k in ["pitṛ", "mātṛ", "bhrātṛ", "duhitṛ", "yātṛ", "nanāndṛ", "devṛ"])
+                    curr_gender_tag = "[Kin]" if is_kin else "[Agt]"
 
             for case in CASES:
                 for number in NUMBERS:
@@ -528,6 +612,17 @@ class DeclensionEngine:
                         extra_annotated=special_ann,
                     )
                     results[(case, number)].extend(res)
+
+                    # For R_STEM Agt/Kin, also query with original gender tag appended (e.g. Masc/Fem)
+                    if curr_tag == "[R_STEM]" and curr_gender_tag in ("[Agt]", "[Kin]"):
+                        annotated_with_gender = f"{curr_stem}{curr_tag}{curr_gender_tag}{gender_tag}[{case}][{number}]"
+                        res2 = self._query(
+                            annotated_with_gender,
+                            case,
+                            number,
+                            curr_gender_tag,
+                        )
+                        results[(case, number)].extend(res2)
 
         # De-duplicate and sort
         for key in results:

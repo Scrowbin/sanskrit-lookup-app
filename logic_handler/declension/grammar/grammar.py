@@ -117,7 +117,7 @@ class SanskritPhonology:
         self.apply_nati_fst = pn.cdrewrite(
             pn.cross("n", "ṇ"),
             triggers + allowed,
-            "",
+            self.vowels,
             self.sigma_star,
         )
 
@@ -163,17 +163,44 @@ class SanskritPhonology:
         # 1. Define what triggers the rule (Neuter Plural tags)
         n_pl_tags = pn.union("[Neut][Nom][Pl]", "[Neut][Acc][Pl]", "[Neut][Voc][Pl]")
 
-        # 2. Define the final consonants that require 'n' (plosives/stops)
-        final_stops = pn.union("t", "d", "k", "g", "p", "b", "c", "j", "ṭ", "ḍ")
-
-        # 3. The rule: Insert "n" out of thin air ("" -> "n")
-        # Left context: Any vowel
-        # Right context: The final consonant + the specific Neuter Plural tags
-        insert_n = pn.cdrewrite(
+        # 2. Homorganic nasal insertion rules based on target consonant classes
+        insert_n_dental = pn.cdrewrite(
             pn.cross("", "n"),
             self.vowels,
-            final_stops + n_pl_tags,
+            pn.union("t", "d") + n_pl_tags,
             self.sigma_star,
+        )
+        insert_n_palatal = pn.cdrewrite(
+            pn.cross("", "ñ"),
+            self.vowels,
+            pn.union("c", "j") + n_pl_tags,
+            self.sigma_star,
+        )
+        insert_n_retroflex = pn.cdrewrite(
+            pn.cross("", "ṇ"),
+            self.vowels,
+            pn.union("ṭ", "ḍ") + n_pl_tags,
+            self.sigma_star,
+        )
+        insert_n_guttural = pn.cdrewrite(
+            pn.cross("", "ṅ"),
+            self.vowels,
+            pn.union("k", "g") + n_pl_tags,
+            self.sigma_star,
+        )
+        insert_n_labial = pn.cdrewrite(
+            pn.cross("", "m"),
+            self.vowels,
+            pn.union("p", "b") + n_pl_tags,
+            self.sigma_star,
+        )
+
+        insert_n = (
+            insert_n_dental
+            @ insert_n_palatal
+            @ insert_n_retroflex
+            @ insert_n_guttural
+            @ insert_n_labial
         )
 
         self.neuter_nasal_insertion = insert_n.optimize()
