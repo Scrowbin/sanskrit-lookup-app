@@ -1,5 +1,9 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, protocol } = require("electron");
 const path = require("path");
+
+protocol.registerSchemesAsPrivileged([
+  { scheme: "app", privileges: { secure: true, standard: true, supportFetchAPI: true, corsEnabled: true } }
+]);
 const { spawn } = require("child_process");
 const http = require("http");
 
@@ -236,7 +240,8 @@ function createWindow() {
 
     webPreferences: {
       preload: path.join(__dirname, "preload.cjs"),
-      devTools: !app.isPackaged, //  dev only
+      devTools: true, // 👈 TEMPORARILY ALWAYS TRUE FOR DEBUGGING
+      webSecurity: false,
       sandbox: false,
       spellcheck: false,
       backgroundThrottling: false,
@@ -245,9 +250,10 @@ function createWindow() {
     },
   });
 
-  if (app.isPackaged) {
-    // 🚀 FAST: load built files
-    mainWindow.loadFile(path.join(__dirname, "..", "dist", "index.html"));
+  const isProd = app.isPackaged || process.env.ELECTRON_IS_PACKAGED;
+  if (isProd) {
+    // 🚀 FAST: load built files securely through custom app protocol
+    mainWindow.loadURL("app://dist/index.html");
   } else {
     // DEV ONLY
     mainWindow.loadURL("http://localhost:5173");
@@ -261,6 +267,12 @@ function createWindow() {
 // ── App Lifecycle ────────────────────────────────────────────────────────────
 
 app.whenReady().then(async () => {
+  protocol.registerFileProtocol("app", (request, callback) => {
+    let url = request.url.substring(6); // strips 'app://'
+    url = url.split("?")[0].split("#")[0]; // remove query strings and hashes
+    callback({ path: path.normalize(`${app.getAppPath()}/${url}`) });
+  });
+
   // 1. Start the Python API server
   startPythonServer();
 

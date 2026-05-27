@@ -214,7 +214,7 @@ class StemBuilder:
 
         # Pāṇini 8.2.31 ho ḍhaḥ (h -> ḍh) & 8.2.32 dāder dhātor ghaḥ (d...h -> gh).
         # We inject [RUH_H] for h-final roots that take ḍh, avoiding the ones that take gh (d-initial) or dh (nah).
-        if root_str.endswith("h"):
+        if ALPHABET.parse_phonemes(root_str)[-1] == "h":
             if root_str == "nah":
                 pass
             elif root_str.startswith("d") and root_str not in {"druh"}:
@@ -499,7 +499,7 @@ class StemBuilder:
         else:
             a_type = DHATUPATHA_ANALYZER.get_aorist_type(root_str, class_num)
 
-        print(f"DEBUG: a_type={a_type}, voice={voice}, derivative={derivative}")
+        # print(f"DEBUG: a_type={a_type}, voice={voice}, derivative={derivative}")
 
         # Algorithmic derivation based on type
         phonemes = ALPHABET.parse_phonemes(root_str)
@@ -528,10 +528,10 @@ class StemBuilder:
                     fst = self._apply_vriddhi(root_str)
                 else:
                     if root_str in aorist_overrides and voice == "middle" and "middle" in aorist_overrides[root_str]:
-                        print(f"DEBUG: override applied: {aorist_overrides[root_str]['middle']}")
+                        # print(f"DEBUG: override applied: {aorist_overrides[root_str]['middle']}")
                         fst = pn.accep(aorist_overrides[root_str]["middle"])
                     else:
-                        print(f"DEBUG: override NOT applied: {root_str} {voice} {aorist_overrides.get(root_str, {})}")
+                        # print(f"DEBUG: override NOT applied: {root_str} {voice} {aorist_overrides.get(root_str, {})}")
                         fst = (
                             self._apply_guna(root_str, "[STRONG]")
                             if ends_in_vowel
@@ -546,10 +546,9 @@ class StemBuilder:
                 else:
                     fst = self._apply_guna(root_str, "[STRONG]")
             else:
-                if root_str.endswith("ṛ") or root_str.endswith("ṝ"):
-                    fst = self._apply_guna(root_str, "[STRONG]")
-                else:
-                    fst = pn.accep(root_str)
+                # Whitney §903: The root-vowel, if capable of it, takes guṇa-strengthening 
+                # in the middle (is-aorist), as well as in the active.
+                fst = self._apply_guna(root_str, "[STRONG]")
             return fst
 
         if a_type == "s_or_is" or (a_type in ("s", "is") and is_vet):

@@ -1,4 +1,7 @@
 import sys, io, csv, time, re
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "grammar")))
 
 # Force UTF-8 output so IAST characters render on Windows consoles
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
@@ -37,7 +40,7 @@ def normalize(form: str) -> str:
 
 
 def run_focused_benchmark(
-    csv_file="../data/verbs_clean.csv", output_report="benchmark_failures.csv"
+    csv_file=os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "verbs_clean.csv")), output_report="benchmark_failures.csv"
 ):
     print(f"Loading database from {csv_file}...")
     t_start = time.perf_counter()
@@ -1151,5 +1154,5 @@ def run_extended_suite():
     print("=" * 60)
 
 if __name__ == "__main__":
-    run_focused_benchmark("../data/verbs_clean.csv", "benchmark_failures.csv")
+    run_focused_benchmark()
     # run_extended_suite()

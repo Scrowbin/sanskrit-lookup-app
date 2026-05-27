@@ -17,6 +17,10 @@ A single tweak to any engine file can be validated instantly.
 import sys
 import io
 import time
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "grammar")))
+
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 from conjugate import SanskritConjugator
@@ -27,8 +31,8 @@ from krdantas import KrdantaEngine
 # Shared helpers
 # ══════════════════════════════════════════════════════════════════════════════
 
-def _krdanta_block(c: SanskritConjugator, root_with_preverb: str, cls: int) -> str:
-    return c.conjugate(root_with_preverb, cls, "3", "sg", "active", "krdantas", use_db=False)
+def _krdanta_block(c: SanskritConjugator, root_with_preverb: str, cls: int, derivative: str = None) -> str:
+    return c.conjugate(root_with_preverb, cls, "3", "sg", "active", "krdantas", derivative=derivative, use_db=False)
 
 def _conj(c: SanskritConjugator, root_str, cls, person, number, voice, tense, derivative=None):
     return c.conjugate(root_str, cls, person, number, voice, tense,
@@ -39,6 +43,16 @@ def _forms(result):
     if isinstance(result, list):
         return set(result)
     return {f.strip() for f in result.split(" OR ")}
+
+def _flatten_krdantas(block):
+    if not isinstance(block, dict):
+        return str(block)
+    forms = []
+    for item in block.get("participles", []):
+        forms.append(item.get("form", ""))
+    for item in block.get("indeclinables", []):
+        forms.append(item.get("form", ""))
+    return " | ".join(forms)
 
 
 
@@ -58,7 +72,7 @@ PHASE1 = [
     ("yuj",    7, "yukta"),            # yuj+ta → yukta (palatal → velar before t)
     ("duh",    2, "dugdha"),           # duh+ta → dugdha (aspirate throwback)
     ("nī",     1, "nīta"),             # long ī preserved
-    ("tud",    6, "tutta"),            # tud+ta → tutta (gemination? no: tud+ta → tutta via voicing)
+    ("tud",    6, "tunna"),            # tud+ta → tunna (P. 8.2.42)
     # Samprasāraṇa suppletive PPPs (via krdanta_overrides)
     ("vac",    2, "ukta"),             # va→u, vac+ta → ukta
     ("yaj",    1, "iṣṭa"),            # ya→i, yaj+ta → iṣṭa
@@ -67,7 +81,7 @@ PHASE1 = [
     ("vah",    1, "ūḍha"),             # va→u, vah+ta → ūḍha
     ("grah",   9, "gṛhīta"),           # ra→ṛ, seṭ: gṛh+ī+ta
     ("prach",  6, "pṛṣṭa"),            # ra→ṛ, prach+ta → pṛṣṭa
-    ("dīv",    4, "dyūta"),            # irregular suppletive override
+    ("div",    4, "dyūta"),            # irregular suppletive override
 
     # ── Past PPP with preverb ─────────────────────────────────────────────────
     ("pra+vac",    2, "prokta"),       # pra+ukta → prokta (a+u→o)
@@ -86,8 +100,8 @@ PHASE1 = [
 
     # ── Present Active Participle (-ant) ──────────────────────────────────────
     ("bhū",    1, "bhavant"),          # thematic: bho+ant → bhavant (ayadi)
-    ("kṛ",     8, "kurvant"),          # athematic: kur+vant
-    ("dā",     3, "dadant"),           # reduplicating dadā → dad+ant
+    ("kṛ",     8, "kurvat"),          # athematic: kur+vant
+    ("dā",     3, "dadat"),           # reduplicating dadā → dad+ant
 
     # ── Future Passive Participle / Gerundive ─────────────────────────────────
     ("gam",    1, "gantavya"),         # gant (aniṭ periphrastic) + avya
@@ -104,6 +118,12 @@ PHASE1 = [
     # ── Future Active Participle (-iṣyat) ────────────────────────────────────
     ("bhū",    1, "bhaviṣyat"),
     ("gam",    1, "gamiṣyat"),
+
+    # ── Intensive Kṛdantas ───────────────────────────────────────────────────
+    ("bhū",    1, "bobhavat m. n. bobhavatī f.", "intensive"),
+    ("bhū",    1, "bobhūyamāna m. n. bobhūyamānā f.", "intensive"),
+    ("bhū",    1, "bobhūyām", "intensive"),
+    ("bhū",    1, "bobhavām", "intensive"),
 ]
 
 
@@ -221,7 +241,7 @@ PHASE4A = [
     ("vah",   1, "ūḍha"),
     ("grah",  9, "gṛhīta"),    ("grah",  9, "gṛhītvā"),
     ("prach", 6, "pṛṣṭa"),
-    ("dīv",   4, "dyūta"),
+    ("div",   4, "dyūta"),
     # With preverb: preverb+PPP sandhi
     ("pra+vac",  2, "prokta"),       # pra+ukta → prokta
     ("sam+yuj",  7, "saṃyukta"),
@@ -294,11 +314,17 @@ class SuiteRunner:
     # ── Phase 1 ───────────────────────────────────────────────────────────────
     def run_phase1(self):
         self._header("PHASE 1 — Kṛdantas (Participles, Infinitives, Gerunds)")
-        for root_str, cls, expected in PHASE1:
+        for item in PHASE1:
+            if len(item) == 4:
+                root_str, cls, expected, derivative = item
+            else:
+                root_str, cls, expected = item
+                derivative = None
             label = f"{root_str} (cl.{cls}) ⊃ '{expected}'"
             try:
-                block = _krdanta_block(self.c, root_str, cls)
-                self._record(label, expected, expected in block, block)
+                block = _krdanta_block(self.c, root_str, cls, derivative)
+                flat_block = _flatten_krdantas(block)
+                self._record(label, expected, expected in flat_block, flat_block)
             except Exception as e:
                 self._record(label, expected, False, f"ERROR: {e}")
 
@@ -331,7 +357,8 @@ class SuiteRunner:
             label = f"{root_str} (cl.{cls}) ⊃ '{expected}'"
             try:
                 block = _krdanta_block(self.c, root_str, cls)
-                self._record(label, expected, expected in block, block)
+                flat_block = _flatten_krdantas(block)
+                self._record(label, expected, expected in flat_block, flat_block)
             except Exception as e:
                 self._record(label, expected, False, f"ERROR: {e}")
 

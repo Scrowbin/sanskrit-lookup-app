@@ -73,6 +73,7 @@ _KNOWN_UBHAYA_ROOTS = frozenset({
     "kram",  # class 1/4 — Whitney §722; ubhayapada (krāmati/kramate)
     "hṛ",    # class 1 — Whitney §725; harati/harate both attested
     "bhū",   # permitted middle for tests/variants
+    "śru",   # allowed middle by INRIA
 })
 
 def to_slp1(iast_str: str) -> str:
@@ -240,10 +241,10 @@ class DhatupathaAnalyzer:
 
     # ── Internal lookup ────────────────────────────────────────────────────────
 
-    def _find_raw(self, root_str: str, class_num: int) -> dict | None:
-        """Return the raw Dhatupatha entry dict, or None if not found."""
+    def _find_raw(self, root_str: str, class_num: int) -> list[dict]:
+        """Return a list of raw Dhatupatha entry dicts, or empty list if not found."""
         if root_str == "vṛ" and class_num == 9:
-            return {'class_num': 9, 'serial_num': 0, 'raw': "vFY"}
+            return [{'class_num': 9, 'serial_num': 0, 'raw': "vFY"}]
 
         slp1_base = to_slp1(root_str)
         candidates = [slp1_base]
@@ -255,15 +256,13 @@ class DhatupathaAnalyzer:
         strip_prefixes = ['qu', 'wu', 'o~', 'Y']
 
         def _clean(raw):
-            # Strip quasi-prefixes BEFORE removing accent/nasal markers so
-            # that 'o~' (which contains '~') is still recognisable.
-            # P.1.1.5-6: qu/wu/o~ are grammatically inert initial markers.
             c = raw
             for pfx in strip_prefixes:
                 if c.startswith(pfx):
                     c = c[len(pfx):]
             return c.replace('\\', '').replace('^', '').replace('~', '')
 
+        matches = []
         # Pass 1: exact class match
         for entry in self._entries:
             if entry['class_num'] != class_num:
@@ -271,16 +270,21 @@ class DhatupathaAnalyzer:
             clean = _clean(entry['raw'])
             for cand in candidates:
                 if clean.startswith(cand):
-                    return entry
+                    matches.append(entry)
+                    break
                 if cand.endswith('h') and clean.startswith(cand[:-1] + 'H'):
-                    return entry
+                    matches.append(entry)
+                    break
+
+        if matches:
+            return matches
 
         # Pass 2: any class (cross-class fallback — PHONOLOGY_AUDIT §6.8).
         # Logs a warning so callers know the data may be wrong for this class.
         for entry in self._entries:
             clean = _clean(entry['raw'])
             for cand in candidates:
-                if clean.startswith(cand):
+                if clean.startswith(cand) or (cand.endswith('h') and clean.startswith(cand[:-1] + 'H')):
                     fallback_cls = entry['class_num']
                     import warnings
                     warnings.warn(
@@ -288,18 +292,28 @@ class DhatupathaAnalyzer:
                         f"using class-{fallback_cls} entry — voice/aniṭ data may be wrong.",
                         stacklevel=4,
                     )
-                    return entry
-                if cand.endswith('h') and clean.startswith(cand[:-1] + 'H'):
-                    fallback_cls = entry['class_num']
-                    import warnings
-                    warnings.warn(
-                        f"DhatupathaAnalyzer: root '{root_str}' class {class_num} not found; "
-                        f"using class-{fallback_cls} entry.",
-                        stacklevel=4,
-                    )
-                    return entry
-
-        return None
+                    matches.append(entry)
+                    break
+            if matches:
+                # To prevent matching a million entries from different classes,
+                # just take all entries from the first fallback class we find.
+                break
+                
+        # If we broke out of the loop having found a fallback class, we need to gather all entries for that fallback class
+        if matches:
+            fallback_cls = matches[0]['class_num']
+            
+            def _matches_cands(e):
+                clean = _clean(e['raw'])
+                for cand in candidates:
+                    if clean.startswith(cand) or (cand.endswith('h') and clean.startswith(cand[:-1] + 'H')):
+                        return True
+                return False
+                
+            matches = [e for e in self._entries if e['class_num'] == fallback_cls and _matches_cands(e)]
+            return matches
+            
+        return []
 
     # ── Raw-string parsers ─────────────────────────────────────────────────────
 
@@ -521,7 +535,8 @@ class DhatupathaAnalyzer:
         if key in self._cache:
             return self._cache[key]
 
-        entry = self._find_raw(root_str, class_num)
+        entries = self._find_raw(root_str, class_num)
+        entry = entries[0] if entries else None
         raw = entry['raw'] if entry else root_str
 
         _empty_flags = {k: False for k in [
@@ -542,52 +557,37 @@ class DhatupathaAnalyzer:
         # Cross-reference adverbs.csv primary gerund (…itvā vs …tvā) when there is
         # no Dhātupāṭha row (PHONOLOGY_AUDIT §6.8 / gerund iṭ, P. 7.2.56–58).
         if not root_str.endswith("ā") and root_str not in _KNOWN_ANIT_ROOTS:
-            if self._missing_dhatupatha_entry(entry):
+            if not entries:
                 hint = self._adverb_gerund_set_hint.get(root_str)
                 if hint is not None:
-                    # True = corpus gerund has connecting i → seṭ → not aniṭ
-                    # False = …ktvā / …tvā without iṭ → aniṭ
                     is_anit = not hint
 
         # ── Voice ─────────────────────────────────────────────────────────────
-        # Three-tier priority system:
-        #
-        #  Tier 1 — HARD Pāṇinian markers (always authoritative):
-        #    Y  (ñit)        → ubhayapada  P. 1.3.72
-        #    N  (ṅit suffix) → ātmanepada  P. 1.3.12
-        #    \ after '~'    → ātmanepada  (anudātta on anubandha vowel)
-        #
-        #  Tier 2 — MW lexicon (unprefixed-roots.csv, authoritative for voice):
-        #    Applied when present; overrides the weak svarita-on-suffix signal.
-        #    The Dhātupāṭha 'a~^' pattern on class-6/4 roots is a gana marker
-        #    that does NOT reliably imply ubhayapada for every root in that gana.
-        #
-        #  Tier 3 — Weak svarita signal (^ after ~, only when MW has no entry):
-        #    Last resort when no MW data is available.
+        permitted_voices = set()
+        
+        raws_to_check = [e['raw'] for e in entries] if entries else [raw]
+        for r in raws_to_check:
+            is_nit, is_ngit, has_svarita_suffix = self._raw_voice_info(r)
+            has_anudatta_suffix = any(
+                r[i - 1] == '~'
+                for i, ch in enumerate(r)
+                if ch == '\\' and i > 0
+            )
+            
+            if is_nit or has_svarita_suffix:
+                permitted_voices.update({"active", "middle"})
+            elif is_ngit or has_anudatta_suffix:
+                permitted_voices.add("middle")
 
-        is_nit, is_ngit, has_svarita_suffix = self._raw_voice_info(raw)
-        has_anudatta_suffix = any(
-            raw[i - 1] == '~'
-            for i, ch in enumerate(raw)
-            if ch == '\\' and i > 0
-        )
         mw_voices = self._mw_voice_lookup(root_str, class_num)
 
-        if is_nit:
-            # ñit → ubhayapada (P. 1.3.72) — hard rule
-            permitted_voices = {"active", "middle"}
-        elif is_ngit or has_anudatta_suffix:
-            # ṅit or anudātta on anubandha → ātmanepada — hard rule
-            permitted_voices = {"middle"}
-        elif mw_voices:
-            # MW lexicon is authoritative for voice when no hard marker
-            permitted_voices = mw_voices
-        elif has_svarita_suffix:
-            # Weak: svarita on anubandha → ubhayapada (last resort)
-            permitted_voices = {"active", "middle"}
-        else:
-            # Default: parasmaipada
-            permitted_voices = {"active"}
+        if not permitted_voices:
+            if mw_voices:
+                # MW lexicon fallback
+                permitted_voices = set(mw_voices)
+            else:
+                # Default to ubhayapada (both voices) if completely unknown
+                permitted_voices = {"active", "middle"}
 
         if class_num == 10:
             permitted_voices = {"active", "middle"}

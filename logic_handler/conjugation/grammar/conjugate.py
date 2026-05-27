@@ -244,7 +244,6 @@ class SanskritConjugator:
                     f"Grammar error: Root '{clean_root_str}' class {class_num} "
                     f"does not permit '{voice}' voice. Allowed: {allowed}."
                 )
-
         # ── 1. Resolve morphological features ────────────────────────────────
         # s_or_is dual-dispatch (Whitney §881a): roots like budh that take either
         # the s-aorist or iṣ-aorist need two separate stem+ending pairings.

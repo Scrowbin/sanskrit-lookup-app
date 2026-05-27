@@ -94,7 +94,7 @@ perfect_stem_overrides = {
     "smṛ": {"strong": "sasmar", "weak": "sasmar"},
 
     "bhū": {"strong": "babhūv", "weak": "babhūv"},
-    "dīv": {"strong": "didīv",  "strong_3sg": "didev",   "weak": "didiv"},
+    "div": {"strong": "didev",  "strong_3sg": "didev",   "weak": "didiv"},
     # han: Grassmann's law throwback (jaghan/jaghn). Truly suppletive.
     "han": {"strong": "jaghan", "strong_3sg": "jaghān", "weak": "jaghn"},
     # vid: perfect-as-present veda (Whitney §801); truly suppletive.
@@ -137,10 +137,11 @@ aorist_overrides = {
     # Type 3: Reduplicated Aorists (Handled algorithmically for causatives)
 
     # Type 4: s-Aorists (overrides for vet roots that exclusively use s)
-    "bhid": {"type": "s"},                                        
+    "bhid": {"type": "root", "middle_type": "s"},                                        
     "kṣip": {"type": "s"},
     "nī":   {"type": "s"},
     "muc":  {"type": "s"},
+    "śru":  {"type": "a", "active": "śrava", "middle_type": "s"},
 
     # Pāṇini allows optional s or iṣ aorist for certain roots like budh.
     "budh": {"type": "s_or_is"},
@@ -177,7 +178,7 @@ desiderative_stem_overrides = {
     "bhū":  ["bubhūṣa"],
     "muc":  ["mumukṣa"],
     "yuj":  ["yuyukṣa"],
-    "div":  ["dideviṣa"],   # desid of div: redupl di + guna dev + iṣa
+    "div":  ["dudyūṣa", "dideviṣa"],   # desid of div: redupl di + guna dev + iṣa
     "han":  ["jighāṃsa"],
     "vac":  ["vivakṣa"],
     "yaj":  ["yiyakṣa"],
@@ -239,6 +240,44 @@ intensive_stem_overrides = {
 # (parts.csv mode=past vs krdantas.py). √gam / √dīv remain until productive PPP /
 # class-4 stems match INRIA without overrides.
 krdanta_overrides = {
+    "hu": {
+        "peri_perf": {"m": "juhavām"},
+    },
+    "ad": {
+        "fpp_ya": {"m": "ādya\nadya", "f": "ādyā\nadyā"},
+    },
+    "bhū": {
+        "fpp_ya": {"m": "bhāvya\nbhavya", "f": "bhāvyā\nbhavyā"},
+        "perf_act": {"m": "babhūvas", "f": "babhūṣī"},
+    },
+    "krī": {
+        "fpp_ya": {"m": "kreya", "f": "kreyā"},
+    },
+    "kṛ": {
+        "fpp_ya": {"m": "kārya\nkṛtya", "f": "kāryā\nkṛtyā"},
+        "abs_ya": {"m": "-kṛtya"},
+        "intensive_active_luganta_prp_act": {"m": "carīkarat", "f": "carīkaratī"},
+    },
+    "tan": {
+        "ppp":    {"m": "tata",    "f": "tatā"},
+        "pp_act": {"m": "tatavat", "f": "tatavatī"},
+        "abs_tva": {"m": "tatvā\ntanitvā"},
+        "abs_ya":  {"m": "-tatya\n-tanya"},
+        "fpp_ya":  {"m": "tānya", "f": "tānyā"},
+    },
+    "tud": {
+        "ppp": {"m": "tunna", "f": "tunnā"},
+        "pp_act": {"m": "tunnavat", "f": "tunnavatī"},
+        "perf_act": {"m": "tutudvas", "f": "tutuduṣī"},
+    },
+    "yuj": {
+        "fpp_ya": {"m": "yogya\nyugya", "f": "yogyā\nyugyā"},
+        "perf_act": {"m": "yuyujvas", "f": "yuyujuṣī"},
+    },
+    "cur": {
+        "abs_ya": {"m": "-corayya"},
+    },
+
     # √gam (cl.1) — suppletive past stem 'gat' (not 'gant')
     "gam": {
         "ppp":    {"m": "gata",    "f": "gatā"},
@@ -246,7 +285,7 @@ krdanta_overrides = {
         "abs_tva": {"m": "gatvā"},
         "abs_ya":  {"m": "-gamya"},
     },
-    "dīv": {
+    "div": {
         "ppp": {"m": "dyūta", "f": "dyūtā"},
         "pp_act": {"m": "dyūtavat", "f": "dyūtavatī"},
         "prp_act": {"m": "dīvyat", "f": "dīvyantī"},
@@ -260,7 +299,7 @@ krdanta_overrides = {
         "perf_act": {"m": "didivvas", "f": "didivuṣī"},
         "perf_mid": {"m": "didivāna", "f": "didivānā"},
         "inf": {"m": "dīvitum"},
-        "abs_tva": {"m": "dyūtvā\nAbsolutive\ndīvitvā"},
+        "abs_tva": {"m": "dyūtvā\ndīvitvā"},
         "abs_ya": {"m": "-dyūya"}
     },
     # ── Samprasāraṇa PPP overrides (Whitney §252, Pāṇini 6.1.13-15) ─────────

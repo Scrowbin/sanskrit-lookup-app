@@ -16,43 +16,45 @@ _PERIPHRASTIC_DERIVATIVES: frozenset[str] = frozenset({"causative", "denominativ
 _AUGMENTED_TENSES: frozenset[str] = frozenset({"imperfect", "conditional", "aorist", "pluperfect"})
 
 # Priority-ordered (predicate, strength_tag) table.
-# Each predicate: (class_num, person, number, voice, tense) → bool.
+# Each predicate: (root_str, class_num, person, number, voice, tense) → bool.
 _STRENGTH_RULES: list[tuple] = [
     # Passives always use a weak root
-    (lambda c, p, n, v, t: v == "passive",                                         "[WEAK]"),
+    (lambda r, c, p, n, v, t: v == "passive",                                         "[WEAK]"),
+    # dviṣ imperative middle 1st person exception (INRIA expects weak dviṣai)
+    (lambda r, c, p, n, v, t: r == "dviṣ" and t == "imperative" and v == "middle" and p == "1", "[WEAK]"),
     # Future / Conditional / Periphrastic Future always use Guna (strong)
-    (lambda c, p, n, v, t: t in ("future", "conditional", "periphrastic_future"),  "[STRONG]"),
+    (lambda r, c, p, n, v, t: t in ("future", "conditional", "periphrastic_future"),  "[STRONG]"),
     # Aorist / Injunctive: active = strong, middle = weak
-    (lambda c, p, n, v, t: t in ("aorist", "injunctive") and v == "active",        "[STRONG]"),
-    (lambda c, p, n, v, t: t in ("aorist", "injunctive") and v == "middle",        "[WEAK]"),
+    (lambda r, c, p, n, v, t: t in ("aorist", "injunctive") and v == "active",        "[STRONG]"),
+    (lambda r, c, p, n, v, t: t in ("aorist", "injunctive") and v == "middle",        "[WEAK]"),
     # Perfect / Pluperfect: sg active = strong; everything else = weak
-    (lambda c, p, n, v, t: t in ("perfect", "pluperfect") and v == "active" and n == "sg", "[STRONG]"),
-    (lambda c, p, n, v, t: t in ("perfect", "pluperfect"),                                 "[WEAK]"),
+    (lambda r, c, p, n, v, t: t in ("perfect", "pluperfect") and v == "active" and n == "sg", "[STRONG]"),
+    (lambda r, c, p, n, v, t: t in ("perfect", "pluperfect"),                                 "[WEAK]"),
     # Thematic classes: cl 1/10 always strong, cl 4/6 always weak
-    (lambda c, p, n, v, t: c in (1, 10),                                           "[STRONG]"),
-    (lambda c, p, n, v, t: c in (4, 6),                                            "[WEAK]"),
+    (lambda r, c, p, n, v, t: c in (1, 10),                                           "[STRONG]"),
+    (lambda r, c, p, n, v, t: c in (4, 6),                                            "[WEAK]"),
     # Imperative 1st person: strong regardless of voice
-    (lambda c, p, n, v, t: t == "imperative" and p == "1",                         "[STRONG]"),
+    (lambda r, c, p, n, v, t: t == "imperative" and p == "1",                         "[STRONG]"),
     # Optative / Benedictive: always weak
-    (lambda c, p, n, v, t: t in ("optative", "benedictive"),                       "[WEAK]"),
+    (lambda r, c, p, n, v, t: t in ("optative", "benedictive"),                       "[WEAK]"),
     # Middle voice: weak (after imperative-1 check)
-    (lambda c, p, n, v, t: v == "middle",                                          "[WEAK]"),
+    (lambda r, c, p, n, v, t: v == "middle",                                          "[WEAK]"),
     # Remaining imperative 2sg: weak
-    (lambda c, p, n, v, t: t == "imperative" and p == "2" and n == "sg",          "[WEAK]"),
+    (lambda r, c, p, n, v, t: t == "imperative" and p == "2" and n == "sg",          "[WEAK]"),
     # Singular active: strong (main athematic rule)
-    (lambda c, p, n, v, t: n == "sg",                                              "[STRONG]"),
+    (lambda r, c, p, n, v, t: n == "sg",                                              "[STRONG]"),
     # cl3 imperfect 3pl is exceptionally strong (ajuhavuḥ)
-    (lambda c, p, n, v, t: c == 3 and t == "imperfect" and p == "3" and n == "pl","[STRONG]"),
+    (lambda r, c, p, n, v, t: c == 3 and t == "imperfect" and p == "3" and n == "pl","[STRONG]"),
     # Default: weak
-    (lambda c, p, n, v, t: True,                                                   "[WEAK]"),
+    (lambda r, c, p, n, v, t: True,                                                   "[WEAK]"),
 ]
 
 
-def _evaluate_strength(class_num: int, person: str, number: str,
+def _evaluate_strength(root_str: str, class_num: int, person: str, number: str,
                         voice: str, tense: str) -> str:
     """Return '[STRONG]' or '[WEAK]' by scanning the priority rule table."""
     for predicate, tag in _STRENGTH_RULES:
-        if predicate(class_num, person, number, voice, tense):
+        if predicate(root_str, class_num, person, number, voice, tense):
             return tag
     return "[WEAK]"  # unreachable; last rule always matches
 
@@ -111,7 +113,7 @@ class MorphologicalFeatureResolver:
             derivative = None
 
         if derivative == "causative":
-            strength = _evaluate_strength(10, person, number, voice, tense)
+            strength = _evaluate_strength(root_str, 10, person, number, voice, tense)
             effective_class = 10
             # Causative passive uses a dedicated stem in -ya (not -aya).
             effective_derivative = "causative_passive" if voice == "passive" else None
@@ -136,7 +138,7 @@ class MorphologicalFeatureResolver:
                     effective_derivative = "intensive_active_anta"
                 else:
                     # Active intensive luganta: athematic class-3 endings with strength
-                    strength = _evaluate_strength(3, person, number, voice, tense)
+                    strength = _evaluate_strength(root_str, 3, person, number, voice, tense)
                     effective_class = 3
                     effective_derivative = "intensive_active_luganta"
 
@@ -159,7 +161,7 @@ class MorphologicalFeatureResolver:
                 ) else None
 
         else:
-            strength = _evaluate_strength(class_num, person, number, voice, tense)
+            strength = _evaluate_strength(root_str, class_num, person, number, voice, tense)
             effective_class = 3 if tense == "pluperfect" else class_num
             effective_derivative = derivative
 

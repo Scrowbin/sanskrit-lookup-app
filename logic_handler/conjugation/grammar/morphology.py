@@ -384,15 +384,16 @@ class MorphologyEngine:
 
         # ── 7.1. Intensive Imperative 2sg [HI_DHI] Resolution ─────────────────
         # Whitney §1011: The 2d sing. act. takes dhi after a consonant, and hi after a vowel.
+        opt_tags = pn.closure(pn.union(*ALPHABET.tags_list), 0)
         self.intensive_hi = pn.cdrewrite(
             pn.cross("[HI_DHI]", "hi"),
-            pn.union(*ALPHABET.vowels_list) + pn.accep("+"),
+            pn.union(*ALPHABET.vowels_list) + opt_tags + pn.accep("+"),
             "",
             sig
         )
         self.intensive_dhi = pn.cdrewrite(
             pn.cross("[HI_DHI]", "dhi"),
-            pn.union(*ALPHABET.consonants_list) + pn.accep("+"),
+            pn.union(*ALPHABET.consonants_list) + opt_tags + pn.accep("+"),
             "",
             sig
         )

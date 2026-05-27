@@ -517,9 +517,17 @@ class SandhiEngine:
         
         # m → ṃ (anusvāra) before sibilants (ś, ṣ, s, h) internally.
         # Whitney §212; Pāṇini 8.3.24 (naś cāpadāntasya jhali): internally, m and n become anusvāra ONLY before jhal (fricatives here).
-        # (External sandhi converts m to anusvāra before semivowels too, but this is internal sandhi!)
+        # (External sandhi converts m to anusvāra before semivowels too. Preverb sam- behaves externally).
         self.anusvara = pn.cdrewrite(
-            pn.string_map([("m+", "ṃ+"), ("n+", "ṃ+")]),
+            pn.string_map([
+                ("sam+", "saṃ+"),
+            ]),
+            "", pn.union("v", "y", "r", "l"), self.sig
+        ) @ pn.cdrewrite(
+            pn.cross("m+", "ṃ+"),
+            "", pn.union("ś", "ṣ", "s", "h"), self.sig
+        ) @ pn.cdrewrite(
+            pn.cross("n+", "ṃ+"),
             "", pn.union("ś", "ṣ", "s", "h"), self.sig
         )
         # REMOVED: gamya_fix — it was reverting anusvāra back to m, producing
@@ -555,6 +563,35 @@ class SandhiEngine:
             ]),
             "", "", self.sig
         )
+
+        # Pāṇini 6.1.68 (halṅyābbhyo...): word-final s and t drop after a consonant.
+        # Run before sibilant_cluster_tagged to prevent word-final kṣ.
+        _tags_opt = pn.closure(pn.union(*ALPHABET.tags_list), 0)
+        _any_cons_tagged = pn.union(*ALPHABET.consonants_list) + _tags_opt
+        self.s_t_drop_after_cons = pn.cdrewrite(
+            pn.union(
+                pn.cross("+s", ""),
+                pn.cross("+t", ""),
+                pn.cross("s", ""),
+                pn.cross("t", "")
+            ),
+            _any_cons_tagged, pn.union("[EOS]", "+[EOS]"), self.sig
+        )
+        
+        self.d_s_to_h = pn.cdrewrite(
+            pn.union(
+                pn.cross("t+s", "ḥ"), pn.cross("t+s", "t"),
+                pn.cross("th+s", "ḥ"), pn.cross("th+s", "t"),
+                pn.cross("d+s", "ḥ"), pn.cross("d+s", "t"),
+                pn.cross("dh+s", "ḥ"), pn.cross("dh+s", "t"),
+                pn.cross("ts", "ḥ"), pn.cross("ts", "t"),
+                pn.cross("ths", "ḥ"), pn.cross("ths", "t"),
+                pn.cross("ds", "ḥ"), pn.cross("ds", "t"),
+                pn.cross("dhs", "ḥ"), pn.cross("dhs", "t")
+            ),
+            "", pn.union("[EOS]", "+[EOS]"), self.sig
+        )
+        self.s_t_drop_after_cons = (self.d_s_to_h @ self.s_t_drop_after_cons).optimize()
 
         # Sibilant clusters: ś/ṣ + s → kṣ (Whitney §249 / Pāṇini 8.2.41).
         self.sibilant_cluster_tagged = pn.cdrewrite(
@@ -663,40 +700,6 @@ class SandhiEngine:
             "", pn.union("[EOS]", "+[EOS]"), self.sig
         )
 
-        # Pāṇini 6.1.68 (halṅyābbhyo...): word-final s and t drop after a consonant.
-        # But for 2sg 's' (sip), Pāṇini 8.2.74 (sipi dhātor ru vā) optionally turns root-final d to ḥ.
-        # We will implement this as: d+s[EOS] -> ḥ[EOS] (optional, but we must output what INRIA wants).
-        # INRIA expects abhinaḥ, so we do d+s -> ḥ. For others, C+s -> C, C+t -> C.
-        _any_cons = pn.union(*ALPHABET.consonants_list)
-        # We need specific optional ḥ for d/dh: so we match s with left context d or dh to yield ḥ.
-        # But since we can't output two strings easily, we'll just map s -> ḥ after d/dh for INRIA compliance.
-        # After any other consonant, s -> epsilon, t -> epsilon.
-        self.s_t_drop_after_cons = pn.cdrewrite(
-            pn.union(
-                pn.cross("+s", ""),
-                pn.cross("+t", ""),
-                pn.cross("s", ""),
-                pn.cross("t", "")
-            ),
-            _any_cons, pn.union("[EOS]", "+[EOS]"), self.sig
-        )
-        
-        self.d_s_to_h = pn.cdrewrite(
-            pn.union(
-                pn.cross("t+s", "ḥ"), pn.cross("t+s", "t"),
-                pn.cross("th+s", "ḥ"), pn.cross("th+s", "t"),
-                pn.cross("d+s", "ḥ"), pn.cross("d+s", "t"),
-                pn.cross("dh+s", "ḥ"), pn.cross("dh+s", "t"),
-                pn.cross("ts", "ḥ"), pn.cross("ts", "t"),
-                pn.cross("ths", "ḥ"), pn.cross("ths", "t"),
-                pn.cross("ds", "ḥ"), pn.cross("ds", "t"),
-                pn.cross("dhs", "ḥ"), pn.cross("dhs", "t")
-            ),
-            "", pn.union("[EOS]", "+[EOS]"), self.sig
-        )
-        # Note: s_t_drop_after_cons handles other consonants.
-        self.s_t_drop_after_cons = (self.d_s_to_h @ self.s_t_drop_after_cons).optimize()
-
         # Visarga: word-final s → ḥ (Whitney §170–172; Pāṇini 8.3.15).
         # Note: ṣ removed from visarga rule since it becomes ṭ at word-final.
         self.visarga = pn.cdrewrite(
@@ -769,6 +772,7 @@ class SandhiEngine:
             ("retro_th",           self.retro_th),
             ("retro_t",            self.retro_t),
             ("retro_dhv",          self.retro_dhv),
+            ("s_t_drop_after_cons", self.s_t_drop_after_cons),
             ("sibilant_cluster_tagged", self.sibilant_cluster_tagged),
             ("devoicing",          self.devoicing),
             ("nasal_assimilation", self.nasal_assimilation),
@@ -782,7 +786,6 @@ class SandhiEngine:
             ("clean_sd_residual",  self.clean_sd_residual),
         ]
         self._long_distance_rules: list[tuple[str, pn.Fst]] = [
-            ("s_t_drop_after_cons",  self.s_t_drop_after_cons),
             ("cluster_reduction",    self.cluster_reduction),
             ("cluster_reduction_rt", self.cluster_reduction_rt),
             ("visarga",              self.visarga),              # §170 Word-final s/r → ḥ
@@ -885,6 +888,8 @@ class SandhiEngine:
                 @ self.retro_dh                     # §2.9 Whitney §226b — before retro_t/th
                 @ self.retro_th
                 @ self.retro_t
+                @ self.retro_dhv
+                @ self.s_t_drop_after_cons
                 @ self.sibilant_cluster_tagged
                 @ self.devoicing
                 @ self.nasal_assimilation
@@ -904,7 +909,6 @@ class SandhiEngine:
                 fst, self._long_distance_rules, "long_distance_phase"
             )
         return (fst
-                @ self.s_t_drop_after_cons        # P. 6.1.68 drop s/t after cons
                 @ self.cluster_reduction          # P. 8.2.23: Reduce word-final cluster before changing permitted finals
                 @ self.cluster_reduction_rt
                 @ self.visarga                    # §170: s/r -> ḥ at EOS (must run after cluster reduction)
