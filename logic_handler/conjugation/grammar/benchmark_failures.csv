@@ -1,0 +1,181 @@
+Root,Class,Derivation,Tense,Voice,Person,Number,Expected (INRIA),Actual (FST),Error_Type
+kṛ,8 (intensive),intensive,imperfect,active,3,sg,acarkaḥ,acarkar OR acarkart OR acarkarīt,Mismatch
+budh,1 (desiderative),desiderative,present,active,2,sg,bubhutsasi OR bubhodhiṣasi,bubhodhikṣi,Mismatch
+budh,1 (desiderative),desiderative,present,active,2,du,bubhutsathaḥ OR bubhodhiṣathaḥ,bubhodhiṣṭhaḥ,Mismatch
+budh,1 (desiderative),desiderative,present,active,2,pl,bubhutsatha OR bubhodhiṣatha,bubhodhiṣṭha,Mismatch
+budh,1 (desiderative),desiderative,present,active,3,sg,bubhutsati OR bubhodhiṣati,bubhodhiṣṭi,Mismatch
+budh,1 (desiderative),desiderative,present,active,3,du,bubhutsataḥ OR bubhodhiṣataḥ,bubhodhiṣṭaḥ,Mismatch
+budh,1 (desiderative),desiderative,present,active,3,pl,bubhutsanti OR bubhodhiṣanti,bubhodhiṣnti,Mismatch
+budh,1 (desiderative),desiderative,present,middle,1,sg,bubhutse OR bubhodiṣe,bubhodhiṣe,Mismatch
+budh,1 (desiderative),desiderative,present,middle,1,du,bubhutsāvahe OR bubhodiṣāvahe,bubhodhiṣāvahe,Mismatch
+budh,1 (desiderative),desiderative,present,middle,1,pl,bubhutsāmahe OR bubhodiṣāmahe,bubhodhiṣāmahe,Mismatch
+budh,1 (desiderative),desiderative,present,middle,2,sg,bubhutsase OR bubhodiṣase,bubhodhikṣe,Mismatch
+budh,1 (desiderative),desiderative,present,middle,2,du,bubhutsethe OR bubhodiṣethe,bubhodhiṣethe,Mismatch
+budh,1 (desiderative),desiderative,present,middle,2,pl,bubhutsadhve OR bubhodiṣadhve,bubhodhiḍḍhve,Mismatch
+budh,1 (desiderative),desiderative,present,middle,3,sg,bubhutsate OR bubhodiṣate,bubhodhiṣṭe,Mismatch
+budh,1 (desiderative),desiderative,present,middle,3,du,bubhutsete OR bubhodiṣete,bubhodhiṣete,Mismatch
+budh,1 (desiderative),desiderative,present,middle,3,pl,bubhutsante OR bubhodiṣante,bubhodhiṣnte,Mismatch
+budh,1 (desiderative),desiderative,imperfect,active,1,sg,abubhutsam OR abubhodhiṣam,abubhodhiṣm,Mismatch
+budh,1 (desiderative),desiderative,imperfect,active,2,sg,abubhutsaḥ OR abubhodhiṣaḥ,abubhodhikṭ,Mismatch
+budh,1 (desiderative),desiderative,imperfect,active,2,du,abubhutsatam OR abubhodhiṣatam,abubhodhiṣṭam,Mismatch
+budh,1 (desiderative),desiderative,imperfect,active,2,pl,abubhutsata OR abubhodhiṣata,abubhodhiṣṭa,Mismatch
+budh,1 (desiderative),desiderative,imperfect,active,3,sg,abubhutsat OR abubhodhiṣat,abubhodhiṭ,Mismatch
+budh,1 (desiderative),desiderative,imperfect,active,3,du,abubhutsatām OR abubhodhiṣatām,abubhodhiṣṭām,Mismatch
+budh,1 (desiderative),desiderative,imperfect,active,3,pl,abubhutsan OR abubhodhiṣan,abubhodhiṣn,Mismatch
+budh,1 (desiderative),desiderative,imperfect,middle,1,sg,abubhutse OR abubhodiṣe,abubhodhiṣi,Mismatch
+budh,1 (desiderative),desiderative,imperfect,middle,1,du,abubhutsāvahi OR abubhodiṣāvahi,abubhodhiṣāvahi,Mismatch
+budh,1 (desiderative),desiderative,imperfect,middle,1,pl,abubhutsāmahi OR abubhodiṣāmahi,abubhodhiṣāmahi,Mismatch
+budh,1 (desiderative),desiderative,imperfect,middle,2,sg,abubhutsathāḥ OR abubhodiṣathāḥ,abubhodhiṣṭhāḥ,Mismatch
+budh,1 (desiderative),desiderative,imperfect,middle,2,du,abubhutsethām OR abubhodiṣethām,abubhodhiṣethām,Mismatch
+budh,1 (desiderative),desiderative,imperfect,middle,2,pl,abubhutsadhvam OR abubhodiṣadhvam,abubhodhiḍḍhvam,Mismatch
+budh,1 (desiderative),desiderative,imperfect,middle,3,sg,abubhodiṣata,abubhodhiṣṭa,Mismatch
+budh,1 (desiderative),desiderative,imperfect,middle,3,du,abubhutsetām OR abubhodiṣetām,abubhodhiṣetām,Mismatch
+budh,1 (desiderative),desiderative,imperfect,middle,3,pl,abubhutsanta OR abubhodiṣanta,abubhodhiṣnta,Mismatch
+budh,1 (desiderative),desiderative,imperative,active,2,sg,bubhutsa OR bubhodhiṣa,bubhodhiṣṭāt OR bubhodhiṭ,Mismatch
+budh,1 (desiderative),desiderative,imperative,active,2,du,bubhutsatam OR bubhodhiṣatam,bubhodhiṣṭam,Mismatch
+budh,1 (desiderative),desiderative,imperative,active,2,pl,bubhutsata OR bubhodhiṣata,bubhodhiṣṭa,Mismatch
+budh,1 (desiderative),desiderative,imperative,active,3,sg,bubhutsatu OR bubhodhiṣatu,bubhodhiṣṭu OR bubhodhiṣṭāt,Mismatch
+budh,1 (desiderative),desiderative,imperative,active,3,du,bubhutsatām OR bubhodhiṣatām,bubhodhiṣṭām,Mismatch
+budh,1 (desiderative),desiderative,imperative,active,3,pl,bubhutsantu OR bubhodhiṣantu,bubhodhiṣntu,Mismatch
+budh,1 (desiderative),desiderative,imperative,middle,1,sg,bubhutsai OR bubhodiṣai,bubhodhiṣai,Mismatch
+budh,1 (desiderative),desiderative,imperative,middle,1,du,bubhutsāvahai OR bubhodiṣāvahai,bubhodhiṣāvahai,Mismatch
+budh,1 (desiderative),desiderative,imperative,middle,1,pl,bubhutsāmahai OR bubhodiṣāmahai,bubhodhiṣāmahai,Mismatch
+budh,1 (desiderative),desiderative,imperative,middle,2,sg,bubhutsasva OR bubhodiṣasva,bubhodhikṣva,Mismatch
+budh,1 (desiderative),desiderative,imperative,middle,2,du,bubhutsethām OR bubhodiṣethām,bubhodhiṣithām,Mismatch
+budh,1 (desiderative),desiderative,imperative,middle,2,pl,bubhutsadhvam OR bubhodiṣadhvam,bubhodhiḍḍhvam,Mismatch
+budh,1 (desiderative),desiderative,imperative,middle,3,sg,bubhodiṣatām,bubhodhiṣṭām,Mismatch
+budh,1 (desiderative),desiderative,imperative,middle,3,du,bubhodiṣetām,bubhodhiṣitām,Mismatch
+budh,1 (desiderative),desiderative,imperative,middle,3,pl,bubhutsantām OR bubhodiṣantām,bubhodhiṣntām,Mismatch
+budh,1 (desiderative),desiderative,optative,middle,1,sg,bubhutseya OR bubhodiṣeya,bubhodhiṣeya,Mismatch
+budh,1 (desiderative),desiderative,optative,middle,1,du,bubhutsevahi OR bubhodiṣevahi,bubhodhiṣevahi,Mismatch
+budh,1 (desiderative),desiderative,optative,middle,1,pl,bubhutsemahi OR bubhodiṣemahi,bubhodhiṣemahi,Mismatch
+budh,1 (desiderative),desiderative,optative,middle,2,sg,bubhutsethāḥ OR bubhodiṣethāḥ,bubhodhiṣethāḥ,Mismatch
+budh,1 (desiderative),desiderative,optative,middle,2,du,bubhutseyāthām OR bubhodiṣeyāthām,bubhodhiṣeyāthām,Mismatch
+budh,1 (desiderative),desiderative,optative,middle,2,pl,bubhutsedhvam OR bubhodiṣedhvam,bubhodhiṣedhvam,Mismatch
+budh,1 (desiderative),desiderative,optative,middle,3,sg,bubhodiṣeta,bubhodhiṣeta,Mismatch
+budh,1 (desiderative),desiderative,optative,middle,3,du,bubhutseyātām OR bubhodiṣeyātām,bubhodhiṣeyātām,Mismatch
+budh,1 (desiderative),desiderative,optative,middle,3,pl,bubhutseran OR bubhodiṣeran,bubhodhiṣeran,Mismatch
+budh,1 (desiderative),desiderative,future,middle,1,sg,bubhutsye OR bubhodiṣye,bubhodhiṣye,Mismatch
+budh,1 (desiderative),desiderative,future,middle,1,du,bubhutsyāvahe OR bubhodiṣyāvahe,bubhodhiṣyāvahe,Mismatch
+budh,1 (desiderative),desiderative,future,middle,1,pl,bubhutsyāmahe OR bubhodiṣyāmahe,bubhodhiṣyāmahe,Mismatch
+budh,1 (desiderative),desiderative,future,middle,2,sg,bubhutsyase OR bubhodiṣyase,bubhodhiṣyase,Mismatch
+budh,1 (desiderative),desiderative,future,middle,2,du,bubhutsyethe OR bubhodiṣyethe,bubhodhiṣyethe,Mismatch
+budh,1 (desiderative),desiderative,future,middle,2,pl,bubhutsyadhve OR bubhodiṣyadhve,bubhodhiṣyadhve,Mismatch
+budh,1 (desiderative),desiderative,future,middle,3,sg,bubhutsyate OR bubhodiṣyate,bubhodhiṣyate,Mismatch
+budh,1 (desiderative),desiderative,future,middle,3,du,bubhutsyete OR bubhodiṣyete,bubhodhiṣyete,Mismatch
+budh,1 (desiderative),desiderative,future,middle,3,pl,bubhutsyante OR bubhodiṣyante,bubhodhiṣyante,Mismatch
+budh,1 (desiderative),desiderative,perfect,middle,1,du,bububhutsivahe OR bububhodiṣivahe,bububhodhiṣivahe,Mismatch
+budh,1 (desiderative),desiderative,perfect,middle,1,pl,bububhutsimahe OR bububhodiṣimahe,bububhodhiṣimahe,Mismatch
+budh,1 (desiderative),desiderative,perfect,middle,2,sg,bububhutsiṣe OR bububhodiṣiṣe,bububhodhiṣiṣe,Mismatch
+budh,1 (desiderative),desiderative,perfect,middle,2,du,bububhutsāthe OR bububhodiṣāthe,bububhodhiṣāthe,Mismatch
+budh,1 (desiderative),desiderative,perfect,middle,2,pl,bububhutsidhve OR bububhodiṣidhve,bububhodhiṣidhve,Mismatch
+budh,1 (desiderative),desiderative,perfect,middle,3,sg,bububhutse OR bububhodiṣe,bububhodhiṣe,Mismatch
+budh,1 (desiderative),desiderative,perfect,middle,3,du,bububhutsāte OR bububhodiṣāte,bububhodhiṣāte,Mismatch
+budh,1 (desiderative),desiderative,perfect,middle,3,pl,bububhutsire OR bububhodiṣire,bububhodhiṣire,Mismatch
+budh,1 (intensive),intensive,present,active,1,du,bobhudhvaḥ,bobhodhvaḥ,Mismatch
+budh,1 (intensive),intensive,present,active,1,pl,bobhudhmaḥ,bobhodhmaḥ,Mismatch
+budh,1 (intensive),intensive,present,active,3,du,bobhuddhaḥ,bobhoddhaḥ,Mismatch
+budh,1 (intensive),intensive,present,active,3,pl,bobhudhati,bobhodhati,Mismatch
+budh,1 (intensive),intensive,imperfect,active,1,du,abobhudhva,abobhodhva,Mismatch
+budh,1 (intensive),intensive,imperfect,active,1,pl,abobhudhma,abobhodhma,Mismatch
+budh,1 (intensive),intensive,imperfect,active,2,sg,abobhudhīt OR abobhudhīḥ,abobhodhīḥ OR abobhotḥ,Mismatch
+budh,1 (intensive),intensive,imperfect,active,2,du,abobhuddham,abobhoddham,Mismatch
+budh,1 (intensive),intensive,imperfect,active,2,pl,abobhuddha,abobhoddha,Mismatch
+budh,1 (intensive),intensive,imperfect,active,3,du,abobhuddhām,abobhoddhām,Mismatch
+budh,1 (intensive),intensive,imperative,active,2,sg,bobhuddhi,bobhoddhi OR bobhoddhāt OR bobhodhhi,Mismatch
+budh,1 (intensive),intensive,imperative,active,2,du,bobhuddham,bobhoddham,Mismatch
+budh,1 (intensive),intensive,imperative,active,2,pl,bobhuddha,bobhoddha,Mismatch
+budh,1 (intensive),intensive,imperative,active,3,du,bobhuddhām,bobhoddhām,Mismatch
+budh,1 (intensive),intensive,imperative,active,3,pl,bobhudhatu,bobhodhatu,Mismatch
+budh,1 (intensive),intensive,optative,active,1,sg,bobhudhyām,bobhodhyām,Mismatch
+budh,1 (intensive),intensive,optative,active,1,du,bobhudhyāva,bobhodhyāva,Mismatch
+budh,1 (intensive),intensive,optative,active,1,pl,bobhudhyāma,bobhodhyāma,Mismatch
+budh,1 (intensive),intensive,optative,active,2,sg,bobhudhyāḥ,bobhodhyāḥ,Mismatch
+budh,1 (intensive),intensive,optative,active,2,du,bobhudhyātam,bobhodhyātam,Mismatch
+budh,1 (intensive),intensive,optative,active,2,pl,bobhudhyāta,bobhodhyāta,Mismatch
+budh,1 (intensive),intensive,optative,active,3,sg,bobhudhyāt,bobhodhyāt,Mismatch
+budh,1 (intensive),intensive,optative,active,3,du,bobhudhyātām,bobhodhyātām,Mismatch
+budh,1 (intensive),intensive,optative,active,3,pl,bobhudhyuḥ,bobhodhyuḥ,Mismatch
+muc,6 (primary),primary,aorist,active,2,pl,amaukta,amucata,Mismatch
+vac,2 (primary),primary,present,middle,1,sg,vaśe,vace,Mismatch
+vac,2 (primary),primary,present,middle,1,du,vaśvahe,vacvahe,Mismatch
+vac,2 (primary),primary,present,middle,1,pl,vaśmahe,vacmahe,Mismatch
+vac,2 (primary),primary,present,middle,2,du,vaśāthe,vacāthe,Mismatch
+vac,2 (primary),primary,present,middle,2,pl,vaḍḍhve,vajdhve,Mismatch
+vac,2 (primary),primary,present,middle,3,sg,vaṣṭe,vakte,Mismatch
+vac,2 (primary),primary,present,middle,3,du,vaśāte,vacāte,Mismatch
+vac,2 (primary),primary,present,middle,3,pl,vaśate,vacate,Mismatch
+vac,2 (primary),primary,imperative,active,2,sg,vagdhi OR voci,vajdhi OR vaktāt,Mismatch
+pā,1 (primary),primary,aorist,middle,2,pl,apedhvam,apeḍhvam,Mismatch
+śru,5 (primary),primary,perfect,active,2,sg,śuśrotha,śuśravitha,Mismatch
+dā,3 (primary),primary,imperative,active,2,sg,dehi,daddhi OR dattāt,Mismatch
+bhid,7 (primary),primary,imperfect,active,2,sg,abhinaḥ,abhinatḥ,Mismatch
+yaj,1 (intensive),intensive,present,active,1,sg,yāyajyāmi OR yāyajyemi,yāyajmi OR yāyajīmi,Mismatch
+yaj,1 (intensive),intensive,present,active,1,du,yāyajyāvaḥ,yāyajvaḥ,Mismatch
+yaj,1 (intensive),intensive,present,active,1,pl,yāyajyāmaḥ,yāyajmaḥ,Mismatch
+yaj,1 (intensive),intensive,present,active,2,sg,yāyajyāsi OR yāyajyeṣi,yāyajīṣi OR yāyakṣi,Mismatch
+yaj,1 (intensive),intensive,present,active,2,du,yāyajyāthaḥ,yāyaṣṭhaḥ,Mismatch
+yaj,1 (intensive),intensive,present,active,2,pl,yāyajyātha,yāyaṣṭha,Mismatch
+yaj,1 (intensive),intensive,present,active,3,sg,yāyajyeti,yāyajīti OR yāyaṣṭi,Mismatch
+yaj,1 (intensive),intensive,present,active,3,du,yāyajyātaḥ,yāyaṣṭaḥ,Mismatch
+yaj,1 (intensive),intensive,present,active,3,pl,yāyajyāti,yāyajati,Mismatch
+yaj,1 (intensive),intensive,imperfect,active,1,sg,ayāyajyām,ayāyajam,Mismatch
+yaj,1 (intensive),intensive,imperfect,active,1,du,ayāyajyāva,ayāyajva,Mismatch
+yaj,1 (intensive),intensive,imperfect,active,1,pl,ayāyajyāma,ayāyajma,Mismatch
+yaj,1 (intensive),intensive,imperfect,active,2,sg,ayāyajyāḥ OR ayāyajyet OR ayāyajyeḥ,ayāyajīḥ OR ayāyakḥ,Mismatch
+yaj,1 (intensive),intensive,imperfect,active,2,du,ayāyajyātam,ayāyaṣṭam,Mismatch
+yaj,1 (intensive),intensive,imperfect,active,2,pl,ayāyajyāta,ayāyaṣṭa,Mismatch
+yaj,1 (intensive),intensive,imperfect,active,3,sg,ayāyajyāt,ayāyajīt OR ayāyaṭ,Mismatch
+yaj,1 (intensive),intensive,imperfect,active,3,du,ayāyajyātām,ayāyaṣṭām,Mismatch
+yaj,1 (intensive),intensive,imperfect,active,3,pl,ayāyajyoḥ,ayāyajuḥ,Mismatch
+yaj,1 (intensive),intensive,imperative,active,1,sg,yāyajyāni,yāyajāni,Mismatch
+yaj,1 (intensive),intensive,imperative,active,1,du,yāyajyāva,yāyajāva,Mismatch
+yaj,1 (intensive),intensive,imperative,active,1,pl,yāyajyāma,yāyajāma,Mismatch
+yaj,1 (intensive),intensive,imperative,active,2,sg,yāyajyāhi,yāyajhi OR yāyaḍḍhi OR yāyaṣṭāt,Mismatch
+yaj,1 (intensive),intensive,imperative,active,2,du,yāyajyātam,yāyaṣṭam,Mismatch
+yaj,1 (intensive),intensive,imperative,active,2,pl,yāyajyāta,yāyaṣṭa,Mismatch
+yaj,1 (intensive),intensive,imperative,active,3,sg,yāyajyetu,yāyajītu OR yāyajītāt OR yāyaṣṭu OR yāyaṣṭāt,Mismatch
+yaj,1 (intensive),intensive,imperative,active,3,du,yāyajyātām,yāyaṣṭām,Mismatch
+yaj,1 (intensive),intensive,imperative,active,3,pl,yāyajyātu,yāyajatu,Mismatch
+yaj,1 (intensive),intensive,optative,active,1,sg,yāyajyāyām,yāyajyām,Mismatch
+yaj,1 (intensive),intensive,optative,active,1,du,yāyajyāyāva,yāyajyāva,Mismatch
+yaj,1 (intensive),intensive,optative,active,1,pl,yāyajyāyāma,yāyajyāma,Mismatch
+yaj,1 (intensive),intensive,optative,active,2,sg,yāyajyāyāḥ,yāyajyāḥ,Mismatch
+yaj,1 (intensive),intensive,optative,active,2,du,yāyajyāyātam,yāyajyātam,Mismatch
+yaj,1 (intensive),intensive,optative,active,2,pl,yāyajyāyāta,yāyajyāta,Mismatch
+yaj,1 (intensive),intensive,optative,active,3,sg,yāyajyāyāt,yāyajyāt,Mismatch
+yaj,1 (intensive),intensive,optative,active,3,du,yāyajyāyātām,yāyajyātām,Mismatch
+yaj,1 (intensive),intensive,optative,active,3,pl,yāyajyāyuḥ,yāyajyuḥ,Mismatch
+labh,1 (primary),primary,aorist,middle,2,pl,alabhdhvam,alabdhvam,Mismatch
+smṛ,1 (primary),primary,periphrastic_future,active,1,sg,smartāsmi,smaritāsmi,Mismatch
+smṛ,1 (primary),primary,periphrastic_future,active,1,du,smartāsvaḥ,smaritāsvaḥ,Mismatch
+smṛ,1 (primary),primary,periphrastic_future,active,1,pl,smartāsmaḥ,smaritāsmaḥ,Mismatch
+smṛ,1 (primary),primary,periphrastic_future,active,2,sg,smartāsi,smaritāsi,Mismatch
+smṛ,1 (primary),primary,periphrastic_future,active,2,du,smartāsthaḥ,smaritāsthaḥ,Mismatch
+smṛ,1 (primary),primary,periphrastic_future,active,2,pl,smartāstha,smaritāstha,Mismatch
+smṛ,1 (primary),primary,periphrastic_future,active,3,sg,smartā,smaritā,Mismatch
+smṛ,1 (primary),primary,periphrastic_future,active,3,du,smartārau,smaritārau,Mismatch
+smṛ,1 (primary),primary,periphrastic_future,active,3,pl,smartāraḥ,smaritāraḥ,Mismatch
+vid,2 (primary),primary,perfect,active,1,du,vidva OR vividiva,vidiva,Mismatch
+vid,2 (primary),primary,perfect,active,1,pl,vidma OR vividima,vidima,Mismatch
+vid,2 (primary),primary,perfect,active,2,sg,viveditha OR vettha,veditha,Mismatch
+vid,2 (primary),primary,perfect,active,2,du,vitthuḥ OR vividathuḥ,vidathuḥ,Mismatch
+vid,2 (primary),primary,perfect,active,3,du,vittuḥ OR vividatuḥ,vidatuḥ,Mismatch
+vid,2 (primary),primary,perfect,middle,1,du,vividivahe,vidivahe,Mismatch
+vid,2 (primary),primary,perfect,middle,1,pl,vividimahe,vidimahe,Mismatch
+vid,2 (primary),primary,perfect,middle,2,sg,vividiṣe,vidiṣe,Mismatch
+vid,2 (primary),primary,perfect,middle,2,du,vividāthe,vidāthe,Mismatch
+vid,2 (primary),primary,perfect,middle,2,pl,vivididhve,vididhve,Mismatch
+vid,2 (primary),primary,perfect,middle,3,sg,vivide,vide,Mismatch
+vid,2 (primary),primary,perfect,middle,3,du,vividāte,vidāte,Mismatch
+vid,2 (primary),primary,perfect,middle,3,pl,vividire,vidire,Mismatch
+vid,2 (primary),primary,aorist,middle,1,sg,avide OR avediṣi,avidiṣi,Mismatch
+vid,2 (primary),primary,aorist,middle,1,du,avidāvahi OR avediṣvahi,avidiṣvahi,Mismatch
+vid,2 (primary),primary,aorist,middle,1,pl,avidāmahi OR avediṣmahi,avidiṣmahi,Mismatch
+vid,2 (primary),primary,aorist,middle,2,sg,avidathāḥ OR avediṣṭhāḥ,avidiṣṭhāḥ,Mismatch
+vid,2 (primary),primary,aorist,middle,2,du,avidethām OR avediṣāthām,avidiṣāthām,Mismatch
+vid,2 (primary),primary,aorist,middle,2,pl,avidadhvam OR avedidhvam,avididhvam,Mismatch
+vid,2 (primary),primary,aorist,middle,3,sg,avediṣṭa,avidiṣṭa,Mismatch
+vid,2 (primary),primary,aorist,middle,3,du,avidetām OR avediṣātām,avidiṣātām,Mismatch
+vid,2 (primary),primary,aorist,middle,3,pl,avidanta OR avediṣata,avidiṣata,Mismatch
+vid,2 (intensive),intensive,imperfect,active,3,pl,aveveduḥ,aveviduḥ,Mismatch

@@ -1,0 +1,1263 @@
+Root,Class,Derivation,Tense,Voice,Person,Number,Expected (INRIA),Actual (FST)
+bhū,1 (primary),primary,perfect,active,2,sg,babhūtha OR babhūvitha,babhūvitha
+bhū,1 (intensive),intensive,present,active,1,sg,bobhavīmi OR bobhomi,bobhavmi OR bobhavīmi OR bobhomi OR bobhvīmi
+bhū,1 (intensive),intensive,present,active,1,du,bobhavvaḥ OR bobhovaḥ,bobhavvaḥ OR bobhovaḥ OR bobhūvaḥ
+bhū,1 (intensive),intensive,present,active,1,pl,bobhavmaḥ OR bobhomaḥ,bobhavmaḥ OR bobhomaḥ OR bobhūmaḥ
+bhū,1 (intensive),intensive,present,active,2,sg,bobhavīṣi OR bobhoṣi,bobhavsi OR bobhavīṣi OR bobhoṣi OR bobhvīṣi
+bhū,1 (intensive),intensive,present,active,2,du,bobhavthaḥ OR bobhothaḥ,bobhavthaḥ OR bobhothaḥ OR bobhūthaḥ
+bhū,1 (intensive),intensive,present,active,2,pl,bobhavtha OR bobhotha,bobhavtha OR bobhotha OR bobhūtha
+bhū,1 (intensive),intensive,present,active,3,sg,bobhavīti OR bobhoti,bobhavti OR bobhavīti OR bobhoti OR bobhvīti
+bhū,1 (intensive),intensive,present,active,3,du,bobhavtaḥ OR bobhotaḥ,bobhavtaḥ OR bobhotaḥ OR bobhūtaḥ
+bhū,1 (intensive),intensive,imperfect,active,1,du,abobhavva OR abobhova,abobhavva OR abobhova OR abobhūva
+bhū,1 (intensive),intensive,imperfect,active,1,pl,abobhavma OR abobhoma,abobhavma OR abobhoma OR abobhūma
+bhū,1 (intensive),intensive,imperfect,active,2,sg,abobhavīt OR abobhavīḥ OR abobhoḥ,abobhavīḥ OR abobhavḥ OR abobhoḥ OR abobhvīḥ
+bhū,1 (intensive),intensive,imperfect,active,2,du,abobhavtam OR abobhotam,abobhavtam OR abobhotam OR abobhūtam
+bhū,1 (intensive),intensive,imperfect,active,2,pl,abobhavta OR abobhota,abobhavta OR abobhota OR abobhūta
+bhū,1 (intensive),intensive,imperfect,active,3,du,abobhavtām OR abobhotām,abobhavtām OR abobhotām OR abobhūtām
+bhū,1 (intensive),intensive,imperative,active,2,sg,bobhavdhi OR bobhohi,bobhavdhi OR bobhavhi OR bobhavtāt OR bobhodhi OR bobhohi OR bobhotāt OR bobhūdhi OR bobhūhi OR bobhūtāt
+bhū,1 (intensive),intensive,imperative,active,2,du,bobhavtam OR bobhotam,bobhavtam OR bobhotam OR bobhūtam
+bhū,1 (intensive),intensive,imperative,active,2,pl,bobhavta OR bobhota,bobhavta OR bobhota OR bobhūta
+bhū,1 (intensive),intensive,imperative,active,3,sg,bobhavītu OR bobhotu,bobhavtu OR bobhavtāt OR bobhavītu OR bobhavītāt OR bobhotu OR bobhotāt OR bobhvītu OR bobhvītāt
+bhū,1 (intensive),intensive,imperative,active,3,du,bobhavtām OR bobhotām,bobhavtām OR bobhotām OR bobhūtām
+hu,3 (primary),primary,perfect,active,2,sg,juhavitha OR juhotha,juhavitha
+hu,3 (intensive),intensive,present,active,1,sg,johavīmi OR johomi,johavmi OR johavīmi OR johomi OR johvīmi
+hu,3 (intensive),intensive,present,active,2,sg,johavīṣi OR johoṣi,johavsi OR johavīṣi OR johoṣi OR johvīṣi
+hu,3 (intensive),intensive,present,active,3,sg,johavīti OR johoti,johavti OR johavīti OR johoti OR johvīti
+hu,3 (intensive),intensive,imperfect,active,2,sg,ajohavīt OR ajohavīḥ OR ajohoḥ,ajohavīḥ OR ajohavḥ OR ajohoḥ OR ajohvīḥ
+hu,3 (intensive),intensive,imperative,active,3,sg,johavītu OR johotu,johavtu OR johavtāt OR johavītu OR johavītāt OR johotu OR johotāt OR johvītu OR johvītāt
+su,5 (primary),primary,present,active,1,du,sunuvaḥ OR sunvaḥ,sunuvaḥ
+su,5 (primary),primary,present,active,1,pl,sunumaḥ OR sunmaḥ,sunumaḥ
+su,5 (primary),primary,present,middle,1,du,sunuvahe OR sunvahe,sunuvahe
+su,5 (primary),primary,present,middle,1,pl,sunumahe OR sunmahe,sunumahe
+su,5 (primary),primary,imperfect,active,1,du,asunuva OR asunva,asunuva
+su,5 (primary),primary,imperfect,active,1,pl,asunuma OR asunma,asunuma
+su,5 (primary),primary,imperfect,middle,1,du,asunuvahi OR asunvahi,asunuvahi
+su,5 (primary),primary,imperfect,middle,1,pl,asunumahi OR asunmahi,asunumahi
+su,5 (primary),primary,future,active,1,sg,saviṣyāmi OR soṣyāmi,saviṣyāmi OR soṣyāmi
+su,5 (primary),primary,future,active,1,du,saviṣyāvaḥ OR soṣyāvaḥ,saviṣyāvaḥ OR soṣyāvaḥ
+su,5 (primary),primary,future,active,1,pl,saviṣyāmaḥ OR soṣyāmaḥ,saviṣyāmaḥ OR soṣyāmaḥ
+su,5 (primary),primary,future,active,2,sg,saviṣyasi OR soṣyasi,saviṣyasi OR soṣyasi
+su,5 (primary),primary,future,active,2,du,saviṣyathaḥ OR soṣyathaḥ,saviṣyathaḥ OR soṣyathaḥ
+su,5 (primary),primary,future,active,2,pl,saviṣyatha OR soṣyatha,saviṣyatha OR soṣyatha
+su,5 (primary),primary,future,active,3,sg,saviṣyati OR soṣyati,saviṣyati OR soṣyati
+su,5 (primary),primary,future,active,3,du,saviṣyataḥ OR soṣyataḥ,saviṣyataḥ OR soṣyataḥ
+su,5 (primary),primary,future,active,3,pl,saviṣyanti OR soṣyanti,saviṣyanti OR soṣyanti
+su,5 (primary),primary,future,middle,1,sg,saviṣye OR soṣye,saviṣye OR soṣye
+su,5 (primary),primary,future,middle,1,du,saviṣyāvahe OR soṣyāvahe,saviṣyāvahe OR soṣyāvahe
+su,5 (primary),primary,future,middle,1,pl,saviṣyāmahe OR soṣyāmahe,saviṣyāmahe OR soṣyāmahe
+su,5 (primary),primary,future,middle,2,sg,saviṣyase OR soṣyase,saviṣyase OR soṣyase
+su,5 (primary),primary,future,middle,2,du,saviṣyethe OR soṣyethe,saviṣyethe OR soṣyethe
+su,5 (primary),primary,future,middle,2,pl,saviṣyadhve OR soṣyadhve,saviṣyadhve OR soṣyadhve
+su,5 (primary),primary,future,middle,3,sg,saviṣyate OR soṣyate,saviṣyate OR soṣyate
+su,5 (primary),primary,future,middle,3,du,saviṣyete OR soṣyete,saviṣyete OR soṣyete
+su,5 (primary),primary,future,middle,3,pl,saviṣyante OR soṣyante,saviṣyante OR soṣyante
+su,5 (primary),primary,perfect,active,2,sg,suṣavitha OR suṣotha,suṣavitha OR suṣotha
+su,5 (primary),primary,periphrastic_future,active,1,sg,savitāsmi OR sotāsmi,savitāsmi OR sotāsmi
+su,5 (primary),primary,periphrastic_future,active,1,du,savitāsvaḥ OR sotāsvaḥ,savitāsvaḥ OR sotāsvaḥ
+su,5 (primary),primary,periphrastic_future,active,1,pl,savitāsmaḥ OR sotāsmaḥ,savitāsmaḥ OR sotāsmaḥ
+su,5 (primary),primary,periphrastic_future,active,2,sg,savitāsi OR sotāsi,savitāsi OR sotāsi
+su,5 (primary),primary,periphrastic_future,active,2,du,savitāsthaḥ OR sotāsthaḥ,savitāsthaḥ OR sotāsthaḥ
+su,5 (primary),primary,periphrastic_future,active,2,pl,savitāstha OR sotāstha,savitāstha OR sotāstha
+su,5 (primary),primary,periphrastic_future,active,3,sg,savitā OR sotā,savitā OR sotā
+su,5 (primary),primary,periphrastic_future,active,3,du,savitārau OR sotārau,savitārau OR sotārau
+su,5 (primary),primary,periphrastic_future,active,3,pl,savitāraḥ OR sotāraḥ,savitāraḥ OR sotāraḥ
+yuj,7 (primary),primary,aorist,active,1,sg,ayujam OR ayokṣam OR ayaukṣam,ayaukṣam OR ayujam
+yuj,7 (primary),primary,aorist,active,1,du,ayujāva OR ayokṣva OR ayaukṣva,ayaukṣva OR ayujāva
+yuj,7 (primary),primary,aorist,active,1,pl,ayujāma OR ayokṣma OR ayaukṣma,ayaukṣma OR ayujāma
+yuj,7 (primary),primary,aorist,active,2,sg,ayujaḥ OR ayokṣīḥ OR ayaukṣīḥ,ayaukṣīḥ OR ayujaḥ
+yuj,7 (primary),primary,aorist,active,2,du,ayujatam OR ayoktam OR ayauktam,ayauktam OR ayujatam
+yuj,7 (primary),primary,aorist,active,2,pl,ayokta OR ayaukta,ayaukta OR ayujata
+yuj,7 (primary),primary,aorist,active,3,sg,ayujat OR ayokṣīt OR ayaukṣīt,ayaukṣīt OR ayujat
+yuj,7 (primary),primary,aorist,active,3,du,ayujatām OR ayoktām OR ayauktām,ayauktām OR ayujatām
+yuj,7 (primary),primary,aorist,active,3,pl,ayujan OR ayokṣuḥ OR ayaukṣuḥ,ayaukṣuḥ OR ayujan
+yuj,7 (primary),primary,aorist,middle,1,sg,ayukṣi OR ayuje,ayuje OR ayukṣi
+yuj,7 (primary),primary,aorist,middle,1,du,ayukṣvahi OR ayujāvahi,ayujāvahi OR ayukṣvahi
+yuj,7 (primary),primary,aorist,middle,1,pl,ayukṣmahi OR ayujāmahi,ayujāmahi OR ayukṣmahi
+yuj,7 (primary),primary,aorist,middle,2,sg,ayukthāḥ OR ayujathāḥ,ayujathāḥ OR ayukthāḥ
+yuj,7 (primary),primary,aorist,middle,2,du,ayukṣāthām OR ayujethām,ayujethām OR ayukṣāthām
+yuj,7 (primary),primary,aorist,middle,2,pl,ayugdhvam OR ayujadhvam,ayujadhvam OR ayujdhvam
+yuj,7 (primary),primary,aorist,middle,3,sg,ayukta OR ayujata,ayujata OR ayukta
+yuj,7 (primary),primary,aorist,middle,3,du,ayukṣātām OR ayujetām,ayujetām OR ayukṣātām
+yuj,7 (primary),primary,aorist,middle,3,pl,ayukṣata OR ayujanta,ayujanta OR ayukṣata
+tan,8 (primary),primary,present,active,1,du,tanuvaḥ OR tanvaḥ,tanuvaḥ
+tan,8 (primary),primary,present,active,1,pl,tanumaḥ OR tanmaḥ,tanumaḥ
+tan,8 (primary),primary,present,middle,1,du,tanuvahe OR tanvahe,tanuvahe
+tan,8 (primary),primary,present,middle,1,pl,tanumahe OR tanmahe,tanumahe
+tan,8 (primary),primary,imperfect,active,1,du,atanuva OR atanva,atanuva
+tan,8 (primary),primary,imperfect,active,1,pl,atanuma OR atanma,atanuma
+tan,8 (primary),primary,imperfect,middle,1,du,atanuvahi OR atanvahi,atanuvahi
+tan,8 (primary),primary,imperfect,middle,1,pl,atanumahi OR atanmahi,atanumahi
+tan,8 (primary),primary,perfect,active,2,sg,tatantha OR tenitha,tatantha
+krī,9 (primary),primary,perfect,active,2,sg,cikrayitha OR cikretha,cikrayitha
+kṛ,8 (primary),primary,aorist,active,1,sg,akaram OR akāriṣam OR akārṣam,akārṣam
+kṛ,8 (primary),primary,aorist,active,1,du,akāriṣva OR akārṣva OR akṛva,akārṣva
+kṛ,8 (primary),primary,aorist,active,1,pl,akāriṣma OR akārṣma OR akṛma,akārṣma
+kṛ,8 (primary),primary,aorist,active,2,sg,akārīḥ OR akārṣīḥ,akārṣīḥ
+kṛ,8 (primary),primary,aorist,active,2,du,akāriṣṭam OR akārṣṭam OR akṛtam,akārṣṭam
+kṛ,8 (primary),primary,aorist,active,2,pl,akāriṣṭa OR akārṣṭa,akārṣṭa
+kṛ,8 (primary),primary,aorist,active,3,sg,akaḥ OR akārīt OR akārṣīt,akārṣīt
+kṛ,8 (primary),primary,aorist,active,3,du,akāriṣṭām OR akārṣṭām OR akṛtām,akārṣṭām
+kṛ,8 (primary),primary,aorist,active,3,pl,akāriṣuḥ OR akārṣuḥ OR akran,akārṣuḥ
+kṛ,8 (primary),primary,aorist,middle,1,sg,akṛṣi OR akri,akri
+kṛ,8 (primary),primary,aorist,middle,1,du,akṛvahi OR akṛṣvahi,akṛvahi
+kṛ,8 (primary),primary,aorist,middle,1,pl,akṛmahi OR akṛṣmahi,akṛmahi
+kṛ,8 (primary),primary,aorist,middle,2,du,akṛṣāthām OR akrāthām,akrāthām
+kṛ,8 (primary),primary,aorist,middle,2,pl,akṛḍhvam OR akṛdhvam,akṛdhvam
+kṛ,8 (primary),primary,aorist,middle,3,du,akṛṣātām OR akrātām,akrātām
+kṛ,8 (primary),primary,aorist,middle,3,pl,akṛṣata OR akrata,akrata
+kṛ,8 (primary),primary,injunctive,middle,1,sg,kṛṣi OR kri,kri
+kṛ,8 (primary),primary,injunctive,middle,1,du,kṛvahi OR kṛṣvahi,kṛvahi
+kṛ,8 (primary),primary,injunctive,middle,1,pl,kṛmahi OR kṛṣmahi,kṛmahi
+kṛ,8 (primary),primary,injunctive,middle,2,du,kṛṣāthām OR krāthām,krāthām
+kṛ,8 (primary),primary,injunctive,middle,2,pl,kṛḍhvam OR kṛdhvam,kṛdhvam
+kṛ,8 (primary),primary,injunctive,middle,3,du,kṛṣātām OR krātām,krātām
+kṛ,8 (primary),primary,injunctive,middle,3,pl,kṛṣata OR krata,krata
+kṛ,8 (intensive),intensive,present,active,1,sg,carkarīmi OR carkarmi,carkarmi OR carkarīmi
+kṛ,8 (intensive),intensive,present,active,2,sg,carkarīṣi OR carkarṣi,carkarīṣi OR carkarṣi
+kṛ,8 (intensive),intensive,present,active,3,sg,carkarīti OR carkarti,carkarti OR carkarīti
+kṛ,8 (intensive),intensive,imperfect,active,2,sg,acarkarīt OR acarkarīḥ,acarkarīḥ OR acarkarḥ
+kṛ,8 (intensive),intensive,imperative,active,3,sg,carkarītu OR carkartu,carkartu OR carkartāt OR carkarītu OR carkarītāt
+budh,1 (primary),primary,aorist,active,1,sg,abodhiṣam OR abhautsam,abhautsam OR abodhiṣam
+budh,1 (primary),primary,aorist,active,1,du,abodhiṣva OR abhautsva,abhautsva OR abodhiṣva
+budh,1 (primary),primary,aorist,active,1,pl,abodhiṣma OR abhautsma,abhautsma OR abodhiṣma
+budh,1 (primary),primary,aorist,active,2,sg,abodhīḥ OR abhautsīḥ,abhautsīḥ OR abodhīḥ
+budh,1 (primary),primary,aorist,active,2,du,abodhiṣṭam OR abauddham,abauddham OR abodhiṣṭam
+budh,1 (primary),primary,aorist,active,3,sg,abodhīt OR abhautsīt,abhautsīt OR abodhīt
+budh,1 (primary),primary,aorist,active,3,du,abodhiṣṭām OR abauddhām,abauddhām OR abodhiṣṭām
+budh,1 (primary),primary,aorist,active,3,pl,abodhiṣuḥ OR abhautsuḥ,abhautsuḥ OR abodhiṣuḥ
+budh,1 (primary),primary,aorist,middle,1,sg,abodhiṣi OR abhutsi,abhutsi OR abudhiṣi
+budh,1 (primary),primary,aorist,middle,1,du,abodhiṣvahi OR abhutsvahi,abhutsvahi OR abudhiṣvahi
+budh,1 (primary),primary,aorist,middle,1,pl,abodhiṣmahi OR abhutsmahi,abhutsmahi OR abudhiṣmahi
+budh,1 (primary),primary,aorist,middle,2,sg,abuddhāḥ OR abodhiṣṭhāḥ,abuddhhāḥ OR abuddhāḥ OR abudhiṣṭhāḥ
+budh,1 (primary),primary,aorist,middle,2,du,abodhiṣāthām OR abhutsāthām,abhutsāthām OR abudhiṣāthām
+budh,1 (primary),primary,aorist,middle,2,pl,abuddhvam OR abodhidhvam,abuddhvam OR abudhidhvam
+budh,1 (primary),primary,aorist,middle,3,sg,abuddha OR abodhiṣṭa,abuddha OR abudhiṣṭa
+budh,1 (primary),primary,aorist,middle,3,du,abodhiṣātām OR abhutsātām,abhutsātām OR abudhiṣātām
+budh,1 (primary),primary,aorist,middle,3,pl,abodhiṣata OR abhutsata,abhutsata OR abudhiṣata
+budh,1 (desiderative),desiderative,present,active,1,sg,bubhutsāmi OR bubhodhiṣāmi,bubhodhiṣāmi
+budh,1 (desiderative),desiderative,present,active,1,du,bubhutsāvaḥ OR bubhodhiṣāvaḥ,bubhodhiṣāvaḥ
+budh,1 (desiderative),desiderative,present,active,1,pl,bubhutsāmaḥ OR bubhodhiṣāmaḥ,bubhodhiṣāmaḥ
+budh,1 (desiderative),desiderative,imperfect,active,1,du,abubhutsāva OR abubhodhiṣāva,abubhodhiṣāva
+budh,1 (desiderative),desiderative,imperfect,active,1,pl,abubhutsāma OR abubhodhiṣāma,abubhodhiṣāma
+budh,1 (desiderative),desiderative,imperfect,passive,1,sg,abubhutsye OR abubhodiṣye OR abubhodhiṣye,abubhodhiṣye
+budh,1 (desiderative),desiderative,imperfect,passive,1,du,abubhutsyāvahi OR abubhodiṣyāvahi OR abubhodhiṣyāvahi,abubhodhiṣyāvahi
+budh,1 (desiderative),desiderative,imperfect,passive,1,pl,abubhutsyāmahi OR abubhodiṣyāmahi OR abubhodhiṣyāmahi,abubhodhiṣyāmahi
+budh,1 (desiderative),desiderative,imperfect,passive,2,sg,abubhutsyathāḥ OR abubhodiṣyathāḥ OR abubhodhiṣyathāḥ,abubhodhiṣyathāḥ
+budh,1 (desiderative),desiderative,imperfect,passive,2,du,abubhutsyethām OR abubhodiṣyethām OR abubhodhiṣyethām,abubhodhiṣyethām
+budh,1 (desiderative),desiderative,imperfect,passive,2,pl,abubhutsyadhvam OR abubhodiṣyadhvam OR abubhodhiṣyadhvam,abubhodhiṣyadhvam
+budh,1 (desiderative),desiderative,imperfect,passive,3,sg,abubhutsyata OR abubhodiṣyata OR abubhodhiṣyata,abubhodhiṣyata
+budh,1 (desiderative),desiderative,imperfect,passive,3,du,abubhutsyetām OR abubhodiṣyetām OR abubhodhiṣyetām,abubhodhiṣyetām
+budh,1 (desiderative),desiderative,imperfect,passive,3,pl,abubhutsyanta OR abubhodiṣyanta OR abubhodhiṣyanta,abubhodhiṣyanta
+budh,1 (desiderative),desiderative,imperative,active,1,sg,bubhutsāni OR bubhodhiṣāṇi,bubhodhiṣāṇi
+budh,1 (desiderative),desiderative,imperative,active,1,du,bubhutsāva OR bubhodhiṣāva,bubhodhiṣāva
+budh,1 (desiderative),desiderative,imperative,active,1,pl,bubhutsāma OR bubhodhiṣāma,bubhodhiṣāma
+budh,1 (desiderative),desiderative,imperative,passive,1,sg,bubhutsyai OR bubhodiṣyai OR bubhodhiṣyai,bubhodhiṣyai
+budh,1 (desiderative),desiderative,imperative,passive,1,du,bubhutsyāvahai OR bubhodiṣyāvahai OR bubhodhiṣyāvahai,bubhodhiṣyāvahai
+budh,1 (desiderative),desiderative,imperative,passive,1,pl,bubhutsyāmahai OR bubhodiṣyāmahai OR bubhodhiṣyāmahai,bubhodhiṣyāmahai
+budh,1 (desiderative),desiderative,imperative,passive,2,sg,bubhutsyasva OR bubhodiṣyasva OR bubhodhiṣyasva,bubhodhiṣyasva
+budh,1 (desiderative),desiderative,imperative,passive,2,du,bubhutsyethām OR bubhodiṣyethām OR bubhodhiṣyethām,bubhodhiṣyethām
+budh,1 (desiderative),desiderative,imperative,passive,2,pl,bubhutsyadhvam OR bubhodiṣyadhvam OR bubhodhiṣyadhvam,bubhodhiṣyadhvam
+budh,1 (desiderative),desiderative,imperative,passive,3,sg,bubhutsyatām OR bubhodiṣyatām OR bubhodhiṣyatām,bubhodhiṣyatām
+budh,1 (desiderative),desiderative,imperative,passive,3,du,bubhutsyetām OR bubhodiṣyetām OR bubhodhiṣyetām,bubhodhiṣyetām
+budh,1 (desiderative),desiderative,imperative,passive,3,pl,bubhutsyantām OR bubhodiṣyantām OR bubhodhiṣyantām,bubhodhiṣyantām
+budh,1 (desiderative),desiderative,optative,active,1,sg,bubhutseyam OR bubhodhiṣeyam,bubhodhiṣeyam
+budh,1 (desiderative),desiderative,optative,active,1,du,bubhutseva OR bubhodhiṣeva,bubhodhiṣeva
+budh,1 (desiderative),desiderative,optative,active,1,pl,bubhutsema OR bubhodhiṣema,bubhodhiṣema
+budh,1 (desiderative),desiderative,optative,active,2,sg,bubhutseḥ OR bubhodhiṣeḥ,bubhodhiṣeḥ
+budh,1 (desiderative),desiderative,optative,active,2,du,bubhutsetam OR bubhodhiṣetam,bubhodhiṣetam
+budh,1 (desiderative),desiderative,optative,active,2,pl,bubhutseta OR bubhodhiṣeta,bubhodhiṣeta
+budh,1 (desiderative),desiderative,optative,active,3,sg,bubhutset OR bubhodhiṣet,bubhodhiṣet
+budh,1 (desiderative),desiderative,optative,active,3,du,bubhutsetām OR bubhodhiṣetām,bubhodhiṣetām
+budh,1 (desiderative),desiderative,optative,active,3,pl,bubhutseyuḥ OR bubhodhiṣeyuḥ,bubhodhiṣeyuḥ
+budh,1 (desiderative),desiderative,optative,passive,1,sg,bubhutsyeya OR bubhodiṣyeya OR bubhodhiṣyeya,bubhodhiṣyeya
+budh,1 (desiderative),desiderative,optative,passive,1,du,bubhutsyevahi OR bubhodiṣyevahi OR bubhodhiṣyevahi,bubhodhiṣyevahi
+budh,1 (desiderative),desiderative,optative,passive,1,pl,bubhutsyemahi OR bubhodiṣyemahi OR bubhodhiṣyemahi,bubhodhiṣyemahi
+budh,1 (desiderative),desiderative,optative,passive,2,sg,bubhutsyethāḥ OR bubhodiṣyethāḥ OR bubhodhiṣyethāḥ,bubhodhiṣyethāḥ
+budh,1 (desiderative),desiderative,optative,passive,2,du,bubhutsyeyāthām OR bubhodiṣyeyāthām OR bubhodhiṣyeyāthām,bubhodhiṣyeyāthām
+budh,1 (desiderative),desiderative,optative,passive,2,pl,bubhutsyedhvam OR bubhodiṣyedhvam OR bubhodhiṣyedhvam,bubhodhiṣyedhvam
+budh,1 (desiderative),desiderative,optative,passive,3,sg,bubhutsyeta OR bubhodiṣyeta OR bubhodhiṣyeta,bubhodhiṣyeta
+budh,1 (desiderative),desiderative,optative,passive,3,du,bubhutsyeyātām OR bubhodiṣyeyātām OR bubhodhiṣyeyātām,bubhodhiṣyeyātām
+budh,1 (desiderative),desiderative,optative,passive,3,pl,bubhutsyeran OR bubhodiṣyeran OR bubhodhiṣyeran,bubhodhiṣyeran
+budh,1 (desiderative),desiderative,future,active,1,sg,bubhutsyāmi OR bubhodhiṣyāmi,bubhodhiṣyāmi
+budh,1 (desiderative),desiderative,future,active,1,du,bubhutsyāvaḥ OR bubhodhiṣyāvaḥ,bubhodhiṣyāvaḥ
+budh,1 (desiderative),desiderative,future,active,1,pl,bubhutsyāmaḥ OR bubhodhiṣyāmaḥ,bubhodhiṣyāmaḥ
+budh,1 (desiderative),desiderative,future,active,2,sg,bubhutsyasi OR bubhodhiṣyasi,bubhodhiṣyasi
+budh,1 (desiderative),desiderative,future,active,2,du,bubhutsyathaḥ OR bubhodhiṣyathaḥ,bubhodhiṣyathaḥ
+budh,1 (desiderative),desiderative,future,active,2,pl,bubhutsyatha OR bubhodhiṣyatha,bubhodhiṣyatha
+budh,1 (desiderative),desiderative,future,active,3,sg,bubhutsyati OR bubhodhiṣyati,bubhodhiṣyati
+budh,1 (desiderative),desiderative,future,active,3,du,bubhutsyataḥ OR bubhodhiṣyataḥ,bubhodhiṣyataḥ
+budh,1 (desiderative),desiderative,future,active,3,pl,bubhutsyanti OR bubhodhiṣyanti,bubhodhiṣyanti
+budh,1 (desiderative),desiderative,perfect,active,1,du,bububhutsiva OR bububhodhiṣiva,bububhodhiṣiva
+budh,1 (desiderative),desiderative,perfect,active,1,pl,bububhutsima OR bububhodhiṣima,bububhodhiṣima
+budh,1 (desiderative),desiderative,perfect,active,2,sg,bububhutsitha OR bububhodhiṣitha,bububhodhiṣitha
+budh,1 (desiderative),desiderative,perfect,active,2,du,bububhutsathuḥ OR bububhodhiṣathuḥ,bububhodhiṣathuḥ
+budh,1 (desiderative),desiderative,perfect,active,2,pl,bububhutsa OR bububhodhiṣa,bububhodhiṣa
+budh,1 (desiderative),desiderative,perfect,active,3,du,bububhutsatuḥ OR bububhodhiṣatuḥ,bububhodhiṣatuḥ
+budh,1 (desiderative),desiderative,perfect,active,3,pl,bububhutsuḥ OR bububhodhiṣuḥ,bububhodhiṣuḥ
+budh,1 (desiderative),desiderative,periphrastic_future,active,1,sg,bubhutsitāsmi OR bubhodiṣitāsmi OR bubhodhiṣitāsmi,bubhodhiṣitāsmi
+budh,1 (desiderative),desiderative,periphrastic_future,active,1,du,bubhutsitāsvaḥ OR bubhodiṣitāsvaḥ OR bubhodhiṣitāsvaḥ,bubhodhiṣitāsvaḥ
+budh,1 (desiderative),desiderative,periphrastic_future,active,1,pl,bubhutsitāsmaḥ OR bubhodiṣitāsmaḥ OR bubhodhiṣitāsmaḥ,bubhodhiṣitāsmaḥ
+budh,1 (desiderative),desiderative,periphrastic_future,active,2,sg,bubhutsitāsi OR bubhodiṣitāsi OR bubhodhiṣitāsi,bubhodhiṣitāsi
+budh,1 (desiderative),desiderative,periphrastic_future,active,2,du,bubhutsitāsthaḥ OR bubhodiṣitāsthaḥ OR bubhodhiṣitāsthaḥ,bubhodhiṣitāsthaḥ
+budh,1 (desiderative),desiderative,periphrastic_future,active,2,pl,bubhutsitāstha OR bubhodiṣitāstha OR bubhodhiṣitāstha,bubhodhiṣitāstha
+budh,1 (desiderative),desiderative,periphrastic_future,active,3,sg,bubhutsitā OR bubhodiṣitā OR bubhodhiṣitā,bubhodhiṣitā
+budh,1 (desiderative),desiderative,periphrastic_future,active,3,du,bubhutsitārau OR bubhodiṣitārau OR bubhodhiṣitārau,bubhodhiṣitārau
+budh,1 (desiderative),desiderative,periphrastic_future,active,3,pl,bubhutsitāraḥ OR bubhodiṣitāraḥ OR bubhodhiṣitāraḥ,bubhodhiṣitāraḥ
+budh,1 (intensive),intensive,present,active,1,sg,bobhudhīmi OR bobhodhmi,bobhodhmi OR bobhodhīmi
+budh,1 (intensive),intensive,present,active,2,sg,bobhudhīṣi OR bobhotsi,bobhodhīṣi OR bobhotsi
+budh,1 (intensive),intensive,present,active,3,sg,bobhudhīti OR bobhoddhi,bobhoddhi OR bobhodhīti
+budh,1 (intensive),intensive,imperative,active,3,sg,bobhoddhu OR bobhodhītu,bobhoddhu OR bobhoddhāt OR bobhodhītu OR bobhodhītāt
+duh,2 (primary),primary,imperfect,middle,3,pl,aduhata OR aduhra,aduhata
+gam,1 (primary),primary,perfect,active,2,sg,jagantha OR jagamitha,jagamitha
+gam,1 (primary),primary,aorist,active,1,sg,agamam OR ajīgamam,agamam
+gam,1 (primary),primary,aorist,active,1,du,aganva OR agamāva OR ajīgamāva,agamāva
+gam,1 (primary),primary,aorist,active,1,pl,aganma OR agamāma OR ajīgamāma,agamāma
+gam,1 (primary),primary,aorist,active,2,sg,agamaḥ OR ajīgamaḥ,agamaḥ
+gam,1 (primary),primary,aorist,active,2,du,agantam OR agamatam OR ajīgamatam,agamatam
+gam,1 (primary),primary,aorist,active,3,sg,agan OR agamat OR ajīgamat,agamat
+gam,1 (primary),primary,aorist,active,3,du,agantām OR agamatām OR ajīgamatām,agamatām
+gam,1 (primary),primary,aorist,active,3,pl,agaman OR agman OR ajīgaman,agaman
+gam,1 (primary),primary,aorist,middle,1,sg,agami OR agame OR ajīgame,agame
+gam,1 (primary),primary,aorist,middle,1,du,aganvahi OR agamāvahi OR ajīgamāvahi,agamāvahi
+gam,1 (primary),primary,aorist,middle,1,pl,aganmahi OR agamāmahi OR ajīgamāmahi,agamāmahi
+gam,1 (primary),primary,aorist,middle,2,sg,aganthāḥ OR agamathāḥ OR ajīgamathāḥ,agamathāḥ
+gam,1 (primary),primary,aorist,middle,2,du,agamāthām OR agamethām OR ajīgamethām,agamethām
+gam,1 (primary),primary,aorist,middle,2,pl,agandhvam OR agamadhvam OR ajīgamadhvam,agamadhvam
+gam,1 (primary),primary,aorist,middle,3,sg,aganta OR agamata OR ajīgamata,agamata
+gam,1 (primary),primary,aorist,middle,3,du,agamātām OR agametām OR ajīgametām,agametām
+gam,1 (primary),primary,aorist,middle,3,pl,agamanta OR ajīgamanta,agamanta
+gam,1 (primary),primary,injunctive,active,1,sg,gamam OR jīgamam,gamam
+gam,1 (primary),primary,injunctive,active,1,du,ganva OR gamāva OR jīgamāva,gamāva
+gam,1 (primary),primary,injunctive,active,1,pl,ganma OR gamāma OR jīgamāma,gamāma
+gam,1 (primary),primary,injunctive,active,2,sg,gamaḥ OR jīgamaḥ,gamaḥ
+gam,1 (primary),primary,injunctive,active,2,du,gantam OR gamatam OR jīgamatam,gamatam
+gam,1 (primary),primary,injunctive,active,3,sg,gan OR gamat OR jīgamat,gamat
+gam,1 (primary),primary,injunctive,active,3,du,gantām OR gamatām OR jīgamatām,gamatām
+gam,1 (primary),primary,injunctive,active,3,pl,gaman OR gman OR jīgaman,gaman
+gam,1 (primary),primary,injunctive,middle,1,sg,gami OR game OR jīgame,game
+gam,1 (primary),primary,injunctive,middle,1,du,ganvahi OR gamāvahi OR jīgamāvahi,gamāvahi
+gam,1 (primary),primary,injunctive,middle,1,pl,ganmahi OR gamāmahi OR jīgamāmahi,gamāmahi
+gam,1 (primary),primary,injunctive,middle,2,sg,ganthāḥ OR gamathāḥ OR jīgamathāḥ,gamathāḥ
+gam,1 (primary),primary,injunctive,middle,2,du,gamāthām OR gamethām OR jīgamethām,gamethām
+gam,1 (primary),primary,injunctive,middle,2,pl,gandhvam OR gamadhvam OR jīgamadhvam,gamadhvam
+gam,1 (primary),primary,injunctive,middle,3,sg,ganta OR gamata OR jīgamata,gamata
+gam,1 (primary),primary,injunctive,middle,3,du,gamātām OR gametām OR jīgametām,gametām
+gam,1 (primary),primary,injunctive,middle,3,pl,gamanta OR jīgamanta,gamanta
+muc,6 (primary),primary,aorist,active,1,sg,amucam OR amūmucam OR amaukṣam,amucam
+muc,6 (primary),primary,aorist,active,1,du,amucāva OR amūmucāva OR amaukṣva,amucāva
+muc,6 (primary),primary,aorist,active,1,pl,amucāma OR amūmucāma OR amaukṣma,amucāma
+muc,6 (primary),primary,aorist,active,2,sg,amucaḥ OR amūmucaḥ OR amaukṣīḥ,amucaḥ
+muc,6 (primary),primary,aorist,active,2,du,amucatam OR amūmucatam OR amauktam,amucatam
+muc,6 (primary),primary,aorist,active,3,sg,amucat OR amūmucat OR amaukṣīt,amucat
+muc,6 (primary),primary,aorist,active,3,du,amucatām OR amūmucatām OR amauktām,amucatām
+muc,6 (primary),primary,aorist,active,3,pl,amucan OR amūmucan OR amaukṣuḥ,amucan
+muc,6 (primary),primary,aorist,middle,1,sg,amukṣi OR amuce OR amūmuce,amuce
+muc,6 (primary),primary,aorist,middle,1,du,amukṣvahi OR amucāvahi OR amūmucāvahi,amucāvahi
+muc,6 (primary),primary,aorist,middle,1,pl,amukṣmahi OR amucāmahi OR amūmucāmahi,amucāmahi
+muc,6 (primary),primary,aorist,middle,2,sg,amukthāḥ OR amucathāḥ OR amūmucathāḥ,amucathāḥ
+muc,6 (primary),primary,aorist,middle,2,du,amukṣāthām OR amucethām OR amūmucethām,amucethām
+muc,6 (primary),primary,aorist,middle,2,pl,amugdhvam OR amucadhvam OR amūmucadhvam,amucadhvam
+muc,6 (primary),primary,aorist,middle,3,sg,amukta OR amucata OR amūmucata,amucata
+muc,6 (primary),primary,aorist,middle,3,du,amukṣātām OR amucetām OR amūmucetām,amucetām
+muc,6 (primary),primary,aorist,middle,3,pl,amukṣata OR amucanta OR amūmucanta,amucanta
+vac,2 (primary),primary,imperative,active,3,sg,vaktu OR vocatu,vaktu OR vaktāt
+vac,2 (primary),primary,perfect,active,2,sg,uvaktha OR uvacitha,uvacitha
+vac,2 (primary),primary,aorist,passive,3,sg,avāci OR avoci,avāci
+han,2 (primary),primary,future,active,1,sg,haṃsyāmi OR haniṣyāmi,haniṣyāmi
+han,2 (primary),primary,future,active,1,du,haṃsyāvaḥ OR haniṣyāvaḥ,haniṣyāvaḥ
+han,2 (primary),primary,future,active,1,pl,haṃsyāmaḥ OR haniṣyāmaḥ,haniṣyāmaḥ
+han,2 (primary),primary,future,active,2,sg,haṃsyasi OR haniṣyasi,haniṣyasi
+han,2 (primary),primary,future,active,2,du,haṃsyathaḥ OR haniṣyathaḥ,haniṣyathaḥ
+han,2 (primary),primary,future,active,2,pl,haṃsyatha OR haniṣyatha,haniṣyatha
+han,2 (primary),primary,future,active,3,sg,haṃsyati OR haniṣyati,haniṣyati
+han,2 (primary),primary,future,active,3,du,haṃsyataḥ OR haniṣyataḥ,haniṣyataḥ
+han,2 (primary),primary,future,active,3,pl,haṃsyanti OR haniṣyanti,haniṣyanti
+han,2 (primary),primary,future,middle,1,sg,haṃsye OR haniṣye,haniṣye
+han,2 (primary),primary,future,middle,1,du,haṃsyāvahe OR haniṣyāvahe,haniṣyāvahe
+han,2 (primary),primary,future,middle,1,pl,haṃsyāmahe OR haniṣyāmahe,haniṣyāmahe
+han,2 (primary),primary,future,middle,2,sg,haṃsyase OR haniṣyase,haniṣyase
+han,2 (primary),primary,future,middle,2,du,haṃsyethe OR haniṣyethe,haniṣyethe
+han,2 (primary),primary,future,middle,2,pl,haṃsyadhve OR haniṣyadhve,haniṣyadhve
+han,2 (primary),primary,future,middle,3,sg,haṃsyate OR haniṣyate,haniṣyate
+han,2 (primary),primary,future,middle,3,du,haṃsyete OR haniṣyete,haniṣyete
+han,2 (primary),primary,future,middle,3,pl,haṃsyante OR haniṣyante,haniṣyante
+han,2 (primary),primary,perfect,active,2,sg,jaghanitha OR jaghantha,jaghanitha
+han,2 (intensive),intensive,present,active,1,sg,jaṅghami OR jaṅghemi,jaṅghami OR jaṅghemi
+han,2 (intensive),intensive,present,active,2,sg,jaṅghasi OR jaṅgheṣi,jaṅghasi OR jaṅgheṣi
+han,2 (intensive),intensive,present,active,3,sg,jaṅghati OR jaṅgheti,jaṅghati OR jaṅgheti
+han,2 (intensive),intensive,imperfect,active,2,sg,ajaṅghaḥ OR ajaṅghet OR ajaṅgheḥ,ajaṅghaḥ OR ajaṅgheḥ
+han,2 (intensive),intensive,imperative,active,3,sg,jaṅghatu OR jaṅghetu,jaṅghatu OR jaṅghatāt OR jaṅghetu OR jaṅghetāt
+pā,1 (primary),primary,perfect,active,2,sg,papātha OR papitha,papitha
+pā,1 (primary),primary,aorist,active,1,sg,apām OR apāsiṣam,apām
+pā,1 (primary),primary,aorist,active,1,du,apāva OR apāsiṣva,apāva
+pā,1 (primary),primary,aorist,active,1,pl,apāma OR apāsiṣma,apāma
+pā,1 (primary),primary,aorist,active,2,sg,apāḥ OR apāsīḥ,apāḥ
+pā,1 (primary),primary,aorist,active,2,du,apātam OR apāsiṣṭam,apātam
+pā,1 (primary),primary,aorist,active,2,pl,apāta OR apāsiṣṭa,apāta
+pā,1 (primary),primary,aorist,active,3,sg,apāt OR apāsīt,apāt
+pā,1 (primary),primary,aorist,active,3,du,apātām OR apāsiṣṭām,apātām
+pā,1 (primary),primary,aorist,active,3,pl,apāsiṣuḥ OR apuḥ,apoḥ OR apuḥ
+pā,1 (causative),causative,present,active,1,sg,pāyayāmi OR pālayāmi,pāyayāmi
+pā,1 (causative),causative,present,active,1,du,pāyayāvaḥ OR pālayāvaḥ,pāyayāvaḥ
+pā,1 (causative),causative,present,active,1,pl,pāyayāmaḥ OR pālayāmaḥ,pāyayāmaḥ
+pā,1 (causative),causative,present,active,2,sg,pāyayasi OR pālayasi,pāyayasi
+pā,1 (causative),causative,present,active,2,du,pāyayathaḥ OR pālayathaḥ,pāyayathaḥ
+pā,1 (causative),causative,present,active,2,pl,pāyayatha OR pālayatha,pāyayatha
+pā,1 (causative),causative,present,active,3,sg,pāyayati OR pālayati,pāyayati
+pā,1 (causative),causative,present,active,3,du,pāyayataḥ OR pālayataḥ,pāyayataḥ
+pā,1 (causative),causative,present,active,3,pl,pāyayanti OR pālayanti,pāyayanti
+pā,1 (causative),causative,present,middle,1,sg,pāyaye OR pālaye,pāyaye
+pā,1 (causative),causative,present,middle,1,du,pāyayāvahe OR pālayāvahe,pāyayāvahe
+pā,1 (causative),causative,present,middle,1,pl,pāyayāmahe OR pālayāmahe,pāyayāmahe
+pā,1 (causative),causative,present,middle,2,sg,pāyayase OR pālayase,pāyayase
+pā,1 (causative),causative,present,middle,2,du,pāyayethe OR pālayethe,pāyayethe
+pā,1 (causative),causative,present,middle,2,pl,pāyayadhve OR pālayadhve,pāyayadhve
+pā,1 (causative),causative,present,middle,3,sg,pāyayate OR pālayate,pāyayate
+pā,1 (causative),causative,present,middle,3,du,pāyayete OR pālayete,pāyayete
+pā,1 (causative),causative,present,middle,3,pl,pāyayante OR pālayante,pāyayante
+pā,1 (causative),causative,present,passive,1,sg,pāyye OR pālye,pāyye
+pā,1 (causative),causative,present,passive,1,du,pāyyāvahe OR pālyāvahe,pāyyāvahe
+pā,1 (causative),causative,present,passive,1,pl,pāyyāmahe OR pālyāmahe,pāyyāmahe
+pā,1 (causative),causative,present,passive,2,sg,pāyyase OR pālyase,pāyyase
+pā,1 (causative),causative,present,passive,2,du,pāyyethe OR pālyethe,pāyyethe
+pā,1 (causative),causative,present,passive,2,pl,pāyyadhve OR pālyadhve,pāyyadhve
+pā,1 (causative),causative,present,passive,3,sg,pāyyate OR pālyate,pāyyate
+pā,1 (causative),causative,present,passive,3,du,pāyyete OR pālyete,pāyyete
+pā,1 (causative),causative,present,passive,3,pl,pāyyante OR pālyante,pāyyante
+pā,1 (causative),causative,imperfect,active,1,sg,apāyayam OR apālayam,apāyayam
+pā,1 (causative),causative,imperfect,active,1,du,apāyayāva OR apālayāva,apāyayāva
+pā,1 (causative),causative,imperfect,active,1,pl,apāyayāma OR apālayāma,apāyayāma
+pā,1 (causative),causative,imperfect,active,2,sg,apāyayaḥ OR apālayaḥ,apāyayaḥ
+pā,1 (causative),causative,imperfect,active,2,du,apāyayatam OR apālayatam,apāyayatam
+pā,1 (causative),causative,imperfect,active,3,sg,apāyayat OR apālayat,apāyayat
+pā,1 (causative),causative,imperfect,active,3,du,apāyayatām OR apālayatām,apāyayatām
+pā,1 (causative),causative,imperfect,active,3,pl,apāyayan OR apālayan,apāyayan
+pā,1 (causative),causative,imperfect,middle,1,sg,apāyaye OR apālaye,apāyaye
+pā,1 (causative),causative,imperfect,middle,1,du,apāyayāvahi OR apālayāvahi,apāyayāvahi
+pā,1 (causative),causative,imperfect,middle,1,pl,apāyayāmahi OR apālayāmahi,apāyayāmahi
+pā,1 (causative),causative,imperfect,middle,2,sg,apāyayathāḥ OR apālayathāḥ,apāyayathāḥ
+pā,1 (causative),causative,imperfect,middle,2,du,apāyayethām OR apālayethām,apāyayethām
+pā,1 (causative),causative,imperfect,middle,2,pl,apāyayadhvam OR apālayadhvam,apāyayadhvam
+pā,1 (causative),causative,imperfect,middle,3,sg,apāyayata OR apālayata,apāyayata
+pā,1 (causative),causative,imperfect,middle,3,du,apāyayetām OR apālayetām,apāyayetām
+pā,1 (causative),causative,imperfect,middle,3,pl,apāyayanta OR apālayanta,apāyayanta
+pā,1 (causative),causative,imperfect,passive,1,sg,apāyye OR apālye,apāyye
+pā,1 (causative),causative,imperfect,passive,1,du,apāyyāvahi OR apālyāvahi,apāyyāvahi
+pā,1 (causative),causative,imperfect,passive,1,pl,apāyyāmahi OR apālyāmahi,apāyyāmahi
+pā,1 (causative),causative,imperfect,passive,2,sg,apāyyathāḥ OR apālyathāḥ,apāyyathāḥ
+pā,1 (causative),causative,imperfect,passive,2,du,apāyyethām OR apālyethām,apāyyethām
+pā,1 (causative),causative,imperfect,passive,2,pl,apāyyadhvam OR apālyadhvam,apāyyadhvam
+pā,1 (causative),causative,imperfect,passive,3,sg,apāyyata OR apālyata,apāyyata
+pā,1 (causative),causative,imperfect,passive,3,du,apāyyetām OR apālyetām,apāyyetām
+pā,1 (causative),causative,imperfect,passive,3,pl,apāyyanta OR apālyanta,apāyyanta
+pā,1 (causative),causative,imperative,active,1,sg,pāyayāni OR pālayāni,pāyayāni
+pā,1 (causative),causative,imperative,active,1,du,pāyayāva OR pālayāva,pāyayāva
+pā,1 (causative),causative,imperative,active,1,pl,pāyayāma OR pālayāma,pāyayāma
+pā,1 (causative),causative,imperative,active,2,sg,pāyaya OR pālaya,pāyaya OR pāyayatāt
+pā,1 (causative),causative,imperative,active,2,du,pāyayatam OR pālayatam,pāyayatam
+pā,1 (causative),causative,imperative,active,2,pl,pāyayata OR pālayata,pāyayata
+pā,1 (causative),causative,imperative,active,3,sg,pāyayatu OR pālayatu,pāyayatu OR pāyayatāt
+pā,1 (causative),causative,imperative,active,3,pl,pāyayantu OR pālayantu,pāyayantu
+pā,1 (causative),causative,imperative,middle,1,sg,pāyayai OR pālayai,pāyayai
+pā,1 (causative),causative,imperative,middle,1,du,pāyayāvahai OR pālayāvahai,pāyayāvahai
+pā,1 (causative),causative,imperative,middle,1,pl,pāyayāmahai OR pālayāmahai,pāyayāmahai
+pā,1 (causative),causative,imperative,middle,2,sg,pāyayasva OR pālayasva,pāyayasva
+pā,1 (causative),causative,imperative,middle,2,du,pāyayethām OR pālayethām,pāyayethām
+pā,1 (causative),causative,imperative,middle,2,pl,pāyayadhvam OR pālayadhvam,pāyayadhvam
+pā,1 (causative),causative,imperative,middle,3,sg,pāyayatām OR pālayatām,pāyayatām
+pā,1 (causative),causative,imperative,middle,3,du,pāyayetām OR pālayetām,pāyayetām
+pā,1 (causative),causative,imperative,middle,3,pl,pāyayantām OR pālayantām,pāyayantām
+pā,1 (causative),causative,imperative,passive,1,sg,pāyyai OR pālyai,pāyyai
+pā,1 (causative),causative,imperative,passive,1,du,pāyyāvahai OR pālyāvahai,pāyyāvahai
+pā,1 (causative),causative,imperative,passive,1,pl,pāyyāmahai OR pālyāmahai,pāyyāmahai
+pā,1 (causative),causative,imperative,passive,2,sg,pāyyasva OR pālyasva,pāyyasva
+pā,1 (causative),causative,imperative,passive,2,du,pāyyethām OR pālyethām,pāyyethām
+pā,1 (causative),causative,imperative,passive,2,pl,pāyyadhvam OR pālyadhvam,pāyyadhvam
+pā,1 (causative),causative,imperative,passive,3,sg,pāyyatām OR pālyatām,pāyyatām
+pā,1 (causative),causative,imperative,passive,3,du,pāyyetām OR pālyetām,pāyyetām
+pā,1 (causative),causative,imperative,passive,3,pl,pāyyantām OR pālyantām,pāyyantām
+pā,1 (causative),causative,optative,active,1,sg,pāyayeyam OR pālayeyam,pāyayeyam
+pā,1 (causative),causative,optative,active,1,du,pāyayeva OR pālayeva,pāyayeva
+pā,1 (causative),causative,optative,active,1,pl,pāyayema OR pālayema,pāyayema
+pā,1 (causative),causative,optative,active,2,sg,pāyayeḥ OR pālayeḥ,pāyayeḥ
+pā,1 (causative),causative,optative,active,2,du,pāyayetam OR pālayetam,pāyayetam
+pā,1 (causative),causative,optative,active,3,sg,pāyayet OR pālayet,pāyayet
+pā,1 (causative),causative,optative,active,3,pl,pāyayeyuḥ OR pālayeyuḥ,pāyayeyuḥ
+pā,1 (causative),causative,optative,middle,1,sg,pāyayeya OR pālayeya,pāyayeya
+pā,1 (causative),causative,optative,middle,1,du,pāyayevahi OR pālayevahi,pāyayevahi
+pā,1 (causative),causative,optative,middle,1,pl,pāyayemahi OR pālayemahi,pāyayemahi
+pā,1 (causative),causative,optative,middle,2,sg,pāyayethāḥ OR pālayethāḥ,pāyayethāḥ
+pā,1 (causative),causative,optative,middle,2,du,pāyayeyāthām OR pālayeyāthām,pāyayeyāthām
+pā,1 (causative),causative,optative,middle,2,pl,pāyayedhvam OR pālayedhvam,pāyayedhvam
+pā,1 (causative),causative,optative,middle,3,sg,pāyayeta OR pālayeta,pāyayeta
+pā,1 (causative),causative,optative,middle,3,du,pāyayeyātām OR pālayeyātām,pāyayeyātām
+pā,1 (causative),causative,optative,middle,3,pl,pāyayeran OR pālayeran,pāyayeran
+pā,1 (causative),causative,optative,passive,1,sg,pāyyeya OR pālyeya,pāyyeya
+pā,1 (causative),causative,optative,passive,1,du,pāyyevahi OR pālyevahi,pāyyevahi
+pā,1 (causative),causative,optative,passive,1,pl,pāyyemahi OR pālyemahi,pāyyemahi
+pā,1 (causative),causative,optative,passive,2,sg,pāyyethāḥ OR pālyethāḥ,pāyyethāḥ
+pā,1 (causative),causative,optative,passive,2,du,pāyyeyāthām OR pālyeyāthām,pāyyeyāthām
+pā,1 (causative),causative,optative,passive,2,pl,pāyyedhvam OR pālyedhvam,pāyyedhvam
+pā,1 (causative),causative,optative,passive,3,sg,pāyyeta OR pālyeta,pāyyeta
+pā,1 (causative),causative,optative,passive,3,du,pāyyeyātām OR pālyeyātām,pāyyeyātām
+pā,1 (causative),causative,optative,passive,3,pl,pāyyeran OR pālyeran,pāyyeran
+pā,1 (causative),causative,future,active,1,sg,pāyayiṣyāmi OR pālayiṣyāmi,pāyayiṣyāmi
+pā,1 (causative),causative,future,active,1,du,pāyayiṣyāvaḥ OR pālayiṣyāvaḥ,pāyayiṣyāvaḥ
+pā,1 (causative),causative,future,active,1,pl,pāyayiṣyāmaḥ OR pālayiṣyāmaḥ,pāyayiṣyāmaḥ
+pā,1 (causative),causative,future,active,2,sg,pāyayiṣyasi OR pālayiṣyasi,pāyayiṣyasi
+pā,1 (causative),causative,future,active,2,du,pāyayiṣyathaḥ OR pālayiṣyathaḥ,pāyayiṣyathaḥ
+pā,1 (causative),causative,future,active,2,pl,pāyayiṣyatha OR pālayiṣyatha,pāyayiṣyatha
+pā,1 (causative),causative,future,active,3,sg,pāyayiṣyati OR pālayiṣyati,pāyayiṣyati
+pā,1 (causative),causative,future,active,3,du,pāyayiṣyataḥ OR pālayiṣyataḥ,pāyayiṣyataḥ
+pā,1 (causative),causative,future,active,3,pl,pāyayiṣyanti OR pālayiṣyanti,pāyayiṣyanti
+pā,1 (causative),causative,future,middle,1,sg,pāyayiṣye OR pālayiṣye,pāyayiṣye
+pā,1 (causative),causative,future,middle,1,du,pāyayiṣyāvahe OR pālayiṣyāvahe,pāyayiṣyāvahe
+pā,1 (causative),causative,future,middle,1,pl,pāyayiṣyāmahe OR pālayiṣyāmahe,pāyayiṣyāmahe
+pā,1 (causative),causative,future,middle,2,sg,pāyayiṣyase OR pālayiṣyase,pāyayiṣyase
+pā,1 (causative),causative,future,middle,2,du,pāyayiṣyethe OR pālayiṣyethe,pāyayiṣyethe
+pā,1 (causative),causative,future,middle,2,pl,pāyayiṣyadhve OR pālayiṣyadhve,pāyayiṣyadhve
+pā,1 (causative),causative,future,middle,3,sg,pāyayiṣyate OR pālayiṣyate,pāyayiṣyate
+pā,1 (causative),causative,future,middle,3,du,pāyayiṣyete OR pālayiṣyete,pāyayiṣyete
+pā,1 (causative),causative,future,middle,3,pl,pāyayiṣyante OR pālayiṣyante,pāyayiṣyante
+pā,1 (causative),causative,periphrastic_future,active,1,sg,pāyayitāsmi OR pālayitāsmi,pāyayitāsmi
+pā,1 (causative),causative,periphrastic_future,active,1,du,pāyayitāsvaḥ OR pālayitāsvaḥ,pāyayitāsvaḥ
+pā,1 (causative),causative,periphrastic_future,active,1,pl,pāyayitāsmaḥ OR pālayitāsmaḥ,pāyayitāsmaḥ
+pā,1 (causative),causative,periphrastic_future,active,2,sg,pāyayitāsi OR pālayitāsi,pāyayitāsi
+pā,1 (causative),causative,periphrastic_future,active,2,du,pāyayitāsthaḥ OR pālayitāsthaḥ,pāyayitāsthaḥ
+pā,1 (causative),causative,periphrastic_future,active,2,pl,pāyayitāstha OR pālayitāstha,pāyayitāstha
+pā,1 (causative),causative,periphrastic_future,active,3,sg,pāyayitā OR pālayitā,pāyayitā
+pā,1 (causative),causative,periphrastic_future,active,3,du,pāyayitārau OR pālayitārau,pāyayitārau
+pā,1 (causative),causative,periphrastic_future,active,3,pl,pāyayitāraḥ OR pālayitāraḥ,pāyayitāraḥ
+pā,1 (intensive),intensive,present,middle,1,sg,pāpāye OR pepīpye,pepīpye
+pā,1 (intensive),intensive,present,middle,1,du,pāpāyāvahe OR pepīpyāvahe,pepīpyāvahe
+pā,1 (intensive),intensive,present,middle,1,pl,pāpāyāmahe OR pepīpyāmahe,pepīpyāmahe
+pā,1 (intensive),intensive,present,middle,2,sg,pāpāyase OR pepīpyase,pepīpyase
+pā,1 (intensive),intensive,present,middle,2,du,pāpāyethe OR pepīpyethe,pepīpyethe
+pā,1 (intensive),intensive,present,middle,2,pl,pāpāyadhve OR pepīpyadhve,pepīpyadhve
+pā,1 (intensive),intensive,present,middle,3,sg,pāpāyate OR pepīpyate,pepīpyate
+pā,1 (intensive),intensive,present,middle,3,du,pāpāyete OR pepīpyete,pepīpyete
+pā,1 (intensive),intensive,present,middle,3,pl,pāpāyante OR pepīpyante,pepīpyante
+pā,1 (intensive),intensive,imperfect,middle,1,sg,apāpāye OR apepīpye,apepīpye
+pā,1 (intensive),intensive,imperfect,middle,1,du,apāpāyāvahi OR apepīpyāvahi,apepīpyāvahi
+pā,1 (intensive),intensive,imperfect,middle,1,pl,apāpāyāmahi OR apepīpyāmahi,apepīpyāmahi
+pā,1 (intensive),intensive,imperfect,middle,2,sg,apāpāyathāḥ OR apepīpyathāḥ,apepīpyathāḥ
+pā,1 (intensive),intensive,imperfect,middle,2,du,apāpāyethām OR apepīpyethām,apepīpyethām
+pā,1 (intensive),intensive,imperfect,middle,2,pl,apāpāyadhvam OR apepīpyadhvam,apepīpyadhvam
+pā,1 (intensive),intensive,imperfect,middle,3,sg,apāpāyata OR apepīpyata,apepīpyata
+pā,1 (intensive),intensive,imperfect,middle,3,du,apāpāyetām OR apepīpyetām,apepīpyetām
+pā,1 (intensive),intensive,imperfect,middle,3,pl,apāpāyanta OR apepīpyanta,apepīpyanta
+pā,1 (intensive),intensive,imperative,middle,1,sg,pāpāyai OR pepīpyai,pepīpyai
+pā,1 (intensive),intensive,imperative,middle,1,du,pāpāyāvahai OR pepīpyāvahai,pepīpyāvahai
+pā,1 (intensive),intensive,imperative,middle,1,pl,pāpāyāmahai OR pepīpyāmahai,pepīpyāmahai
+pā,1 (intensive),intensive,imperative,middle,2,sg,pāpāyasva OR pepīpyasva,pepīpyasva
+pā,1 (intensive),intensive,imperative,middle,2,du,pāpāyethām OR pepīpyethām,pepīpyethām
+pā,1 (intensive),intensive,imperative,middle,2,pl,pāpāyadhvam OR pepīpyadhvam,pepīpyadhvam
+pā,1 (intensive),intensive,imperative,middle,3,sg,pāpāyatām OR pepīpyatām,pepīpyatām
+pā,1 (intensive),intensive,imperative,middle,3,du,pāpāyetām OR pepīpyetām,pepīpyetām
+pā,1 (intensive),intensive,imperative,middle,3,pl,pāpāyantām OR pepīpyantām,pepīpyantām
+pā,1 (intensive),intensive,optative,middle,1,sg,pāpāyeya OR pepīpyeya,pepīpyeya
+pā,1 (intensive),intensive,optative,middle,1,du,pāpāyevahi OR pepīpyevahi,pepīpyevahi
+pā,1 (intensive),intensive,optative,middle,1,pl,pāpāyemahi OR pepīpyemahi,pepīpyemahi
+pā,1 (intensive),intensive,optative,middle,2,sg,pāpāyethāḥ OR pepīpyethāḥ,pepīpyethāḥ
+pā,1 (intensive),intensive,optative,middle,2,du,pāpāyeyāthām OR pepīpyeyāthām,pepīpyeyāthām
+pā,1 (intensive),intensive,optative,middle,2,pl,pāpāyedhvam OR pepīpyedhvam,pepīpyedhvam
+pā,1 (intensive),intensive,optative,middle,3,sg,pāpāyeta OR pepīpyeta,pepīpyeta
+pā,1 (intensive),intensive,optative,middle,3,du,pāpāyeyātām OR pepīpyeyātām,pepīpyeyātām
+pā,1 (intensive),intensive,optative,middle,3,pl,pāpāyeran OR pepīpyeran,pepīpyeran
+nī,1 (primary),primary,future,active,1,sg,nayiṣyāmi OR neṣyāmi,neṣyāmi
+nī,1 (primary),primary,future,active,1,du,nayiṣyāvaḥ OR neṣyāvaḥ,neṣyāvaḥ
+nī,1 (primary),primary,future,active,1,pl,nayiṣyāmaḥ OR neṣyāmaḥ,neṣyāmaḥ
+nī,1 (primary),primary,future,active,2,sg,nayiṣyasi OR neṣyasi,neṣyasi
+nī,1 (primary),primary,future,active,2,du,nayiṣyathaḥ OR neṣyathaḥ,neṣyathaḥ
+nī,1 (primary),primary,future,active,2,pl,nayiṣyatha OR neṣyatha,neṣyatha
+nī,1 (primary),primary,future,active,3,sg,nayiṣyati OR neṣyati,neṣyati
+nī,1 (primary),primary,future,active,3,du,nayiṣyataḥ OR neṣyataḥ,neṣyataḥ
+nī,1 (primary),primary,future,active,3,pl,nayiṣyanti OR neṣyanti,neṣyanti
+nī,1 (primary),primary,future,middle,1,sg,nayiṣye OR neṣye,neṣye
+nī,1 (primary),primary,future,middle,1,du,nayiṣyāvahe OR neṣyāvahe,neṣyāvahe
+nī,1 (primary),primary,future,middle,1,pl,nayiṣyāmahe OR neṣyāmahe,neṣyāmahe
+nī,1 (primary),primary,future,middle,2,sg,nayiṣyase OR neṣyase,neṣyase
+nī,1 (primary),primary,future,middle,2,du,nayiṣyethe OR neṣyethe,neṣyethe
+nī,1 (primary),primary,future,middle,2,pl,nayiṣyadhve OR neṣyadhve,neṣyadhve
+nī,1 (primary),primary,future,middle,3,sg,nayiṣyate OR neṣyate,neṣyate
+nī,1 (primary),primary,future,middle,3,du,nayiṣyete OR neṣyete,neṣyete
+nī,1 (primary),primary,future,middle,3,pl,nayiṣyante OR neṣyante,neṣyante
+nī,1 (primary),primary,perfect,active,2,sg,ninayitha OR ninetha,ninayitha
+nī,1 (primary),primary,periphrastic_future,active,1,sg,nayitāsmi OR netāsmi,netāsmi
+nī,1 (primary),primary,periphrastic_future,active,1,du,nayitāsvaḥ OR netāsvaḥ,netāsvaḥ
+nī,1 (primary),primary,periphrastic_future,active,1,pl,nayitāsmaḥ OR netāsmaḥ,netāsmaḥ
+nī,1 (primary),primary,periphrastic_future,active,2,sg,nayitāsi OR netāsi,netāsi
+nī,1 (primary),primary,periphrastic_future,active,2,du,nayitāsthaḥ OR netāsthaḥ,netāsthaḥ
+nī,1 (primary),primary,periphrastic_future,active,2,pl,nayitāstha OR netāstha,netāstha
+nī,1 (primary),primary,periphrastic_future,active,3,sg,nayitā OR netā,netā
+nī,1 (primary),primary,periphrastic_future,active,3,du,nayitārau OR netārau,netārau
+nī,1 (primary),primary,periphrastic_future,active,3,pl,nayitāraḥ OR netāraḥ,netāraḥ
+śru,5 (primary),primary,present,active,1,du,śṛṇuvaḥ OR śṛṇvaḥ,śṛṇuvaḥ
+śru,5 (primary),primary,present,active,1,pl,śṛṇumaḥ OR śṛṇmaḥ,śṛṇumaḥ
+śru,5 (primary),primary,imperfect,active,1,du,aśṛṇuva OR aśṛṇva,aśṛṇuva
+śru,5 (primary),primary,imperfect,active,1,pl,aśṛṇuma OR aśṛṇma,aśṛṇuma
+śru,5 (primary),primary,imperative,active,2,sg,śṛṇu OR śrudhi,śṛṇu OR śṛṇutāt
+śru,5 (primary),primary,aorist,active,1,sg,aśuśruvam OR aśravam OR aśrauṣam,aśrauṣam
+śru,5 (primary),primary,aorist,active,1,du,aśuśruvāva OR aśravāva OR aśrauṣva,aśrauṣva
+śru,5 (primary),primary,aorist,active,1,pl,aśuśruvāma OR aśravāma OR aśrauṣma,aśrauṣma
+śru,5 (primary),primary,aorist,active,2,sg,aśuśruvaḥ OR aśravaḥ OR aśrauṣīḥ,aśrauṣīḥ
+śru,5 (primary),primary,aorist,active,2,du,aśuśruvatam OR aśravatam OR aśrauṣṭam,aśrauṣṭam
+śru,5 (primary),primary,aorist,active,2,pl,aśravata OR aśrauṣṭa,aśrauṣṭa
+śru,5 (primary),primary,aorist,active,3,sg,aśuśruvat OR aśravat OR aśrauṣīt,aśrauṣīt
+śru,5 (primary),primary,aorist,active,3,du,aśuśruvatām OR aśravatām OR aśrauṣṭām,aśrauṣṭām
+śru,5 (primary),primary,aorist,active,3,pl,aśuśruvan OR aśravan OR aśrauṣuḥ,aśrauṣuḥ
+śru,5 (primary),primary,aorist,middle,1,sg,aśuśruve OR aśroṣi,aśroṣi
+śru,5 (primary),primary,aorist,middle,1,du,aśuśruvāvahi OR aśroṣvahi,aśroṣvahi
+śru,5 (primary),primary,aorist,middle,1,pl,aśuśruvāmahi OR aśroṣmahi,aśroṣmahi
+śru,5 (primary),primary,aorist,middle,2,sg,aśuśruvathāḥ OR aśroṣṭhāḥ,aśroṣṭhāḥ
+śru,5 (primary),primary,aorist,middle,2,du,aśuśruvethām OR aśroṣāthām,aśroṣāthām
+śru,5 (primary),primary,aorist,middle,2,pl,aśuśruvadhvam OR aśroḍhvam,aśroḍhvam
+śru,5 (primary),primary,aorist,middle,3,sg,aśuśruvata OR aśroṣṭa,aśroṣṭa
+śru,5 (primary),primary,aorist,middle,3,du,aśuśruvetām OR aśroṣātām,aśroṣātām
+śru,5 (primary),primary,aorist,middle,3,pl,aśuśruvanta OR aśroṣata,aśroṣata
+dā,3 (primary),primary,perfect,active,2,sg,dadātha OR daditha,daditha
+dā,3 (primary),primary,aorist,active,1,sg,adām OR adāsam OR adīdadam,adām
+dā,3 (primary),primary,aorist,active,1,du,adāva OR adāsva OR adīdadāva,adāva
+dā,3 (primary),primary,aorist,active,1,pl,adāma OR adāsma OR adīdadāma,adāma
+dā,3 (primary),primary,aorist,active,2,sg,adāḥ OR adāsīḥ OR adīdadaḥ,adāḥ
+dā,3 (primary),primary,aorist,active,2,du,adātam OR adāstam OR adīdadatam,adātam
+dā,3 (primary),primary,aorist,active,2,pl,adāta OR adāsta,adāta
+dā,3 (primary),primary,aorist,active,3,sg,adāt OR adāsīt OR adīdadat,adāt
+dā,3 (primary),primary,aorist,active,3,du,adātām OR adāstām OR adīdadatām,adātām
+dā,3 (primary),primary,aorist,active,3,pl,adāsuḥ OR adīdadan OR aduḥ,adoḥ OR aduḥ
+dā,3 (primary),primary,aorist,middle,1,sg,adiṣi OR adīdade,adiṣi
+dā,3 (primary),primary,aorist,middle,1,du,adiṣvahi OR adīdadāvahi,adiṣvahi
+dā,3 (primary),primary,aorist,middle,1,pl,adiṣmahi OR adīdadāmahi,adiṣmahi
+dā,3 (primary),primary,aorist,middle,2,sg,adiṣṭhāḥ OR adīdadathāḥ,adiṣṭhāḥ
+dā,3 (primary),primary,aorist,middle,2,du,adiṣāthām OR adīdadethām,adiṣāthām
+dā,3 (primary),primary,aorist,middle,2,pl,adiḍhvam OR adīdadadhvam,adiḍhvam
+dā,3 (primary),primary,aorist,middle,3,sg,adiṣṭa OR adīdadata,adiṣṭa
+dā,3 (primary),primary,aorist,middle,3,du,adiṣātām OR adīdadetām,adiṣātām
+dā,3 (primary),primary,aorist,middle,3,pl,adiṣata OR adīdadanta,adiṣata
+sthā,1 (primary),primary,perfect,active,2,sg,tasthātha OR tasthitha,tasthitha
+vṛ,9 (primary),primary,future,active,1,sg,variṣyāmi OR varīṣyāmi,variṣyāmi OR varīṣyāmi
+vṛ,9 (primary),primary,future,active,1,du,variṣyāvaḥ OR varīṣyāvaḥ,variṣyāvaḥ OR varīṣyāvaḥ
+vṛ,9 (primary),primary,future,active,1,pl,variṣyāmaḥ OR varīṣyāmaḥ,variṣyāmaḥ OR varīṣyāmaḥ
+vṛ,9 (primary),primary,future,active,2,sg,variṣyasi OR varīṣyasi,variṣyasi OR varīṣyasi
+vṛ,9 (primary),primary,future,active,2,du,variṣyathaḥ OR varīṣyathaḥ,variṣyathaḥ OR varīṣyathaḥ
+vṛ,9 (primary),primary,future,active,2,pl,variṣyatha OR varīṣyatha,variṣyatha OR varīṣyatha
+vṛ,9 (primary),primary,future,active,3,sg,variṣyati OR varīṣyati,variṣyati OR varīṣyati
+vṛ,9 (primary),primary,future,active,3,du,variṣyataḥ OR varīṣyataḥ,variṣyataḥ OR varīṣyataḥ
+vṛ,9 (primary),primary,future,active,3,pl,variṣyanti OR varīṣyanti,variṣyanti OR varīṣyanti
+vṛ,9 (primary),primary,future,middle,1,sg,variṣye OR varīṣye,variṣye OR varīṣye
+vṛ,9 (primary),primary,future,middle,1,du,variṣyāvahe OR varīṣyāvahe,variṣyāvahe OR varīṣyāvahe
+vṛ,9 (primary),primary,future,middle,1,pl,variṣyāmahe OR varīṣyāmahe,variṣyāmahe OR varīṣyāmahe
+vṛ,9 (primary),primary,future,middle,2,sg,variṣyase OR varīṣyase,variṣyase OR varīṣyase
+vṛ,9 (primary),primary,future,middle,2,du,variṣyethe OR varīṣyethe,variṣyethe OR varīṣyethe
+vṛ,9 (primary),primary,future,middle,2,pl,variṣyadhve OR varīṣyadhve,variṣyadhve OR varīṣyadhve
+vṛ,9 (primary),primary,future,middle,3,sg,variṣyate OR varīṣyate,variṣyate OR varīṣyate
+vṛ,9 (primary),primary,future,middle,3,du,variṣyete OR varīṣyete,variṣyete OR varīṣyete
+vṛ,9 (primary),primary,future,middle,3,pl,variṣyante OR varīṣyante,variṣyante OR varīṣyante
+vṛ,9 (primary),primary,perfect,active,2,sg,vavaritha OR vavartha,vavaritha
+vṛ,9 (primary),primary,periphrastic_future,active,1,sg,varitāsmi OR varītāsmi,varitāsmi OR varītāsmi
+vṛ,9 (primary),primary,periphrastic_future,active,1,du,varitāsvaḥ OR varītāsvaḥ,varitāsvaḥ OR varītāsvaḥ
+vṛ,9 (primary),primary,periphrastic_future,active,1,pl,varitāsmaḥ OR varītāsmaḥ,varitāsmaḥ OR varītāsmaḥ
+vṛ,9 (primary),primary,periphrastic_future,active,2,sg,varitāsi OR varītāsi,varitāsi OR varītāsi
+vṛ,9 (primary),primary,periphrastic_future,active,2,du,varitāsthaḥ OR varītāsthaḥ,varitāsthaḥ OR varītāsthaḥ
+vṛ,9 (primary),primary,periphrastic_future,active,2,pl,varitāstha OR varītāstha,varitāstha OR varītāstha
+vṛ,9 (primary),primary,periphrastic_future,active,3,sg,varitā OR varītā,varitā OR varītā
+vṛ,9 (primary),primary,periphrastic_future,active,3,du,varitārau OR varītārau,varitārau OR varītārau
+vṛ,9 (primary),primary,periphrastic_future,active,3,pl,varitāraḥ OR varītāraḥ,varitāraḥ OR varītāraḥ
+vṛ,9 (primary),primary,aorist,active,1,sg,avāriṣam OR avārṣam OR avīvaram,avāriṣam
+vṛ,9 (primary),primary,aorist,active,1,du,avāriṣva OR avārṣva OR avīvarāva,avāriṣva
+vṛ,9 (primary),primary,aorist,active,1,pl,avāriṣma OR avārṣma OR avīvarāma,avāriṣma
+vṛ,9 (primary),primary,aorist,active,2,sg,avārīḥ OR avārṣīḥ OR avīvaraḥ,avārīḥ
+vṛ,9 (primary),primary,aorist,active,2,du,avāriṣṭam OR avārṣṭam OR avīvaratam,avāriṣṭam
+vṛ,9 (primary),primary,aorist,active,2,pl,avāriṣṭa OR avārṣṭa,avāriṣṭa
+vṛ,9 (primary),primary,aorist,active,3,sg,avārīt OR avārṣīt OR avīvarat,avārīt
+vṛ,9 (primary),primary,aorist,active,3,du,avāriṣṭām OR avārṣṭām OR avīvaratām,avāriṣṭām
+vṛ,9 (primary),primary,aorist,active,3,pl,avāriṣuḥ OR avārṣuḥ OR avīvaran,avāriṣuḥ
+vṛ,9 (primary),primary,aorist,middle,1,sg,avariṣi OR avīvare OR avṛṣi,avariṣi
+vṛ,9 (primary),primary,aorist,middle,1,du,avariṣvahi OR avīvarāvahi OR avṛṣvahi,avariṣvahi
+vṛ,9 (primary),primary,aorist,middle,1,pl,avariṣmahi OR avīvarāmahi OR avṛṣmahi,avariṣmahi
+vṛ,9 (primary),primary,aorist,middle,2,sg,avariṣṭhāḥ OR avīvarathāḥ OR avṛṣṭhāḥ,avariṣṭhāḥ
+vṛ,9 (primary),primary,aorist,middle,2,du,avariṣāthām OR avīvarethām OR avṛṣāthām,avariṣāthām
+vṛ,9 (primary),primary,aorist,middle,2,pl,avaridhvam OR avīvaradhvam OR avṛḍhvam,avaridhvam
+vṛ,9 (primary),primary,aorist,middle,3,sg,avariṣṭa OR avīvarata OR avṛṣṭa,avariṣṭa
+vṛ,9 (primary),primary,aorist,middle,3,du,avariṣātām OR avīvaretām OR avṛṣātām,avariṣātām
+vṛ,9 (primary),primary,aorist,middle,3,pl,avariṣata OR avīvaranta OR avṛṣata,avariṣata
+vṛ,9 (causative),causative,present,active,1,sg,varayāmi OR vārayāmi,vārayāmi
+vṛ,9 (causative),causative,present,active,1,du,varayāvaḥ OR vārayāvaḥ,vārayāvaḥ
+vṛ,9 (causative),causative,present,active,1,pl,varayāmaḥ OR vārayāmaḥ,vārayāmaḥ
+vṛ,9 (causative),causative,present,active,2,sg,varayasi OR vārayasi,vārayasi
+vṛ,9 (causative),causative,present,active,2,du,varayathaḥ OR vārayathaḥ,vārayathaḥ
+vṛ,9 (causative),causative,present,active,2,pl,varayatha OR vārayatha,vārayatha
+vṛ,9 (causative),causative,present,active,3,sg,varayati OR vārayati,vārayati
+vṛ,9 (causative),causative,present,active,3,du,varayataḥ OR vārayataḥ,vārayataḥ
+vṛ,9 (causative),causative,present,active,3,pl,varayanti OR vārayanti,vārayanti
+vṛ,9 (causative),causative,present,middle,1,sg,varaye OR vāraye,vāraye
+vṛ,9 (causative),causative,present,middle,1,du,varayāvahe OR vārayāvahe,vārayāvahe
+vṛ,9 (causative),causative,present,middle,1,pl,varayāmahe OR vārayāmahe,vārayāmahe
+vṛ,9 (causative),causative,present,middle,2,sg,varayase OR vārayase,vārayase
+vṛ,9 (causative),causative,present,middle,2,du,varayethe OR vārayethe,vārayethe
+vṛ,9 (causative),causative,present,middle,2,pl,varayadhve OR vārayadhve,vārayadhve
+vṛ,9 (causative),causative,present,middle,3,sg,varayate OR vārayate,vārayate
+vṛ,9 (causative),causative,present,middle,3,du,varayete OR vārayete,vārayete
+vṛ,9 (causative),causative,present,middle,3,pl,varayante OR vārayante,vārayante
+vṛ,9 (causative),causative,present,passive,1,sg,varye OR vārye,vārye
+vṛ,9 (causative),causative,present,passive,1,du,varyāvahe OR vāryāvahe,vāryāvahe
+vṛ,9 (causative),causative,present,passive,1,pl,varyāmahe OR vāryāmahe,vāryāmahe
+vṛ,9 (causative),causative,present,passive,2,sg,varyase OR vāryase,vāryase
+vṛ,9 (causative),causative,present,passive,2,du,varyethe OR vāryethe,vāryethe
+vṛ,9 (causative),causative,present,passive,2,pl,varyadhve OR vāryadhve,vāryadhve
+vṛ,9 (causative),causative,present,passive,3,sg,varyate OR vāryate,vāryate
+vṛ,9 (causative),causative,present,passive,3,du,varyete OR vāryete,vāryete
+vṛ,9 (causative),causative,present,passive,3,pl,varyante OR vāryante,vāryante
+vṛ,9 (causative),causative,imperfect,active,1,sg,avarayam OR avārayam,avārayam
+vṛ,9 (causative),causative,imperfect,active,1,du,avarayāva OR avārayāva,avārayāva
+vṛ,9 (causative),causative,imperfect,active,1,pl,avarayāma OR avārayāma,avārayāma
+vṛ,9 (causative),causative,imperfect,active,2,sg,avarayaḥ OR avārayaḥ,avārayaḥ
+vṛ,9 (causative),causative,imperfect,active,2,du,avarayatam OR avārayatam,avārayatam
+vṛ,9 (causative),causative,imperfect,active,3,sg,avarayat OR avārayat,avārayat
+vṛ,9 (causative),causative,imperfect,active,3,du,avarayatām OR avārayatām,avārayatām
+vṛ,9 (causative),causative,imperfect,active,3,pl,avarayan OR avārayan,avārayan
+vṛ,9 (causative),causative,imperfect,middle,1,sg,avaraye OR avāraye,avāraye
+vṛ,9 (causative),causative,imperfect,middle,1,du,avarayāvahi OR avārayāvahi,avārayāvahi
+vṛ,9 (causative),causative,imperfect,middle,1,pl,avarayāmahi OR avārayāmahi,avārayāmahi
+vṛ,9 (causative),causative,imperfect,middle,2,sg,avarayathāḥ OR avārayathāḥ,avārayathāḥ
+vṛ,9 (causative),causative,imperfect,middle,2,du,avarayethām OR avārayethām,avārayethām
+vṛ,9 (causative),causative,imperfect,middle,2,pl,avarayadhvam OR avārayadhvam,avārayadhvam
+vṛ,9 (causative),causative,imperfect,middle,3,sg,avarayata OR avārayata,avārayata
+vṛ,9 (causative),causative,imperfect,middle,3,du,avarayetām OR avārayetām,avārayetām
+vṛ,9 (causative),causative,imperfect,middle,3,pl,avarayanta OR avārayanta,avārayanta
+vṛ,9 (causative),causative,imperfect,passive,1,sg,avarye OR avārye,avārye
+vṛ,9 (causative),causative,imperfect,passive,1,du,avaryāvahi OR avāryāvahi,avāryāvahi
+vṛ,9 (causative),causative,imperfect,passive,1,pl,avaryāmahi OR avāryāmahi,avāryāmahi
+vṛ,9 (causative),causative,imperfect,passive,2,sg,avaryathāḥ OR avāryathāḥ,avāryathāḥ
+vṛ,9 (causative),causative,imperfect,passive,2,du,avaryethām OR avāryethām,avāryethām
+vṛ,9 (causative),causative,imperfect,passive,2,pl,avaryadhvam OR avāryadhvam,avāryadhvam
+vṛ,9 (causative),causative,imperfect,passive,3,sg,avaryata OR avāryata,avāryata
+vṛ,9 (causative),causative,imperfect,passive,3,du,avaryetām OR avāryetām,avāryetām
+vṛ,9 (causative),causative,imperfect,passive,3,pl,avaryanta OR avāryanta,avāryanta
+vṛ,9 (causative),causative,imperative,active,1,sg,varayāṇi OR vārayāṇi,vārayāṇi
+vṛ,9 (causative),causative,imperative,active,1,du,varayāva OR vārayāva,vārayāva
+vṛ,9 (causative),causative,imperative,active,1,pl,varayāma OR vārayāma,vārayāma
+vṛ,9 (causative),causative,imperative,active,2,sg,varaya OR vāraya,vāraya OR vārayatāt
+vṛ,9 (causative),causative,imperative,active,2,du,varayatam OR vārayatam,vārayatam
+vṛ,9 (causative),causative,imperative,active,2,pl,varayata OR vārayata,vārayata
+vṛ,9 (causative),causative,imperative,active,3,sg,varayatu OR vārayatu,vārayatu OR vārayatāt
+vṛ,9 (causative),causative,imperative,active,3,pl,varayantu OR vārayantu,vārayantu
+vṛ,9 (causative),causative,imperative,middle,1,sg,varayai OR vārayai,vārayai
+vṛ,9 (causative),causative,imperative,middle,1,du,varayāvahai OR vārayāvahai,vārayāvahai
+vṛ,9 (causative),causative,imperative,middle,1,pl,varayāmahai OR vārayāmahai,vārayāmahai
+vṛ,9 (causative),causative,imperative,middle,2,sg,varayasva OR vārayasva,vārayasva
+vṛ,9 (causative),causative,imperative,middle,2,du,varayethām OR vārayethām,vārayethām
+vṛ,9 (causative),causative,imperative,middle,2,pl,varayadhvam OR vārayadhvam,vārayadhvam
+vṛ,9 (causative),causative,imperative,middle,3,sg,varayatām OR vārayatām,vārayatām
+vṛ,9 (causative),causative,imperative,middle,3,du,varayetām OR vārayetām,vārayetām
+vṛ,9 (causative),causative,imperative,middle,3,pl,varayantām OR vārayantām,vārayantām
+vṛ,9 (causative),causative,imperative,passive,1,sg,varyai OR vāryai,vāryai
+vṛ,9 (causative),causative,imperative,passive,1,du,varyāvahai OR vāryāvahai,vāryāvahai
+vṛ,9 (causative),causative,imperative,passive,1,pl,varyāmahai OR vāryāmahai,vāryāmahai
+vṛ,9 (causative),causative,imperative,passive,2,sg,varyasva OR vāryasva,vāryasva
+vṛ,9 (causative),causative,imperative,passive,2,du,varyethām OR vāryethām,vāryethām
+vṛ,9 (causative),causative,imperative,passive,2,pl,varyadhvam OR vāryadhvam,vāryadhvam
+vṛ,9 (causative),causative,imperative,passive,3,sg,varyatām OR vāryatām,vāryatām
+vṛ,9 (causative),causative,imperative,passive,3,du,varyetām OR vāryetām,vāryetām
+vṛ,9 (causative),causative,imperative,passive,3,pl,varyantām OR vāryantām,vāryantām
+vṛ,9 (causative),causative,optative,active,1,sg,varayeyam OR vārayeyam,vārayeyam
+vṛ,9 (causative),causative,optative,active,1,du,varayeva OR vārayeva,vārayeva
+vṛ,9 (causative),causative,optative,active,1,pl,varayema OR vārayema,vārayema
+vṛ,9 (causative),causative,optative,active,2,sg,varayeḥ OR vārayeḥ,vārayeḥ
+vṛ,9 (causative),causative,optative,active,2,du,varayetam OR vārayetam,vārayetam
+vṛ,9 (causative),causative,optative,active,3,sg,varayet OR vārayet,vārayet
+vṛ,9 (causative),causative,optative,active,3,pl,varayeyuḥ OR vārayeyuḥ,vārayeyuḥ
+vṛ,9 (causative),causative,optative,middle,1,sg,varayeya OR vārayeya,vārayeya
+vṛ,9 (causative),causative,optative,middle,1,du,varayevahi OR vārayevahi,vārayevahi
+vṛ,9 (causative),causative,optative,middle,1,pl,varayemahi OR vārayemahi,vārayemahi
+vṛ,9 (causative),causative,optative,middle,2,sg,varayethāḥ OR vārayethāḥ,vārayethāḥ
+vṛ,9 (causative),causative,optative,middle,2,du,varayeyāthām OR vārayeyāthām,vārayeyāthām
+vṛ,9 (causative),causative,optative,middle,2,pl,varayedhvam OR vārayedhvam,vārayedhvam
+vṛ,9 (causative),causative,optative,middle,3,sg,varayeta OR vārayeta,vārayeta
+vṛ,9 (causative),causative,optative,middle,3,du,varayeyātām OR vārayeyātām,vārayeyātām
+vṛ,9 (causative),causative,optative,middle,3,pl,varayeran OR vārayeran,vārayeran
+vṛ,9 (causative),causative,optative,passive,1,sg,varyeya OR vāryeya,vāryeya
+vṛ,9 (causative),causative,optative,passive,1,du,varyevahi OR vāryevahi,vāryevahi
+vṛ,9 (causative),causative,optative,passive,1,pl,varyemahi OR vāryemahi,vāryemahi
+vṛ,9 (causative),causative,optative,passive,2,sg,varyethāḥ OR vāryethāḥ,vāryethāḥ
+vṛ,9 (causative),causative,optative,passive,2,du,varyeyāthām OR vāryeyāthām,vāryeyāthām
+vṛ,9 (causative),causative,optative,passive,2,pl,varyedhvam OR vāryedhvam,vāryedhvam
+vṛ,9 (causative),causative,optative,passive,3,sg,varyeta OR vāryeta,vāryeta
+vṛ,9 (causative),causative,optative,passive,3,du,varyeyātām OR vāryeyātām,vāryeyātām
+vṛ,9 (causative),causative,optative,passive,3,pl,varyeran OR vāryeran,vāryeran
+vṛ,9 (causative),causative,future,active,1,sg,varayiṣyāmi OR vārayiṣyāmi,vārayiṣyāmi
+vṛ,9 (causative),causative,future,active,1,du,varayiṣyāvaḥ OR vārayiṣyāvaḥ,vārayiṣyāvaḥ
+vṛ,9 (causative),causative,future,active,1,pl,varayiṣyāmaḥ OR vārayiṣyāmaḥ,vārayiṣyāmaḥ
+vṛ,9 (causative),causative,future,active,2,sg,varayiṣyasi OR vārayiṣyasi,vārayiṣyasi
+vṛ,9 (causative),causative,future,active,2,du,varayiṣyathaḥ OR vārayiṣyathaḥ,vārayiṣyathaḥ
+vṛ,9 (causative),causative,future,active,2,pl,varayiṣyatha OR vārayiṣyatha,vārayiṣyatha
+vṛ,9 (causative),causative,future,active,3,sg,varayiṣyati OR vārayiṣyati,vārayiṣyati
+vṛ,9 (causative),causative,future,active,3,du,varayiṣyataḥ OR vārayiṣyataḥ,vārayiṣyataḥ
+vṛ,9 (causative),causative,future,active,3,pl,varayiṣyanti OR vārayiṣyanti,vārayiṣyanti
+vṛ,9 (causative),causative,future,middle,1,sg,varayiṣye OR vārayiṣye,vārayiṣye
+vṛ,9 (causative),causative,future,middle,1,du,varayiṣyāvahe OR vārayiṣyāvahe,vārayiṣyāvahe
+vṛ,9 (causative),causative,future,middle,1,pl,varayiṣyāmahe OR vārayiṣyāmahe,vārayiṣyāmahe
+vṛ,9 (causative),causative,future,middle,2,sg,varayiṣyase OR vārayiṣyase,vārayiṣyase
+vṛ,9 (causative),causative,future,middle,2,du,varayiṣyethe OR vārayiṣyethe,vārayiṣyethe
+vṛ,9 (causative),causative,future,middle,2,pl,varayiṣyadhve OR vārayiṣyadhve,vārayiṣyadhve
+vṛ,9 (causative),causative,future,middle,3,sg,varayiṣyate OR vārayiṣyate,vārayiṣyate
+vṛ,9 (causative),causative,future,middle,3,du,varayiṣyete OR vārayiṣyete,vārayiṣyete
+vṛ,9 (causative),causative,future,middle,3,pl,varayiṣyante OR vārayiṣyante,vārayiṣyante
+vṛ,9 (causative),causative,periphrastic_future,active,1,sg,varayitāsmi OR vārayitāsmi,vārayitāsmi
+vṛ,9 (causative),causative,periphrastic_future,active,1,du,varayitāsvaḥ OR vārayitāsvaḥ,vārayitāsvaḥ
+vṛ,9 (causative),causative,periphrastic_future,active,1,pl,varayitāsmaḥ OR vārayitāsmaḥ,vārayitāsmaḥ
+vṛ,9 (causative),causative,periphrastic_future,active,2,sg,varayitāsi OR vārayitāsi,vārayitāsi
+vṛ,9 (causative),causative,periphrastic_future,active,2,du,varayitāsthaḥ OR vārayitāsthaḥ,vārayitāsthaḥ
+vṛ,9 (causative),causative,periphrastic_future,active,2,pl,varayitāstha OR vārayitāstha,vārayitāstha
+vṛ,9 (causative),causative,periphrastic_future,active,3,sg,varayitā OR vārayitā,vārayitā
+vṛ,9 (causative),causative,periphrastic_future,active,3,du,varayitārau OR vārayitārau,vārayitārau
+vṛ,9 (causative),causative,periphrastic_future,active,3,pl,varayitāraḥ OR vārayitāraḥ,vārayitāraḥ
+yaj,1 (primary),primary,perfect,active,2,sg,iyajitha OR iyaṣṭha,iyajitha
+yaj,1 (primary),primary,aorist,active,1,sg,ayākṣam OR ayīyajam,ayākṣam
+yaj,1 (primary),primary,aorist,active,1,du,ayākṣva OR ayīyajāva,ayākṣva
+yaj,1 (primary),primary,aorist,active,1,pl,ayākṣma OR ayīyajāma,ayākṣma
+yaj,1 (primary),primary,aorist,active,2,sg,ayākṣīḥ OR ayīyajaḥ,ayākṣīḥ
+yaj,1 (primary),primary,aorist,active,2,du,ayāṣṭam OR ayīyajatam,ayāṣṭam
+yaj,1 (primary),primary,aorist,active,3,sg,ayākṣīt OR ayīyajat,ayākṣīt
+yaj,1 (primary),primary,aorist,active,3,du,ayāṣṭām OR ayīyajatām,ayāṣṭām
+yaj,1 (primary),primary,aorist,active,3,pl,ayākṣuḥ OR ayīyajan,ayākṣuḥ
+yaj,1 (primary),primary,aorist,middle,1,sg,ayakṣi OR ayīyaje,ayakṣi
+yaj,1 (primary),primary,aorist,middle,1,du,ayakṣvahi OR ayīyajāvahi,ayakṣvahi
+yaj,1 (primary),primary,aorist,middle,1,pl,ayakṣmahi OR ayīyajāmahi,ayakṣmahi
+yaj,1 (primary),primary,aorist,middle,2,sg,ayaṣṭhāḥ OR ayīyajathāḥ,ayaṣṭhāḥ
+yaj,1 (primary),primary,aorist,middle,2,du,ayakṣāthām OR ayīyajethām,ayakṣāthām
+yaj,1 (primary),primary,aorist,middle,2,pl,ayaḍḍhvam OR ayīyajadhvam,ayaḍḍhvam
+yaj,1 (primary),primary,aorist,middle,3,sg,ayaṣṭa OR ayīyajata,ayaṣṭa
+yaj,1 (primary),primary,aorist,middle,3,du,ayakṣātām OR ayīyajetām,ayakṣātām
+yaj,1 (primary),primary,aorist,middle,3,pl,ayakṣata OR ayīyajanta,ayakṣata
+labh,1 (primary),primary,future,active,1,sg,lapsyāmi OR labhiṣyāmi,labhiṣyāmi
+labh,1 (primary),primary,future,active,1,du,lapsyāvaḥ OR labhiṣyāvaḥ,labhiṣyāvaḥ
+labh,1 (primary),primary,future,active,1,pl,lapsyāmaḥ OR labhiṣyāmaḥ,labhiṣyāmaḥ
+labh,1 (primary),primary,future,active,2,sg,lapsyasi OR labhiṣyasi,labhiṣyasi
+labh,1 (primary),primary,future,active,2,du,lapsyathaḥ OR labhiṣyathaḥ,labhiṣyathaḥ
+labh,1 (primary),primary,future,active,2,pl,lapsyatha OR labhiṣyatha,labhiṣyatha
+labh,1 (primary),primary,future,active,3,sg,lapsyati OR labhiṣyati,labhiṣyati
+labh,1 (primary),primary,future,active,3,du,lapsyataḥ OR labhiṣyataḥ,labhiṣyataḥ
+labh,1 (primary),primary,future,active,3,pl,lapsyanti OR labhiṣyanti,labhiṣyanti
+labh,1 (primary),primary,future,middle,1,sg,lapsye OR labhiṣye,labhiṣye
+labh,1 (primary),primary,future,middle,1,du,lapsyāvahe OR labhiṣyāvahe,labhiṣyāvahe
+labh,1 (primary),primary,future,middle,1,pl,lapsyāmahe OR labhiṣyāmahe,labhiṣyāmahe
+labh,1 (primary),primary,future,middle,2,sg,lapsyase OR labhiṣyase,labhiṣyase
+labh,1 (primary),primary,future,middle,2,du,lapsyethe OR labhiṣyethe,labhiṣyethe
+labh,1 (primary),primary,future,middle,2,pl,lapsyadhve OR labhiṣyadhve,labhiṣyadhve
+labh,1 (primary),primary,future,middle,3,sg,lapsyate OR labhiṣyate,labhiṣyate
+labh,1 (primary),primary,future,middle,3,du,lapsyete OR labhiṣyete,labhiṣyete
+labh,1 (primary),primary,future,middle,3,pl,lapsyante OR labhiṣyante,labhiṣyante
+labh,1 (primary),primary,perfect,active,2,sg,lalabdha OR lebhitha,lalabdha OR lalabdhha
+labh,1 (primary),primary,periphrastic_future,active,1,sg,labdhāsmi OR labhitāsmi,labhitāsmi
+labh,1 (primary),primary,periphrastic_future,active,1,du,labdhāsvaḥ OR labhitāsvaḥ,labhitāsvaḥ
+labh,1 (primary),primary,periphrastic_future,active,1,pl,labdhāsmaḥ OR labhitāsmaḥ,labhitāsmaḥ
+labh,1 (primary),primary,periphrastic_future,active,2,sg,labdhāsi OR labhitāsi,labhitāsi
+labh,1 (primary),primary,periphrastic_future,active,2,du,labdhāsthaḥ OR labhitāsthaḥ,labhitāsthaḥ
+labh,1 (primary),primary,periphrastic_future,active,2,pl,labdhāstha OR labhitāstha,labhitāstha
+labh,1 (primary),primary,periphrastic_future,active,3,sg,labdhā OR labhitā,labhitā
+labh,1 (primary),primary,periphrastic_future,active,3,du,labdhārau OR labhitārau,labhitārau
+labh,1 (primary),primary,periphrastic_future,active,3,pl,labdhāraḥ OR labhitāraḥ,labhitāraḥ
+man,4 (primary),primary,future,active,1,sg,maṃsyāmi OR maniṣyāmi,maṃsyāmi
+man,4 (primary),primary,future,active,1,du,maṃsyāvaḥ OR maniṣyāvaḥ,maṃsyāvaḥ
+man,4 (primary),primary,future,active,1,pl,maṃsyāmaḥ OR maniṣyāmaḥ,maṃsyāmaḥ
+man,4 (primary),primary,future,active,2,sg,maṃsyasi OR maniṣyasi,maṃsyasi
+man,4 (primary),primary,future,active,2,du,maṃsyathaḥ OR maniṣyathaḥ,maṃsyathaḥ
+man,4 (primary),primary,future,active,2,pl,maṃsyatha OR maniṣyatha,maṃsyatha
+man,4 (primary),primary,future,active,3,sg,maṃsyati OR maniṣyati,maṃsyati
+man,4 (primary),primary,future,active,3,du,maṃsyataḥ OR maniṣyataḥ,maṃsyataḥ
+man,4 (primary),primary,future,active,3,pl,maṃsyanti OR maniṣyanti,maṃsyanti
+man,4 (primary),primary,future,middle,1,sg,maṃsye OR maniṣye,maṃsye
+man,4 (primary),primary,future,middle,1,du,maṃsyāvahe OR maniṣyāvahe,maṃsyāvahe
+man,4 (primary),primary,future,middle,1,pl,maṃsyāmahe OR maniṣyāmahe,maṃsyāmahe
+man,4 (primary),primary,future,middle,2,sg,maṃsyase OR maniṣyase,maṃsyase
+man,4 (primary),primary,future,middle,2,du,maṃsyethe OR maniṣyethe,maṃsyethe
+man,4 (primary),primary,future,middle,2,pl,maṃsyadhve OR maniṣyadhve,maṃsyadhve
+man,4 (primary),primary,future,middle,3,sg,maṃsyate OR maniṣyate,maṃsyate
+man,4 (primary),primary,future,middle,3,du,maṃsyete OR maniṣyete,maṃsyete
+man,4 (primary),primary,future,middle,3,pl,maṃsyante OR maniṣyante,maṃsyante
+man,4 (primary),primary,perfect,active,2,sg,mamantha OR menitha,mamantha
+man,4 (primary),primary,periphrastic_future,active,1,sg,manitāsmi OR mantāsmi,mantāsmi
+man,4 (primary),primary,periphrastic_future,active,1,du,manitāsvaḥ OR mantāsvaḥ,mantāsvaḥ
+man,4 (primary),primary,periphrastic_future,active,1,pl,manitāsmaḥ OR mantāsmaḥ,mantāsmaḥ
+man,4 (primary),primary,periphrastic_future,active,2,sg,manitāsi OR mantāsi,mantāsi
+man,4 (primary),primary,periphrastic_future,active,2,du,manitāsthaḥ OR mantāsthaḥ,mantāsthaḥ
+man,4 (primary),primary,periphrastic_future,active,2,pl,manitāstha OR mantāstha,mantāstha
+man,4 (primary),primary,periphrastic_future,active,3,sg,manitā OR mantā,mantā
+man,4 (primary),primary,periphrastic_future,active,3,du,manitārau OR mantārau,mantārau
+man,4 (primary),primary,periphrastic_future,active,3,pl,manitāraḥ OR mantāraḥ,mantāraḥ
+vid,2 (primary),primary,future,active,1,sg,vetsyāmi OR vediṣyāmi,vetsyāmi
+vid,2 (primary),primary,future,active,1,du,vetsyāvaḥ OR vediṣyāvaḥ,vetsyāvaḥ
+vid,2 (primary),primary,future,active,1,pl,vetsyāmaḥ OR vediṣyāmaḥ,vetsyāmaḥ
+vid,2 (primary),primary,future,active,2,sg,vetsyasi OR vediṣyasi,vetsyasi
+vid,2 (primary),primary,future,active,2,du,vetsyathaḥ OR vediṣyathaḥ,vetsyathaḥ
+vid,2 (primary),primary,future,active,2,pl,vetsyatha OR vediṣyatha,vetsyatha
+vid,2 (primary),primary,future,active,3,sg,vetsyati OR vediṣyati,vetsyati
+vid,2 (primary),primary,future,active,3,du,vetsyataḥ OR vediṣyataḥ,vetsyataḥ
+vid,2 (primary),primary,future,active,3,pl,vetsyanti OR vediṣyanti,vetsyanti
+vid,2 (primary),primary,perfect,active,2,pl,vida OR vivida,vida
+vid,2 (primary),primary,perfect,active,3,sg,viveda OR veda,veda
+vid,2 (primary),primary,perfect,active,3,pl,viduḥ OR vividuḥ,viduḥ
+vid,2 (primary),primary,periphrastic_future,active,1,sg,vettāsmi OR veditāsmi,vettāsmi
+vid,2 (primary),primary,periphrastic_future,active,1,du,vettāsvaḥ OR veditāsvaḥ,vettāsvaḥ
+vid,2 (primary),primary,periphrastic_future,active,1,pl,vettāsmaḥ OR veditāsmaḥ,vettāsmaḥ
+vid,2 (primary),primary,periphrastic_future,active,2,sg,vettāsi OR veditāsi,vettāsi
+vid,2 (primary),primary,periphrastic_future,active,2,du,vettāsthaḥ OR veditāsthaḥ,vettāsthaḥ
+vid,2 (primary),primary,periphrastic_future,active,2,pl,vettāstha OR veditāstha,vettāstha
+vid,2 (primary),primary,periphrastic_future,active,3,sg,vettā OR veditā,vettā
+vid,2 (primary),primary,periphrastic_future,active,3,du,vettārau OR veditārau,vettārau
+vid,2 (primary),primary,periphrastic_future,active,3,pl,vettāraḥ OR veditāraḥ,vettāraḥ
+vid,2 (primary),primary,aorist,active,1,sg,avidam OR avediṣam,avediṣam
+vid,2 (primary),primary,aorist,active,1,du,avidāva OR avediṣva,avediṣva
+vid,2 (primary),primary,aorist,active,1,pl,avidāma OR avediṣma,avediṣma
+vid,2 (primary),primary,aorist,active,2,sg,avidaḥ OR avedīḥ,avedīḥ
+vid,2 (primary),primary,aorist,active,2,du,avidatam OR avediṣṭam,avediṣṭam
+vid,2 (primary),primary,aorist,active,3,sg,avidat OR avedīt,avedīt
+vid,2 (primary),primary,aorist,active,3,du,avidatām OR avediṣṭām,avediṣṭām
+vid,2 (desiderative),desiderative,present,active,1,sg,vivitsāmi OR vividiṣāmi,vivitsāmi
+vid,2 (desiderative),desiderative,present,active,1,du,vivitsāvaḥ OR vividiṣāvaḥ,vivitsāvaḥ
+vid,2 (desiderative),desiderative,present,active,1,pl,vivitsāmaḥ OR vividiṣāmaḥ,vivitsāmaḥ
+vid,2 (desiderative),desiderative,present,active,2,sg,vivitsasi OR vividiṣasi,vivitsasi
+vid,2 (desiderative),desiderative,present,active,2,du,vivitsathaḥ OR vividiṣathaḥ,vivitsathaḥ
+vid,2 (desiderative),desiderative,present,active,2,pl,vivitsatha OR vividiṣatha,vivitsatha
+vid,2 (desiderative),desiderative,present,active,3,sg,vivitsati OR vividiṣati,vivitsati
+vid,2 (desiderative),desiderative,present,active,3,du,vivitsataḥ OR vividiṣataḥ,vivitsataḥ
+vid,2 (desiderative),desiderative,present,active,3,pl,vivitsanti OR vividiṣanti,vivitsanti
+vid,2 (desiderative),desiderative,present,passive,1,sg,vivitsye OR vividiṣye,vivitsye
+vid,2 (desiderative),desiderative,present,passive,1,du,vivitsyāvahe OR vividiṣyāvahe,vivitsyāvahe
+vid,2 (desiderative),desiderative,present,passive,1,pl,vivitsyāmahe OR vividiṣyāmahe,vivitsyāmahe
+vid,2 (desiderative),desiderative,present,passive,2,sg,vivitsyase OR vividiṣyase,vivitsyase
+vid,2 (desiderative),desiderative,present,passive,2,du,vivitsyethe OR vividiṣyethe,vivitsyethe
+vid,2 (desiderative),desiderative,present,passive,2,pl,vivitsyadhve OR vividiṣyadhve,vivitsyadhve
+vid,2 (desiderative),desiderative,present,passive,3,sg,vivitsyate OR vividiṣyate,vivitsyate
+vid,2 (desiderative),desiderative,present,passive,3,du,vivitsyete OR vividiṣyete,vivitsyete
+vid,2 (desiderative),desiderative,present,passive,3,pl,vivitsyante OR vividiṣyante,vivitsyante
+vid,2 (desiderative),desiderative,imperfect,active,1,sg,avivitsam OR avividiṣam,avivitsam
+vid,2 (desiderative),desiderative,imperfect,active,1,du,avivitsāva OR avividiṣāva,avivitsāva
+vid,2 (desiderative),desiderative,imperfect,active,1,pl,avivitsāma OR avividiṣāma,avivitsāma
+vid,2 (desiderative),desiderative,imperfect,active,2,sg,avivitsaḥ OR avividiṣaḥ,avivitsaḥ
+vid,2 (desiderative),desiderative,imperfect,active,2,du,avivitsatam OR avividiṣatam,avivitsatam
+vid,2 (desiderative),desiderative,imperfect,active,2,pl,avivitsata OR avividiṣata,avivitsata
+vid,2 (desiderative),desiderative,imperfect,active,3,sg,avivitsat OR avividiṣat,avivitsat
+vid,2 (desiderative),desiderative,imperfect,active,3,du,avivitsatām OR avividiṣatām,avivitsatām
+vid,2 (desiderative),desiderative,imperfect,active,3,pl,avivitsan OR avividiṣan,avivitsan
+vid,2 (desiderative),desiderative,imperfect,passive,1,sg,avivitsye OR avividiṣye,avivitsye
+vid,2 (desiderative),desiderative,imperfect,passive,1,du,avivitsyāvahi OR avividiṣyāvahi,avivitsyāvahi
+vid,2 (desiderative),desiderative,imperfect,passive,1,pl,avivitsyāmahi OR avividiṣyāmahi,avivitsyāmahi
+vid,2 (desiderative),desiderative,imperfect,passive,2,sg,avivitsyathāḥ OR avividiṣyathāḥ,avivitsyathāḥ
+vid,2 (desiderative),desiderative,imperfect,passive,2,du,avivitsyethām OR avividiṣyethām,avivitsyethām
+vid,2 (desiderative),desiderative,imperfect,passive,2,pl,avivitsyadhvam OR avividiṣyadhvam,avivitsyadhvam
+vid,2 (desiderative),desiderative,imperfect,passive,3,sg,avivitsyata OR avividiṣyata,avivitsyata
+vid,2 (desiderative),desiderative,imperfect,passive,3,du,avivitsyetām OR avividiṣyetām,avivitsyetām
+vid,2 (desiderative),desiderative,imperfect,passive,3,pl,avivitsyanta OR avividiṣyanta,avivitsyanta
+vid,2 (desiderative),desiderative,imperative,active,1,sg,vivitsāni OR vividiṣāṇi,vivitsāni
+vid,2 (desiderative),desiderative,imperative,active,1,du,vivitsāva OR vividiṣāva,vivitsāva
+vid,2 (desiderative),desiderative,imperative,active,1,pl,vivitsāma OR vividiṣāma,vivitsāma
+vid,2 (desiderative),desiderative,imperative,active,2,sg,vivitsa OR vividiṣa,vivitsa OR vivitsatāt
+vid,2 (desiderative),desiderative,imperative,active,2,du,vivitsatam OR vividiṣatam,vivitsatam
+vid,2 (desiderative),desiderative,imperative,active,2,pl,vivitsata OR vividiṣata,vivitsata
+vid,2 (desiderative),desiderative,imperative,active,3,sg,vivitsatu OR vividiṣatu,vivitsatu OR vivitsatāt
+vid,2 (desiderative),desiderative,imperative,active,3,du,vivitsatām OR vividiṣatām,vivitsatām
+vid,2 (desiderative),desiderative,imperative,active,3,pl,vivitsantu OR vividiṣantu,vivitsantu
+vid,2 (desiderative),desiderative,imperative,passive,1,sg,vivitsyai OR vividiṣyai,vivitsyai
+vid,2 (desiderative),desiderative,imperative,passive,1,du,vivitsyāvahai OR vividiṣyāvahai,vivitsyāvahai
+vid,2 (desiderative),desiderative,imperative,passive,1,pl,vivitsyāmahai OR vividiṣyāmahai,vivitsyāmahai
+vid,2 (desiderative),desiderative,imperative,passive,2,sg,vivitsyasva OR vividiṣyasva,vivitsyasva
+vid,2 (desiderative),desiderative,imperative,passive,2,du,vivitsyethām OR vividiṣyethām,vivitsyethām
+vid,2 (desiderative),desiderative,imperative,passive,2,pl,vivitsyadhvam OR vividiṣyadhvam,vivitsyadhvam
+vid,2 (desiderative),desiderative,imperative,passive,3,sg,vivitsyatām OR vividiṣyatām,vivitsyatām
+vid,2 (desiderative),desiderative,imperative,passive,3,du,vivitsyetām OR vividiṣyetām,vivitsyetām
+vid,2 (desiderative),desiderative,imperative,passive,3,pl,vivitsyantām OR vividiṣyantām,vivitsyantām
+vid,2 (desiderative),desiderative,optative,active,1,sg,vivitseyam OR vividiṣeyam,vivitseyam
+vid,2 (desiderative),desiderative,optative,active,1,du,vivitseva OR vividiṣeva,vivitseva
+vid,2 (desiderative),desiderative,optative,active,1,pl,vivitsema OR vividiṣema,vivitsema
+vid,2 (desiderative),desiderative,optative,active,2,sg,vivitseḥ OR vividiṣeḥ,vivitseḥ
+vid,2 (desiderative),desiderative,optative,active,2,du,vivitsetam OR vividiṣetam,vivitsetam
+vid,2 (desiderative),desiderative,optative,active,2,pl,vivitseta OR vividiṣeta,vivitseta
+vid,2 (desiderative),desiderative,optative,active,3,sg,vivitset OR vividiṣet,vivitset
+vid,2 (desiderative),desiderative,optative,active,3,du,vivitsetām OR vividiṣetām,vivitsetām
+vid,2 (desiderative),desiderative,optative,active,3,pl,vivitseyuḥ OR vividiṣeyuḥ,vivitseyuḥ
+vid,2 (desiderative),desiderative,optative,passive,1,sg,vivitsyeya OR vividiṣyeya,vivitsyeya
+vid,2 (desiderative),desiderative,optative,passive,1,du,vivitsyevahi OR vividiṣyevahi,vivitsyevahi
+vid,2 (desiderative),desiderative,optative,passive,1,pl,vivitsyemahi OR vividiṣyemahi,vivitsyemahi
+vid,2 (desiderative),desiderative,optative,passive,2,sg,vivitsyethāḥ OR vividiṣyethāḥ,vivitsyethāḥ
+vid,2 (desiderative),desiderative,optative,passive,2,du,vivitsyeyāthām OR vividiṣyeyāthām,vivitsyeyāthām
+vid,2 (desiderative),desiderative,optative,passive,2,pl,vivitsyedhvam OR vividiṣyedhvam,vivitsyedhvam
+vid,2 (desiderative),desiderative,optative,passive,3,sg,vivitsyeta OR vividiṣyeta,vivitsyeta
+vid,2 (desiderative),desiderative,optative,passive,3,du,vivitsyeyātām OR vividiṣyeyātām,vivitsyeyātām
+vid,2 (desiderative),desiderative,optative,passive,3,pl,vivitsyeran OR vividiṣyeran,vivitsyeran
+vid,2 (desiderative),desiderative,future,active,1,sg,vivitsyāmi OR vividiṣyāmi,vivitsyāmi
+vid,2 (desiderative),desiderative,future,active,1,du,vivitsyāvaḥ OR vividiṣyāvaḥ,vivitsyāvaḥ
+vid,2 (desiderative),desiderative,future,active,1,pl,vivitsyāmaḥ OR vividiṣyāmaḥ,vivitsyāmaḥ
+vid,2 (desiderative),desiderative,future,active,2,sg,vivitsyasi OR vividiṣyasi,vivitsyasi
+vid,2 (desiderative),desiderative,future,active,2,du,vivitsyathaḥ OR vividiṣyathaḥ,vivitsyathaḥ
+vid,2 (desiderative),desiderative,future,active,2,pl,vivitsyatha OR vividiṣyatha,vivitsyatha
+vid,2 (desiderative),desiderative,future,active,3,sg,vivitsyati OR vividiṣyati,vivitsyati
+vid,2 (desiderative),desiderative,future,active,3,du,vivitsyataḥ OR vividiṣyataḥ,vivitsyataḥ
+vid,2 (desiderative),desiderative,future,active,3,pl,vivitsyanti OR vividiṣyanti,vivitsyanti
+vid,2 (desiderative),desiderative,perfect,active,1,du,vivivitsiva OR vivividiṣiva,vivivitsiva
+vid,2 (desiderative),desiderative,perfect,active,1,pl,vivivitsima OR vivividiṣima,vivivitsima
+vid,2 (desiderative),desiderative,perfect,active,2,sg,vivivitsitha OR vivividiṣitha,vivivitsitha
+vid,2 (desiderative),desiderative,perfect,active,2,du,vivivitsathuḥ OR vivividiṣathuḥ,vivivitsathuḥ
+vid,2 (desiderative),desiderative,perfect,active,2,pl,vivivitsa OR vivividiṣa,vivivitsa
+vid,2 (desiderative),desiderative,perfect,active,3,du,vivivitsatuḥ OR vivividiṣatuḥ,vivivitsatuḥ
+vid,2 (desiderative),desiderative,perfect,active,3,pl,vivivitsuḥ OR vivividiṣuḥ,vivivitsuḥ
+vid,2 (desiderative),desiderative,periphrastic_future,active,1,sg,vivitsitāsmi OR vividiṣitāsmi,vivitsitāsmi
+vid,2 (desiderative),desiderative,periphrastic_future,active,1,du,vivitsitāsvaḥ OR vividiṣitāsvaḥ,vivitsitāsvaḥ
+vid,2 (desiderative),desiderative,periphrastic_future,active,1,pl,vivitsitāsmaḥ OR vividiṣitāsmaḥ,vivitsitāsmaḥ
+vid,2 (desiderative),desiderative,periphrastic_future,active,2,sg,vivitsitāsi OR vividiṣitāsi,vivitsitāsi
+vid,2 (desiderative),desiderative,periphrastic_future,active,2,du,vivitsitāsthaḥ OR vividiṣitāsthaḥ,vivitsitāsthaḥ
+vid,2 (desiderative),desiderative,periphrastic_future,active,2,pl,vivitsitāstha OR vividiṣitāstha,vivitsitāstha
+vid,2 (desiderative),desiderative,periphrastic_future,active,3,sg,vivitsitā OR vividiṣitā,vivitsitā
+vid,2 (desiderative),desiderative,periphrastic_future,active,3,du,vivitsitārau OR vividiṣitārau,vivitsitārau
+vid,2 (desiderative),desiderative,periphrastic_future,active,3,pl,vivitsitāraḥ OR vividiṣitāraḥ,vivitsitāraḥ
+vid,2 (intensive),intensive,present,active,1,sg,vevidīmi OR vevedmi,vevedmi OR vevidīmi
+vid,2 (intensive),intensive,present,active,2,sg,vevidīṣi OR vevetsi,vevetsi OR vevidīṣi
+vid,2 (intensive),intensive,present,active,3,sg,vevidīti OR vevetti,vevetti OR vevidīti
+vid,2 (intensive),intensive,imperfect,active,2,sg,avevidīt OR avevidīḥ,avevetḥ OR avevidīḥ
+vid,2 (intensive),intensive,imperative,active,3,sg,vevettu OR vevedītu,vevettu OR vevettāt OR vevidītu OR vevidītāt
+ruh,1 (causative),causative,present,active,1,sg,ropayāmi OR rohayāmi,ropayāmi
+ruh,1 (causative),causative,present,active,1,du,ropayāvaḥ OR rohayāvaḥ,ropayāvaḥ
+ruh,1 (causative),causative,present,active,1,pl,ropayāmaḥ OR rohayāmaḥ,ropayāmaḥ
+ruh,1 (causative),causative,present,active,2,sg,ropayasi OR rohayasi,ropayasi
+ruh,1 (causative),causative,present,active,2,du,ropayathaḥ OR rohayathaḥ,ropayathaḥ
+ruh,1 (causative),causative,present,active,2,pl,ropayatha OR rohayatha,ropayatha
+ruh,1 (causative),causative,present,active,3,sg,ropayati OR rohayati,ropayati
+ruh,1 (causative),causative,present,active,3,du,ropayataḥ OR rohayataḥ,ropayataḥ
+ruh,1 (causative),causative,present,active,3,pl,ropayanti OR rohayanti,ropayanti
+ruh,1 (causative),causative,present,middle,1,sg,ropaye OR rohaye,ropaye
+ruh,1 (causative),causative,present,middle,1,du,ropayāvahe OR rohayāvahe,ropayāvahe
+ruh,1 (causative),causative,present,middle,1,pl,ropayāmahe OR rohayāmahe,ropayāmahe
+ruh,1 (causative),causative,present,middle,2,sg,ropayase OR rohayase,ropayase
+ruh,1 (causative),causative,present,middle,2,du,ropayethe OR rohayethe,ropayethe
+ruh,1 (causative),causative,present,middle,2,pl,ropayadhve OR rohayadhve,ropayadhve
+ruh,1 (causative),causative,present,middle,3,sg,ropayate OR rohayate,ropayate
+ruh,1 (causative),causative,present,middle,3,du,ropayete OR rohayete,ropayete
+ruh,1 (causative),causative,present,middle,3,pl,ropayante OR rohayante,ropayante
+ruh,1 (causative),causative,present,passive,1,sg,ropye OR rohye,ropye
+ruh,1 (causative),causative,present,passive,1,du,ropyāvahe OR rohyāvahe,ropyāvahe
+ruh,1 (causative),causative,present,passive,1,pl,ropyāmahe OR rohyāmahe,ropyāmahe
+ruh,1 (causative),causative,present,passive,2,sg,ropyase OR rohyase,ropyase
+ruh,1 (causative),causative,present,passive,2,du,ropyethe OR rohyethe,ropyethe
+ruh,1 (causative),causative,present,passive,2,pl,ropyadhve OR rohyadhve,ropyadhve
+ruh,1 (causative),causative,present,passive,3,sg,ropyate OR rohyate,ropyate
+ruh,1 (causative),causative,present,passive,3,du,ropyete OR rohyete,ropyete
+ruh,1 (causative),causative,present,passive,3,pl,ropyante OR rohyante,ropyante
+ruh,1 (causative),causative,imperfect,active,1,sg,aropayam OR arohayam,aropayam
+ruh,1 (causative),causative,imperfect,active,1,du,aropayāva OR arohayāva,aropayāva
+ruh,1 (causative),causative,imperfect,active,1,pl,aropayāma OR arohayāma,aropayāma
+ruh,1 (causative),causative,imperfect,active,2,sg,aropayaḥ OR arohayaḥ,aropayaḥ
+ruh,1 (causative),causative,imperfect,active,2,du,aropayatam OR arohayatam,aropayatam
+ruh,1 (causative),causative,imperfect,active,3,sg,aropayat OR arohayat,aropayat
+ruh,1 (causative),causative,imperfect,active,3,du,aropayatām OR arohayatām,aropayatām
+ruh,1 (causative),causative,imperfect,active,3,pl,aropayan OR arohayan,aropayan
+ruh,1 (causative),causative,imperfect,middle,1,sg,aropaye OR arohaye,aropaye
+ruh,1 (causative),causative,imperfect,middle,1,du,aropayāvahi OR arohayāvahi,aropayāvahi
+ruh,1 (causative),causative,imperfect,middle,1,pl,aropayāmahi OR arohayāmahi,aropayāmahi
+ruh,1 (causative),causative,imperfect,middle,2,sg,aropayathāḥ OR arohayathāḥ,aropayathāḥ
+ruh,1 (causative),causative,imperfect,middle,2,du,aropayethām OR arohayethām,aropayethām
+ruh,1 (causative),causative,imperfect,middle,2,pl,aropayadhvam OR arohayadhvam,aropayadhvam
+ruh,1 (causative),causative,imperfect,middle,3,sg,aropayata OR arohayata,aropayata
+ruh,1 (causative),causative,imperfect,middle,3,du,aropayetām OR arohayetām,aropayetām
+ruh,1 (causative),causative,imperfect,middle,3,pl,aropayanta OR arohayanta,aropayanta
+ruh,1 (causative),causative,imperfect,passive,1,sg,aropye OR arohye,aropye
+ruh,1 (causative),causative,imperfect,passive,1,du,aropyāvahi OR arohyāvahi,aropyāvahi
+ruh,1 (causative),causative,imperfect,passive,1,pl,aropyāmahi OR arohyāmahi,aropyāmahi
+ruh,1 (causative),causative,imperfect,passive,2,sg,aropyathāḥ OR arohyathāḥ,aropyathāḥ
+ruh,1 (causative),causative,imperfect,passive,2,du,aropyethām OR arohyethām,aropyethām
+ruh,1 (causative),causative,imperfect,passive,2,pl,aropyadhvam OR arohyadhvam,aropyadhvam
+ruh,1 (causative),causative,imperfect,passive,3,sg,aropyata OR arohyata,aropyata
+ruh,1 (causative),causative,imperfect,passive,3,du,aropyetām OR arohyetām,aropyetām
+ruh,1 (causative),causative,imperfect,passive,3,pl,aropyanta OR arohyanta,aropyanta
+ruh,1 (causative),causative,imperative,active,1,sg,ropayāṇi OR rohayāṇi,ropayāṇi
+ruh,1 (causative),causative,imperative,active,1,du,ropayāva OR rohayāva,ropayāva
+ruh,1 (causative),causative,imperative,active,1,pl,ropayāma OR rohayāma,ropayāma
+ruh,1 (causative),causative,imperative,active,2,sg,ropaya OR rohaya,ropaya OR ropayatāt
+ruh,1 (causative),causative,imperative,active,2,du,ropayatam OR rohayatam,ropayatam
+ruh,1 (causative),causative,imperative,active,2,pl,ropayata OR rohayata,ropayata
+ruh,1 (causative),causative,imperative,active,3,sg,ropayatu OR rohayatu,ropayatu OR ropayatāt
+ruh,1 (causative),causative,imperative,active,3,pl,ropayantu OR rohayantu,ropayantu
+ruh,1 (causative),causative,imperative,middle,1,sg,ropayai OR rohayai,ropayai
+ruh,1 (causative),causative,imperative,middle,1,du,ropayāvahai OR rohayāvahai,ropayāvahai
+ruh,1 (causative),causative,imperative,middle,1,pl,ropayāmahai OR rohayāmahai,ropayāmahai
+ruh,1 (causative),causative,imperative,middle,2,sg,ropayasva OR rohayasva,ropayasva
+ruh,1 (causative),causative,imperative,middle,2,du,ropayethām OR rohayethām,ropayethām
+ruh,1 (causative),causative,imperative,middle,2,pl,ropayadhvam OR rohayadhvam,ropayadhvam
+ruh,1 (causative),causative,imperative,middle,3,sg,ropayatām OR rohayatām,ropayatām
+ruh,1 (causative),causative,imperative,middle,3,du,ropayetām OR rohayetām,ropayetām
+ruh,1 (causative),causative,imperative,middle,3,pl,ropayantām OR rohayantām,ropayantām
+ruh,1 (causative),causative,imperative,passive,1,sg,ropyai OR rohyai,ropyai
+ruh,1 (causative),causative,imperative,passive,1,du,ropyāvahai OR rohyāvahai,ropyāvahai
+ruh,1 (causative),causative,imperative,passive,1,pl,ropyāmahai OR rohyāmahai,ropyāmahai
+ruh,1 (causative),causative,imperative,passive,2,sg,ropyasva OR rohyasva,ropyasva
+ruh,1 (causative),causative,imperative,passive,2,du,ropyethām OR rohyethām,ropyethām
+ruh,1 (causative),causative,imperative,passive,2,pl,ropyadhvam OR rohyadhvam,ropyadhvam
+ruh,1 (causative),causative,imperative,passive,3,sg,ropyatām OR rohyatām,ropyatām
+ruh,1 (causative),causative,imperative,passive,3,du,ropyetām OR rohyetām,ropyetām
+ruh,1 (causative),causative,imperative,passive,3,pl,ropyantām OR rohyantām,ropyantām
+ruh,1 (causative),causative,optative,active,1,sg,ropayeyam OR rohayeyam,ropayeyam
+ruh,1 (causative),causative,optative,active,1,du,ropayeva OR rohayeva,ropayeva
+ruh,1 (causative),causative,optative,active,1,pl,ropayema OR rohayema,ropayema
+ruh,1 (causative),causative,optative,active,2,sg,ropayeḥ OR rohayeḥ,ropayeḥ
+ruh,1 (causative),causative,optative,active,2,du,ropayetam OR rohayetam,ropayetam
+ruh,1 (causative),causative,optative,active,3,sg,ropayet OR rohayet,ropayet
+ruh,1 (causative),causative,optative,active,3,pl,ropayeyuḥ OR rohayeyuḥ,ropayeyuḥ
+ruh,1 (causative),causative,optative,middle,1,sg,ropayeya OR rohayeya,ropayeya
+ruh,1 (causative),causative,optative,middle,1,du,ropayevahi OR rohayevahi,ropayevahi
+ruh,1 (causative),causative,optative,middle,1,pl,ropayemahi OR rohayemahi,ropayemahi
+ruh,1 (causative),causative,optative,middle,2,sg,ropayethāḥ OR rohayethāḥ,ropayethāḥ
+ruh,1 (causative),causative,optative,middle,2,du,ropayeyāthām OR rohayeyāthām,ropayeyāthām
+ruh,1 (causative),causative,optative,middle,2,pl,ropayedhvam OR rohayedhvam,ropayedhvam
+ruh,1 (causative),causative,optative,middle,3,sg,ropayeta OR rohayeta,ropayeta
+ruh,1 (causative),causative,optative,middle,3,du,ropayeyātām OR rohayeyātām,ropayeyātām
+ruh,1 (causative),causative,optative,middle,3,pl,ropayeran OR rohayeran,ropayeran
+ruh,1 (causative),causative,optative,passive,1,sg,ropyeya OR rohyeya,ropyeya
+ruh,1 (causative),causative,optative,passive,1,du,ropyevahi OR rohyevahi,ropyevahi
+ruh,1 (causative),causative,optative,passive,1,pl,ropyemahi OR rohyemahi,ropyemahi
+ruh,1 (causative),causative,optative,passive,2,sg,ropyethāḥ OR rohyethāḥ,ropyethāḥ
+ruh,1 (causative),causative,optative,passive,2,du,ropyeyāthām OR rohyeyāthām,ropyeyāthām
+ruh,1 (causative),causative,optative,passive,2,pl,ropyedhvam OR rohyedhvam,ropyedhvam
+ruh,1 (causative),causative,optative,passive,3,sg,ropyeta OR rohyeta,ropyeta
+ruh,1 (causative),causative,optative,passive,3,du,ropyeyātām OR rohyeyātām,ropyeyātām
+ruh,1 (causative),causative,optative,passive,3,pl,ropyeran OR rohyeran,ropyeran
+ruh,1 (causative),causative,future,active,1,sg,ropayiṣyāmi OR rohayiṣyāmi,ropayiṣyāmi
+ruh,1 (causative),causative,future,active,1,du,ropayiṣyāvaḥ OR rohayiṣyāvaḥ,ropayiṣyāvaḥ
+ruh,1 (causative),causative,future,active,1,pl,ropayiṣyāmaḥ OR rohayiṣyāmaḥ,ropayiṣyāmaḥ
+ruh,1 (causative),causative,future,active,2,sg,ropayiṣyasi OR rohayiṣyasi,ropayiṣyasi
+ruh,1 (causative),causative,future,active,2,du,ropayiṣyathaḥ OR rohayiṣyathaḥ,ropayiṣyathaḥ
+ruh,1 (causative),causative,future,active,2,pl,ropayiṣyatha OR rohayiṣyatha,ropayiṣyatha
+ruh,1 (causative),causative,future,active,3,sg,ropayiṣyati OR rohayiṣyati,ropayiṣyati
+ruh,1 (causative),causative,future,active,3,du,ropayiṣyataḥ OR rohayiṣyataḥ,ropayiṣyataḥ
+ruh,1 (causative),causative,future,active,3,pl,ropayiṣyanti OR rohayiṣyanti,ropayiṣyanti
+ruh,1 (causative),causative,future,middle,1,sg,ropayiṣye OR rohayiṣye,ropayiṣye
+ruh,1 (causative),causative,future,middle,1,du,ropayiṣyāvahe OR rohayiṣyāvahe,ropayiṣyāvahe
+ruh,1 (causative),causative,future,middle,1,pl,ropayiṣyāmahe OR rohayiṣyāmahe,ropayiṣyāmahe
+ruh,1 (causative),causative,future,middle,2,sg,ropayiṣyase OR rohayiṣyase,ropayiṣyase
+ruh,1 (causative),causative,future,middle,2,du,ropayiṣyethe OR rohayiṣyethe,ropayiṣyethe
+ruh,1 (causative),causative,future,middle,2,pl,ropayiṣyadhve OR rohayiṣyadhve,ropayiṣyadhve
+ruh,1 (causative),causative,future,middle,3,sg,ropayiṣyate OR rohayiṣyate,ropayiṣyate
+ruh,1 (causative),causative,future,middle,3,du,ropayiṣyete OR rohayiṣyete,ropayiṣyete
+ruh,1 (causative),causative,future,middle,3,pl,ropayiṣyante OR rohayiṣyante,ropayiṣyante
+ruh,1 (causative),causative,periphrastic_future,active,1,sg,ropayitāsmi OR rohayitāsmi,ropayitāsmi
+ruh,1 (causative),causative,periphrastic_future,active,1,du,ropayitāsvaḥ OR rohayitāsvaḥ,ropayitāsvaḥ
+ruh,1 (causative),causative,periphrastic_future,active,1,pl,ropayitāsmaḥ OR rohayitāsmaḥ,ropayitāsmaḥ
+ruh,1 (causative),causative,periphrastic_future,active,2,sg,ropayitāsi OR rohayitāsi,ropayitāsi
+ruh,1 (causative),causative,periphrastic_future,active,2,du,ropayitāsthaḥ OR rohayitāsthaḥ,ropayitāsthaḥ
+ruh,1 (causative),causative,periphrastic_future,active,2,pl,ropayitāstha OR rohayitāstha,ropayitāstha
+ruh,1 (causative),causative,periphrastic_future,active,3,sg,ropayitā OR rohayitā,ropayitā
+ruh,1 (causative),causative,periphrastic_future,active,3,du,ropayitārau OR rohayitārau,ropayitārau
+ruh,1 (causative),causative,periphrastic_future,active,3,pl,ropayitāraḥ OR rohayitāraḥ,ropayitāraḥ
+viś,6 (primary),primary,aorist,active,1,sg,avikṣam OR avīviśam,avikṣam
+viś,6 (primary),primary,aorist,active,1,du,avikṣāva OR avīviśāva,avikṣāva
+viś,6 (primary),primary,aorist,active,1,pl,avikṣāma OR avīviśāma,avikṣāma
+viś,6 (primary),primary,aorist,active,2,sg,avikṣaḥ OR avīviśaḥ,avikṣaḥ
+viś,6 (primary),primary,aorist,active,2,du,avikṣatam OR avīviśatam,avikṣatam
+viś,6 (primary),primary,aorist,active,3,sg,avikṣat OR avīviśat,avikṣat
+viś,6 (primary),primary,aorist,active,3,du,avikṣatām OR avīviśatām,avikṣatām
+viś,6 (primary),primary,aorist,active,3,pl,avikṣan OR avīviśan,avikṣan
+viś,6 (primary),primary,aorist,middle,1,sg,avikṣi OR avīviśe,avikṣi
+viś,6 (primary),primary,aorist,middle,1,du,avikṣāvahi OR avīviśāvahi,avikṣāvahi
+viś,6 (primary),primary,aorist,middle,1,pl,avikṣāmahi OR avīviśāmahi,avikṣāmahi
+viś,6 (primary),primary,aorist,middle,2,sg,avikṣathāḥ OR avīviśathāḥ,avikṣathāḥ
+viś,6 (primary),primary,aorist,middle,2,du,avikṣāthām OR avīviśethām,avikṣāthām
+viś,6 (primary),primary,aorist,middle,2,pl,avikṣadhvam OR avīviśadhvam,avikṣadhvam
+viś,6 (primary),primary,aorist,middle,3,sg,avikṣata OR avīviśata,avikṣata
+viś,6 (primary),primary,aorist,middle,3,du,avikṣātām OR avīviśetām,avikṣātām
+viś,6 (primary),primary,aorist,middle,3,pl,avikṣanta OR avīviśanta,avikṣanta
+stu,2 (primary),primary,present,active,1,sg,stavīmi OR staumi,staumi OR stomi
+stu,2 (primary),primary,future,active,1,sg,staviṣyāmi OR stoṣyāmi,stoṣyāmi
+stu,2 (primary),primary,future,active,1,du,staviṣyāvaḥ OR stoṣyāvaḥ,stoṣyāvaḥ
+stu,2 (primary),primary,future,active,1,pl,staviṣyāmaḥ OR stoṣyāmaḥ,stoṣyāmaḥ
+stu,2 (primary),primary,future,active,2,sg,staviṣyasi OR stoṣyasi,stoṣyasi
+stu,2 (primary),primary,future,active,2,du,staviṣyathaḥ OR stoṣyathaḥ,stoṣyathaḥ
+stu,2 (primary),primary,future,active,2,pl,staviṣyatha OR stoṣyatha,stoṣyatha
+stu,2 (primary),primary,future,active,3,sg,staviṣyati OR stoṣyati,stoṣyati
+stu,2 (primary),primary,future,active,3,du,staviṣyataḥ OR stoṣyataḥ,stoṣyataḥ
+stu,2 (primary),primary,future,active,3,pl,staviṣyanti OR stoṣyanti,stoṣyanti
+stu,2 (primary),primary,future,middle,1,sg,staviṣye OR stoṣye,stoṣye
+stu,2 (primary),primary,future,middle,1,du,staviṣyāvahe OR stoṣyāvahe,stoṣyāvahe
+stu,2 (primary),primary,future,middle,1,pl,staviṣyāmahe OR stoṣyāmahe,stoṣyāmahe
+stu,2 (primary),primary,future,middle,2,sg,staviṣyase OR stoṣyase,stoṣyase
+stu,2 (primary),primary,future,middle,2,du,staviṣyethe OR stoṣyethe,stoṣyethe
+stu,2 (primary),primary,future,middle,2,pl,staviṣyadhve OR stoṣyadhve,stoṣyadhve
+stu,2 (primary),primary,future,middle,3,sg,staviṣyate OR stoṣyate,stoṣyate
+stu,2 (primary),primary,future,middle,3,du,staviṣyete OR stoṣyete,stoṣyete
+stu,2 (primary),primary,future,middle,3,pl,staviṣyante OR stoṣyante,stoṣyante
+stu,2 (primary),primary,periphrastic_future,active,1,sg,stavitāsmi OR stotāsmi,stotāsmi
+stu,2 (primary),primary,periphrastic_future,active,1,du,stavitāsvaḥ OR stotāsvaḥ,stotāsvaḥ
+stu,2 (primary),primary,periphrastic_future,active,1,pl,stavitāsmaḥ OR stotāsmaḥ,stotāsmaḥ
+stu,2 (primary),primary,periphrastic_future,active,2,sg,stavitāsi OR stotāsi,stotāsi
+stu,2 (primary),primary,periphrastic_future,active,2,du,stavitāsthaḥ OR stotāsthaḥ,stotāsthaḥ
+stu,2 (primary),primary,periphrastic_future,active,2,pl,stavitāstha OR stotāstha,stotāstha
+stu,2 (primary),primary,periphrastic_future,active,3,sg,stavitā OR stotā,stotā
+stu,2 (primary),primary,periphrastic_future,active,3,du,stavitārau OR stotārau,stotārau
+stu,2 (primary),primary,periphrastic_future,active,3,pl,stavitāraḥ OR stotāraḥ,stotāraḥ
+stu,2 (primary),primary,aorist,active,1,sg,atuṣṭuvam OR astāviṣam OR astauṣam,astauṣam
+stu,2 (primary),primary,aorist,active,1,du,atuṣṭuvāva OR astāviṣva OR astauṣva,astauṣva
+stu,2 (primary),primary,aorist,active,1,pl,atuṣṭuvāma OR astāviṣma OR astauṣma,astauṣma
+stu,2 (primary),primary,aorist,active,2,sg,atuṣṭuvaḥ OR astāvīḥ OR astauṣīḥ,astauṣīḥ
+stu,2 (primary),primary,aorist,active,2,du,atuṣṭuvatam OR astāviṣṭam OR astauṣṭam,astauṣṭam
+stu,2 (primary),primary,aorist,active,2,pl,astāviṣṭa OR astauṣṭa,astauṣṭa
+stu,2 (primary),primary,aorist,active,3,sg,atuṣṭuvat OR astāvīt OR astauṣīt,astauṣīt
+stu,2 (primary),primary,aorist,active,3,du,atuṣṭuvatām OR astāviṣṭām OR astauṣṭām,astauṣṭām
+stu,2 (primary),primary,aorist,active,3,pl,atuṣṭuvan OR astāviṣuḥ OR astauṣuḥ,astauṣuḥ
+stu,2 (primary),primary,aorist,middle,1,sg,atuṣṭuve OR astaviṣi OR astoṣi,astoṣi
+stu,2 (primary),primary,aorist,middle,1,du,atuṣṭuvāvahi OR astaviṣvahi OR astoṣvahi,astoṣvahi
+stu,2 (primary),primary,aorist,middle,1,pl,atuṣṭuvāmahi OR astaviṣmahi OR astoṣmahi,astoṣmahi
+stu,2 (primary),primary,aorist,middle,2,sg,atuṣṭuvathāḥ OR astaviṣṭhāḥ OR astoṣṭhāḥ,astoṣṭhāḥ
+stu,2 (primary),primary,aorist,middle,2,du,atuṣṭuvethām OR astaviṣāthām OR astoṣāthām,astoṣāthām
+stu,2 (primary),primary,aorist,middle,2,pl,atuṣṭuvadhvam OR astavidhvam OR astoḍhvam,astoḍhvam
+stu,2 (primary),primary,aorist,middle,3,sg,atuṣṭuvata OR astaviṣṭa OR astoṣṭa,astoṣṭa
+stu,2 (primary),primary,aorist,middle,3,du,atuṣṭuvetām OR astaviṣātām OR astoṣātām,astoṣātām
+stu,2 (primary),primary,aorist,middle,3,pl,atuṣṭuvanta OR astaviṣata OR astoṣata,astoṣata
+jan,4 (primary),primary,future,active,1,sg,janiṣyāmi OR jāsyāmi,janiṣyāmi
+jan,4 (primary),primary,future,active,1,du,janiṣyāvaḥ OR jāsyāvaḥ,janiṣyāvaḥ
+jan,4 (primary),primary,future,active,1,pl,janiṣyāmaḥ OR jāsyāmaḥ,janiṣyāmaḥ
+jan,4 (primary),primary,future,active,2,sg,janiṣyasi OR jāsyasi,janiṣyasi
+jan,4 (primary),primary,future,active,2,du,janiṣyathaḥ OR jāsyathaḥ,janiṣyathaḥ
+jan,4 (primary),primary,future,active,2,pl,janiṣyatha OR jāsyatha,janiṣyatha
+jan,4 (primary),primary,future,active,3,sg,janiṣyati OR jāsyati,janiṣyati
+jan,4 (primary),primary,future,active,3,du,janiṣyataḥ OR jāsyataḥ,janiṣyataḥ
+jan,4 (primary),primary,future,active,3,pl,janiṣyanti OR jāsyanti,janiṣyanti
+jan,4 (primary),primary,future,middle,1,sg,janiṣye OR jāsye,janiṣye
+jan,4 (primary),primary,future,middle,1,du,janiṣyāvahe OR jāsyāvahe,janiṣyāvahe
+jan,4 (primary),primary,future,middle,1,pl,janiṣyāmahe OR jāsyāmahe,janiṣyāmahe
+jan,4 (primary),primary,future,middle,2,sg,janiṣyase OR jāsyase,janiṣyase
+jan,4 (primary),primary,future,middle,2,du,janiṣyethe OR jāsyethe,janiṣyethe
+jan,4 (primary),primary,future,middle,2,pl,janiṣyadhve OR jāsyadhve,janiṣyadhve
+jan,4 (primary),primary,future,middle,3,sg,janiṣyate OR jāsyate,janiṣyate
+jan,4 (primary),primary,future,middle,3,du,janiṣyete OR jāsyete,janiṣyete
+jan,4 (primary),primary,future,middle,3,pl,janiṣyante OR jāsyante,janiṣyante
+jan,4 (primary),primary,perfect,active,2,sg,jajantha OR jajñitha,jajantha
+jan,4 (primary),primary,periphrastic_future,active,1,sg,janitāsmi OR jātāsmi,janitāsmi
+jan,4 (primary),primary,periphrastic_future,active,1,du,janitāsvaḥ OR jātāsvaḥ,janitāsvaḥ
+jan,4 (primary),primary,periphrastic_future,active,1,pl,janitāsmaḥ OR jātāsmaḥ,janitāsmaḥ
+jan,4 (primary),primary,periphrastic_future,active,2,sg,janitāsi OR jātāsi,janitāsi
+jan,4 (primary),primary,periphrastic_future,active,2,du,janitāsthaḥ OR jātāsthaḥ,janitāsthaḥ
+jan,4 (primary),primary,periphrastic_future,active,2,pl,janitāstha OR jātāstha,janitāstha
+jan,4 (primary),primary,periphrastic_future,active,3,sg,janitā OR jātā,janitā
+jan,4 (primary),primary,periphrastic_future,active,3,du,janitārau OR jātārau,janitārau
+jan,4 (primary),primary,periphrastic_future,active,3,pl,janitāraḥ OR jātāraḥ,janitāraḥ
+jan,4 (primary),primary,aorist,active,1,sg,ajanam OR ajījanam,ajanam
+jan,4 (primary),primary,aorist,active,1,du,ajanva OR ajījanāva,ajanva
+jan,4 (primary),primary,aorist,active,1,pl,ajanma OR ajījanāma,ajanma
+jan,4 (primary),primary,aorist,active,2,du,ajantam OR ajījanatam,ajantam
+jan,4 (primary),primary,aorist,active,3,sg,ajan OR ajījanat,ajan
+jan,4 (primary),primary,aorist,active,3,du,ajantām OR ajījanatām,ajantām
+jan,4 (primary),primary,aorist,active,3,pl,ajanan OR ajījanan,ajanan
+jan,4 (primary),primary,aorist,middle,1,sg,ajani OR ajaniṣi OR ajījane,ajaniṣi
+jan,4 (primary),primary,aorist,middle,1,du,ajaniṣvahi OR ajanvahi OR ajījanāvahi,ajaniṣvahi
+jan,4 (primary),primary,aorist,middle,1,pl,ajaniṣmahi OR ajanmahi OR ajījanāmahi,ajaniṣmahi
+jan,4 (primary),primary,aorist,middle,2,sg,ajaniṣṭhāḥ OR ajanthāḥ OR ajījanathāḥ,ajaniṣṭhāḥ
+jan,4 (primary),primary,aorist,middle,2,du,ajanāthām OR ajaniṣāthām OR ajījanethām,ajaniṣāthām
+jan,4 (primary),primary,aorist,middle,2,pl,ajanidhvam OR ajandhvam OR ajījanadhvam,ajanidhvam
+jan,4 (primary),primary,aorist,middle,3,sg,ajaniṣṭa OR ajanta OR ajījanata,ajaniṣṭa
+jan,4 (primary),primary,aorist,middle,3,du,ajanātām OR ajaniṣātām OR ajījanetām,ajaniṣātām
+jan,4 (primary),primary,aorist,middle,3,pl,ajanata OR ajaniṣata OR ajījananta,ajaniṣata
+mṛj,2 (primary),primary,present,active,3,pl,mārjanti OR mṛjanti,mṛjanti
+mṛj,2 (primary),primary,present,middle,1,sg,mārje OR mṛje,mṛje
+mṛj,2 (primary),primary,present,middle,2,du,mārjāthe OR mṛjāthe,mṛjāthe
+mṛj,2 (primary),primary,present,middle,3,du,mārjāte OR mṛjāte,mṛjāte
+mṛj,2 (primary),primary,present,middle,3,pl,mārjate OR mṛjate,mṛjate
+mṛj,2 (primary),primary,imperfect,active,3,pl,amārjan OR amṛjan,amṛjan
+mṛj,2 (primary),primary,imperfect,middle,1,sg,amārji OR amṛji,amṛji
+mṛj,2 (primary),primary,imperfect,middle,2,du,amārjāthām OR amṛjāthām,amṛjāthām
+mṛj,2 (primary),primary,imperfect,middle,3,du,amārjātām OR amṛjātām,amṛjātām
+mṛj,2 (primary),primary,imperfect,middle,3,pl,amārjata OR amṛjata,amṛjata
+mṛj,2 (primary),primary,imperative,active,3,pl,mārjantu OR mṛjantu,mṛjantu
+mṛj,2 (primary),primary,imperative,middle,2,du,mārjāthām OR mṛjāthām,mṛjāthām
+mṛj,2 (primary),primary,imperative,middle,3,du,mārjātām OR mṛjātām,mṛjātām
+mṛj,2 (primary),primary,imperative,middle,3,pl,mārjatām OR mṛjatām,mṛjatām
+mṛj,2 (primary),primary,optative,middle,1,sg,mārjīya OR mṛjīya,mṛjīya
+mṛj,2 (primary),primary,optative,middle,1,du,mārjīvahi OR mṛjīvahi,mṛjīvahi
+mṛj,2 (primary),primary,optative,middle,1,pl,mārjīmahi OR mṛjīmahi,mṛjīmahi
+mṛj,2 (primary),primary,optative,middle,2,sg,mārjīthāḥ OR mṛjīthāḥ,mṛjīthāḥ
+mṛj,2 (primary),primary,optative,middle,2,du,mārjīyāthām OR mṛjīyāthām,mṛjīyāthām
+mṛj,2 (primary),primary,optative,middle,2,pl,mārjīdhvam OR mṛjīdhvam,mṛjīdhvam
+mṛj,2 (primary),primary,optative,middle,3,sg,mārjīta OR mṛjīta,mṛjīta
+mṛj,2 (primary),primary,optative,middle,3,du,mārjīyātām OR mṛjīyātām,mṛjīyātām
+mṛj,2 (primary),primary,optative,middle,3,pl,mārjīran OR mṛjīran,mṛjīran
+mṛj,2 (primary),primary,future,active,1,sg,mārkṣyāmi OR mārjiṣyāmi,mārjiṣyāmi OR mārkṣyāmi
+mṛj,2 (primary),primary,future,active,1,du,mārkṣyāvaḥ OR mārjiṣyāvaḥ,mārjiṣyāvaḥ OR mārkṣyāvaḥ
+mṛj,2 (primary),primary,future,active,1,pl,mārkṣyāmaḥ OR mārjiṣyāmaḥ,mārjiṣyāmaḥ OR mārkṣyāmaḥ
+mṛj,2 (primary),primary,future,active,2,sg,mārkṣyasi OR mārjiṣyasi,mārjiṣyasi OR mārkṣyasi
+mṛj,2 (primary),primary,future,active,2,du,mārkṣyathaḥ OR mārjiṣyathaḥ,mārjiṣyathaḥ OR mārkṣyathaḥ
+mṛj,2 (primary),primary,future,active,2,pl,mārkṣyatha OR mārjiṣyatha,mārjiṣyatha OR mārkṣyatha
+mṛj,2 (primary),primary,future,active,3,sg,mārkṣyati OR mārjiṣyati,mārjiṣyati OR mārkṣyati
+mṛj,2 (primary),primary,future,active,3,du,mārkṣyataḥ OR mārjiṣyataḥ,mārjiṣyataḥ OR mārkṣyataḥ
+mṛj,2 (primary),primary,future,active,3,pl,mārkṣyanti OR mārjiṣyanti,mārjiṣyanti OR mārkṣyanti
+mṛj,2 (primary),primary,future,middle,1,sg,mārkṣye OR mārjiṣye,mārjiṣye OR mārkṣye
+mṛj,2 (primary),primary,future,middle,1,du,mārkṣyāvahe OR mārjiṣyāvahe,mārjiṣyāvahe OR mārkṣyāvahe
+mṛj,2 (primary),primary,future,middle,1,pl,mārkṣyāmahe OR mārjiṣyāmahe,mārjiṣyāmahe OR mārkṣyāmahe
+mṛj,2 (primary),primary,future,middle,2,sg,mārkṣyase OR mārjiṣyase,mārjiṣyase OR mārkṣyase
+mṛj,2 (primary),primary,future,middle,2,du,mārkṣyethe OR mārjiṣyethe,mārjiṣyethe OR mārkṣyethe
+mṛj,2 (primary),primary,future,middle,2,pl,mārkṣyadhve OR mārjiṣyadhve,mārjiṣyadhve OR mārkṣyadhve
+mṛj,2 (primary),primary,future,middle,3,sg,mārkṣyate OR mārjiṣyate,mārjiṣyate OR mārkṣyate
+mṛj,2 (primary),primary,future,middle,3,du,mārkṣyete OR mārjiṣyete,mārjiṣyete OR mārkṣyete
+mṛj,2 (primary),primary,future,middle,3,pl,mārkṣyante OR mārjiṣyante,mārjiṣyante OR mārkṣyante
+mṛj,2 (primary),primary,periphrastic_future,active,1,sg,mārjitāsmi OR mārṣṭāsmi,mārjitāsmi OR mārṣṭāsmi
+mṛj,2 (primary),primary,periphrastic_future,active,1,du,mārjitāsvaḥ OR mārṣṭāsvaḥ,mārjitāsvaḥ OR mārṣṭāsvaḥ
+mṛj,2 (primary),primary,periphrastic_future,active,1,pl,mārjitāsmaḥ OR mārṣṭāsmaḥ,mārjitāsmaḥ OR mārṣṭāsmaḥ
+mṛj,2 (primary),primary,periphrastic_future,active,2,sg,mārjitāsi OR mārṣṭāsi,mārjitāsi OR mārṣṭāsi
+mṛj,2 (primary),primary,periphrastic_future,active,2,du,mārjitāsthaḥ OR mārṣṭāsthaḥ,mārjitāsthaḥ OR mārṣṭāsthaḥ
+mṛj,2 (primary),primary,periphrastic_future,active,2,pl,mārjitāstha OR mārṣṭāstha,mārjitāstha OR mārṣṭāstha
+mṛj,2 (primary),primary,periphrastic_future,active,3,sg,mārjitā OR mārṣṭā,mārjitā OR mārṣṭā
+mṛj,2 (primary),primary,periphrastic_future,active,3,du,mārjitārau OR mārṣṭārau,mārjitārau OR mārṣṭārau
+mṛj,2 (primary),primary,periphrastic_future,active,3,pl,mārjitāraḥ OR mārṣṭāraḥ,mārjitāraḥ OR mārṣṭāraḥ
+svap,2 (primary),primary,imperfect,active,2,sg,asvapaḥ OR asvapīḥ,asvapīḥ
+svap,2 (primary),primary,imperfect,active,3,sg,asvapat OR asvapīt,asvapīt
+svap,2 (primary),primary,future,active,1,sg,svapiṣyāmi OR svapsyāmi,svapsyāmi
+svap,2 (primary),primary,future,active,1,du,svapiṣyāvaḥ OR svapsyāvaḥ,svapsyāvaḥ
+svap,2 (primary),primary,future,active,1,pl,svapiṣyāmaḥ OR svapsyāmaḥ,svapsyāmaḥ
+svap,2 (primary),primary,future,active,2,sg,svapiṣyasi OR svapsyasi,svapsyasi
+svap,2 (primary),primary,future,active,2,du,svapiṣyathaḥ OR svapsyathaḥ,svapsyathaḥ
+svap,2 (primary),primary,future,active,2,pl,svapiṣyatha OR svapsyatha,svapsyatha
+svap,2 (primary),primary,future,active,3,sg,svapiṣyati OR svapsyati,svapsyati
+svap,2 (primary),primary,future,active,3,du,svapiṣyataḥ OR svapsyataḥ,svapsyataḥ
+svap,2 (primary),primary,future,active,3,pl,svapiṣyanti OR svapsyanti,svapsyanti
+svap,2 (primary),primary,periphrastic_future,active,1,sg,svapitāsmi OR svaptāsmi,svaptāsmi
+svap,2 (primary),primary,periphrastic_future,active,1,du,svapitāsvaḥ OR svaptāsvaḥ,svaptāsvaḥ
+svap,2 (primary),primary,periphrastic_future,active,1,pl,svapitāsmaḥ OR svaptāsmaḥ,svaptāsmaḥ
+svap,2 (primary),primary,periphrastic_future,active,2,sg,svapitāsi OR svaptāsi,svaptāsi
+svap,2 (primary),primary,periphrastic_future,active,2,du,svapitāsthaḥ OR svaptāsthaḥ,svaptāsthaḥ
+svap,2 (primary),primary,periphrastic_future,active,2,pl,svapitāstha OR svaptāstha,svaptāstha
+svap,2 (primary),primary,periphrastic_future,active,3,sg,svapitā OR svaptā,svaptā
+svap,2 (primary),primary,periphrastic_future,active,3,du,svapitārau OR svaptārau,svaptārau
+svap,2 (primary),primary,periphrastic_future,active,3,pl,svapitāraḥ OR svaptāraḥ,svaptāraḥ
+śās,2 (primary),primary,present,passive,1,sg,śāsye OR śiṣye,śāsye
+śās,2 (primary),primary,present,passive,1,du,śāsyāvahe OR śiṣyāvahe,śāsyāvahe
+śās,2 (primary),primary,present,passive,1,pl,śāsyāmahe OR śiṣyāmahe,śāsyāmahe
+śās,2 (primary),primary,present,passive,2,sg,śāsyase OR śiṣyase,śāsyase
+śās,2 (primary),primary,present,passive,2,du,śāsyethe OR śiṣyethe,śāsyethe
+śās,2 (primary),primary,present,passive,2,pl,śāsyadhve OR śiṣyadhve,śāsyadhve
+śās,2 (primary),primary,present,passive,3,sg,śāsyate OR śiṣyate,śāsyate
+śās,2 (primary),primary,present,passive,3,du,śāsyete OR śiṣyete,śāsyete
+śās,2 (primary),primary,present,passive,3,pl,śāsyante OR śiṣyante,śāsyante
+śās,2 (primary),primary,imperfect,active,2,sg,aśāt OR aśāḥ,aśāḥ
+śās,2 (primary),primary,imperfect,passive,1,sg,aśāsye OR aśiṣye,aśāsye
+śās,2 (primary),primary,imperfect,passive,1,du,aśāsyāvahi OR aśiṣyāvahi,aśāsyāvahi
+śās,2 (primary),primary,imperfect,passive,1,pl,aśāsyāmahi OR aśiṣyāmahi,aśāsyāmahi
+śās,2 (primary),primary,imperfect,passive,2,sg,aśāsyathāḥ OR aśiṣyathāḥ,aśāsyathāḥ
+śās,2 (primary),primary,imperfect,passive,2,du,aśāsyethām OR aśiṣyethām,aśāsyethām
+śās,2 (primary),primary,imperfect,passive,2,pl,aśāsyadhvam OR aśiṣyadhvam,aśāsyadhvam
+śās,2 (primary),primary,imperfect,passive,3,sg,aśāsyata OR aśiṣyata,aśāsyata
+śās,2 (primary),primary,imperfect,passive,3,du,aśāsyetām OR aśiṣyetām,aśāsyetām
+śās,2 (primary),primary,imperfect,passive,3,pl,aśāsyanta OR aśiṣyanta,aśāsyanta
+śās,2 (primary),primary,imperative,passive,1,sg,śāsyai OR śiṣyai,śāsyai
+śās,2 (primary),primary,imperative,passive,1,du,śāsyāvahai OR śiṣyāvahai,śāsyāvahai
+śās,2 (primary),primary,imperative,passive,1,pl,śāsyāmahai OR śiṣyāmahai,śāsyāmahai
+śās,2 (primary),primary,imperative,passive,2,sg,śāsyasva OR śiṣyasva,śāsyasva
+śās,2 (primary),primary,imperative,passive,2,du,śāsyethām OR śiṣyethām,śāsyethām
+śās,2 (primary),primary,imperative,passive,2,pl,śāsyadhvam OR śiṣyadhvam,śāsyadhvam
+śās,2 (primary),primary,imperative,passive,3,sg,śāsyatām OR śiṣyatām,śāsyatām
+śās,2 (primary),primary,imperative,passive,3,du,śāsyetām OR śiṣyetām,śāsyetām
+śās,2 (primary),primary,imperative,passive,3,pl,śāsyantām OR śiṣyantām,śāsyantām
+śās,2 (primary),primary,optative,passive,1,sg,śāsyeya OR śiṣyeya,śāsyeya
+śās,2 (primary),primary,optative,passive,1,du,śāsyevahi OR śiṣyevahi,śāsyevahi
+śās,2 (primary),primary,optative,passive,1,pl,śāsyemahi OR śiṣyemahi,śāsyemahi
+śās,2 (primary),primary,optative,passive,2,sg,śāsyethāḥ OR śiṣyethāḥ,śāsyethāḥ
+śās,2 (primary),primary,optative,passive,2,du,śāsyeyāthām OR śiṣyeyāthām,śāsyeyāthām
+śās,2 (primary),primary,optative,passive,2,pl,śāsyedhvam OR śiṣyedhvam,śāsyedhvam
+śās,2 (primary),primary,optative,passive,3,sg,śāsyeta OR śiṣyeta,śāsyeta
+śās,2 (primary),primary,optative,passive,3,du,śāsyeyātām OR śiṣyeyātām,śāsyeyātām
+śās,2 (primary),primary,optative,passive,3,pl,śāsyeran OR śiṣyeran,śāsyeran

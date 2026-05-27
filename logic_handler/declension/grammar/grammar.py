@@ -17,7 +17,7 @@ Long ū-stem implementaton
 class SanskritPhonology:
     def __init__(self):
         # 1. DEFINE SIGMA AND SIGMA STAR
-        self.sigma = pn.union(*"abcdefghijklmnopqrstuvwxyzāīūṛṝḷḹeaiouḥṃṅñṇnṃśṣs")
+        self.sigma = pn.union(*("abcdefghijklmnopqrstuvwxyzāīūṛṝḷḹṃḥṅñṭḍṇśṣḻ"))
         self.sigma = pn.union(self.sigma, "[WORD_END]")
         self.sigma_star = self.sigma.closure()
 
@@ -78,24 +78,46 @@ class SanskritPhonology:
         self._build_sandhi()
 
     def _build_nati_rule(self):
-        """Compiles the Nati (retroflexion) context-dependent rewrite rule."""
-        triggers = pn.union("r", "ṛ", "ṝ", "ṣ")
-        velars = pn.union("k", "kh", "g", "gh", "ṅ")
-        others = pn.union("y", "v", "h", "ṃ")
+        """
+        Build the Sanskrit ṇati rule.
 
-        # Interveners allowed between the trigger and 'n'
-        allowed_interveners = pn.union(
-            self.vowels, velars, self.labial, others
+        Dental n -> retroflex ṇ after:
+            r, ṛ, ṝ, ṣ
+
+        Allowed interveners:
+            vowels, gutturals, labials, y, v, h, ṃ
+
+        Blocked by:
+            coronals/dentals/palatals/etc.
+        """
+
+        triggers = pn.union("r", "ṛ", "ṝ", "ṣ")
+
+        allowed = pn.union(
+            self.vowels,
+            # gutturals
+            "k",
+            "kh",
+            "g",
+            "gh",
+            "ṅ",
+            # labials
+            "p",
+            "ph",
+            "b",
+            "bh",
+            "m",
+            # semivowels / misc
+            "y",
+            "v",
+            "h",
+            "ṃ",
         ).closure()
 
-        right_context = pn.union(self.vowels, "m", "v", "y")
-
-        # Context-dependent rewrite: cross 'n' to 'ṇ'
-        # Notice we are passing self.sigma_star here, not self.sigma!
         self.apply_nati_fst = pn.cdrewrite(
             pn.cross("n", "ṇ"),
-            triggers + allowed_interveners,
-            right_context,
+            triggers + allowed,
+            "",
             self.sigma_star,
         )
 
@@ -161,54 +183,96 @@ class SanskritPhonology:
         # EXTERNAL SANDHI only: final stop/sibilant → voiced unaspirated before
         # a voiced-initial word.  NOT used for isolated word forms (use
         # apply_permitted_finals instead for those).
-        jhal_to_jash = pn.string_map([
-            ("k", "g"),  ("kh", "g"), ("g", "g"),  ("gh", "g"),
-            ("c", "j"),  ("ch", "j"), ("j", "j"),  ("jh", "j"),
-            ("ṭ", "ḍ"),  ("ṭh", "ḍ"),("ḍ", "ḍ"),  ("ḍh", "ḍ"),
-            ("t", "d"),  ("th", "d"), ("d", "d"),  ("dh", "d"),
-            ("p", "b"),  ("ph", "b"), ("b", "b"),  ("bh", "b"),
-            ("ś", "j"),  ("ṣ", "ḍ"), ("s", "d"),  ("h", "gh"),
-        ])
+        jhal_to_jash = pn.string_map(
+            [
+                ("k", "g"),
+                ("kh", "g"),
+                ("g", "g"),
+                ("gh", "g"),
+                ("c", "j"),
+                ("ch", "j"),
+                ("j", "j"),
+                ("jh", "j"),
+                ("ṭ", "ḍ"),
+                ("ṭh", "ḍ"),
+                ("ḍ", "ḍ"),
+                ("ḍh", "ḍ"),
+                ("t", "d"),
+                ("th", "d"),
+                ("d", "d"),
+                ("dh", "d"),
+                ("p", "b"),
+                ("ph", "b"),
+                ("b", "b"),
+                ("bh", "b"),
+                ("ś", "j"),
+                ("ṣ", "ḍ"),
+                ("s", "d"),
+                ("h", "gh"),
+            ]
+        )
         self.apply_jhal_to_jash = pn.cdrewrite(
-            jhal_to_jash, "", "[WORD_END]", self.sigma_star,
+            jhal_to_jash,
+            "",
+            "[WORD_END]",
+            self.sigma_star,
         )
 
         # ── Permitted Finals (Whitney §141–150; Pāṇini 8.2.30–39) ────────────
         # At ABSOLUTE word-end (isolated form), only voiceless unaspirated stops
         # are permitted.  Voiced/aspirated stops deasperate and devoice; palatals
         # revert to velars; ś/ṣ → ṭ; s/r → ḥ (handled by apply_visarga).
-        permitted = pn.string_map([
-            # Velars: voiced/aspirated → k
-            ("gh", "k"), ("g", "k"),
-            # Palatals revert to velar (Whitney §142)
-            ("jh", "k"), ("j", "k"), ("ch", "k"), ("c", "k"),
-            # Retroflexes: voiced/aspirated → ṭ
-            ("ḍh", "ṭ"), ("ḍ", "ṭ"),
-            # Dentals: voiced/aspirated → t
-            ("dh", "t"), ("d", "t"), ("th", "t"),
-            # Labials: voiced/aspirated → p
-            ("bh", "p"), ("b", "p"), ("ph", "p"),
-            # Sibilants → retroflex stop (Whitney §145)
-            ("ś", "ṭ"), ("ṣ", "ṭ"),
-            # h: treated as voiced aspirate → devoice to k (default; duh-class
-            # handled separately in paradigm FSTs)
-            ("h", "k"),
-        ])
+        permitted = pn.string_map(
+            [
+                # Velars: voiced/aspirated → k
+                ("gh", "k"),
+                ("g", "k"),
+                # Palatals revert to velar (Whitney §142)
+                ("jh", "k"),
+                ("j", "k"),
+                ("ch", "k"),
+                ("c", "k"),
+                # Retroflexes: voiced/aspirated → ṭ
+                ("ḍh", "ṭ"),
+                ("ḍ", "ṭ"),
+                # Dentals: voiced/aspirated → t
+                ("dh", "t"),
+                ("d", "t"),
+                ("th", "t"),
+                # Labials: voiced/aspirated → p
+                ("bh", "p"),
+                ("b", "p"),
+                ("ph", "p"),
+                # Sibilants → retroflex stop (Whitney §145)
+                ("ś", "ṭ"),
+                ("ṣ", "ṭ"),
+                # h: treated as voiced aspirate → devoice to k (default; duh-class
+                # handled separately in paradigm FSTs)
+                ("h", "k"),
+            ]
+        )
         self.apply_permitted_finals = pn.cdrewrite(
-            permitted, "", "[WORD_END]", self.sigma_star,
+            permitted,
+            "",
+            "[WORD_END]",
+            self.sigma_star,
         ).optimize()
 
         # ── S-stem oblique sandhi ─────────────────────────────────────────────
         # as → o / is-us → r before bh-initial endings (Whitney §176–177).
         as_to_o = pn.cdrewrite(
-            pn.cross("as", "o"), "", "bh", self.sigma_star,
+            pn.cross("as", "o"),
+            "",
+            "bh",
+            self.sigma_star,
         )
         is_us_to_r = pn.cdrewrite(
             pn.cross("s", "r"),
-            pn.union("i", "u", "ī", "ū"), "bh", self.sigma_star,
+            pn.union("i", "u", "ī", "ū"),
+            "bh",
+            self.sigma_star,
         )
         self.apply_s_stem_sandhi = (as_to_o @ is_us_to_r).optimize()
 
 
 phonology = SanskritPhonology()
-

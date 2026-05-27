@@ -10,4 +10,5 @@ word[STEM] [MASC] [Nom / Acc / Ins] [Sg Pl Du] [EOS]
 Inria L's 
 
 incorrect declension for the word bhāvant: its NEU PL NOM should be bhāvanti NOT bhāvannti
+incorrect declensio nfor the fem gender of the word aṃśumat: should be treated as aṃśumati
 

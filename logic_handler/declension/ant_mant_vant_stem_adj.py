@@ -12,6 +12,7 @@ strong_n = pn.cross(ant_tags, "") + pn.cross("[Neut]", "")
 weak_m = pn.cross("nt", "t") + pn.cross(ant_tags, "") + pn.cross("[Masc]", "")
 weak_n = pn.cross("nt", "t") + pn.cross(ant_tags, "") + pn.cross("[Neut]", "")
 weak_blind = pn.cross("nt", "t") + pn.cross(ant_tags, "") + pn.cross(mn_g, "")
+weak_blind_pada = pn.cross("nt", "t#") + pn.cross(ant_tags, "") + pn.cross(mn_g, "")
 
 
 """
@@ -50,18 +51,16 @@ acc_sg_n = weak_n + pn.cross("[Acc][Sg]", "")
 voc_sg_n = weak_n + pn.cross("[Voc][Sg]", "")
 
 # Note: Pure participles ([ANT_STEM]) can optionally form bhāvanti here,
-# but bhāvatī is universally accepted for all three. Verified.
-nom_du_n = weak_n + pn.cross("[Nom][Du]", "ī")  # bhāvant -> bhāvatī
-acc_du_n = weak_n + pn.cross("[Acc][Du]", "ī")
-voc_du_n = weak_n + pn.cross("[Voc][Du]", "ī")
+# but bhāvantī is universally accepted for all three. Verified.
+nom_du_n = strong_n + pn.cross("[Nom][Du]", "ī")  # bhāvant -> bhāvantī
+acc_du_n = strong_n + pn.cross("[Acc][Du]", "ī")
+voc_du_n = strong_n + pn.cross("[Voc][Du]", "ī")
 
 # --- Strong Cases (Nom/Acc/Voc Pl) ---
-# FIXED: Classical Sanskrit requires lengthening the penultimate vowel (ant -> ānt)
-nom_pl_n = (
-    pn.cross("ant", "ānt") + strong_n + pn.cross("[Nom][Pl]", "i")
-)  # bhāvant -> bhāvānti
-acc_pl_n = pn.cross("ant", "ānt") + strong_n + pn.cross("[Acc][Pl]", "i")
-voc_pl_n = pn.cross("ant", "ānt") + strong_n + pn.cross("[Voc][Pl]", "i")
+# Penultimate vowel remains short for general mat/vat/ant adjectives (except mahat)
+nom_pl_n = strong_n + pn.cross("[Nom][Pl]", "i")  # bhāvant -> bhāvanti
+acc_pl_n = strong_n + pn.cross("[Acc][Pl]", "i")
+voc_pl_n = strong_n + pn.cross("[Voc][Pl]", "i")
 
 
 """
@@ -75,18 +74,93 @@ abl_sg = weak_blind + pn.cross("[Abl][Sg]", "as")
 gen_sg = weak_blind + pn.cross("[Gen][Sg]", "as")
 loc_sg = weak_blind + pn.cross("[Loc][Sg]", "i")
 
-ins_du = weak_blind + pn.cross("[Ins][Du]", "bhyām")  # bhāvant -> bhāvatbhyām
-dat_du = weak_blind + pn.cross("[Dat][Du]", "bhyām")
-abl_du = weak_blind + pn.cross("[Abl][Du]", "bhyām")
+ins_du = weak_blind_pada + pn.cross("[Ins][Du]", "bhyām")  # bhāvant -> bhāvat#bhyām (-> bhāvadbhyām)
+dat_du = weak_blind_pada + pn.cross("[Dat][Du]", "bhyām")
+abl_du = weak_blind_pada + pn.cross("[Abl][Du]", "bhyām")
 gen_du = weak_blind + pn.cross("[Gen][Du]", "os")
 loc_du = weak_blind + pn.cross("[Loc][Du]", "os")
 
-ins_pl = weak_blind + pn.cross("[Ins][Pl]", "bhis")  # bhāvant -> bhāvatbhis
-dat_pl = weak_blind + pn.cross("[Dat][Pl]", "bhyas")
-abl_pl = weak_blind + pn.cross("[Abl][Pl]", "bhyas")
+ins_pl = weak_blind_pada + pn.cross("[Ins][Pl]", "bhis")  # bhāvant -> bhāvat#bhis (-> bhāvadbhiḥ)
+dat_pl = weak_blind_pada + pn.cross("[Dat][Pl]", "bhyas")
+abl_pl = weak_blind_pada + pn.cross("[Abl][Pl]", "bhyas")
 gen_pl = weak_blind + pn.cross("[Gen][Pl]", "ām")
-loc_pl = weak_blind + pn.cross("[Loc][Pl]", "su")  # bhāvant -> bhāvatsu
+loc_pl = weak_blind_pada + pn.cross("[Loc][Pl]", "su")  # bhāvant -> bhāvat#su (-> bhāvatsu)
 
+"""
+6. FEMININE SPECIFIC CASES (Nadī Declension)
+"""
+# --- Dynamic Feminine Bases ---
+# Participles ([ANT_STEM]) keep the 'n' for thematic roots -> nt + ī
+f_strong_base = pn.cross("[ANT_STEM]", "") + pn.cross("[Fem]", "")
+
+# Possessives ([MANT_STEM], [VANT_STEM]) drop the 'n' -> t + ī
+# (Note: If you add athematic participles later, add them to this weak base)
+f_weak_base = pn.cross("nt", "t") + pn.cross(m_v_tags, "") + pn.cross("[Fem]", "")
+
+f_base = pn.union(f_strong_base, f_weak_base)
+
+# --- Nominative / Accusative / Vocative ---
+nom_sg_f = f_base + pn.cross(
+    "[Nom][Sg]", "ī"
+)  # bhāvant -> bhāvantī / bhagavat -> bhagavatī
+acc_sg_f = f_base + pn.cross("[Acc][Sg]", "īm")
+voc_sg_f = f_base + pn.cross("[Voc][Sg]", "i")
+
+nom_du_f = f_base + pn.cross("[Nom][Du]", "yau")
+acc_du_f = f_base + pn.cross("[Acc][Du]", "yau")
+voc_du_f = f_base + pn.cross("[Voc][Du]", "yau")
+
+nom_pl_f = f_base + pn.cross("[Nom][Pl]", "yas")
+acc_pl_f = f_base + pn.cross("[Acc][Pl]", "īs")  # Acc Pl uses īs, not yas!
+voc_pl_f = f_base + pn.cross("[Voc][Pl]", "yas")
+
+# --- Oblique Cases (yā, yai, yās, yām) ---
+ins_sg_f = f_base + pn.cross("[Ins][Sg]", "yā")
+dat_sg_f = f_base + pn.cross("[Dat][Sg]", "yai")
+abl_sg_f = f_base + pn.cross("[Abl][Sg]", "yās")
+gen_sg_f = f_base + pn.cross("[Gen][Sg]", "yās")
+loc_sg_f = f_base + pn.cross("[Loc][Sg]", "yām")
+
+ins_du_f = f_base + pn.cross("[Ins][Du]", "ībhyām")
+dat_du_f = f_base + pn.cross("[Dat][Du]", "ībhyām")
+abl_du_f = f_base + pn.cross("[Abl][Du]", "ībhyām")
+gen_du_f = f_base + pn.cross("[Gen][Du]", "yos")
+loc_du_f = f_base + pn.cross("[Loc][Du]", "yos")
+
+ins_pl_f = f_base + pn.cross("[Ins][Pl]", "ībhis")
+dat_pl_f = f_base + pn.cross("[Dat][Pl]", "ībhyas")
+abl_pl_f = f_base + pn.cross("[Abl][Pl]", "ībhyas")
+gen_pl_f = f_base + pn.cross("[Gen][Pl]", "īnām")
+loc_pl_f = f_base + pn.cross("[Loc][Pl]", "īṣu")  # Retroflex ṣ triggered by ī
+
+
+# Compile the Feminine Paradigm
+ant_fem_paradigm = pn.union(
+    nom_sg_f,
+    acc_sg_f,
+    voc_sg_f,
+    nom_du_f,
+    acc_du_f,
+    voc_du_f,
+    nom_pl_f,
+    acc_pl_f,
+    voc_pl_f,
+    ins_sg_f,
+    dat_sg_f,
+    abl_sg_f,
+    gen_sg_f,
+    loc_sg_f,
+    ins_du_f,
+    dat_du_f,
+    abl_du_f,
+    gen_du_f,
+    loc_du_f,
+    ins_pl_f,
+    dat_pl_f,
+    abl_pl_f,
+    gen_pl_f,
+    loc_pl_f,
+).optimize()
 
 ant_masc_paradigm = pn.union(
     nom_sg_ant,
@@ -145,4 +219,6 @@ ant_neut_paradigm = pn.union(
 ).optimize()
 
 # Combined active participle / possessive paradigm
-ant_stem_paradigm = pn.union(ant_masc_paradigm, ant_neut_paradigm).optimize()
+ant_stem_paradigm = pn.union(
+    ant_masc_paradigm, ant_neut_paradigm, ant_fem_paradigm
+).optimize()
