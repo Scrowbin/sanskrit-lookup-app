@@ -280,8 +280,10 @@ class SuffixProvider:
             is_intensive = kwargs.get('derivative') == 'intensive_active_luganta'
             if is_intensive:
                 from alphabet import ALPHABET as _A
-                # Intensive stem ending in consonant takes 'dhi' (e.g. carkar-dhi)
-                sg2 = "dhi|hi" 
+                # Intensive stem ending in consonant takes 'dhi' (e.g. carkar-dhi, bobhav-dhi)
+                # Vowel stems take 'hi' (e.g. bobho-hi).
+                # The stem FST generates both variants dynamically, so we use a tag.
+                sg2 = "[HI_DHI]" 
             else:
                 sg2 = "dhi" if root_str in ("hu", "ad") else "hi"
                 
@@ -523,7 +525,7 @@ class SuffixProvider:
         """Middle Benedictive endings (-sīṣṭa). Very rare in Classical Sanskrit."""
         return {
             "[3sg]": _s("sīṣṭa"),   "[3du]": _s("sīyāstām"), "[3pl]": _s("sīran"),
-            "[2sg]": _s("sīṣṭhāḥ"), "[2du]": _s("sīyāsthām"),"[2pl]": _s("sīdhvam"),
+            "[2sg]": _s("sīṣṭhāḥ"), "[2du]": _s("sīyāsthām"),"[2pl]": _s("sīḍhvam"),
             "[1sg]": _s("sīya"),    "[1du]": _s("sīvahi"),   "[1pl]": _s("sīmahi"),
         }
 

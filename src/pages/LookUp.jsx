@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { t } from "@indic-transliteration/sanscript";
 import { INPUT_SCHEMES } from "../constants/transliterationSchemes";
 import useSanskritAPI from "../hook/useSanskritAPI";
@@ -65,8 +65,25 @@ export default function LookUp() {
   const [conjResults, setConjResults] = useState(null); // { primary, causative, desiderative, intensive }
   const [declResult, setDeclResult] = useState(null);
   const [activeTab, setActiveTab] = useState("primary");
+  const [showScroll, setShowScroll] = useState(false);
 
   const devanagariDisplay = t(inputValue, inputScheme, "devanagari");
+
+  useEffect(() => {
+    const checkScrollTop = () => {
+      if (!showScroll && window.pageYOffset > 400) {
+        setShowScroll(true);
+      } else if (showScroll && window.pageYOffset <= 400) {
+        setShowScroll(false);
+      }
+    };
+    window.addEventListener('scroll', checkScrollTop);
+    return () => window.removeEventListener('scroll', checkScrollTop);
+  }, [showScroll]);
+
+  const scrollTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -138,6 +155,25 @@ export default function LookUp() {
 
   // ── Rendering Helpers ──────────────────────────────────────────────────────
 
+  function renderKrdantaForm(formString) {
+    if (outputScript !== "Devanagari") {
+      // Still apply styling to the m. n. f. tags even in Roman script
+      return formString.split(" ").map((word, i) => {
+        if (word === "m." || word === "n." || word === "f.") {
+          return <span key={i} className="text-neutral-500 font-sans text-[10px] uppercase tracking-wider mx-1">{word.replace('.', '')}</span>;
+        }
+        return <span key={i}>{word} </span>;
+      });
+    }
+    
+    return formString.split(" ").map((word, i) => {
+      if (word === "m." || word === "n." || word === "f.") {
+        return <span key={i} className="text-neutral-500 font-sans text-[10px] uppercase tracking-wider mx-1">{word.replace('.', '')}</span>;
+      }
+      return <span key={i}>{t(word, "iast", "devanagari")} </span>;
+    });
+  }
+
   function renderDerivativeResult(title, data) {
     if (!data || (!data.tenses && !data.krdantas) || (Object.keys(data.tenses || {}).length === 0 && !data.krdantas)) {
       return null;
@@ -152,8 +188,9 @@ export default function LookUp() {
           if (!tenseData) return null;
 
           return (
-            <div key={value} className="space-y-6">
-              <h3 className="text-xl font-medium text-neutral-200">{label}</h3>
+            <div key={value} className="space-y-6 bg-neutral-900/40 p-6 rounded-xl border border-neutral-800 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500/50"></div>
+              <h3 className="text-xl font-bold text-neutral-100 border-b border-neutral-700/50 pb-3 mb-4">{label}</h3>
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                 {VOICES.map(({ value: voiceValue, label: voiceLabel }) => {
                   const paradigm = tenseData[voiceValue];
@@ -205,8 +242,8 @@ export default function LookUp() {
                   {data.krdantas.participles.map((p, idx) => (
                     <div key={idx} className="bg-neutral-900 p-4 rounded-lg shadow border border-neutral-800">
                       <div className="text-xs uppercase tracking-wide text-neutral-500 mb-1">{p.name}</div>
-                      <div className="font-mono text-base text-neutral-200">
-                        {outputScript === "Devanagari" ? t(p.form, "iast", "devanagari") : p.form}
+                      <div className="font-mono text-base text-neutral-200 whitespace-pre-wrap">
+                        {renderKrdantaForm(p.form)}
                       </div>
                     </div>
                   ))}
@@ -221,8 +258,8 @@ export default function LookUp() {
                   {data.krdantas.indeclinables.map((item, idx) => (
                     <div key={idx} className="bg-neutral-900 px-5 py-4 rounded-lg shadow border border-neutral-800 flex-1 min-w-[200px]">
                       <div className="text-xs uppercase tracking-wide text-neutral-500 mb-1">{item.name}</div>
-                      <div className="font-mono text-base text-neutral-200">
-                        {outputScript === "Devanagari" ? t(item.form, "iast", "devanagari") : item.form}
+                      <div className="font-mono text-base text-neutral-200 whitespace-pre-wrap">
+                        {renderKrdantaForm(item.form)}
                       </div>
                     </div>
                   ))}
@@ -587,6 +624,19 @@ export default function LookUp() {
           </section>
         )}
       </div>
+
+      {/* Scroll to top button */}
+      <button
+        onClick={scrollTop}
+        className={`fixed bottom-8 right-8 p-3 rounded-full bg-indigo-600 text-white shadow-lg transition-all duration-300 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-neutral-950 z-50 ${
+          showScroll ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'
+        }`}
+        aria-label="Scroll to top"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+        </svg>
+      </button>
     </div>
   );
 }

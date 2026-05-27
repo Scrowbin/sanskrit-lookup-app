@@ -180,9 +180,14 @@ class DhatupathaAnalyzer:
     # ── CSV loader ─────────────────────────────────────────────────────────────
 
     def _load(self):
-        csv_path = os.path.join(
-            os.path.dirname(__file__), '..', 'data', 'dhatupatha.csv'
-        )
+        import sys
+        if getattr(sys, 'frozen', False):
+            # Running in PyInstaller bundle
+            data_dir = os.path.join(sys._MEIPASS, 'data')
+        else:
+            # Running in normal Python
+            data_dir = os.path.join(os.path.dirname(__file__), '..', 'data')
+        csv_path = os.path.join(data_dir, 'dhatupatha.csv')
         try:
             with open(csv_path, 'r', encoding='utf-8') as f:
                 reader = csv.reader(f)
@@ -197,7 +202,7 @@ class DhatupathaAnalyzer:
                         except ValueError:
                             pass
         except Exception as e:
-            print(f"DhatupathaAnalyzer: error loading CSV — {e}")
+            print(f"DhatupathaAnalyzer: error loading CSV - {e}")
 
     def _load_mw_roots(self):
         """Load unprefixed-roots.csv (MW) for voice fallback and homonym data.
@@ -208,9 +213,12 @@ class DhatupathaAnalyzer:
         Ubhayapada roots appear as TWO rows — one para and one atma — for the
         same (root, class) key.  We collect a set per key so both are captured.
         """
-        csv_path = os.path.join(
-            os.path.dirname(__file__), '..', 'data', 'unprefixed-roots.csv'
-        )
+        import sys
+        if getattr(sys, 'frozen', False):
+            data_dir = os.path.join(sys._MEIPASS, 'data')
+        else:
+            data_dir = os.path.join(os.path.dirname(__file__), '..', 'data')
+        csv_path = os.path.join(data_dir, 'unprefixed-roots.csv')
         try:
             with open(csv_path, 'r', encoding='utf-8') as f:
                 reader = csv.DictReader(f)
@@ -227,7 +235,7 @@ class DhatupathaAnalyzer:
                     if key not in self._mw_hom:
                         self._mw_hom[key] = hom
         except Exception as e:
-            print(f"DhatupathaAnalyzer: error loading unprefixed-roots — {e}")
+            print(f"DhatupathaAnalyzer: error loading unprefixed-roots - {e}")
 
 
     # ── Internal lookup ────────────────────────────────────────────────────────

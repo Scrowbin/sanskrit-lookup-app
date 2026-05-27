@@ -47,6 +47,14 @@ try:
 except ImportError:
     pass
 
+# Also include Conda DLLs (like ffi for ctypes, dl for pynini, fst for openfst)
+import glob
+conda_lib_bin = os.path.join(sys.prefix, "Library", "bin")
+
+for pat in ("ffi*.dll", "dl.dll", "*fst*.dll"):
+    for dll in glob.glob(os.path.join(conda_lib_bin, pat)):
+        binaries.append((dll, "."))
+
 # Data files to bundle alongside the executable
 datas = [
     # Conjugation grammar modules (all .py files — imported at runtime)

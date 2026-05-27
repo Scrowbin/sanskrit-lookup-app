@@ -131,7 +131,8 @@ class MorphologicalFeatureResolver:
             else:
                 if derivative == "intensive_anta":
                     strength = "[WEAK]"
-                    effective_class = 1
+                    # Whitney §1006a: Active intensive yaṅanta occasionally takes athematic (class 3) endings like the luganta.
+                    effective_class = 3
                     effective_derivative = "intensive_active_anta"
                 else:
                     # Active intensive luganta: athematic class-3 endings with strength

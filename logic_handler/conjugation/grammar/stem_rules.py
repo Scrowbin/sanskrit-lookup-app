@@ -620,11 +620,11 @@ class StemBuilder:
                 return pn.accep("[SAMP]" + root_str)
 
             if root_str.endswith("ā"):
-                # Whitney §838: ā-final roots use e-grade (dā→de, sthā→sthe)
-                # Some also allow ī-grade (dā→dī). Union both.
+                # Whitney §922a: ā-final roots change ā to e (e.g. dā→de, sthā→sthe).
                 e_form = pn.accep(root_str[:-1] + "e")
-                ii_form = pn.accep(root_str[:-1] + "ī")
-                return pn.union(pn.accep(root_str), e_form, ii_form)
+                if root_str == "jñā":
+                    return pn.union(pn.accep(root_str), e_form)
+                return e_form
             elif root_str.endswith("i"):
                 # Whitney §922: i-final roots lengthen
                 return pn.accep(root_str[:-1] + "ī")
@@ -632,8 +632,16 @@ class StemBuilder:
                 # Whitney §922: u-final roots lengthen
                 return pn.accep(root_str[:-1] + "ū")
             elif root_str.endswith("ṛ") or root_str.endswith("ṝ"):
-                # Whitney §922: ṛ-final roots take guna (ṛ→ar) in benedictive active
-                return pn.accep(root_str[:-1] + "ar")
+                # Macdonell §438: ṛ becomes ri; ṝ becomes īr (ūr after labials).
+                # Exceptions: smṛ, jṛ etc. take guna (ar).
+                if root_str in ("smṛ", "jṛ", "stṛ"):
+                    return pn.accep(root_str[:-1] + "ar")
+                elif root_str.endswith("ṝ"):
+                    if len(root_str) > 1 and root_str[-2] in ("p", "ph", "b", "bh", "m", "v"):
+                        return pn.accep(root_str[:-1] + "ūr")
+                    return pn.accep(root_str[:-1] + "īr")
+                else:
+                    return pn.accep(root_str[:-1] + "ri")
             elif root_str == "div":
                 # Pāṇini 8.2.77: div lengthens to dīv before consonants
                 return pn.accep("dīv")
@@ -669,10 +677,19 @@ class StemBuilder:
         Whitney §794: Roots ending in a before voiced aspirate use e-grade weak.
         """
         if root_str == "vid" and class_num == 2:
+            # Whitney §801: vid has an unreduplicated perfect (veda, vidva) that acts as a present (active only),
+            # alongside the regular reduplicated perfect (viveda, vividiva).
+            reg_prefix = self.reduplicator.generate_prefix(root_str)
+            voice = kwargs.get("voice", "active")
             if strength == "[STRONG]":
-                return self._apply_guna(root_str, "[STRONG]")
+                reg_strong = pn.accep(reg_prefix + "+") + pn.accep("ved")
+                unred_strong = pn.accep("ved[VID_UNRED]")
+                # Both are valid in active.
+                return pn.union(reg_strong, unred_strong) if voice == "active" else reg_strong
             else:
-                return pn.accep(root_str)
+                reg_weak = pn.accep(reg_prefix + "+") + pn.accep("vid[PERF_WEAK]")
+                unred_weak = pn.accep("vid[VID_UNRED]")
+                return pn.union(reg_weak, unred_weak) if voice == "active" else reg_weak
 
         prefix = self.reduplicator.generate_prefix(root_str)
 

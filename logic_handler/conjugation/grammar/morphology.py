@@ -315,6 +315,18 @@ class MorphologyEngine:
             pn.union("i", "ī"),
             sig
         )
+
+        # Rule B.2: Unreduplicated perfect 'vid' does not take iṭ (Whitney §801).
+        self.vid_perfect_i_drop = pn.cdrewrite(
+            pn.cross("i", ""),
+            pn.accep("[VID_UNRED]+") | pn.accep("[VID_UNRED]"),
+            "",
+            sig
+        )
+        self.vid_unred_to_perf_weak = pn.cdrewrite(
+            pn.cross("[VID_UNRED]", "[PERF_WEAK]"),
+            "", "", sig
+        )
         
         # Rule B.2: Pāṇini 7.3.72 kasyāci ca (ksa drops a before ac)
         # sa-aorist (ksa) drops its final 'a' before vowel endings
@@ -367,6 +379,21 @@ class MorphologyEngine:
             pn.union(pn.cross("śās", "śiṣ"), pn.cross("śās", "śās")) + pn.cross(_any_weak, "+"),
             "",
             sas_context,
+            sig
+        )
+
+        # ── 7.1. Intensive Imperative 2sg [HI_DHI] Resolution ─────────────────
+        # Whitney §1011: The 2d sing. act. takes dhi after a consonant, and hi after a vowel.
+        self.intensive_hi = pn.cdrewrite(
+            pn.cross("[HI_DHI]", "hi"),
+            pn.union(*ALPHABET.vowels_list) + pn.accep("+"),
+            "",
+            sig
+        )
+        self.intensive_dhi = pn.cdrewrite(
+            pn.cross("[HI_DHI]", "dhi"),
+            pn.union(*ALPHABET.consonants_list) + pn.accep("+"),
+            "",
             sig
         )
 
@@ -428,7 +455,7 @@ class MorphologyEngine:
             "[PASSIVE]", "[CLASS4]", "[CLASS8]", "[CAUS_PASS]",
             "[STRONG]",  "[WEAK]",   "[VRIDDHI]", "[CLASS2_WEAK]",
             "[ROOT_AORIST]", "[AORIST]", "[AORIST_PASS_3SG]", "[SA_AORIST]", "[INTENSIVE_ACTIVE]",
-            "[SAMP]", "[AUG]", "[NASAL]",
+            "[SAMP]", "[AUG]", "[NASAL]", "[HI_DHI]",
             # Note: [NO_RUKI], [RUH_H], [PERF_WEAK], and [MRJ] MUST NOT be stripped here,
             # as they are needed by SandhiEngine. They are stripped in sandhi.py.
         )
@@ -466,11 +493,16 @@ class MorphologyEngine:
                 ("zero_grade_as",            self.zero_grade_as),
                 ("zero_grade_a_drop_vowel",  self.zero_grade_a_drop_vowel),
                 ("a_drop_before_i",          self.a_drop_before_i),
+                ("vid_perfect_i_drop",       self.vid_perfect_i_drop),
+                ("vid_unred_to_perf_weak",   self.vid_unred_to_perf_weak),
                 ("sa_aorist_a_drop",         self.sa_aorist_a_drop),
                 ("zero_grade_han_hi",        self.zero_grade_han_hi),
                 ("zero_grade_han_cons",      self.zero_grade_han_cons),
                 ("zero_grade_han_nasal",     self.zero_grade_han_nasal),
+                ("zero_grade_sas_dhi",       self.zero_grade_sas_dhi),
                 ("zero_grade_sas_cons",      self.zero_grade_sas_cons),
+                ("intensive_hi",             self.intensive_hi),
+                ("intensive_dhi",            self.intensive_dhi),
                 ("clean_tags",               self.clean_tags),
                 ("sd_boundary_tagging",      self.sd_boundary_tagging),
             ]
@@ -519,12 +551,16 @@ class MorphologyEngine:
             @ self.zero_grade_as
             @ self.zero_grade_a_drop_vowel
             @ self.a_drop_before_i
+            @ self.vid_perfect_i_drop
+            @ self.vid_unred_to_perf_weak
             @ self.sa_aorist_a_drop
             @ self.zero_grade_han_hi
             @ self.zero_grade_han_cons
             @ self.zero_grade_han_nasal
             @ self.zero_grade_sas_dhi
             @ self.zero_grade_sas_cons
+            @ self.intensive_hi
+            @ self.intensive_dhi
             @ self.clean_tags
             @ self.sd_boundary_tagging
         )

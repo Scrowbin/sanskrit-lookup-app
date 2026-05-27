@@ -84,12 +84,14 @@ class SanskritAlphabet:
             "[AUG]",
             "[NASAL]",
             "[PERF_WEAK]",
+            "[VID_UNRED]",
             "[CLASS9]",
             "[MRJ]",
             "[RUH_H]",
             "[GRASSMANN]",
             "[NO_RUKI]",
             "[PRAGRHYA]",
+            "[HI_DHI]",
             # --- Sandhi pipeline (morphology inserts → sandhi consumes / clean_sd_residual) ---
             "[SD_DCP]",   # dental + palatal fusion (t/d/dh + c/ch → cc/cch)
             "[SD_GEM]",   # homorganic gemination across '+'

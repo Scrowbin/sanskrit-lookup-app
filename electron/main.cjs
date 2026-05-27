@@ -139,7 +139,7 @@ function waitForServer(retries = 30, interval = 1000) {
           try {
             const json = JSON.parse(data);
             if (json.status === "ok") return resolve(true);
-          } catch {}
+          } catch { }
           retry();
         });
       });
@@ -236,7 +236,7 @@ function createWindow() {
 
     webPreferences: {
       preload: path.join(__dirname, "preload.cjs"),
-      devTools: !app.isPackaged, // 👈 dev only
+      devTools: !app.isPackaged, //  dev only
       sandbox: false,
       spellcheck: false,
       backgroundThrottling: false,
@@ -247,7 +247,7 @@ function createWindow() {
 
   if (app.isPackaged) {
     // 🚀 FAST: load built files
-    mainWindow.loadFile(path.join(__dirname, "dist/index.html"));
+    mainWindow.loadFile(path.join(__dirname, "..", "dist", "index.html"));
   } else {
     // DEV ONLY
     mainWindow.loadURL("http://localhost:5173");

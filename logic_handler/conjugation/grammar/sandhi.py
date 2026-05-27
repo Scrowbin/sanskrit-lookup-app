@@ -349,12 +349,11 @@ class SandhiEngine:
         # Must use left-context to ensure we match a genuine 'h', not the 'h' inside 'dh', 'bh', etc.
         _h_left = pn.union(ALPHABET.vowels, "r", "l", "y", "v", "n", "m", "ṅ", "ñ", "ṇ")
         self.bartho_hth = pn.cdrewrite(pn.cross("h+th", "gdh"), _h_left, "", self.sig)
-        self.bartho_hdh = pn.cdrewrite(pn.cross("h+dh", "gdh"), _h_left, "", self.sig)
         self.bartho_ht  = pn.cdrewrite(pn.cross("h+t",  "gdh"), _h_left, "", self.sig)
 
         # Grassmann's Law (throwback deaspiration).
         throwback_triggers = pn.union(
-            "+s", "+ṣ", "+t", "+th", "+c", "+ch", "[EOS]"
+            "+s", "+ṣ", "+t", "+th", "+c", "+ch", "+dhv", "[EOS]"
         )
         self.grassmann_throwback = pn.cdrewrite(
             pn.string_map([("b", "bh"), ("d", "dh"), ("g", "gh")]),
@@ -402,6 +401,18 @@ class SandhiEngine:
                 ("bh", "b"),
             ]),
             "", _non_nasal_mutes_and_sibilants, self.sig
+        )
+
+        # h -> g before voiced mutes (dh, bh, etc.).
+        # Roots like duh, dah, dih, guh treat h as gh before voiced mutes (Whitney §222).
+        # This gives dug+dhve, allowing throwback to apply (or applying after throwback).
+        # We must NOT consume the '+' so throwback triggers still match.
+        _voiced_mutes = pn.union(
+            "+g", "+gh", "+j", "+jh", "+ḍ", "+ḍh", "+d", "+dh", "+dhv", "+b", "+bh"
+        )
+        self.h_to_g_voiced = pn.cdrewrite(
+            pn.cross("h", "g"),
+            "", _voiced_mutes, self.sig
         )
 
         # h → k before +s/+ṣ (after a vowel or sonorant).
@@ -742,10 +753,10 @@ class SandhiEngine:
             ("jhalo_jhali",        self.jhalo_jhali),
             ("bartholomae_general", self.bartholomae_general),
             ("bartho_hth",         self.bartho_hth),
-            ("bartho_hdh",         self.bartho_hdh),
             ("bartho_ht",          self.bartho_ht),
             ("grassmann_throwback",self.grassmann_throwback),
             ("deaspiration_153",   self.deaspiration_153),   # §153 Whitney — after Bartholomae, before devoicing
+            ("h_to_g_voiced",      self.h_to_g_voiced),
             ("h_to_k",             self.h_to_k),
             ("j_retroflex",        self.j_retroflex),
             ("sha_sonant_aspirate", self.sha_sonant_aspirate),   # §2.6 Whitney §218
@@ -859,10 +870,10 @@ class SandhiEngine:
                 @ self.jhalo_jhali
                 @ self.bartholomae_general
                 @ self.bartho_hth
-                @ self.bartho_hdh
                 @ self.bartho_ht
                 @ self.grassmann_throwback
                 @ self.deaspiration_153          # §153 Whitney — after Bartholomae, before devoicing
+                @ self.h_to_g_voiced
                 @ self.h_to_k
                 @ self.j_retroflex
                 @ self.sha_sonant_aspirate          # §2.6 Whitney §218 — before palatal_sandhi

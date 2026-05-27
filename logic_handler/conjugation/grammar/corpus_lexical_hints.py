@@ -59,9 +59,12 @@ def load_adverb_primary_gerund_set_hints(
     statistically safer default for Sanskrit primary gerunds.
     """
     if csv_path is None:
-        csv_path = os.path.join(
-            os.path.dirname(__file__), "..", "data", "adverbs.csv"
-        )
+        import sys
+        if getattr(sys, 'frozen', False):
+            data_dir = os.path.join(sys._MEIPASS, 'data')
+        else:
+            data_dir = os.path.join(os.path.dirname(__file__), "..", "data")
+        csv_path = os.path.join(data_dir, "adverbs.csv")
     votes: dict[str, list[bool]] = {}
     try:
         with open(csv_path, "r", encoding="utf-8") as fp:
@@ -104,9 +107,12 @@ def load_parts_past_stems_by_root(
     Value: list of attested stem_IAST strings (may include duplicates).
     """
     if csv_path is None:
-        csv_path = os.path.join(
-            os.path.dirname(__file__), "..", "data", "parts.csv"
-        )
+        import sys
+        if getattr(sys, 'frozen', False):
+            data_dir = os.path.join(sys._MEIPASS, 'data')
+        else:
+            data_dir = os.path.join(os.path.dirname(__file__), "..", "data")
+        csv_path = os.path.join(data_dir, "parts.csv")
     index: dict[tuple[str, str, str], list[str]] = {}
     try:
         with open(csv_path, "r", encoding="utf-8") as fp:

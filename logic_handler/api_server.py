@@ -189,6 +189,16 @@ _TENSES_VOICES = {
     "injunctive":           ["active", "middle", "passive"],
 }
 
+# Whitney §1002-1012: Intensives only conjugate in the present-system
+# (present, imperfect, optative, imperative) and only in active + middle.
+# The yaṅluganta active is athematic (cl3); the yaṅanta is middle-only.
+_INTENSIVE_TENSES_VOICES = {
+    "present":   ["active", "middle"],
+    "imperfect": ["active", "middle"],
+    "optative":  ["active", "middle"],
+    "imperative":["active", "middle"],
+}
+
 
 @app.route("/api/conjugate/derivative", methods=["POST"])
 def conjugate_derivative():
@@ -227,7 +237,10 @@ def conjugate_derivative():
 
         result = {"tenses": {}}
 
-        for tense, voices in _TENSES_VOICES.items():
+        # Intensives use a restricted tense set (Whitney §1002-1012)
+        tenses_voices = _INTENSIVE_TENSES_VOICES if derivative == "intensive" else _TENSES_VOICES
+
+        for tense, voices in tenses_voices.items():
             tense_data = {}
             for voice in voices:
                 paradigm = {}
