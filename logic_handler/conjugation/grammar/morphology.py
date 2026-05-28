@@ -101,6 +101,12 @@ class MorphologyEngine:
             ]),
             "", "", sig
         )
+        # For roots ending in ñc, passive -ya surfaces as -cya (not -ñcya):
+        # kañc + ya -> kacya (INRIA paradigms).
+        self.passive_ncya_simplification = pn.cdrewrite(
+            pn.cross("ñc[PASSIVE]+y", "c+y"),
+            "", "", sig
+        )
 
         # ── 2. Class-4 (Divyādi) internal lengthening ─────────────────────────
         # The stem is built as root + [CLASS4] + +ya, e.g. "div[CLASS4]+ya".
@@ -112,13 +118,20 @@ class MorphologyEngine:
         # by replacing i→ī when [CLASS4] is somewhere to the right.
         # cdrewrite left-context "" / right-context: any consonants then [CLASS4]
         _any_cons = pn.closure(ALPHABET.consonants)
+        # Divyādi (class 4): lengthen penultimate short i only (not u).
         self.class4_lengthening = pn.cdrewrite(
-            pn.string_map([("i", "ī"), ("u", "ū")]),
+            pn.string_map([("i", "ī")]),
             "",
             _any_cons + pn.accep("[CLASS4]"),
             sig
         )
-
+        # Short a in class-4 stems (e.g. klam → klāmaya-) takes vrddhi before +ya.
+        self.class4_a_vrddhi = pn.cdrewrite(
+            pn.cross("a", "ā"),
+            "",
+            ALPHABET.consonants + pn.accep("[CLASS4]"),
+            sig,
+        )
         # ── 2.6. Intensive active ī augment reduction ──────────────────────────
         # Intensive active forms with ī augment (īmi, īṣi, īti) behave as weak (no guna)
         # for roots ending in consonants (budh, dviṣ, vid). We reduce o→u, e→i.
@@ -129,7 +142,6 @@ class MorphologyEngine:
             _one_or_more_cons + pn.accep("[INTENSIVE_ACTIVE]+ī"),
             sig
         )
-
         # ── 2.5. Samprasāraṇa ────────────────────────────────────────────────
         # Converts semivowels to vowels in weak contexts (Whitney §252; Pāṇini 6.1.13–15).
         # Tag [SAMP] is prepended to the whole root by build() when the root
@@ -186,6 +198,7 @@ class MorphologyEngine:
                 ("pā[CLASS1_IRR]", "pib"),
                 ("sad[CLASS1_IRR]", "sīd"),
                 ("scand[CLASS1_IRR]", "skand"),
+                ("vyā[CLASS1_IRR]", "vyay"),
             ]),
             "", "", sig
         )
@@ -247,6 +260,13 @@ class MorphologyEngine:
             "",
             pn.union("v", "m"),
             sig
+        )
+        # ṛ-root iṣ-aorist: āriṣ → ārṣ (akāriṣam → akārṣam, class-4 kṛ).
+        self.aorist_arisi_to_arsi = pn.cdrewrite(
+            pn.cross("āriṣ", "ārṣ"),
+            "",
+            "",
+            sig,
         )
         # ── 5. Root Aorist exceptions ─────────────────────────────────────────
         # √bhū + [ROOT_AORIST] + vowel → bhūv + vowel (e.g. abhūvam)
@@ -520,7 +540,9 @@ class MorphologyEngine:
                 ("nasal_palatal_insertion",  self.nasal_palatal_insertion),
                 ("nasal_vowel_fallback",     self.nasal_vowel_fallback),
                 ("passive_vowels",           self.passive_vowels),
+                ("passive_ncya_simplification", self.passive_ncya_simplification),
                 ("class4_lengthening",       self.class4_lengthening),
+                ("class4_a_vrddhi",          self.class4_a_vrddhi),
                 ("caus_pass_erase_with_a",   self.caus_pass_erase_with_a),
                 ("caus_pass_erase",          self.caus_pass_erase),
                 ("class1_suppletion",        self.class1_suppletion),
@@ -533,6 +555,7 @@ class MorphologyEngine:
                 ("class5_8_u_drop_opt",      self.class5_8_u_drop_opt),
                 ("perfect_u_guna_opt",       self.perfect_u_guna_opt),
                 ("yaj_intensive_a",          self.yaj_intensive_a),
+                ("aorist_arisi_to_arsi",     self.aorist_arisi_to_arsi),
                 ("root_aorist_bhuv",         self.root_aorist_bhuv),
                 ("aorist_pass_vriddhi_final",     self.aorist_pass_vriddhi_final),
                 ("aorist_pass_vriddhi_medial_a",  self.aorist_pass_vriddhi_medial_a),
@@ -583,7 +606,9 @@ class MorphologyEngine:
             @ self.nasal_palatal_insertion
             @ self.nasal_vowel_fallback
             @ self.passive_vowels
+            @ self.passive_ncya_simplification
             @ self.class4_lengthening
+            @ self.class4_a_vrddhi
             @ self.caus_pass_erase_with_a
             @ self.caus_pass_erase
             @ self.class1_suppletion
@@ -596,6 +621,7 @@ class MorphologyEngine:
             @ self.class5_8_u_drop_opt
             @ self.perfect_u_guna_opt
             @ self.yaj_intensive_a
+            @ self.aorist_arisi_to_arsi
             @ self.root_aorist_bhuv
             @ self.aorist_pass_vriddhi_final
             @ self.aorist_pass_vriddhi_medial_a

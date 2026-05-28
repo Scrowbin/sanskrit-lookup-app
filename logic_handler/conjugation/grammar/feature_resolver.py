@@ -5,6 +5,7 @@ conjugate() becomes a dumb pipe; all morphological decision-making lives here.
 """
 from __future__ import annotations
 from dataclasses import dataclass
+from functools import lru_cache
 from dhatupatha_analyzer import DHATUPATHA_ANALYZER
 
 # Derivatives whose perfect is always periphrastic (uses kṛ auxiliary).
@@ -30,8 +31,10 @@ _STRENGTH_RULES: list[tuple] = [
     # Perfect / Pluperfect: sg active = strong; everything else = weak
     (lambda r, c, p, n, v, t: t in ("perfect", "pluperfect") and v == "active" and n == "sg", "[STRONG]"),
     (lambda r, c, p, n, v, t: t in ("perfect", "pluperfect"),                                 "[WEAK]"),
-    # Thematic classes: cl 1/10 always strong, cl 4/6 always weak
-    (lambda r, c, p, n, v, t: c in (1, 10),                                           "[STRONG]"),
+    # Class 9 (tanādi): present-system forms use weak nī-stem (not nā).
+    (lambda r, c, p, n, v, t: c == 9 and t in ("present", "imperfect", "imperative", "optative"), "[WEAK]"),
+    # Thematic classes: cl 1/10 strong in active; middle keeps weak stem grade.
+    (lambda r, c, p, n, v, t: c in (1, 10) and v != "middle",                        "[STRONG]"),
     (lambda r, c, p, n, v, t: c in (4, 6),                                            "[WEAK]"),
     # Imperative 1st person: strong regardless of voice
     (lambda r, c, p, n, v, t: t == "imperative" and p == "1",                         "[STRONG]"),
@@ -41,8 +44,8 @@ _STRENGTH_RULES: list[tuple] = [
     (lambda r, c, p, n, v, t: v == "middle",                                          "[WEAK]"),
     # Remaining imperative 2sg: weak
     (lambda r, c, p, n, v, t: t == "imperative" and p == "2" and n == "sg",          "[WEAK]"),
-    # Singular active: strong (main athematic rule)
-    (lambda r, c, p, n, v, t: n == "sg",                                              "[STRONG]"),
+    # Singular active: strong (main athematic rule); class 9 stays weak in present system.
+    (lambda r, c, p, n, v, t: n == "sg" and c != 9,                                   "[STRONG]"),
     # cl3 imperfect 3pl is exceptionally strong (ajuhavuḥ)
     (lambda r, c, p, n, v, t: c == 3 and t == "imperfect" and p == "3" and n == "pl","[STRONG]"),
     # Default: weak
@@ -86,7 +89,8 @@ class MorphologicalFeatureResolver:
     remain a pure FST pipeline.
     """
 
-    def resolve(
+    @lru_cache(maxsize=16384)
+    def _resolve_cached(
         self,
         root_str: str,
         class_num: int,
@@ -96,7 +100,7 @@ class MorphologicalFeatureResolver:
         tense: str,
         derivative: str | None,
     ) -> ResolvedFeatures:
-        """Return a ResolvedFeatures for the given parameters."""
+        """Memoized core resolver logic for repeated lookup workloads."""
 
         # ── Periphrastic perfect detection ────────────────────────────────────
         is_periphrastic = False
@@ -176,4 +180,25 @@ class MorphologicalFeatureResolver:
             effective_derivative=effective_derivative,
             is_periphrastic=is_periphrastic,
             augment=augment,
+        )
+
+    def resolve(
+        self,
+        root_str: str,
+        class_num: int,
+        person: str,
+        number: str,
+        voice: str,
+        tense: str,
+        derivative: str | None,
+    ) -> ResolvedFeatures:
+        """Return a ResolvedFeatures for the given parameters."""
+        return self._resolve_cached(
+            root_str=root_str,
+            class_num=class_num,
+            person=person,
+            number=number,
+            voice=voice,
+            tense=tense,
+            derivative=derivative,
         )

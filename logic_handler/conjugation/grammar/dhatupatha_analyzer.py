@@ -1,6 +1,7 @@
 import csv
 import os
 from dataclasses import dataclass
+from functools import lru_cache
 
 from alphabet import ALPHABET
 from corpus_lexical_hints import load_adverb_primary_gerund_set_hints
@@ -39,6 +40,109 @@ _RUH_CLASS_ROOTS = frozenset({
 _GRASSMANN_ROOTS = frozenset({
     "duh", "dah", "dih", "druh", "bandh", "bādh", "budh", "dabh",
 })
+
+# Roots that allow optional -iṭ in future/periphrastic-future systems
+# even when the raw marker is not reliably present in source encoding.
+# Kept small and centralized in lexical analysis instead of stem builders.
+_OPTIONAL_FUTURE_I_ROOTS = frozenset({
+    "budh", "nī", "han", "labh", "man", "vid", "stu", "svap", "jan", "rudh", "su",
+})
+
+# Known class-lookup aliases where engine gaṇa usage differs from the
+# Dhātupāṭha row used for lexical features. These avoid noisy cross-class
+# fallback warnings while keeping behavior explicit.
+_CLASS_LOOKUP_ALIASES: dict[tuple[str, int], int] = {
+    ("śru", 5): 1,   # engine uses class-5 paradigms; dhātupāṭha lexical row is class-1
+    # High-frequency class mismatches from benchmark input (INRIA class tags vs
+    # vidyut lexical class rows). Keep explicit here so feature lookup stays
+    # deterministic and warning-free.
+    ("karṇa", 1): 10,
+    ("kṛt", 1): 6,
+    ("kṛt", 2): 6,
+    ("kṛt", 5): 6,
+    ("kṛś", 10): 4,
+    ("kṛṣ", 10): 1,
+    ("kṛṣ", 4): 1,
+    ("kṛṣ", 7): 1,
+    ("kan", 5): 1,
+    ("kam", 10): 1,
+    ("kāś", 10): 1,
+    ("kaṣ", 10): 1,
+    ("kas", 10): 1,
+    ("kuṭ", 5): 6,
+    ("kunth", 1): 9,
+    ("kuṣ", 6): 9,
+    ("kuṣ", 5): 9,
+    ("kuha", 1): 10,
+    ("kuc", 10): 1,
+    ("knū", 10): 1,
+    ("krand", 1): 10,
+    ("krand", 5): 10,
+    ("kram", 10): 1,
+    ("kram", 5): 1,
+    ("krī", 10): 1,
+    ("krīḍ", 10): 1,
+    ("kruś", 7): 1,
+}
+
+# Lexical aorist-family defaults that are not reliably inferable from current
+# source markers alone. Keep here (feature layer), not in runtime override flow.
+_AORIST_TYPE_LEXICAL_OVERRIDES: dict[tuple[str, int], str] = {
+    ("ad", 2): "a",
+    ("han", 2): "is",
+    ("bhū", 1): "root",
+    ("div", 4): "is",
+    ("gā", 1): "root",
+    ("hu", 3): "s",
+    ("jñā", 9): "sis",
+    ("kṛ", 1): "root",
+    ("kṛ", 8): "s",
+    ("kṛ", 5): "is",
+    ("krī", 9): "s",
+    ("kṣip", 6): "s",
+    ("labh", 1): "s",
+    ("muc", 6): "s",
+    ("nī", 1): "s",
+    ("sthā", 1): "root",
+    ("su", 5): "s",
+    ("tan", 8): "s",
+    ("vac", 2): "a",
+    ("yā", 1): "sis",
+    ("dṛś", 1): "a",
+    ("śru", 5): "a",
+}
+
+# Voice-specific aorist family (mostly middle) that should be resolved in the
+# lexical feature layer, not in runtime override dispatch.
+_AORIST_MIDDLE_TYPE_OVERRIDES: dict[str, str] = {
+    "bhid": "s",
+    "jan": "is",
+    "kṛ": "root",
+    "pā": "s",
+    "dā": "s",
+    "dhā": "s",
+    "śru": "s",
+}
+
+# Lexical middle stems used in weak s-aorist-style formation for select roots.
+_AORIST_MIDDLE_STEM_OVERRIDES: dict[str, str] = {
+    "ad": "ghasa",
+    "han": "vadh",
+    "kṛ": "kṛ",
+    "pā": "pe",
+    "dā": "di",
+    "dhā": "dhi",
+}
+
+# Class-sensitive active aorist stems (root, gaṇa) → stem.
+_AORIST_ACTIVE_STEM_OVERRIDES: dict[tuple[str, int], str] = {
+    ("ad", 2): "ghasa",
+    ("han", 2): "vadh",
+    ("kṛ", 1): "kar",
+    ("kṛ", 4): "kār",
+    ("kṛ", 5): "kār",
+    ("kan", 5): "kān",
+}
 
 # Roots that are genuinely Aniṭ but whose CSV entries do NOT have an anudātta
 # accent (\\) on any character other than a suffix-~ — so the position-aware
@@ -113,6 +217,7 @@ _KNOWN_UBHAYA_ROOTS = frozenset({
     "cur",   # class 10 — already handled by class-10 rule but explicit for clarity
 })
 
+@lru_cache(maxsize=8192)
 def to_slp1(iast_str: str) -> str:
     s = iast_str
     for k, v in sorted(IAST_TO_SLP1.items(), key=lambda x: -len(x[0])):
@@ -176,9 +281,16 @@ class RootObject:
     takes_periphrastic_perfect: bool
     permitted_voices: set
     takes_samprasarana: bool
+    takes_optional_future_i: bool = False
+    aorist_middle_type: str = ""
+    aorist_active_stem: str = ""
+    aorist_middle_stem: str = ""
     is_mrj_class: bool = False     # j → ṣ before dentals (Whitney §219)
     is_ruh_class: bool = False     # h + dental → vowel lengthening + lingual (Whitney §222)
     is_initial_aspirate: bool = False  # Grassmann's Law (Whitney §155)
+    source_raw: str = ""               # Selected raw Dhātupāṭha string (SLP1 with markers)
+    source_code: str = ""              # Dhātupāṭha serial code (e.g. 01.1157)
+    source_meaning: str = ""           # Gloss from source lexicon, if available
 
     @property
     def is_set(self) -> bool:
@@ -188,12 +300,12 @@ class RootObject:
 # ── DhatupathaAnalyzer ─────────────────────────────────────────────────────────
 
 class DhatupathaAnalyzer:
-    """Loads dhatupatha.csv and answers grammatical queries about roots.
+    """Loads Dhātupāṭha data and answers grammatical queries about roots.
 
-    CSV format (3 columns, no header):
-        col 0 – gaṇa (class) number
-        col 1 – serial number within the gaṇa
-        col 2 – raw Dhātupāṭha entry in SLP1 with anubandhas and accent marks
+    Preferred source (TSV with header):
+        code    - serial code, e.g. 01.1157 (gaṇa.serial)
+        dhatu   - raw Dhātupāṭha entry in SLP1 with anubandhas/accent marks
+        artha   - semantic gloss
 
     Accent marks in SLP1:
         \\  anudātta — immediately after root vowel → Aniṭ
@@ -204,6 +316,7 @@ class DhatupathaAnalyzer:
 
     def __init__(self):
         self._entries: list[dict] = []
+        self._entries_by_class: dict[int, list[dict]] = {}
         self._cache: dict[tuple, RootObject] = {}
         # MW voice index: (slp1_root, class_str) -> set of 'para'/'atma' values
         # Also keyed without class for class-agnostic lookups.
@@ -213,6 +326,7 @@ class DhatupathaAnalyzer:
         # Primary gerund in adverbs.csv → seṭ (True) / aniṭ (False); see corpus_lexical_hints.
         self._adverb_gerund_set_hint: dict[str, bool] = load_adverb_primary_gerund_set_hints()
         self._load()
+        self._build_indexes()
         self._load_mw_roots()
 
     # ── CSV loader ─────────────────────────────────────────────────────────────
@@ -225,20 +339,43 @@ class DhatupathaAnalyzer:
         else:
             # Running in normal Python
             data_dir = os.path.join(os.path.dirname(__file__), '..', 'data')
+        tsv_path = os.path.join(data_dir, 'vidyut_dhatupatha_5.tsv')
         csv_path = os.path.join(data_dir, 'dhatupatha.csv')
         try:
-            with open(csv_path, 'r', encoding='utf-8') as f:
-                reader = csv.reader(f)
-                for row in reader:
-                    if len(row) >= 3 and not row[0].startswith('#'):
-                        try:
-                            self._entries.append({
-                                'class_num':  int(row[0]),
-                                'serial_num': int(row[1]),   # serial within gaṇa
-                                'raw':        row[2],
-                            })
-                        except ValueError:
-                            pass
+            if os.path.exists(tsv_path):
+                with open(tsv_path, 'r', encoding='utf-8-sig') as f:
+                    reader = csv.DictReader(f, delimiter='\t')
+                    for row in reader:
+                        code = (row.get('code') or '').strip()
+                        raw = (row.get('dhatu') or '').strip()
+                        meaning = (row.get('artha') or '').strip()
+                        if not code or not raw or raw == "-":
+                            continue
+                        parts = code.split('.', 1)
+                        if len(parts) != 2 or not parts[0].isdigit() or not parts[1].isdigit():
+                            continue
+                        self._entries.append({
+                            'class_num': int(parts[0]),
+                            'serial_num': int(parts[1]),
+                            'raw': raw,
+                            'code': code,
+                            'meaning': meaning,
+                        })
+            else:
+                with open(csv_path, 'r', encoding='utf-8') as f:
+                    reader = csv.reader(f)
+                    for row in reader:
+                        if len(row) >= 3 and not row[0].startswith('#'):
+                            try:
+                                self._entries.append({
+                                    'class_num':  int(row[0]),
+                                    'serial_num': int(row[1]),   # serial within gaṇa
+                                    'raw':        row[2],
+                                    'code': f"{int(row[0]):02d}.{int(row[1]):04d}",
+                                    'meaning': "",
+                                })
+                            except ValueError:
+                                pass
         except Exception as e:
             print(f"DhatupathaAnalyzer: error loading CSV - {e}")
 
@@ -275,6 +412,14 @@ class DhatupathaAnalyzer:
         except Exception as e:
             print(f"DhatupathaAnalyzer: error loading unprefixed-roots - {e}")
 
+    def _build_indexes(self):
+        """Build read-only lookup indexes for faster root/class queries."""
+        by_class: dict[int, list[dict]] = {}
+        for entry in self._entries:
+            cls = entry["class_num"]
+            by_class.setdefault(cls, []).append(entry)
+        self._entries_by_class = by_class
+
 
     # ── Internal lookup ────────────────────────────────────────────────────────
 
@@ -282,6 +427,12 @@ class DhatupathaAnalyzer:
         """Return a list of raw Dhatupatha entry dicts, or empty list if not found."""
         if root_str == "vṛ" and class_num == 9:
             return [{'class_num': 9, 'serial_num': 0, 'raw': "vFY"}]
+
+        alias_class = _CLASS_LOOKUP_ALIASES.get((root_str, class_num))
+        if alias_class is not None:
+            aliased = self._find_raw(root_str, alias_class)
+            if aliased:
+                return aliased
 
         slp1_base = to_slp1(root_str)
         candidates = [slp1_base]
@@ -300,12 +451,14 @@ class DhatupathaAnalyzer:
             return c.replace('\\', '').replace('^', '').replace('~', '')
 
         matches = []
+        exact_matches = []
         # Pass 1: exact class match
-        for entry in self._entries:
-            if entry['class_num'] != class_num:
-                continue
+        for entry in self._entries_by_class.get(class_num, []):
             clean = _clean(entry['raw'])
             for cand in candidates:
+                if clean == cand or (cand.endswith('h') and clean == cand[:-1] + 'H'):
+                    exact_matches.append(entry)
+                    break
                 if clean.startswith(cand):
                     matches.append(entry)
                     break
@@ -313,6 +466,8 @@ class DhatupathaAnalyzer:
                     matches.append(entry)
                     break
 
+        if exact_matches:
+            return exact_matches
         if matches:
             return matches
 
@@ -347,7 +502,7 @@ class DhatupathaAnalyzer:
                         return True
                 return False
                 
-            matches = [e for e in self._entries if e['class_num'] == fallback_cls and _matches_cands(e)]
+            matches = [e for e in self._entries_by_class.get(fallback_cls, []) if _matches_cands(e)]
             return matches
             
         return []
@@ -471,7 +626,7 @@ class DhatupathaAnalyzer:
 
         # ir-it must be checked before i-it
         is_irit = 'ir' in clean or 'i~r' in clean
-        is_idit = ('i~' in clean or clean.endswith('i')) and not is_irit
+        is_idit = ('i~' in clean or 'I~' in clean or clean.endswith('i')) and not is_irit
 
         # ḷ-it (x~) marker (P. 7.1.59): triggers nasal insertion for certain roots
         is_lrit = 'x~' in clean
@@ -538,8 +693,12 @@ class DhatupathaAnalyzer:
             result.update({"active", "middle"})
         return result
 
-    def _raw_aorist_type(self, root_str: str, raw: str, flags: dict) -> str:
+    def _raw_aorist_type(self, root_str: str, class_num: int, raw: str, flags: dict) -> str:
         """Derive aorist class from anubandhas + phonology."""
+        lexical_type = _AORIST_TYPE_LEXICAL_OVERRIDES.get((root_str, class_num))
+        if lexical_type:
+            return lexical_type
+
         phonemes = ALPHABET.parse_phonemes(root_str)
 
         # Pāṇini 3.1.59: ṣ-it (z) → aṅ-Aorist
@@ -642,13 +801,20 @@ class DhatupathaAnalyzer:
             hom=hom,
             is_anit=is_anit,
             is_vet=(root_str in {"su"} or (entry is not None and self._raw_is_vet(raw))),
-            aorist_type=self._raw_aorist_type(root_str, raw, flags),
+            aorist_type=self._raw_aorist_type(root_str, class_num, raw, flags),
             takes_periphrastic_perfect=self._check_periphrastic(root_str),
             permitted_voices=permitted_voices,
             takes_samprasarana=(root_str in _SAMPRASARANA_ROOTS),
+            takes_optional_future_i=((entry is not None and self._raw_is_vet(raw)) or (root_str in _OPTIONAL_FUTURE_I_ROOTS)),
+            aorist_middle_type=_AORIST_MIDDLE_TYPE_OVERRIDES.get(root_str, ""),
+            aorist_active_stem=_AORIST_ACTIVE_STEM_OVERRIDES.get((root_str, class_num), ""),
+            aorist_middle_stem=_AORIST_MIDDLE_STEM_OVERRIDES.get(root_str, ""),
             is_mrj_class=(root_str in _MRJ_CLASS_ROOTS),
             is_ruh_class=(root_str in _RUH_CLASS_ROOTS),
             is_initial_aspirate=(root_str in _GRASSMANN_ROOTS),
+            source_raw=raw if entry else "",
+            source_code=(entry.get("code", "") if entry else ""),
+            source_meaning=(entry.get("meaning", "") if entry else ""),
             **flags,
         )
 
@@ -694,8 +860,8 @@ class DhatupathaAnalyzer:
 
     def get_root_entry(self, root_str: str, class_num: int) -> str | None:
         """Return raw Dhātupāṭha SLP1 string from CSV (legacy API)."""
-        entry = self._find_raw(root_str, class_num)
-        return entry["raw"] if entry else None
+        entries = self._find_raw(root_str, class_num)
+        return entries[0]["raw"] if entries else None
 
     def is_anit(self, root_str: str, class_num: int) -> bool:
         """Return True if root is Aniṭ (legacy API)."""

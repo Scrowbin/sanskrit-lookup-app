@@ -115,39 +115,15 @@ perfect_stem_overrides = {
 # Types: "root", "a", "reduplicated", "s", "is", "sa"
 aorist_overrides = {
     "yuj":  {"type": "s_or_a"},
-    "bhū":  {"type": "root"},
-    "ad":   {"type": "a", "active": "ghasa", "middle": "ghasa"},  # Suppletive a-aorist
-    "hu":   {"type": "s"},                                         # s-aorist
-    "div":  {"type": "is", "active": "dīv", "middle": "dīv"},     # is-aorist; iṣ is in endings
-    "su":   {"type": "s"},                                         # s-aorist
-    "tud":  {"type": "s"},                                         # s-aorist aniṭ (tut+s)
-    "tan":  {"type": "s"},
-    "krī":  {"type": "s"},
-    "cur":  {"type": "a", "active": "cūcur+a", "middle": "cūcur+a"},  # reduplicated a-aorist
-    "kṛ":   {"type": "s", "middle": "kṛ", "middle_type": "root"}, # middle root: akṛta
 
-    "han":  {"type": "is", "active": "vadh", "middle": "vadh"},   # suppletive aorist
     
     # Type 1: Root Aorists
-    "pā":   {"type": "root", "middle_type": "s", "middle": "pe"},
-    "sthā": {"type": "root"},
-    "dā":   {"type": "root", "middle_type": "s", "middle": "di"},
-    "dhā":  {"type": "root", "middle_type": "s", "middle": "dhi"},
-    "gā":   {"type": "root"},
 
     # Type 2: a-Aorists (Irregular stems)
-    "vac":  {"type": "a", "active": "voca", "middle": "voca"},
-    "dṛś":  {"type": "a", "active": "darśa", "middle": "darśa"},
-    "jan":  {"type": "root", "middle_type": "is"},
 
     # Type 3: Reduplicated Aorists (Handled algorithmically for causatives)
 
     # Type 4: s-Aorists (overrides for vet roots that exclusively use s)
-    "bhid": {"type": "root", "middle_type": "s"},                                        
-    "kṣip": {"type": "s"},
-    "nī":   {"type": "s"},
-    "muc":  {"type": "s"},
-    "śru":  {"type": "a", "active": "śrava", "middle_type": "s"},
 
     # Pāṇini allows optional s or iṣ aorist for certain roots like budh.
     "budh": {"type": "s_or_is"},
@@ -155,13 +131,10 @@ aorist_overrides = {
     # Dual-dispatch in conjugate._conjugate_aorist_dual handles both types.
 
     # Whitney §834b: labh takes s-aorist (lābh+s → lāps via deaspiration).
-    "labh": {"type": "s"},
 
     # Type 5: is-Aorists (Algorithmically handled)
     
     # Type 6: sis-Aorists
-    "yā":   {"type": "sis"},
-    "jñā":  {"type": "sis"},
     
     # Type 7: sa-Aorists (Handled algorithmically for roots ending in ś, ṣ, h)
 }
@@ -205,9 +178,24 @@ desiderative_stem_overrides = {
     "gā":   ["jigāsa"],
     # Whitney §1028e: nind drops nasal in desiderative → ninitsa (nid+sa, d+s→ts)
     "nind": ["ninitsa"],
-    # Whitney §1031: svap undergoes samprasāraṇa (sva→su) → suṣupsa
     "svap": ["suṣupsa"],
-
+    # Vowel-initial roots (ajāder dvitīyasya - Pāṇini 6.1.3)
+    "an":   ["aniniṣa"],
+    "ṛ":    ["aririṣa"],
+    "ṛc":   ["arciciṣa"],
+    "ās":   ["āsisiṣa"],
+    "aś":   ["aśiśiṣa"],
+    "aṭ":   ["aṭiṭiṣa"],
+    "āp":   ["īpsa"],
+    # Exceptions that keep 'ā' or have irregular stems
+    "khyā": ["cikhyāsa"],
+    "yā":   ["yiyāsa"],
+    "dhyā": ["didhyāsa"],
+    "mī":   ["mitsa"],
+    "dhā":  ["didhiṣa", "dhitsa"],
+    "sīv":  ["suṣyūṣa"],
+    "śī":   ["śiśayiṣa"],
+    "smi":  ["sismayiṣa"],
 }
 
 # ── Intensive (yaṅ) stem overrides ───────────────────────────────────────────
@@ -238,6 +226,7 @@ intensive_stem_overrides = {
     "cal":  "caṇcal",
     # Whitney §1002g: svap intensive uses samprasāraṇa soṣup (sva→su, o-grade, RUKI s→ṣ)
     "svap": "soṣup",
+    "viṣ": {"strong": "veveṣ", "weak": "veveṣ", "middle": "veviṣ"},
 }
 
 

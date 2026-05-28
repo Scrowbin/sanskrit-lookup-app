@@ -176,6 +176,13 @@ class SuffixProvider:
                 "[2sg]": _s("as"),  "[2du]": _s("tam"), "[2pl]": _s("ta"),
                 "[1sg]": _s("am"),  "[1du]": _s("va"),  "[1pl]": _s("ma"),
             }
+        # Class 9 (tanādi): weak nī-stem + ā-connective imperfect (akṣubhnāt).
+        if class_num == 9:
+            return {
+                "[3sg]": _s("āt"),  "[3du]": _s("atām"), "[3pl]": _s("an"),
+                "[2sg]": _s("āḥ"),  "[2du]": _s("atam"), "[2pl]": _s("ata"),
+                "[1sg]": _s("ām"),  "[1du]": _s("āva"),  "[1pl]": _s("āma"),
+            }
             
         endings = {
             "[3sg]": _s("t"),   "[3du]": _s("tām"), "[3pl]": _s(third_pl),
@@ -463,13 +470,29 @@ class SuffixProvider:
     def get_aorist_active(class_num: int = 1, root_str=None, **kwargs) -> dict[str, Suffix]:
         from irregulars import aorist_overrides
         from dhatupatha_analyzer import DHATUPATHA_ANALYZER
+        valid_aorist_types = {"s", "is", "sa", "sis", "root", "a", "reduplicated", "s_or_is", "s_or_a"}
         
         derivative = kwargs.get("derivative")
+        forced_type = kwargs.get("aorist_type_override")
         if derivative == "causative" or class_num == 10:
             aorist_type = "reduplicated"
+        elif forced_type:
+            aorist_type = forced_type
         else:
             info = aorist_overrides.get(root_str)
-            aorist_type = info["type"] if info else DHATUPATHA_ANALYZER.get_aorist_type(root_str, class_num)
+            aorist_type = DHATUPATHA_ANALYZER.get_aorist_type(root_str, class_num)
+            if info:
+                # Prefer lexical override type only when entry carries lexical
+                # stem behavior (active/middle/middle_type) or explicit dual type.
+                if (
+                    "active" in info
+                    or "middle" in info
+                    or "middle_type" in info
+                    or ("type" in info and "_or_" in str(info["type"]))
+                ):
+                    t = info.get("type")
+                    if t in valid_aorist_types:
+                        aorist_type = t
 
         if aorist_type in ("a", "reduplicated"):
             return SuffixProvider.get_secondary_active(class_num=1, root_str=root_str, **kwargs)
@@ -500,13 +523,32 @@ class SuffixProvider:
     def get_aorist_middle(class_num: int = 1, root_str=None, **kwargs) -> dict[str, Suffix]:
         from irregulars import aorist_overrides
         from dhatupatha_analyzer import DHATUPATHA_ANALYZER
+        valid_aorist_types = {"s", "is", "sa", "sis", "root", "a", "reduplicated", "s_or_is", "s_or_a"}
         
         derivative = kwargs.get("derivative")
+        forced_type = kwargs.get("aorist_type_override")
         if derivative == "causative" or class_num == 10:
             aorist_type = "reduplicated"
+        elif forced_type:
+            aorist_type = forced_type
         else:
+            root_obj = DHATUPATHA_ANALYZER.get(root_str, class_num) if root_str else None
+            if root_obj and root_obj.aorist_middle_type:
+                aorist_type = root_obj.aorist_middle_type
+            else:
+                aorist_type = DHATUPATHA_ANALYZER.get_aorist_type(root_str, class_num)
             info = aorist_overrides.get(root_str)
-            aorist_type = (info.get("middle_type") or info["type"]) if info else DHATUPATHA_ANALYZER.get_aorist_type(root_str, class_num)
+            if info:
+                if "middle_type" in info and info["middle_type"] in valid_aorist_types:
+                    aorist_type = info["middle_type"]
+                elif (
+                    "active" in info
+                    or "middle" in info
+                    or ("type" in info and "_or_" in str(info["type"]))
+                ):
+                    t = info.get("type")
+                    if t in valid_aorist_types:
+                        aorist_type = t
 
         if aorist_type in ("a", "reduplicated"):
             return SuffixProvider.get_secondary_middle(class_num=1)

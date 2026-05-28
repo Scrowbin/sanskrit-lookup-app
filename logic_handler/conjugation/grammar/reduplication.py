@@ -105,8 +105,20 @@ class ReduplicationEngine:
             return "di"
 
         if root_str and root_str[0] in ALPHABET.vowels_list:
-            # Most vowel-initial roots take the periphrastic perfect (Whitney §1070).
-            # The morphological pipeline should catch this earlier.
+            phonemes = ALPHABET.parse_phonemes(root_str)
+            if root_str[0] == "a" and len(phonemes) > 2 and phonemes[1] not in ALPHABET.vowels_list and phonemes[2] not in ALPHABET.vowels_list:
+                # Pāṇini 7.4.71 (tasmān nuḍ dviḥalaḥ): an augment 'n' is added to the reduplicate 'a'
+                return "an"
+            elif root_str[0] == "a":
+                # For non-heavy a-initial roots (like aś), the prefix is ā (P. 7.4.70 ata ādeḥ) or an depending on the root.
+                return "ā"
+            elif root_str[0] in ("i", "ī"):
+                return "i"
+            elif root_str[0] in ("u", "ū"):
+                return "u"
+            elif root_str[0] in ("ṛ", "ṝ"):
+                return "ā"
+            
             import warnings
             warnings.warn(
                 f"ReduplicationEngine: generating prefix for vowel-initial root '{root_str}'. "

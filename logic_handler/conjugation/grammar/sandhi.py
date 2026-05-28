@@ -197,6 +197,9 @@ class SandhiEngine:
         )
         # Strip [CLASS9] everywhere else so it doesn't block RUKI later.
         self.clean_class9 = pn.cdrewrite(pn.cross("[CLASS9]", ""), "", "", self.sig)
+        
+        # Collapse consecutive pluses (e.g., from stem_rules returning 'x+' and conjugate adding '+')
+        self.clean_pluses = pn.cdrewrite(pn.cross("++", "+"), "", "", self.sig)
 
     def _setup_consonant_rules(self):
         unvoiced_triggers = pn.union(
@@ -855,6 +858,7 @@ class SandhiEngine:
         if debug:
             return self._apply_rules_with_trace(fst, self._vowel_rules, "vowel_phase")
         return (fst
+                @ self.clean_pluses
                 @ self.thematic_merger
                 @ self.class9_special
                 @ self.clean_class9

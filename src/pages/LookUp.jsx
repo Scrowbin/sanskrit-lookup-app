@@ -43,6 +43,14 @@ const VOICES = [
 
 const GENDER_MAP = { mas: "m", fem: "f", neu: "n" };
 
+/** Display schemes: Devanagari + all Roman input schemes (API always returns IAST). */
+const OUTPUT_SCHEME_OPTIONS = [
+  ["devanagari", "Devanagari"],
+  ...Object.entries(INPUT_SCHEMES),
+];
+
+const OUTPUT_SCHEME_STORAGE_KEY = "lookupOutputScheme";
+
 export default function LookUp() {
   const { conjugateDerivative, declense, loading, error, serverReady, clearError } =
     useSanskritAPI();
@@ -53,7 +61,17 @@ export default function LookUp() {
   const [inputType, setInputType] = useState("Roman");
   const [inputValue, setInputValue] = useState("");
   const [inputScheme, setInputScheme] = useState("iast");
-  const [outputScript, setOutputScript] = useState("Roman");
+  const [outputScheme, setOutputScheme] = useState(() => {
+    try {
+      const saved = localStorage.getItem(OUTPUT_SCHEME_STORAGE_KEY);
+      if (saved && OUTPUT_SCHEME_OPTIONS.some(([v]) => v === saved)) {
+        return saved;
+      }
+    } catch {
+      /* private mode / SSR */
+    }
+    return "iast";
+  });
 
   // Conjugation-specific state
   const [gana, setGana] = useState(1);
@@ -68,6 +86,14 @@ export default function LookUp() {
   const [showScroll, setShowScroll] = useState(false);
 
   const devanagariDisplay = t(inputValue, inputScheme, "devanagari");
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(OUTPUT_SCHEME_STORAGE_KEY, outputScheme);
+    } catch {
+      /* ignore */
+    }
+  }, [outputScheme]);
 
   useEffect(() => {
     const checkScrollTop = () => {
@@ -87,13 +113,21 @@ export default function LookUp() {
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
-  /** Convert IAST to chosen output script */
+  /** Convert engine IAST to the user's chosen output transliteration. */
+  function transliterateForm(form) {
+    if (!form) return form;
+    if (outputScheme === "devanagari") {
+      return t(form, "iast", "devanagari");
+    }
+    if (outputScheme === "iast") {
+      return form;
+    }
+    return t(form, "iast", outputScheme);
+  }
+
   function toOutput(forms) {
     if (!forms || forms.length === 0) return "—";
-    const mapped = forms.map((f) =>
-      outputScript === "Devanagari" ? t(f, "iast", "devanagari") : f
-    );
-    return mapped.join(", ");
+    return forms.map((f) => transliterateForm(f)).join(", ");
   }
 
   /** Normalise user input to IAST for the API */
@@ -156,21 +190,18 @@ export default function LookUp() {
   // ── Rendering Helpers ──────────────────────────────────────────────────────
 
   function renderKrdantaForm(formString) {
-    if (outputScript !== "Devanagari") {
-      // Still apply styling to the m. n. f. tags even in Roman script
-      return formString.split(" ").map((word, i) => {
-        if (word === "m." || word === "n." || word === "f.") {
-          return <span key={i} className="text-neutral-500 font-sans text-[10px] uppercase tracking-wider mx-1">{word.replace('.', '')}</span>;
-        }
-        return <span key={i}>{word} </span>;
-      });
-    }
-    
     return formString.split(" ").map((word, i) => {
       if (word === "m." || word === "n." || word === "f.") {
-        return <span key={i} className="text-neutral-500 font-sans text-[10px] uppercase tracking-wider mx-1">{word.replace('.', '')}</span>;
+        return (
+          <span
+            key={i}
+            className="text-neutral-500 font-sans text-[10px] uppercase tracking-wider mx-1"
+          >
+            {word.replace(".", "")}
+          </span>
+        );
       }
-      return <span key={i}>{t(word, "iast", "devanagari")} </span>;
+      return <span key={i}>{transliterateForm(word)} </span>;
     });
   }
 
@@ -402,12 +433,19 @@ export default function LookUp() {
                   </select>
                 </div>
 
-                {/* OUTPUT FORMAT */}
+                {/* OUTPUT TRANSLITERATION */}
                 <div className="space-y-1">
-                  <div className={labelStyles}>Output Script</div>
-                  <select className="input" value={outputScript} onChange={(e) => setOutputScript(e.target.value)}>
-                    <option value="Roman">Roman (IAST)</option>
-                    <option value="Devanagari">Devanagari</option>
+                  <div className={labelStyles}>Output Transliteration</div>
+                  <select
+                    className="input"
+                    value={outputScheme}
+                    onChange={(e) => setOutputScheme(e.target.value)}
+                  >
+                    {OUTPUT_SCHEME_OPTIONS.map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -430,6 +468,7 @@ export default function LookUp() {
                     setInputType("Roman");
                     setInputValue("");
                     setInputScheme("iast");
+                    setOutputScheme("iast");
                     setGana(1);
                     setConjResults(null);
                     clearError();
@@ -547,12 +586,19 @@ export default function LookUp() {
                   </select>
                 </div>
 
-                {/* OUTPUT FORMAT */}
+                {/* OUTPUT TRANSLITERATION */}
                 <div className="space-y-1">
-                  <div className={labelStyles}>Output Script</div>
-                  <select className="input" value={outputScript} onChange={(e) => setOutputScript(e.target.value)}>
-                    <option value="Roman">Roman (IAST)</option>
-                    <option value="Devanagari">Devanagari</option>
+                  <div className={labelStyles}>Output Transliteration</div>
+                  <select
+                    className="input"
+                    value={outputScheme}
+                    onChange={(e) => setOutputScheme(e.target.value)}
+                  >
+                    {OUTPUT_SCHEME_OPTIONS.map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -575,6 +621,7 @@ export default function LookUp() {
                     setInputType("Roman");
                     setInputValue("");
                     setInputScheme("iast");
+                    setOutputScheme("iast");
                     setGender("mas");
                     setDeclResult(null);
                     clearError();

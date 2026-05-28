@@ -102,6 +102,7 @@ class SanskritConjugator:
         strength: str,
         tense: str,
         derivative: str | None,
+        aorist_type_override: str | None = None,
         voice: str = "active",
         person: str | None = None,
         number: str | None = None,
@@ -109,7 +110,8 @@ class SanskritConjugator:
         return self.stems.build(
             root_str, class_num, strength,
             tense=tense, derivative=derivative,
-            person=person, number=number, voice=voice
+            person=person, number=number, voice=voice,
+            aorist_type_override=aorist_type_override,
         )
 
     def _fetch_endings(
@@ -119,6 +121,7 @@ class SanskritConjugator:
         tense: str,
         root_str: str | None = None,
         derivative: str | None = None,
+        aorist_type_override: str | None = None,
     ) -> dict[str, Suffix]:
         if voice == "passive":
             if tense in ("aorist", "injunctive"):
@@ -131,7 +134,49 @@ class SanskritConjugator:
         provider = self._ending_dispatch.get(key)
         if provider is None:
             raise ValueError(f"No ending table for tense='{tense}' voice='{voice}'.")
-        return provider(class_num=class_num, root_str=root_str, tense=tense, derivative=derivative)
+        return provider(
+            class_num=class_num,
+            root_str=root_str,
+            tense=tense,
+            derivative=derivative,
+            aorist_type_override=aorist_type_override,
+        )
+
+    @lru_cache(maxsize=8192)
+    def _fetch_endings_cached(
+        self,
+        class_num: int,
+        voice: str,
+        tense: str,
+        root_str: str | None,
+        derivative: str | None,
+        aorist_type_override: str | None = None,
+    ) -> dict[str, Suffix]:
+        """Memoized ending-table fetch for repeated lookup workloads."""
+        return self._fetch_endings(
+            class_num=class_num,
+            voice=voice,
+            tense=tense,
+            root_str=root_str,
+            derivative=derivative,
+            aorist_type_override=aorist_type_override,
+        )
+
+    @staticmethod
+    def _extract_forms_fast(fst: pn.Fst) -> set[str]:
+        """Extract output forms with a fast path for deterministic FSTs."""
+        optimized = fst.optimize()
+        try:
+            # Probe determinism on output-projected acceptor to avoid
+            # StringFst multi-arc errors on transducers with branching.
+            out_acc = pn.project(optimized, "output").optimize()
+            probe = pn.shortestpath(out_acc, nshortest=2, unique=True).optimize()
+            probe_forms = list(probe.paths().ostrings())
+            if len(probe_forms) == 1:
+                return {probe_forms[0]}
+        except Exception:
+            pass
+        return set(optimized.paths().ostrings())
 
     # ──────────────────────────────────────────────────────────────────────────
     # Main entry point
@@ -141,9 +186,9 @@ class SanskritConjugator:
     def conjugate(
         self,
         root_str: str,
-        class_num: int,
-        person: str,
-        number: str,
+        class_num: int | str | None = None,
+        person: str = "3",
+        number: str = "sg",
         voice: str = "active",
         tense: str = "present",
         derivative: str | None = None,
@@ -154,7 +199,7 @@ class SanskritConjugator:
 
         Args:
             root_str:   IAST string (e.g. "bhū")
-            class_num:  Gaṇa 1-10
+            class_num:  Gaṇa 1-10 or None (engine will guess if None)
             person:     "1", "2", "3"
             number:     "sg", "du", "pl"
             voice:      "active" | "middle" | "passive"
@@ -167,6 +212,19 @@ class SanskritConjugator:
             For ``tense="krdantas"``: a single ``str`` block from the kṛdanta engine.
             Periphrastic perfect returns ``list[str]`` like the main path.
         """
+        # Engine-level class fallback logic
+        if class_num in (None, "", 0, "0"):
+            clean_root = root_str.rsplit("+", 1)[-1] if "+" in root_str else root_str
+            if clean_root.endswith("a") or derivative == "causative" or derivative == "denominative":
+                class_num = 10
+            else:
+                class_num = 1
+        elif isinstance(class_num, str):
+            if class_num.isdigit():
+                class_num = int(class_num)
+            elif class_num == "denom":
+                class_num = 10
+
         if tense == "krdantas":
             return self.get_krdantas_block(root_str, class_num, derivative=derivative, use_db=use_db)
             
@@ -279,7 +337,9 @@ class SanskritConjugator:
             stem = pn.accep("[AUG]a+") + stem
 
         # ── 4. Fetch ending and combine ───────────────────────────────────────
-        endings = self._fetch_endings(f.effective_class, voice, tense, root_str=root_str, derivative=f.effective_derivative)
+        endings = self._fetch_endings_cached(
+            f.effective_class, voice, tense, root_str, f.effective_derivative
+        )
         tag = f"[{person}{number}]"
         if tag not in endings:
             raise ValueError(f"No ending for {tag} in {tense} {voice}.")
@@ -297,9 +357,7 @@ class SanskritConjugator:
         # ── 5. Post-processing ────────────────────────────────────────────────
         morph_fst  = self.morphology.apply_all(combined)
         sandhi_fst = self.sandhi.apply_all(morph_fst)
-        result     = sandhi_fst.optimize()
-
-        forms = set(result.paths().ostrings())
+        forms = self._extract_forms_fast(sandhi_fst)
 
         if use_db:
             db_forms = INRIA_LOOKUP.lookup(root_str, tense, voice, person, number, derivative)
@@ -336,43 +394,47 @@ class SanskritConjugator:
         from irregulars import aorist_overrides
 
         info = aorist_overrides[root_str]
-        original_type = info.get("type", "")
-        forced_types = original_type.split("_or_")
+        forced_types = info.get("type", "").split("_or_")
         all_forms: set[str] = set()
 
         for forced_type in forced_types:
-            aorist_overrides[root_str] = {**info, "type": forced_type}
             try:
                 f = self.resolver.resolve(
                     root_str, class_num, person, number, voice, tense, derivative
                 )
-                stem = self.stems.build(
-                    root_str, f.effective_class, f.strength, tense=tense,
-                    derivative=f.effective_derivative, person=person, number=number,
+                stem = self._get_stem(
+                    root_str,
+                    f.effective_class,
+                    f.strength,
+                    tense=tense,
+                    derivative=f.effective_derivative,
+                    aorist_type_override=forced_type,
+                    person=person,
+                    number=number,
+                    voice=voice,
                 )
                 if f.augment:
                     stem = pn.accep("[AUG]a+") + stem
-                endings = self._fetch_endings(
-                    f.effective_class, voice, tense, root_str=root_str, derivative=f.effective_derivative,
+                endings = self._fetch_endings_cached(
+                    f.effective_class,
+                    voice,
+                    tense,
+                    root_str,
+                    f.effective_derivative,
+                    forced_type,
                 )
                 tag = f"[{person}{number}]"
                 if tag not in endings:
                     continue
                 suffix: Suffix = endings[tag]
-                combined = (
-                    stem if suffix.is_empty
-                    else stem + pn.accep("+") + suffix.to_fst()
-                )
+                combined = stem if suffix.is_empty else stem + pn.accep("+") + suffix.to_fst()
                 if preverb_str:
                     combined = pn.accep(preverb_str) + combined
                 morph_fst = self.morphology.apply_all(combined)
                 sandhi_fst = self.sandhi.apply_all(morph_fst)
-                result = sandhi_fst.optimize()
-                all_forms.update(result.paths().ostrings())
+                all_forms.update(self._extract_forms_fast(sandhi_fst))
             except Exception:
-                pass  # skip if one sub-type fails
-            finally:
-                aorist_overrides[root_str]["type"] = original_type  # restore original
+                pass  # skip if one subtype fails
 
         return sorted(list(all_forms))
 
@@ -438,8 +500,7 @@ class SanskritConjugator:
 
             if preverb_str:
                 combined = pn.accep(preverb_str) + combined
-            for form in self.sandhi.apply_all(combined).optimize().paths().ostrings():
-                results.append(form)
+            results.extend(self._extract_forms_fast(self.sandhi.apply_all(combined)))
                 
         return sorted(list(set(results)))
 

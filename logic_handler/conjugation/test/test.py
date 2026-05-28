@@ -84,57 +84,63 @@ def run_focused_benchmark(
     # Set primary_class="denom" to call the engine with derivative="denominative".
     # The root_iast must match INRIA's stem_iast exactly.
     test_suite = [
-        # All 10 primary classes
-        ("bhū", 1, "Class 1  – Guṇa + Thematic / Standard Seṭ Future"),
-        ("ad", 2, "Class 2  – Athematic + Devoicing (atti / atsyati)"),
-        ("hu", 3, "Class 3  – Reduplication / a-Aorist / ṣ+dhv→ḍhv Sandhi (ahoḍhvam)"),
-        ("dīv", 4, "Class 4  – Internal Lengthening (dīvyati)"),
-        ("su", 5, "Class 5  – Athematic Sign (-nu/-no-)"),
-        ("tud", 6, "Class 6  – Thematic + No Guṇa / Aniṭ Luṭ (tottā)"),
-        ("yuj", 7, "Class 7  – Nasal Infix + Palatal Sandhi (yunakti / yokṣyati)"),
-        ("tan", 8, "Class 8  – Athematic Sign (-u/-o-)"),
-        ("krī", 9, "Class 9  – Athematic Sign (-nā/-nī-) + Nati (krīṇāti)"),
-        ("cur", 10, "Class 10 – Causative-style (-aya-)"),
-        # Phonological edge cases
-        ("kṛ", 8, "Guṇa of ṛ + Ruki / ṣṭ Sandhi (akārṣṭam)"),
-        ("budh", 1, "Grassmann Throwback + Devoicing / iṣ-Aorist (abodhiṣam)"),
-        ("duh", 2, "Grassmann Throwback + H-Sandhi + Ruki (dhokṣyati)"),
-        ("gam", 1, "Suppletive Present (gaccha) / Root Aorist (agamat)"),
-        ("dviṣ", 2, "Aniṭ S-Aorist / Palatal Sandhi (adviṣat)"),
-        ("muc", 6, "Nasal Infix (muñca) / a-Aorist (amucat)"),
-        # Expanded classical suite
-        ("vac", 2, "Suppletive strong stem (vakti / ucyate)"),
-        ("han", 2, "gh-deletion (hanti / jighāṃsati)"),
-        ("pā", 1, "Long-vowel root + yan sandhi (pāti / pātum)"),
-        ("nī", 1, "Long-vowel root + periphrastic perfect"),
-        ("śru", 5, "u-final + Benedictive (śrūyāt)"),
-        ("dā", 3, "Reduplicating class, long-ā (dadāti)"),
-        ("sthā", 1, "Long-ā root, suppletive aorist (asthāt)"),
-        ("bhid", 7, "Class 7 nasal infix, s-aorist (abhaiṭsīt)"),
-        ("kṣip", 6, "Thematic no-guṇa, veṭ future"),
-        ("vṛ", 9, "Veṭ root with both future forms (variṣyati / varīṣyati)"),
-        # Additional coverage gaps
-        ("yaj", 1, "Passive sandhi ya-infix + palatal (ijyate)"),
-        ("labh", 1, "Ātmanepada-only root (labhate)"),
-        ("smṛ", 1, "ṛ-final class 1, different aorist type from kṛ (asmart)"),
-        ("man", 4, "Nasal-final root, non-suppletive (manyate)"),
-        ("vid", 2, "Perfect-as-present anomaly (veda = he knows)"),
-        # Phase 2 & 3 Fixes Coverage
-        ("ruh", 1, "Ruh-class h+dental sandhi (rūḍha)"),
-        ("viś", 6, "ś/ṣ permitted finals (viṭ)"),
-        ("nind", 1, "Heavy syllable guṇa blocking (anindat)"),
-        ("sṛj", 6, "Desiderative RUKI exemption (sisṛkṣati)"),
-        ("stu", 2, "Class-2 Vṛddhi optionality (staumi/stomi)"),
-        ("jan", 4, "Mit-root causative shortening (janayati)"),
-        ("mṛj", 2, "Class 2 mṛj palatal-retroflex sandhi (mārṣṭi)"),
-        # Known Gaps (Unimplemented)
-        ("svap", 2, "Samprasāraṇa cluster (śvapit/suṣvāpa)"),
-        ("śās", 2, "Class 2 zero-grade irregular (śiṣṭe)"),
-        ("rudh", 7, "Class 7 imperative 2sg bare root (runddhi)"),
-        # Denominatives
-        ("namas", "denom", "Denominative from nominal stem (namasyati)"),
-        ("lavaṇa", "denom", "Denominative: "),
-        ("lohita", "denom", "Denominative: "),
+        # ── All 10 Primary Classes ─────────────────────────────────────────────
+        ("bhū",    1,       "Class 1  – Guṇa + Thematic / Standard Seṭ Future"),
+        ("ad",     2,       "Class 2  – Athematic + Devoicing (atti / atsyati)"),
+        ("hu",     3,       "Class 3  – Reduplication / a-Aorist / ṣ+dhv→ḍhv Sandhi (ahoḍhvam)"),
+        ("dīv",    4,       "Class 4  – Internal Lengthening (dīvyati)"),
+        ("su",     5,       "Class 5  – Athematic Sign (-nu/-no-)"),
+        ("tud",    6,       "Class 6  – Thematic + No Guṇa / Aniṭ Luṭ (tottā)"),
+        ("yuj",    7,       "Class 7  – Nasal Infix + Palatal Sandhi (yunakti / yokṣyati)"),
+        ("tan",    8,       "Class 8  – Athematic Sign (-u/-o-)"),
+        ("krī",    9,       "Class 9  – Athematic Sign (-nā/-nī-) + Nati (krīṇāti)"),
+        ("cur",    10,      "Class 10 – Causative-style (-aya-)"),
+
+        # ── Phonological Edge Cases ────────────────────────────────────────────
+        ("kṛ",     8,       "Guṇa of ṛ + Ruki / ṣṭ Sandhi (akārṣṭam)"),
+        ("budh",   1,       "Grassmann Throwback + Devoicing / iṣ-Aorist (abodhiṣam)"),
+        ("duh",    2,       "Grassmann Throwback + H-Sandhi + Ruki (dhokṣyati)"),
+        ("gam",    1,       "Suppletive Present (gaccha) / Root Aorist (agamat)"),
+        ("dviṣ",   2,       "Aniṭ S-Aorist / Palatal Sandhi (adviṣat)"),
+        ("muc",    6,       "Nasal Infix (muñca) / a-Aorist (amucat)"),
+
+        # ── Expanded Classical Suite ───────────────────────────────────────────
+        ("vac",    2,       "Suppletive strong stem (vakti / ucyate)"),
+        ("han",    2,       "gh-deletion (hanti / jighāṃsati)"),
+        ("pā",     1,       "Long-vowel root + yan sandhi (pāti / pātum)"),
+        ("nī",     1,       "Long-vowel root + periphrastic perfect"),
+        ("śru",    5,       "u-final + Benedictive (śrūyāt)"),
+        ("dā",     3,       "Reduplicating class, long-ā (dadāti)"),
+        ("sthā",   1,       "Long-ā root, suppletive aorist (asthāt)"),
+        ("bhid",   7,       "Class 7 nasal infix, s-aorist (abhaiṭsīt)"),
+        ("kṣip",   6,       "Thematic no-guṇa, veṭ future"),
+        ("vṛ",     9,       "Veṭ root with both future forms (variṣyati / varīṣyati)"),
+
+        # ── Additional Coverage Gaps ───────────────────────────────────────────
+        ("yaj",    1,       "Passive sandhi ya-infix + palatal (ijyate)"),
+        ("labh",   1,       "Ātmanepada-only root (labhate)"),
+        ("smṛ",    1,       "ṛ-final class 1, different aorist type from kṛ (asmart)"),
+        ("man",    4,       "Nasal-final root, non-suppletive (manyate)"),
+        ("vid",    2,       "Perfect-as-present anomaly (veda = he knows)"),
+
+        # ── Advanced Engine Hardening ──────────────────────────────────────────
+        ("ruh",    1,       "Ruh-class h+dental sandhi (rūḍha)"),
+        ("viś",    6,       "ś/ṣ permitted finals (viṭ)"),
+        ("nind",   1,       "Heavy syllable guṇa blocking (anindat)"),
+        ("sṛj",    6,       "Desiderative RUKI exemption (sisṛkṣati)"),
+        ("stu",    2,       "Class-2 Vṛddhi optionality (staumi/stomi)"),
+        ("jan",    4,       "Mit-root causative shortening (janayati)"),
+        ("mṛj",    2,       "Class 2 mṛj palatal-retroflex sandhi (mārṣṭi)"),
+
+        # ── Irregular Alternations ─────────────────────────────────────────────
+        ("svap",   2,       "Samprasāraṇa cluster (śvapit/suṣvāpa)"),
+        ("śās",    2,       "Class 2 zero-grade irregular (śiṣṭe)"),
+        ("rudh",   7,       "Class 7 imperative 2sg bare root (runddhi)"),
+
+        # ── Denominatives ──────────────────────────────────────────────────────
+        ("namas",  "denom", "Denominative from nominal stem (namasyati)"),
+        ("lavaṇa", "denom", "Denominative: expanded Pāṇinian structural optionalities"),
+        ("lohita", "denom", "Denominative: lohitāyati/lohitāyate variants"),
     ]
 
     # ── Root remappings ────────────────────────────────────────────────────────
@@ -154,6 +160,7 @@ def run_focused_benchmark(
 
     totals = {
         "pass": 0,
+        "partial": 0,
         "fail": 0,
         "error": 0,
         "skip_inria": 0,
@@ -169,6 +176,7 @@ def run_focused_benchmark(
     for root, primary_class, desc in test_suite:
         per_root[root] = {
             "pass": 0,
+            "partial": 0,
             "fail": 0,
             "error": 0,
             "skip_inria": 0,
@@ -285,11 +293,10 @@ def run_focused_benchmark(
                                     actual if isinstance(actual, list) else [actual]
                                 )
                                 if any(a in expected_forms for a in actual_list):
-                                    counts["pass"] += 1
-                                    totals["pass"] += 1
-                                    if len(expected_forms) > 1:
-                                        if set(expected_forms) != set(actual_list):
-                                            multiple_expected_rows.append(
+                                    if len(expected_forms) > 1 and set(expected_forms) != set(actual_list):
+                                        counts["partial"] += 1
+                                        totals["partial"] += 1
+                                        multiple_expected_rows.append(
                                             {
                                                 "Root": root,
                                                 "Class": f"{primary_class} ({derivation})",
@@ -306,6 +313,9 @@ def run_focused_benchmark(
                                                 ),
                                             }
                                         )
+                                    else:
+                                        counts["pass"] += 1
+                                        totals["pass"] += 1
                                 else:
                                     counts["fail"] += 1
                                     totals["fail"] += 1
@@ -348,13 +358,13 @@ def run_focused_benchmark(
 
         # ── Per-root completion line ───────────────────────────────────────────
         elapsed = time.perf_counter() - t_root
-        tested_root = counts["pass"] + counts["fail"] + counts["error"]
+        tested_root = counts["pass"] + counts["partial"] + counts["fail"] + counts["error"]
         pct_root = (
             f"{100 * counts['pass'] / tested_root:.0f}%" if tested_root else "n/a"
         )
         print(
             f"  ✔ {root:<10} {pct_root:>4}  "
-            f"({counts['pass']}✅ {counts['fail']}❌ {counts['error']}💥)  "
+            f"({counts['pass']}✅ {counts['partial']}⚠️ {counts['fail']}❌ {counts['error']}💥)  "
             f"{elapsed:.2f}s  — {desc}"
         )
 
@@ -402,13 +412,14 @@ def run_focused_benchmark(
 
     # ── Terminal summary ───────────────────────────────────────────────────────
     t_total = time.perf_counter() - t_start
-    tested = totals["pass"] + totals["fail"] + totals["error"]
-    pct = f"{100 * totals['pass'] / tested:.1f}%" if tested else "n/a"
+    tested = totals["pass"] + totals["partial"] + totals["fail"] + totals["error"]
+    pct = f"{100 * (totals['pass'] + totals['partial']) / tested:.1f}%" if tested else "n/a"
 
     print("\n" + "=" * 52)
     print("          FOCUSED BENCHMARK RESULTS")
     print("=" * 52)
     print(f"  ✅ Pass:          {totals['pass']:>6}  ({pct})")
+    print(f"  ⚠️ Partial:       {totals['partial']:>6}")
     print(f"  ❌ Fail:          {totals['fail']:>6}")
     print(f"  💥 Crash:         {totals['error']:>6}")
     print(f"  🚧 Unsupported:   {totals['unsupported']:>6}  (desid / intens)")
@@ -418,12 +429,12 @@ def run_focused_benchmark(
     print("=" * 52)
 
     print("\n  Per-root breakdown:")
-    print(f"  {'Root':<10} {'✅':>6} {'❌':>6} {'💥':>6} {'🚧':>6}  Description")
-    print("  " + "-" * 72)
+    print(f"  {'Root':<10} {'✅':>6} {'⚠️':>6} {'❌':>6} {'💥':>6} {'🚧':>6}  Description")
+    print("  " + "-" * 80)
     for root, primary_class, desc in test_suite:
         c = per_root[root]
         print(
-            f"  {root:<10} {c['pass']:>6} {c['fail']:>6} {c['error']:>6} {c['unsupported']:>6}  {desc}"
+            f"  {root:<10} {c['pass']:>6} {c['partial']:>6} {c['fail']:>6} {c['error']:>6} {c['unsupported']:>6}  {desc}"
         )
 
 
