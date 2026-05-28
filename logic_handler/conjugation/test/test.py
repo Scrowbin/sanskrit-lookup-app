@@ -288,7 +288,8 @@ def run_focused_benchmark(
                                     counts["pass"] += 1
                                     totals["pass"] += 1
                                     if len(expected_forms) > 1:
-                                        multiple_expected_rows.append(
+                                        if set(expected_forms) != set(actual_list):
+                                            multiple_expected_rows.append(
                                             {
                                                 "Root": root,
                                                 "Class": f"{primary_class} ({derivation})",

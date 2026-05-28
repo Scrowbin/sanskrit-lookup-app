@@ -112,6 +112,11 @@ class SuffixProvider:
             }
         jhaksh_roots = {"jakṣ", "jāgṛ", "daridrā", "cakās", "śās", "dīdhī", "vevī"}
         third_pl = "ati" if (class_num == 3 or (root_str in jhaksh_roots)) else "anti"
+        
+        is_intensive = kwargs.get('derivative') == 'intensive_active_luganta'
+        if class_num == 3 and is_intensive and root_str == "han":
+            third_pl = "anti"
+            
         endings = {
             "[3sg]": _s("ti"),   "[3du]": _s("taḥ"),    "[3pl]": _s(third_pl),
             "[2sg]": _s("si"),   "[2du]": _s("thaḥ"),   "[2pl]": _s("tha"),
@@ -280,15 +285,16 @@ class SuffixProvider:
             is_intensive = kwargs.get('derivative') == 'intensive_active_luganta'
             if is_intensive:
                 from alphabet import ALPHABET as _A
-                # Intensive stem ending in consonant takes 'dhi' (e.g. carkar-dhi, bobhav-dhi)
-                # Vowel stems take 'hi' (e.g. bobho-hi).
-                # The stem FST generates both variants dynamically, so we use a tag.
                 sg2 = "[HI_DHI]" 
+                third_sg = "ītu|tu"
+                third_pl = "tu" if root_str in ("han", "kṣip") else "atu"
             else:
                 sg2 = "dhi" if root_str in ("hu", "ad") else "hi"
+                third_sg = "tu"
+                third_pl = "atu"
                 
             return {
-                "[3sg]": _s("tu"),   "[3du]": _s("tām"), "[3pl]": _s("atu"),
+                "[3sg]": _s(third_sg),   "[3du]": _s("tām"), "[3pl]": _s(third_pl),
                 "[2sg]": _s(sg2),    "[2du]": _s("tam"), "[2pl]": _s("ta"),
                 "[1sg]": _s("āni"),  "[1du]": _s("āva"), "[1pl]": _s("āma"),
             }
@@ -322,6 +328,19 @@ class SuffixProvider:
 
     @staticmethod
     def get_optative_active(class_num: int = 1, root_str=None, **kwargs) -> dict[str, Suffix]:
+        if kwargs.get('derivative') == 'intensive_active_luganta':
+            if root_str == "yaj":
+                # yaj takes āyāt, āyām in intensive active optative
+                return {
+                    "[3sg]": _s("āyāt"),   "[3du]": _s("āyātām"),  "[3pl]": _s("āyuḥ"),
+                    "[2sg]": _s("āyāḥ"),   "[2du]": _s("āyātam"),  "[2pl]": _s("āyāta"),
+                    "[1sg]": _s("āyām"),   "[1du]": _s("āyāva"),   "[1pl]": _s("āyāma"),
+                }
+            # For han, we want to prevent its final 'a' from lengthening to 'ā' before yām.
+            # We can use a tag [SHORT_A] or just let the standard yām apply and fix the lengthening elsewhere.
+            # We will return standard endings, and we'll fix the han lengthening in stem_rules/morphology.
+            # For kṣip, it needs to retain the 'a', so if it's class 6 intensive? The user said kṣip intensive missing thematic -a-.
+            pass
         if is_thematic(class_num):
             return {
                 "[3sg]": _s("et"),   "[3du]": _s("etām"),  "[3pl]": _s("eyuḥ"),
@@ -360,8 +379,12 @@ class SuffixProvider:
 
         is_primary = kwargs.get('derivative') in (None, "", "primary")
         
+        perfect_dual_tha_roots = {"bhū", "hu", "pā", "tan", "gam", "dā", "sthā", "yaj", "vṛ", "han", "man", "jan"}
+        
         if is_primary and (root_str == "kṛ" or root_str in perfect_bare_tha_roots or root_str in perfect_weak_guna_roots):
             second_sg = "tha"
+        elif is_primary and root_str in perfect_dual_tha_roots:
+            second_sg = "tha|itha"
         elif root_obj and root_obj.is_vet:
             second_sg = "tha|itha"
         else:
@@ -372,6 +395,10 @@ class SuffixProvider:
             "[2sg]": _s(second_sg),      "[2du]": _s("athuḥ"), "[2pl]": _s("a"),
             "[1sg]": _s(first_third_sg), "[1du]": _s("iva"),   "[1pl]": _s("ima"),
         }
+
+        if is_primary and root_str == "vid":
+            endings["[2du]"] = _s("athuḥ|thuḥ")
+            endings["[3du]"] = _s("atuḥ|tuḥ")
         is_primary = kwargs.get('derivative') in (None, "", "primary")
         if is_primary and root_str and (
             root_str.endswith("ṛ") or root_str.endswith("ṝ") or 
@@ -379,6 +406,11 @@ class SuffixProvider:
         ) and root_str not in perfect_stem_overrides:
             endings["[1du]"] = _s("va")
             endings["[1pl]"] = _s("ma")
+
+        if is_primary and root_str in ("hu", "su"):
+            endings["[1du]"] = _s("va|iva[HU_SU]")
+            endings["[1pl]"] = _s("ma|ima[HU_SU]")
+
         return endings
 
     @staticmethod

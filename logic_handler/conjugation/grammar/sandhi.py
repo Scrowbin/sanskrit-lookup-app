@@ -139,11 +139,16 @@ class SandhiEngine:
         )
 
         # 4. Ayadi (diphthong before vowel): e+V → ay+V, o+V → av+V, etc.
+        # P. 6.1.79 (vānto yi pratyaye): o/au -> av/āv before y-initial suffix. e/ai do NOT.
+        self.ayadi_vanto = pn.cdrewrite(
+            pn.string_map([("o+", "av"), ("au+", "āv")]),
+            "", "y", self.sig
+        )
         self.ayadi = pn.cdrewrite(
             pn.string_map([
                 ("e+", "ay"), ("o+", "av"), ("ai+", "āy"), ("au+", "āv"),
             ]),
-            "", pn.union(ALPHABET.vowels, "y"), self.sig
+            "", ALPHABET.vowels, self.sig
         )
 
         # Perfect weak yan sandhi (er anekācaḥ asamyogapūrvasya & exceptions)
@@ -740,6 +745,7 @@ class SandhiEngine:
             ("thematic_merger",    self.thematic_merger),
             ("class9_special",     self.class9_special),
             ("clean_class9",       self.clean_class9),
+            ("ayadi_vanto",        self.ayadi_vanto),
             ("ayadi",              self.ayadi),
             ("perfect_yan_conjunct", self.perfect_yan_conjunct),
             ("perfect_yan_simple",   self.perfect_yan_simple),
@@ -852,6 +858,7 @@ class SandhiEngine:
                 @ self.thematic_merger
                 @ self.class9_special
                 @ self.clean_class9
+                @ self.ayadi_vanto
                 @ self.ayadi
                 @ self.perfect_yan_conjunct
                 @ self.perfect_yan_simple

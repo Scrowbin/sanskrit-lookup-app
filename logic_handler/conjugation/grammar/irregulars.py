@@ -32,6 +32,7 @@ passive_stem_overrides = {
     # √smṛ passive is smar-ya (INRIA): smaryate (not *smriyate).
     # True lexical irregularity (attested), so keep as override.
     "smṛ": "smar",
+    "śās": ["śās", "śiṣ"],
 }
 
 
@@ -47,7 +48,9 @@ passive_stem_overrides = {
 #
 causative_stem_irregulars = {
     "han": "ghāt",   # ghātayati — aspirate throwback + Vriddhi; Grassmann-driven
-    "ruh": "rop",    # ropayati (Whitney §1042o)
+    "ruh": ["rop", "roh"],    # ropayati (Whitney §1042o)
+    "pā": ["pāy", "pāl"], # pāyayati (drink), pālayati (protect)
+    "vṛ": ["vār", "var"], # vārayati, varayati
     "dū": "dāv",     # dāvayati (Whitney §1042n)
     "dṛp": "darp",   # darpayati (Whitney §1042o)
     "knūy": "knop",  # knopayati (Whitney §1042o)
@@ -95,10 +98,13 @@ perfect_stem_overrides = {
 
     "bhū": {"strong": "babhūv", "weak": "babhūv"},
     "div": {"strong": "didev",  "strong_3sg": "didev",   "weak": "didiv"},
+    "hu":  {"strong": "juho", "strong_3sg": "juhāv", "weak": "juhu"},
+    "su":  {"strong": "suṣo", "strong_3sg": "suṣāv", "weak": "suṣu"},
     # han: Grassmann's law throwback (jaghan/jaghn). Truly suppletive.
     "han": {"strong": "jaghan", "strong_3sg": "jaghān", "weak": "jaghn"},
     # vid: perfect-as-present veda (Whitney §801); truly suppletive.
     "vid": {"strong": "vived", "strong_3sg": "vived", "weak": "vivid", "weak2": "vid"},
+    "vṛ": {"strong": "vavar", "strong_3sg": "vavār", "weak": "vavṛ", "weak2": "vavar"},
 }
 
 
@@ -174,7 +180,7 @@ desiderative_stem_overrides = {
     "tan":  ["titaṃsa", "titāṃsa", "titaniṣa"],
     "dviṣ": ["didvikṣa"],
     "duh":  ["dudhukṣa"],
-    "budh": ["bubhutsa", "bubhodiṣa", "bubhodhiṣa"],
+    "budh": ["bubhutsa", "bubhodiṣa"],
     "bhū":  ["bubhūṣa"],
     "muc":  ["mumukṣa"],
     "yuj":  ["yuyukṣa"],
@@ -187,7 +193,8 @@ desiderative_stem_overrides = {
     "man":  ["mīmāṃsa"],
     "dā":   ["ditsa"],
     "śru":  ["śuśrūṣa"],
-    "pā":   ["pipāsa"],
+    "pā":   ["pipāsa", "pipīṣa"],
+    "vid":  ["vivitsa", "vividiṣa"],
     "nī":   ["ninīṣa"],
     "bhid": ["bibhitsa"],
     "kṣip": ["cikṣipsa", "cikṣīṣa"],
@@ -209,16 +216,16 @@ desiderative_stem_overrides = {
 # Middle voice: stem + ya; Active voice: stem + [INTENSIVE_ACTIVE]
 intensive_stem_overrides = {
     # "gam":  "jaṅgam",  # nasal insertion: ga+gam → jaṅgam (not jagam)
-    "han":  {"strong": "jaṅgha", "weak": "jaṅgha", "middle": "jaṅghan"},
-    "vṛ":   "varīvṛ",
+    "han":  {"strong": "jaṅgha", "weak": "jaṅgha", "middle": ["jaṅghan", "jeghnī"]},
+    "vṛ":   "ūrṇonū",
     "pā":   "pepīp",
     # Whitney §1002 / INRIA: kṛ intensive uses carkar- base (not cekṛ-)
     # The forms attest: carkarīmi, carkarīṣi, carkarti, carkarvaḥ etc.
     "kṛ":   "carkar",
     "mṛj":  "marmṛj",
-    # "kṣip": removed — let algorithm handle kśip → cekṣip
-    # yaj: intensive prefix is yāy- (long ā); Whitney §1014 heavy-syllable intensives
-    "yaj":  "yāyaj",
+    "kṣip": {"strong": "cekṣipa", "weak": "cekṣipa", "middle": "cekṣipa"},
+    # yaj: intensive prefix is yāy- (long ā); active intensive takes y suffix in INRIA.
+    "yaj":  {"strong": "yāyajyā", "weak": "yāyajyā", "middle": "yāyajya"},
     # budh: Whitney §1002i - Grassmann roots restore the original aspirate in the prefix
     "budh": {"strong": "bobhodh", "weak": "bobhudh", "middle": "bobhudh"},
 

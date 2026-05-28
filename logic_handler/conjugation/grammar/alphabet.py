@@ -79,6 +79,7 @@ class SanskritAlphabet:
             "[AORIST_PASS_3SG]",
             "[SA_AORIST]",
             "[INTENSIVE_ACTIVE]",
+            "[CLASS2_U]",
             "[CLASS2_WEAK]",
             "[SAMP]",
             "[AUG]",
@@ -92,6 +93,7 @@ class SanskritAlphabet:
             "[NO_RUKI]",
             "[PRAGRHYA]",
             "[HI_DHI]",
+            "[HU_SU]",
             # --- Sandhi pipeline (morphology inserts → sandhi consumes / clean_sd_residual) ---
             "[SD_DCP]",   # dental + palatal fusion (t/d/dh + c/ch → cc/cch)
             "[SD_GEM]",   # homorganic gemination across '+'

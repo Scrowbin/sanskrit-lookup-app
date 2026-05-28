@@ -174,10 +174,7 @@ class StemBuilder:
             base = self._build_causative_base(root_str)
             fst = base + pn.accep("ya")
         elif derivative == "passive":
-            if root_str in passive_stem_overrides:
-                fst = pn.accep(passive_stem_overrides[root_str]) + pn.accep("+ya")
-            else:
-                fst = self._build_passive(root_str, class_num)
+            fst = self._build_passive(root_str, class_num)
         elif derivative == "aorist_passive_3sg":
             fst = self._build_aorist_passive_3sg(root_str)
         elif derivative == "intensive_middle":
@@ -316,7 +313,10 @@ class StemBuilder:
         """
         # Layer 1: true irregular override (han→ghāt only after removing dā/sthā/pā/krī/labh)
         if root_str in causative_stem_irregulars:
-            return pn.accep(causative_stem_irregulars[root_str])
+            override = causative_stem_irregulars[root_str]
+            if isinstance(override, list):
+                return pn.union(*[pn.accep(s) for s in override])
+            return pn.accep(override)
 
         phonemes = ALPHABET.parse_phonemes(root_str)
         vowels = set(ALPHABET.vowels_list)
@@ -425,7 +425,8 @@ class StemBuilder:
             # Pāṇini 7.2.38 (vṛto vā): vṛ takes optionally long īṭ in future systems
             return pn.union(stem + pn.accep("+iṣya"), stem + pn.accep("+īṣya"))
 
-        if is_vet or root_str == "su":
+        FUTURE_DUAL_ROOTS = {"budh", "nī", "han", "labh", "man", "vid", "stu", "svap", "jan", "rudh"}
+        if is_vet or root_str in FUTURE_DUAL_ROOTS or root_str == "su":
             return pn.union(stem + pn.accep("+sya"), stem + pn.accep("+iṣya"))
 
         suffix = "+sya" if is_anit else "+iṣya"
@@ -463,7 +464,8 @@ class StemBuilder:
         if root_str == "vṛ":
             return pn.union(stem + pn.accep("+i"), stem + pn.accep("+ī"))
 
-        if root_obj.is_vet:
+        FUTURE_DUAL_ROOTS = {"budh", "nī", "han", "labh", "man", "vid", "stu", "svap", "jan", "rudh"}
+        if root_obj.is_vet or root_str in FUTURE_DUAL_ROOTS:
             return pn.union(stem, stem + pn.accep("+i"))
 
         suffix = "" if is_anit else "+i"
@@ -754,12 +756,11 @@ class StemBuilder:
             # Whitney §805: strong forms use Guna for most roots
             root_fst = self._apply_guna(root_str, "[STRONG]")
         else:
-            # Weak: priority table
             if root_str in perfect_stem_overrides:
                 info = perfect_stem_overrides[root_str]
                 if "weak2" in info:
-                    return pn.union(pn.accep(info["weak"]), pn.accep(info["weak2"]))
-                return pn.accep(info["weak"])
+                    return pn.union(pn.accep(info["weak"] + "[PERF_WEAK]"), pn.accep(info["weak2"] + "[PERF_WEAK]"))
+                return pn.accep(info["weak"] + "[PERF_WEAK]")
 
             if root_str in _E_GRADE_WEAK_ROOTS:
                 # Whitney §794: e-grade weak stem (a→e, e.g. labh→lebh).
@@ -958,7 +959,10 @@ class StemBuilder:
 
         # Layer 1: Explicit override
         if root_str in passive_stem_overrides:
-            return pn.accep(passive_stem_overrides[root_str]) + pn.accep("+ya")
+            override = passive_stem_overrides[root_str]
+            if isinstance(override, list):
+                return pn.union(*[pn.accep(s) for s in override]) + pn.accep("+ya")
+            return pn.accep(override) + pn.accep("+ya")
 
         # Layer 2: aa-final root passive: aa -> ii (Panini 6.4.66, Whitney 997)
         # pa->pi, da->di, stha->sthi, ma->mi, ha->hi, jna->jni
@@ -1018,13 +1022,8 @@ class StemBuilder:
             # Whitney §626 / Pāṇini 7.3.89: u-final roots take Vriddhi (optionally Guna).
             # e.g., stu → staumi (vriddhi) / stomi (guna).
             if phonemes[-1] == "u":
-                # We union both to account for the Pāṇinian optionality and
-                # vowel-initial affix contexts where only guna (stavāni) is valid,
-                # ensuring the correct form is always in the output set.
-                return pn.union(
-                    self._apply_vriddhi(root_str),
-                    self._apply_guna(root_str, strength)
-                )
+                # vriddhi and ī augment are applied in morphology.py before consonants
+                return self._apply_guna(root_str, strength) + pn.accep("[CLASS2_U]")
 
         if strength == "[WEAK]":
             phonemes = ALPHABET.parse_phonemes(root_str)
@@ -1177,6 +1176,8 @@ class StemBuilder:
 
         if voice in ("middle", "active_anta"):
             if root_str in intensive_stem_overrides:
+                if isinstance(stem_base, list):
+                    return pn.union(*[pn.accep(s) for s in stem_base]) + pn.accep("+ya")
                 return pn.accep(stem_base) + pn.accep("+ya")
             prefix = self.reduplicator.generate_intensive_prefix(root_str)
             return pn.accep(prefix) + pn.accep(root_str) + pn.accep("+ya")
@@ -1184,6 +1185,8 @@ class StemBuilder:
             # Active luganta: Guna grade + [INTENSIVE_ACTIVE] tag.
             # Morphology erases [INTENSIVE_ACTIVE]+ → +, then sandhi's ayadi fires:
             if root_str in intensive_stem_overrides:
+                if isinstance(stem_base, list):
+                    return pn.union(*[pn.accep(s) for s in stem_base]) + pn.accep("[INTENSIVE_ACTIVE]")
                 return pn.accep(stem_base) + pn.accep("[INTENSIVE_ACTIVE]")
             
             prefix = self.reduplicator.generate_intensive_prefix(root_str)
@@ -1280,8 +1283,8 @@ class StemBuilder:
             if variant == "denominative_aya":
                 return pn.accep(base + "ā+y")
             # Both -īya (Whitney §1058) and -āya (Whitney §1066) are attested
-            # for different a-final stems. Generate both.
-            variants = [pn.accep(base + "ī+y"), pn.accep(base + "ā+y")]
+            # for different a-final stems. Generate both, and also -aya.
+            variants = [pn.accep(base + "ī+y"), pn.accep(base + "ā+y"), pn.accep(base_str + "+y")]
             if base.endswith(("n", "ṇ")) and variant == "denominative":
                 variants.append(pn.accep(base_str + "+s+y"))
             return pn.union(*variants)

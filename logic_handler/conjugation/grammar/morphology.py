@@ -119,6 +119,17 @@ class MorphologyEngine:
             sig
         )
 
+        # ── 2.6. Intensive active ī augment reduction ──────────────────────────
+        # Intensive active forms with ī augment (īmi, īṣi, īti) behave as weak (no guna)
+        # for roots ending in consonants (budh, dviṣ, vid). We reduce o→u, e→i.
+        _one_or_more_cons = ALPHABET.consonants + pn.closure(ALPHABET.consonants)
+        self.intensive_i_reduction = pn.cdrewrite(
+            pn.string_map([("o", "u"), ("e", "i")]),
+            "",
+            _one_or_more_cons + pn.accep("[INTENSIVE_ACTIVE]+ī"),
+            sig
+        )
+
         # ── 2.5. Samprasāraṇa ────────────────────────────────────────────────
         # Converts semivowels to vowels in weak contexts (Whitney §252; Pāṇini 6.1.13–15).
         # Tag [SAMP] is prepended to the whole root by build() when the root
@@ -183,6 +194,20 @@ class MorphologyEngine:
             pn.cross("[CLASS1_IRR]", ""), "", "", sig
         )
 
+        # ── 3.5. Class-2 u-vowel augment ──────────────────────────────────────
+        # Pāṇini 7.3.89: u-vowel roots in class 2 (stu, ru, etc.) take vriddhi or
+        # ī augment before consonant endings. They do not take guna (e.g. stomi).
+        # stem_rules applies [CLASS2_U] to the guna stem.
+        self.class2_u_vowel_ī = pn.cdrewrite(
+            pn.union(pn.cross("o[CLASS2_U]+", "avī+"), pn.cross("o[CLASS2_U]+", "au+")),
+            "",
+            ALPHABET.consonants,
+            sig
+        )
+        self.class2_u_vowel_erase = pn.cdrewrite(
+            pn.cross("[CLASS2_U]", ""), "", "", sig
+        )
+
         # ── 3.8. Class-5 śru weak suppletion ──────────────────────────────────
         # Pāṇini 7.3.80 (śṛṇo ca): śru -> śṛ before class-5 affix nu/no
         self.class5_suppletion = pn.cdrewrite(
@@ -194,11 +219,10 @@ class MorphologyEngine:
 
         # ── 4. Class-8 kṛ weak suppletion ─────────────────────────────────────
         # In weak forms of kṛ (class 8), the root becomes "kur" before -u-.
-        _any_weak_opt = pn.closure(pn.union("[WEAK]", "[PERF_WEAK]"), 0, 1)
         self.class8_suppletion = pn.cdrewrite(
-            pn.cross("kṛ", "kur") + pn.cross(_any_weak_opt, ""),
+            pn.cross("kṛ[WEAK]", "kur"),
             "",
-            "+u+",    # only fires before the class-8 weak affix (+u+)
+            "+u",    # only fires before the class-8 weak affix (+u)
             sig
         )
 
@@ -214,9 +238,12 @@ class MorphologyEngine:
             sig
         )
 
-        # Class 5/8 optional u-drop: sunuvaḥ OR sunvaḥ (Whitney §715)
+        # Class 5/8 optional u-drop: sunuvaḥ OR sunvaḥ, tanuvaḥ OR tanvaḥ (Whitney §715)
         self.class5_8_u_drop_opt = pn.cdrewrite(
-            pn.union(pn.cross("n+u+", "n+"), pn.accep("n+u+")),
+            pn.union(
+                pn.cross("nu+", "n+"), pn.accep("nu+"),
+                pn.cross("n+u+", "n+"), pn.accep("n+u+")
+            ),
             "",
             pn.union("v", "m"),
             sig
@@ -227,6 +254,23 @@ class MorphologyEngine:
             pn.cross("[ROOT_AORIST]+", "v+"),
             "bhū",
             ALPHABET.vowels,
+            sig
+        )
+
+        # Perfect hu/su 1du/1pl Guna (Whitney §796)
+        # juhu+iva[HU_SU] -> juhaviva, suṣu+iva[HU_SU] -> suṣaviva
+        self.perfect_u_guna_opt = pn.cdrewrite(
+            pn.cross("u[PERF_WEAK]+", "av[PERF_WEAK]+"),
+            pn.union("h", "ṣ"),
+            pn.union("iva[HU_SU]", "ima[HU_SU]"),
+            sig
+        )
+
+        # yaj intensive 3sg: yāyajyā[INTENSIVE_ACTIVE]+īti -> yāyajya[INTENSIVE_ACTIVE]+īti -> yāyajyeti (Guna)
+        self.yaj_intensive_a = pn.cdrewrite(
+            pn.cross("ā", "a"),
+            "yāyajy",
+            pn.union("[INTENSIVE_ACTIVE]+", "+") + pn.union("ī", "ā"),
             sig
         )
 
@@ -456,7 +500,7 @@ class MorphologyEngine:
             "[PASSIVE]", "[CLASS4]", "[CLASS8]", "[CAUS_PASS]",
             "[STRONG]",  "[WEAK]",   "[VRIDDHI]", "[CLASS2_WEAK]",
             "[ROOT_AORIST]", "[AORIST]", "[AORIST_PASS_3SG]", "[SA_AORIST]", "[INTENSIVE_ACTIVE]",
-            "[SAMP]", "[AUG]", "[NASAL]", "[HI_DHI]",
+            "[SAMP]", "[AUG]", "[NASAL]", "[HI_DHI]", "[HU_SU]",
             # Note: [NO_RUKI], [RUH_H], [PERF_WEAK], and [MRJ] MUST NOT be stripped here,
             # as they are needed by SandhiEngine. They are stripped in sandhi.py.
         )
@@ -481,15 +525,20 @@ class MorphologyEngine:
                 ("caus_pass_erase",          self.caus_pass_erase),
                 ("class1_suppletion",        self.class1_suppletion),
                 ("class1_irr_erase",         self.class1_irr_erase),
+                ("class2_u_vowel_ī",         self.class2_u_vowel_ī),
+                ("class2_u_vowel_erase",     self.class2_u_vowel_erase),
                 ("class5_suppletion",        self.class5_suppletion),
                 ("class8_suppletion",        self.class8_suppletion),
                 ("class8_u_drop",            self.class8_u_drop),
                 ("class5_8_u_drop_opt",      self.class5_8_u_drop_opt),
+                ("perfect_u_guna_opt",       self.perfect_u_guna_opt),
+                ("yaj_intensive_a",          self.yaj_intensive_a),
                 ("root_aorist_bhuv",         self.root_aorist_bhuv),
                 ("aorist_pass_vriddhi_final",     self.aorist_pass_vriddhi_final),
                 ("aorist_pass_vriddhi_medial_a",  self.aorist_pass_vriddhi_medial_a),
                 ("aorist_pass_guna_medial",  self.aorist_pass_guna_medial),
                 ("aorist_pass_yuk",          self.aorist_pass_yuk),
+                ("intensive_i_reduction",    self.intensive_i_reduction),
                 ("intensive_active_erase",   self.intensive_active_erase),
                 ("zero_grade_as",            self.zero_grade_as),
                 ("zero_grade_a_drop_vowel",  self.zero_grade_a_drop_vowel),
@@ -539,15 +588,20 @@ class MorphologyEngine:
             @ self.caus_pass_erase
             @ self.class1_suppletion
             @ self.class1_irr_erase
+            @ self.class2_u_vowel_ī
+            @ self.class2_u_vowel_erase
             @ self.class5_suppletion
             @ self.class8_suppletion
             @ self.class8_u_drop
             @ self.class5_8_u_drop_opt
+            @ self.perfect_u_guna_opt
+            @ self.yaj_intensive_a
             @ self.root_aorist_bhuv
             @ self.aorist_pass_vriddhi_final
             @ self.aorist_pass_vriddhi_medial_a
             @ self.aorist_pass_guna_medial
             @ self.aorist_pass_yuk
+            @ self.intensive_i_reduction
             @ self.intensive_active_erase
             @ self.zero_grade_as
             @ self.zero_grade_a_drop_vowel
