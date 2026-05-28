@@ -5,7 +5,8 @@ mf_blind = pn.cross(pn.union("[Masc]", "[Fem]"), "")
 """
 ś-stem (e.g., etādṛś, diś, dṛś)
 Note: For these stems, 'ś' changes to 'k' in Nom/Voc Sg and before consonant endings.
-(Your downstream sandhi engine will handle k+bh -> gbh, and k+su -> kṣu).
+'#' junction markers let _junction_sandhi in engine.py voice k→g before bh endings,
+and RUKI converts k#su → kṣu.
 """
 # --- Dynamic Bases ---
 sh_vowel = pn.cross("[SH_STEM]", "") + mf_blind  # Keeps the 'ś' before vowel endings
@@ -28,9 +29,9 @@ nom_du_sh = sh_vowel + pn.cross("[Nom][Du]", "au")
 acc_du_sh = sh_vowel + pn.cross("[Acc][Du]", "au")
 voc_du_sh = sh_vowel + pn.cross("[Voc][Du]", "au")
 
-ins_du_sh = sh_cons + pn.cross("[Ins][Du]", "bhyām")  # etādṛk + bhyām
-dat_du_sh = sh_cons + pn.cross("[Dat][Du]", "bhyām")
-abl_du_sh = sh_cons + pn.cross("[Abl][Du]", "bhyām")
+ins_du_sh = sh_cons + pn.cross("[Ins][Du]", "#bhyām")  # etādṛk#bhyām → etādṛgbhyām
+dat_du_sh = sh_cons + pn.cross("[Dat][Du]", "#bhyām")
+abl_du_sh = sh_cons + pn.cross("[Abl][Du]", "#bhyām")
 
 gen_du_sh = sh_vowel + pn.cross("[Gen][Du]", "os")
 loc_du_sh = sh_vowel + pn.cross("[Loc][Du]", "os")
@@ -40,12 +41,12 @@ nom_pl_sh = sh_vowel + pn.cross("[Nom][Pl]", "as")
 acc_pl_sh = sh_vowel + pn.cross("[Acc][Pl]", "as")
 voc_pl_sh = sh_vowel + pn.cross("[Voc][Pl]", "as")
 
-ins_pl_sh = sh_cons + pn.cross("[Ins][Pl]", "bhis")  # etādṛk + bhis
-dat_pl_sh = sh_cons + pn.cross("[Dat][Pl]", "bhyas")
-abl_pl_sh = sh_cons + pn.cross("[Abl][Pl]", "bhyas")
+ins_pl_sh = sh_cons + pn.cross("[Ins][Pl]", "#bhis")   # etādṛk#bhis → etādṛgbhiḥ
+dat_pl_sh = sh_cons + pn.cross("[Dat][Pl]", "#bhyas")  # etādṛk#bhyas → etādṛgbhyaḥ
+abl_pl_sh = sh_cons + pn.cross("[Abl][Pl]", "#bhyas")
 
 gen_pl_sh = sh_vowel + pn.cross("[Gen][Pl]", "ām")
-loc_pl_sh = sh_cons + pn.cross("[Loc][Pl]", "su")  # etādṛk + su
+loc_pl_sh = sh_cons + pn.cross("[Loc][Pl]", "#su")     # etādṛk#su → etādṛkṣu (via RUKI)
 
 
 # 1. SH-STEM CONSOLIDATION (e.g., etādṛś)
@@ -93,9 +94,10 @@ nom_du_sh_n = sh_vowel_n + pn.cross("[Nom][Du]", "ī")  # etādṛś -> etādṛ
 acc_du_sh_n = sh_vowel_n + pn.cross("[Acc][Du]", "ī")
 voc_du_sh_n = sh_vowel_n + pn.cross("[Voc][Du]", "ī")
 
-# Plural (Infixes nasal 'ñ' before 'ś', plus 'i')
-# e.g., etādṛś -> etādṛñśi (your downstream sandhi will recognize ñś natively)
-sh_pl_n = pn.cross("ś[SH_STEM]", "ñś") + pn.cross("[Neut]", "")
+# Plural (Infixes anusvāra 'ṃ' before 'ś', plus 'i')
+# Whitney §217b: the nasal before ś in neuter plural is anusvāra ṃ (not palatal ñ).
+# e.g., etādṛś -> etādṛṃśi
+sh_pl_n = pn.cross("ś[SH_STEM]", "ṃś") + pn.cross("[Neut]", "")
 
 nom_pl_sh_n = sh_pl_n + pn.cross("[Nom][Pl]", "i")
 acc_pl_sh_n = sh_pl_n + pn.cross("[Acc][Pl]", "i")
@@ -108,19 +110,19 @@ abl_sg_sh_n = sh_vowel_n + pn.cross("[Abl][Sg]", "as")
 gen_sg_sh_n = sh_vowel_n + pn.cross("[Gen][Sg]", "as")
 loc_sg_sh_n = sh_vowel_n + pn.cross("[Loc][Sg]", "i")
 
-ins_du_sh_n = sh_cons_n + pn.cross("[Ins][Du]", "bhyām")
-dat_du_sh_n = sh_cons_n + pn.cross("[Dat][Du]", "bhyām")
-abl_du_sh_n = sh_cons_n + pn.cross("[Abl][Du]", "bhyām")
+ins_du_sh_n = sh_cons_n + pn.cross("[Ins][Du]", "#bhyām")  # k#bh → gbh via junction sandhi
+dat_du_sh_n = sh_cons_n + pn.cross("[Dat][Du]", "#bhyām")
+abl_du_sh_n = sh_cons_n + pn.cross("[Abl][Du]", "#bhyām")
 
 gen_du_sh_n = sh_vowel_n + pn.cross("[Gen][Du]", "os")
 loc_du_sh_n = sh_vowel_n + pn.cross("[Loc][Du]", "os")
 
-ins_pl_sh_n = sh_cons_n + pn.cross("[Ins][Pl]", "bhis")
-dat_pl_sh_n = sh_cons_n + pn.cross("[Dat][Pl]", "bhyas")
-abl_pl_sh_n = sh_cons_n + pn.cross("[Abl][Pl]", "bhyas")
+ins_pl_sh_n = sh_cons_n + pn.cross("[Ins][Pl]", "#bhis")   # k#bh → gbh via junction sandhi
+dat_pl_sh_n = sh_cons_n + pn.cross("[Dat][Pl]", "#bhyas")
+abl_pl_sh_n = sh_cons_n + pn.cross("[Abl][Pl]", "#bhyas")
 
 gen_pl_sh_n = sh_vowel_n + pn.cross("[Gen][Pl]", "ām")
-loc_pl_sh_n = sh_cons_n + pn.cross("[Loc][Pl]", "su")
+loc_pl_sh_n = sh_cons_n + pn.cross("[Loc][Pl]", "#su")     # k#su → kṣu via RUKI
 
 # 2. NEUTER SH-STEM CONSOLIDATION
 sh_neut_paradigm = pn.union(

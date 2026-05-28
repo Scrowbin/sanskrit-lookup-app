@@ -84,34 +84,20 @@ class SanskritPhonology:
         Dental n -> retroflex ṇ after:
             r, ṛ, ṝ, ṣ
 
-        Allowed interveners:
-            vowels, gutturals, labials, y, v, h, ṃ
-
-        Blocked by:
-            coronals/dentals/palatals/etc.
+        Allowed interveners (vowels, gutturals, labials, y, v, h, ṃ):
+            Pāṇini's allowed interveners: vowels, velars/gutturals (k-varga),
+            labials (p-varga), y, v, h, and anusvāra (ṃ).
         """
-
         triggers = pn.union("r", "ṛ", "ṝ", "ṣ")
 
         allowed = pn.union(
             self.vowels,
-            # gutturals
-            "k",
-            "kh",
-            "g",
-            "gh",
-            "ṅ",
+            # gutturals / velars
+            "k", "kh", "g", "gh", "ṅ",
             # labials
-            "p",
-            "ph",
-            "b",
-            "bh",
-            "m",
+            "p", "ph", "b", "bh", "m",
             # semivowels / misc
-            "y",
-            "v",
-            "h",
-            "ṃ",
+            "y", "v", "h", "ṃ",
         ).closure()
 
         self.apply_nati_fst = pn.cdrewrite(
@@ -134,13 +120,18 @@ class SanskritPhonology:
             return word
 
     def _build_ruki_rule(self):
+        """
+        RUKI rule: s -> ṣ after r/ṛ/u/k/i (and long variants/diphthongs)
+        optionally followed by ḥ or ṃ.
+        """
         tau = pn.cross("s", "ṣ")
 
-        ruki_sounds = ["r", "ṛ", "ṝ", "u", "ū", "k", "i", "ī", "e", "o"]
+        ruki_sounds = ["r", "ṛ", "ṝ", "u", "ū", "k", "i", "ī", "e", "o", "ai", "au"]
         lambda_ctx = (pn.union(*ruki_sounds) + pn.union("ḥ", "ṃ", "")).optimize()
         self.apply_ruki_rule_fst = pn.cdrewrite(
             tau, lambda_ctx, "", self.sigma_star
         ).optimize()
+
 
     def apply_ruki(self, word: str) -> str:
         try:

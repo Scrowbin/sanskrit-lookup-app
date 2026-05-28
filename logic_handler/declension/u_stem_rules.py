@@ -58,9 +58,19 @@ nom_du_m_u = pn.cross(
     "u[U_STEM][Masc][Nom][Du]", "ū"
 )  # śátru + au -> śátrū (lengthens)
 acc_du_m_u = pn.cross("u[U_STEM][Masc][Acc][Du]", "ū")  # śátru + au -> śátrū
-ins_du_m_u = pn.cross("[U_STEM][Masc][Ins][Du]", "bhyām")  # śátru + bhyām -> śátrubhyām
-dat_du_m_u = pn.cross("[U_STEM][Masc][Dat][Du]", "bhyām")  # śátru + bhyām -> śátrubhyām
-abl_du_m_u = pn.cross("[U_STEM][Masc][Abl][Du]", "bhyām")  # śátru + bhyām -> śátrubhyām
+# Whitney §341b: u optionally lengthens to ū before bh-suffixes
+ins_du_m_u = pn.union(
+    pn.cross("[U_STEM][Masc][Ins][Du]", "bhyām"),   # śátrubhyām (short)
+    pn.cross("u[U_STEM][Masc][Ins][Du]", "ūbhyām"),  # śátrūbhyām (long)
+)
+dat_du_m_u = pn.union(
+    pn.cross("[U_STEM][Masc][Dat][Du]", "bhyām"),
+    pn.cross("u[U_STEM][Masc][Dat][Du]", "ūbhyām"),
+)
+abl_du_m_u = pn.union(
+    pn.cross("[U_STEM][Masc][Abl][Du]", "bhyām"),
+    pn.cross("u[U_STEM][Masc][Abl][Du]", "ūbhyām"),
+)
 gen_du_m_u = pn.cross(
     "u[U_STEM][Masc][Gen][Du]", "vos"
 )  # śátru + os -> śátrvos (u -> vos)
@@ -70,9 +80,18 @@ voc_du_m_u = pn.cross("u[U_STEM][Masc][Voc][Du]", "ū")  # śátru + au -> śát
 # Feminine
 nom_du_f_u = pn.cross("u[U_STEM][Fem][Nom][Du]", "ū")
 acc_du_f_u = pn.cross("u[U_STEM][Fem][Acc][Du]", "ū")
-ins_du_f_u = pn.cross("[U_STEM][Fem][Ins][Du]", "bhyām")
-dat_du_f_u = pn.cross("[U_STEM][Fem][Dat][Du]", "bhyām")
-abl_du_f_u = pn.cross("[U_STEM][Fem][Abl][Du]", "bhyām")
+ins_du_f_u = pn.union(
+    pn.cross("[U_STEM][Fem][Ins][Du]", "bhyām"),
+    pn.cross("u[U_STEM][Fem][Ins][Du]", "ūbhyām"),
+)
+dat_du_f_u = pn.union(
+    pn.cross("[U_STEM][Fem][Dat][Du]", "bhyām"),
+    pn.cross("u[U_STEM][Fem][Dat][Du]", "ūbhyām"),
+)
+abl_du_f_u = pn.union(
+    pn.cross("[U_STEM][Fem][Abl][Du]", "bhyām"),
+    pn.cross("u[U_STEM][Fem][Abl][Du]", "ūbhyām"),
+)
 gen_du_f_u = pn.cross("u[U_STEM][Fem][Gen][Du]", "vos")
 loc_du_f_u = pn.cross("u[U_STEM][Fem][Loc][Du]", "vos")
 voc_du_f_u = pn.cross("u[U_STEM][Fem][Voc][Du]", "ū")
@@ -81,9 +100,18 @@ voc_du_f_u = pn.cross("u[U_STEM][Fem][Voc][Du]", "ū")
 nom_du_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Nom][Du]", "nī")
 acc_du_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Acc][Du]", "nī")
 voc_du_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Voc][Du]", "nī")
-ins_du_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Ins][Du]", "bhyām")
-dat_du_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Dat][Du]", "bhyām")
-abl_du_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Abl][Du]", "bhyām")
+ins_du_n_u = pn.union(
+    pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Ins][Du]", "bhyām"),
+    pn.cross("u[U_STEM]", "ū") + neut_tag + pn.cross("[Ins][Du]", "bhyām"),
+)
+dat_du_n_u = pn.union(
+    pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Dat][Du]", "bhyām"),
+    pn.cross("u[U_STEM]", "ū") + neut_tag + pn.cross("[Dat][Du]", "bhyām"),
+)
+abl_du_n_u = pn.union(
+    pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Abl][Du]", "bhyām"),
+    pn.cross("u[U_STEM]", "ū") + neut_tag + pn.cross("[Abl][Du]", "bhyām"),
+)
 gen_du_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Gen][Du]", "nos")
 loc_du_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Loc][Du]", "nos")
 """
@@ -96,9 +124,19 @@ nom_pl_m_u = pn.cross(
 acc_pl_m_u = pn.cross(
     "u[U_STEM][Masc][Acc][Pl]", "ūn"
 )  # śátru + as -> śátrūn (u -> ūn)
-ins_pl_m_u = pn.cross("[U_STEM][Masc][Ins][Pl]", "bhis")  # śátru + bhis -> śátrubhis
-dat_pl_m_u = pn.cross("[U_STEM][Masc][Dat][Pl]", "bhyas")  # śátru + bhyas -> śátrubhyas
-abl_pl_m_u = pn.cross("[U_STEM][Masc][Abl][Pl]", "bhyas")  # śátru + bhyas -> śátrubhyas
+# Whitney §341b: u optionally lengthens to ū before bh-suffixes
+ins_pl_m_u = pn.union(
+    pn.cross("[U_STEM][Masc][Ins][Pl]", "bhis"),    # śátrubhis (short)
+    pn.cross("u[U_STEM][Masc][Ins][Pl]", "ūbhis"),   # śátrūbhis (long)
+)
+dat_pl_m_u = pn.union(
+    pn.cross("[U_STEM][Masc][Dat][Pl]", "bhyas"),
+    pn.cross("u[U_STEM][Masc][Dat][Pl]", "ūbhyas"),
+)
+abl_pl_m_u = pn.union(
+    pn.cross("[U_STEM][Masc][Abl][Pl]", "bhyas"),
+    pn.cross("u[U_STEM][Masc][Abl][Pl]", "ūbhyas"),
+)
 gen_pl_m_u = pn.cross(
     "u[U_STEM][Masc][Gen][Pl]", "ūnām"
 )  # śátru + ām -> śátrūṇām (u -> ūnām)
@@ -109,9 +147,18 @@ voc_pl_m_u = pn.cross("u[U_STEM][Masc][Voc][Pl]", "avas")  # śátru + as -> ś�
 nom_pl_f_u = pn.cross("u[U_STEM][Fem][Nom][Pl]", "avas")  # dhenú + as -> dhenávas
 acc_pl_f_u = pn.cross("u[U_STEM][Fem][Acc][Pl]", "ūs")  # dhenú + as -> dhenús (u -> ūs)
 voc_pl_f_u = pn.cross("u[U_STEM][Fem][Voc][Pl]", "avas")
-ins_pl_f_u = pn.cross("[U_STEM][Fem][Ins][Pl]", "bhis")
-dat_pl_f_u = pn.cross("[U_STEM][Fem][Dat][Pl]", "bhyas")
-abl_pl_f_u = pn.cross("[U_STEM][Fem][Abl][Pl]", "bhyas")
+ins_pl_f_u = pn.union(
+    pn.cross("[U_STEM][Fem][Ins][Pl]", "bhis"),
+    pn.cross("u[U_STEM][Fem][Ins][Pl]", "ūbhis"),
+)
+dat_pl_f_u = pn.union(
+    pn.cross("[U_STEM][Fem][Dat][Pl]", "bhyas"),
+    pn.cross("u[U_STEM][Fem][Dat][Pl]", "ūbhyas"),
+)
+abl_pl_f_u = pn.union(
+    pn.cross("[U_STEM][Fem][Abl][Pl]", "bhyas"),
+    pn.cross("u[U_STEM][Fem][Abl][Pl]", "ūbhyas"),
+)
 gen_pl_f_u = pn.cross("u[U_STEM][Fem][Gen][Pl]", "ūnām")
 loc_pl_f_u = pn.cross("[U_STEM][Fem][Loc][Pl]", "su")
 
@@ -119,9 +166,18 @@ loc_pl_f_u = pn.cross("[U_STEM][Fem][Loc][Pl]", "su")
 nom_pl_n_u = pn.cross("u[U_STEM]", "ūni") + neut_tag + pn.cross("[Nom][Pl]", "")
 acc_pl_n_u = pn.cross("u[U_STEM]", "ūni") + neut_tag + pn.cross("[Acc][Pl]", "")
 voc_pl_n_u = pn.cross("u[U_STEM]", "ūni") + neut_tag + pn.cross("[Voc][Pl]", "")
-ins_pl_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Ins][Pl]", "bhis")
-dat_pl_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Dat][Pl]", "bhyas")
-abl_pl_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Abl][Pl]", "bhyas")
+ins_pl_n_u = pn.union(
+    pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Ins][Pl]", "bhis"),
+    pn.cross("u[U_STEM]", "ū") + neut_tag + pn.cross("[Ins][Pl]", "bhis"),
+)
+dat_pl_n_u = pn.union(
+    pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Dat][Pl]", "bhyas"),
+    pn.cross("u[U_STEM]", "ū") + neut_tag + pn.cross("[Dat][Pl]", "bhyas"),
+)
+abl_pl_n_u = pn.union(
+    pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Abl][Pl]", "bhyas"),
+    pn.cross("u[U_STEM]", "ū") + neut_tag + pn.cross("[Abl][Pl]", "bhyas"),
+)
 gen_pl_n_u = pn.cross("u[U_STEM]", "ūnām") + neut_tag + pn.cross("[Gen][Pl]", "")
 loc_pl_n_u = pn.cross("[U_STEM]", "") + neut_tag + pn.cross("[Loc][Pl]", "su")
 

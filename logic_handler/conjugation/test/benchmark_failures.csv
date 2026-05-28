@@ -1,0 +1,145 @@
+Root,Class,Derivation,Tense,Voice,Person,Number,Expected (INRIA),Actual (FST),Error_Type
+bhū,1 (intensive),intensive,imperative,active,3,sg,bobhavītu,bobhotu,Mismatch
+hu,3 (primary),primary,perfect,active,1,du,juhaviva,juhuva,Mismatch
+su,5 (primary),primary,perfect,active,1,du,suṣaviva,suṣuva,Mismatch
+kṛ,8 (primary),primary,imperative,active,2,sg,kuru,kru,Mismatch
+budh,1 (intensive),intensive,imperfect,active,2,sg,abobhudhīḥ,abobhodhīḥ OR abobhot OR abobhoḥ,Mismatch
+dviṣ,2 (intensive),intensive,imperfect,active,2,sg,adedviṣīḥ,adedveṣīḥ OR adedveṭ,Mismatch
+han,2 (intensive),intensive,present,active,3,pl,jaṅghānti,jaṅghāti,Mismatch
+han,2 (intensive),intensive,imperative,active,3,sg,jaṅghetu,jaṅghatu,Mismatch
+han,2 (intensive),intensive,imperative,active,3,pl,jaṅghatu,jaṅghātu,Mismatch
+pā,1 (primary),primary,benedictive,active,1,sg,pāyāsam OR peyāsam,payyāsam,Mismatch
+pā,1 (primary),primary,benedictive,active,1,du,pāyāsva OR peyāsva,payyāsva,Mismatch
+pā,1 (primary),primary,benedictive,active,1,pl,pāyāsma OR peyāsma,payyāsma,Mismatch
+pā,1 (primary),primary,benedictive,active,2,sg,pāyāḥ OR peyāḥ,payyāḥ,Mismatch
+pā,1 (primary),primary,benedictive,active,2,du,pāyāstam OR peyāstam,payyāstam,Mismatch
+pā,1 (primary),primary,benedictive,active,2,pl,pāyāsta OR peyāsta,payyāsta,Mismatch
+pā,1 (primary),primary,benedictive,active,3,sg,pāyāt OR peyāt,payyāt,Mismatch
+pā,1 (primary),primary,benedictive,active,3,du,pāyāstām OR peyāstām,payyāstām,Mismatch
+pā,1 (primary),primary,benedictive,active,3,pl,pāyāsuḥ OR peyāsuḥ,payyāsuḥ,Mismatch
+dā,3 (primary),primary,benedictive,active,1,sg,dīyāsam OR deyāsam,dayyāsam,Mismatch
+dā,3 (primary),primary,benedictive,active,1,du,dīyāsva OR deyāsva,dayyāsva,Mismatch
+dā,3 (primary),primary,benedictive,active,1,pl,dīyāsma OR deyāsma,dayyāsma,Mismatch
+dā,3 (primary),primary,benedictive,active,2,sg,dīyāḥ OR deyāḥ,dayyāḥ,Mismatch
+dā,3 (primary),primary,benedictive,active,2,du,dīyāstam OR deyāstam,dayyāstam,Mismatch
+dā,3 (primary),primary,benedictive,active,2,pl,dīyāsta OR deyāsta,dayyāsta,Mismatch
+dā,3 (primary),primary,benedictive,active,3,sg,dīyāt OR deyāt,dayyāt,Mismatch
+dā,3 (primary),primary,benedictive,active,3,du,dīyāstām OR deyāstām,dayyāstām,Mismatch
+dā,3 (primary),primary,benedictive,active,3,pl,dīyāsuḥ OR deyāsuḥ,dayyāsuḥ,Mismatch
+sthā,1 (primary),primary,benedictive,active,1,sg,stheyāsam,sthayyāsam,Mismatch
+sthā,1 (primary),primary,benedictive,active,1,du,stheyāsva,sthayyāsva,Mismatch
+sthā,1 (primary),primary,benedictive,active,1,pl,stheyāsma,sthayyāsma,Mismatch
+sthā,1 (primary),primary,benedictive,active,2,sg,stheyāḥ,sthayyāḥ,Mismatch
+sthā,1 (primary),primary,benedictive,active,2,du,stheyāstam,sthayyāstam,Mismatch
+sthā,1 (primary),primary,benedictive,active,2,pl,stheyāsta,sthayyāsta,Mismatch
+sthā,1 (primary),primary,benedictive,active,3,sg,stheyāt,sthayyāt,Mismatch
+sthā,1 (primary),primary,benedictive,active,3,du,stheyāstām,sthayyāstām,Mismatch
+sthā,1 (primary),primary,benedictive,active,3,pl,stheyāsuḥ,sthayyāsuḥ,Mismatch
+kṣip,6 (intensive),intensive,present,active,1,sg,cekṣipami OR cekṣipemi,cekṣepmi OR cekṣepīmi,Mismatch
+kṣip,6 (intensive),intensive,present,active,1,du,cekṣipavaḥ,cekṣipvaḥ,Mismatch
+kṣip,6 (intensive),intensive,present,active,1,pl,cekṣipamaḥ,cekṣipmaḥ,Mismatch
+kṣip,6 (intensive),intensive,present,active,2,sg,cekṣipasi OR cekṣipeṣi,cekṣepsi OR cekṣepīṣi,Mismatch
+kṣip,6 (intensive),intensive,present,active,2,du,cekṣipathaḥ,cekṣipthaḥ,Mismatch
+kṣip,6 (intensive),intensive,present,active,2,pl,cekṣipatha,cekṣiptha,Mismatch
+kṣip,6 (intensive),intensive,present,active,3,sg,cekṣipati OR cekṣipeti,cekṣepti OR cekṣepīti,Mismatch
+kṣip,6 (intensive),intensive,present,active,3,du,cekṣipataḥ,cekṣiptaḥ,Mismatch
+kṣip,6 (intensive),intensive,present,active,3,pl,cekṣipāti,cekṣipati,Mismatch
+kṣip,6 (intensive),intensive,imperfect,active,1,sg,acekṣipām,acekṣepam,Mismatch
+kṣip,6 (intensive),intensive,imperfect,active,1,du,acekṣipava,acekṣipva,Mismatch
+kṣip,6 (intensive),intensive,imperfect,active,1,pl,acekṣipama,acekṣipma,Mismatch
+kṣip,6 (intensive),intensive,imperfect,active,2,sg,acekṣipaḥ OR acekṣipeḥ,acekṣep OR acekṣepīḥ,Mismatch
+kṣip,6 (intensive),intensive,imperfect,active,2,du,acekṣipatam,acekṣiptam,Mismatch
+kṣip,6 (intensive),intensive,imperfect,active,2,pl,acekṣipata,acekṣipta,Mismatch
+kṣip,6 (intensive),intensive,imperfect,active,3,sg,acekṣipat OR acekṣipet,acekṣep OR acekṣepīt,Mismatch
+kṣip,6 (intensive),intensive,imperfect,active,3,du,acekṣipatām,acekṣiptām,Mismatch
+kṣip,6 (intensive),intensive,imperfect,active,3,pl,acekṣipoḥ,acekṣepuḥ,Mismatch
+kṣip,6 (intensive),intensive,imperative,active,1,sg,cekṣipāṇi,cekṣepāṇi,Mismatch
+kṣip,6 (intensive),intensive,imperative,active,1,du,cekṣipāva,cekṣepāva,Mismatch
+kṣip,6 (intensive),intensive,imperative,active,1,pl,cekṣipāma,cekṣepāma,Mismatch
+kṣip,6 (intensive),intensive,imperative,active,2,sg,cekṣipahi,cekṣibdhi,Mismatch
+kṣip,6 (intensive),intensive,imperative,active,2,du,cekṣipatam,cekṣiptam,Mismatch
+kṣip,6 (intensive),intensive,imperative,active,2,pl,cekṣipata,cekṣipta,Mismatch
+kṣip,6 (intensive),intensive,imperative,active,3,sg,cekṣipetu,cekṣeptu,Mismatch
+kṣip,6 (intensive),intensive,imperative,active,3,du,cekṣipatām,cekṣiptām,Mismatch
+kṣip,6 (intensive),intensive,optative,active,1,sg,cekṣipayām,cekṣipyām,Mismatch
+kṣip,6 (intensive),intensive,optative,active,1,du,cekṣipayāva,cekṣipyāva,Mismatch
+kṣip,6 (intensive),intensive,optative,active,1,pl,cekṣipayāma,cekṣipyāma,Mismatch
+kṣip,6 (intensive),intensive,optative,active,2,sg,cekṣipayāḥ,cekṣipyāḥ,Mismatch
+kṣip,6 (intensive),intensive,optative,active,2,du,cekṣipayātam,cekṣipyātam,Mismatch
+kṣip,6 (intensive),intensive,optative,active,2,pl,cekṣipayāta,cekṣipyāta,Mismatch
+kṣip,6 (intensive),intensive,optative,active,3,sg,cekṣipayāt,cekṣipyāt,Mismatch
+kṣip,6 (intensive),intensive,optative,active,3,du,cekṣipayātām,cekṣipyātām,Mismatch
+kṣip,6 (intensive),intensive,optative,active,3,pl,cekṣipayuḥ,cekṣipyuḥ,Mismatch
+vṛ,9 (intensive),intensive,present,middle,1,sg,ūrṇonūye,varīvṛye,Mismatch
+vṛ,9 (intensive),intensive,present,middle,1,du,ūrṇonūyāvahe,varīvṛyāvahe,Mismatch
+vṛ,9 (intensive),intensive,present,middle,1,pl,ūrṇonūyāmahe,varīvṛyāmahe,Mismatch
+vṛ,9 (intensive),intensive,present,middle,2,sg,ūrṇonūyase,varīvṛyase,Mismatch
+vṛ,9 (intensive),intensive,present,middle,2,du,ūrṇonūyethe,varīvṛyethe,Mismatch
+vṛ,9 (intensive),intensive,present,middle,2,pl,ūrṇonūyadhve,varīvṛyadhve,Mismatch
+vṛ,9 (intensive),intensive,present,middle,3,sg,ūrṇonūyate,varīvṛyate,Mismatch
+vṛ,9 (intensive),intensive,present,middle,3,du,ūrṇonūyete,varīvṛyete,Mismatch
+vṛ,9 (intensive),intensive,present,middle,3,pl,ūrṇonūyante,varīvṛyante,Mismatch
+vṛ,9 (intensive),intensive,imperfect,middle,1,sg,aurṇonūye,avarīvṛye,Mismatch
+vṛ,9 (intensive),intensive,imperfect,middle,1,du,aurṇonūyāvahi,avarīvṛyāvahi,Mismatch
+vṛ,9 (intensive),intensive,imperfect,middle,1,pl,aurṇonūyāmahi,avarīvṛyāmahi,Mismatch
+vṛ,9 (intensive),intensive,imperfect,middle,2,sg,aurṇonūyathāḥ,avarīvṛyathāḥ,Mismatch
+vṛ,9 (intensive),intensive,imperfect,middle,2,du,aurṇonūyethām,avarīvṛyethām,Mismatch
+vṛ,9 (intensive),intensive,imperfect,middle,2,pl,aurṇonūyadhvam,avarīvṛyadhvam,Mismatch
+vṛ,9 (intensive),intensive,imperfect,middle,3,sg,aurṇonūyata,avarīvṛyata,Mismatch
+vṛ,9 (intensive),intensive,imperfect,middle,3,du,aurṇonūyetām,avarīvṛyetām,Mismatch
+vṛ,9 (intensive),intensive,imperfect,middle,3,pl,aurṇonūyanta,avarīvṛyanta,Mismatch
+vṛ,9 (intensive),intensive,imperative,middle,1,sg,ūrṇonūyai,varīvṛyai,Mismatch
+vṛ,9 (intensive),intensive,imperative,middle,1,du,ūrṇonūyāvahai,varīvṛyāvahai,Mismatch
+vṛ,9 (intensive),intensive,imperative,middle,1,pl,ūrṇonūyāmahai,varīvṛyāmahai,Mismatch
+vṛ,9 (intensive),intensive,imperative,middle,2,sg,ūrṇonūyasva,varīvṛyasva,Mismatch
+vṛ,9 (intensive),intensive,imperative,middle,2,du,ūrṇonūyethām,varīvṛyethām,Mismatch
+vṛ,9 (intensive),intensive,imperative,middle,2,pl,ūrṇonūyadhvam,varīvṛyadhvam,Mismatch
+vṛ,9 (intensive),intensive,imperative,middle,3,sg,ūrṇonūyatām,varīvṛyatām,Mismatch
+vṛ,9 (intensive),intensive,imperative,middle,3,du,ūrṇonūyetām,varīvṛyetām,Mismatch
+vṛ,9 (intensive),intensive,imperative,middle,3,pl,ūrṇonūyantām,varīvṛyantām,Mismatch
+vṛ,9 (intensive),intensive,optative,middle,1,sg,ūrṇonūyeya,varīvṛyeya,Mismatch
+vṛ,9 (intensive),intensive,optative,middle,1,du,ūrṇonūyevahi,varīvṛyevahi,Mismatch
+vṛ,9 (intensive),intensive,optative,middle,1,pl,ūrṇonūyemahi,varīvṛyemahi,Mismatch
+vṛ,9 (intensive),intensive,optative,middle,2,sg,ūrṇonūyethāḥ,varīvṛyethāḥ,Mismatch
+vṛ,9 (intensive),intensive,optative,middle,2,du,ūrṇonūyeyāthām,varīvṛyeyāthām,Mismatch
+vṛ,9 (intensive),intensive,optative,middle,2,pl,ūrṇonūyedhvam,varīvṛyedhvam,Mismatch
+vṛ,9 (intensive),intensive,optative,middle,3,sg,ūrṇonūyeta,varīvṛyeta,Mismatch
+vṛ,9 (intensive),intensive,optative,middle,3,du,ūrṇonūyeyātām,varīvṛyeyātām,Mismatch
+vṛ,9 (intensive),intensive,optative,middle,3,pl,ūrṇonūyeran,varīvṛyeran,Mismatch
+yaj,1 (intensive),intensive,present,active,1,sg,yāyajyāmi OR yāyajyemi,yāyajmi OR yāyajīmi,Mismatch
+yaj,1 (intensive),intensive,present,active,1,du,yāyajyāvaḥ,yāyajvaḥ,Mismatch
+yaj,1 (intensive),intensive,present,active,1,pl,yāyajyāmaḥ,yāyajmaḥ,Mismatch
+yaj,1 (intensive),intensive,present,active,2,sg,yāyajyāsi OR yāyajyeṣi,yāyajīṣi OR yāyakṣi,Mismatch
+yaj,1 (intensive),intensive,present,active,2,du,yāyajyāthaḥ,yāyaṣṭhaḥ,Mismatch
+yaj,1 (intensive),intensive,present,active,2,pl,yāyajyātha,yāyaṣṭha,Mismatch
+yaj,1 (intensive),intensive,present,active,3,sg,yāyajyeti,yāyajīti OR yāyaṣṭi,Mismatch
+yaj,1 (intensive),intensive,present,active,3,du,yāyajyātaḥ,yāyaṣṭaḥ,Mismatch
+yaj,1 (intensive),intensive,present,active,3,pl,yāyajyāti,yāyajati,Mismatch
+yaj,1 (intensive),intensive,imperfect,active,1,sg,ayāyajyām,ayāyajam,Mismatch
+yaj,1 (intensive),intensive,imperfect,active,1,du,ayāyajyāva,ayāyajva,Mismatch
+yaj,1 (intensive),intensive,imperfect,active,1,pl,ayāyajyāma,ayāyajma,Mismatch
+yaj,1 (intensive),intensive,imperfect,active,2,sg,ayāyajyāḥ OR ayāyajyeḥ,ayāyajīḥ OR ayāyak,Mismatch
+yaj,1 (intensive),intensive,imperfect,active,2,du,ayāyajyātam,ayāyaṣṭam,Mismatch
+yaj,1 (intensive),intensive,imperfect,active,2,pl,ayāyajyāta,ayāyaṣṭa,Mismatch
+yaj,1 (intensive),intensive,imperfect,active,3,sg,ayāyajyāt OR ayāyajyet,ayāyajīt OR ayāyaṭ,Mismatch
+yaj,1 (intensive),intensive,imperfect,active,3,du,ayāyajyātām,ayāyaṣṭām,Mismatch
+yaj,1 (intensive),intensive,imperfect,active,3,pl,ayāyajyoḥ,ayāyajuḥ,Mismatch
+yaj,1 (intensive),intensive,imperative,active,1,sg,yāyajyāni,yāyajāni,Mismatch
+yaj,1 (intensive),intensive,imperative,active,1,du,yāyajyāva,yāyajāva,Mismatch
+yaj,1 (intensive),intensive,imperative,active,1,pl,yāyajyāma,yāyajāma,Mismatch
+yaj,1 (intensive),intensive,imperative,active,2,sg,yāyajyāhi,yāyaḍḍhi,Mismatch
+yaj,1 (intensive),intensive,imperative,active,2,du,yāyajyātam,yāyaṣṭam,Mismatch
+yaj,1 (intensive),intensive,imperative,active,2,pl,yāyajyāta,yāyaṣṭa,Mismatch
+yaj,1 (intensive),intensive,imperative,active,3,sg,yāyajyetu,yāyaṣṭu,Mismatch
+yaj,1 (intensive),intensive,imperative,active,3,du,yāyajyātām,yāyaṣṭām,Mismatch
+yaj,1 (intensive),intensive,imperative,active,3,pl,yāyajyātu,yāyajatu,Mismatch
+yaj,1 (intensive),intensive,optative,active,1,sg,yāyajyāyām,yāyajyām,Mismatch
+yaj,1 (intensive),intensive,optative,active,1,du,yāyajyāyāva,yāyajyāva,Mismatch
+yaj,1 (intensive),intensive,optative,active,1,pl,yāyajyāyāma,yāyajyāma,Mismatch
+yaj,1 (intensive),intensive,optative,active,2,sg,yāyajyāyāḥ,yāyajyāḥ,Mismatch
+yaj,1 (intensive),intensive,optative,active,2,du,yāyajyāyātam,yāyajyātam,Mismatch
+yaj,1 (intensive),intensive,optative,active,2,pl,yāyajyāyāta,yāyajyāta,Mismatch
+yaj,1 (intensive),intensive,optative,active,3,sg,yāyajyāyāt,yāyajyāt,Mismatch
+yaj,1 (intensive),intensive,optative,active,3,du,yāyajyāyātām,yāyajyātām,Mismatch
+yaj,1 (intensive),intensive,optative,active,3,pl,yāyajyāyuḥ,yāyajyuḥ,Mismatch
+vid,2 (intensive),intensive,imperfect,active,2,sg,avevidīḥ,avevedīḥ OR avevet OR aveveḥ,Mismatch

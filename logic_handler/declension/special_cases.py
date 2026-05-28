@@ -404,6 +404,98 @@ ahan_paradigm = pn.union(
 ).optimize()
 
 # =============================================================================
+# 15. IDAM PARADIGM (This — fully suppletive demonstrative pronoun)
+# =============================================================================
+# All forms are suppletive; none are derivable from the stem 'idam'.
+# Two sets of alternants exist: primary (ayam/asya/anena…) and enclitic (enam/enena…).
+idam_paradigm = pn.union(
+    # ── MASCULINE ────────────────────────────────────────────────────────────
+    pn.cross("idam", "ayam")    + masc_tag + pn.cross("[Nom][Sg]", ""),
+    pn.cross("idam", "imam")    + masc_tag + pn.cross("[Acc][Sg]", ""),
+    pn.cross("idam", "enam")    + masc_tag + pn.cross("[Acc][Sg]", ""),   # enclitic
+    pn.cross("idam", "anena")   + masc_tag + pn.cross("[Ins][Sg]", ""),
+    pn.cross("idam", "enena")   + masc_tag + pn.cross("[Ins][Sg]", ""),   # enclitic
+    pn.cross("idam", "asmai")   + masc_tag + pn.cross("[Dat][Sg]", ""),
+    pn.cross("idam", "asmāt")   + masc_tag + pn.cross("[Abl][Sg]", ""),
+    pn.cross("idam", "asya")    + masc_tag + pn.cross("[Gen][Sg]", ""),
+    pn.cross("idam", "asmin")   + masc_tag + pn.cross("[Loc][Sg]", ""),
+    pn.cross("idam", "imau")    + masc_tag + pn.cross("[Nom][Du]", ""),
+    pn.cross("idam", "imau")    + masc_tag + pn.cross("[Acc][Du]", ""),
+    pn.cross("idam", "enau")    + masc_tag + pn.cross("[Acc][Du]", ""),   # enclitic
+    pn.cross("idam", "ābhyām")  + masc_tag + pn.cross("[Ins][Du]", ""),
+    pn.cross("idam", "ābhyām")  + masc_tag + pn.cross("[Dat][Du]", ""),
+    pn.cross("idam", "ābhyām")  + masc_tag + pn.cross("[Abl][Du]", ""),
+    pn.cross("idam", "anayoḥ")  + masc_tag + pn.cross("[Gen][Du]", ""),
+    pn.cross("idam", "enayoḥ")  + masc_tag + pn.cross("[Gen][Du]", ""),   # enclitic
+    pn.cross("idam", "anayoḥ")  + masc_tag + pn.cross("[Loc][Du]", ""),
+    pn.cross("idam", "enayoḥ")  + masc_tag + pn.cross("[Loc][Du]", ""),   # enclitic
+    pn.cross("idam", "ime")     + masc_tag + pn.cross("[Nom][Pl]", ""),
+    pn.cross("idam", "imān")    + masc_tag + pn.cross("[Acc][Pl]", ""),
+    pn.cross("idam", "enān")    + masc_tag + pn.cross("[Acc][Pl]", ""),   # enclitic
+    pn.cross("idam", "ebhiḥ")   + masc_tag + pn.cross("[Ins][Pl]", ""),
+    pn.cross("idam", "ebhyaḥ")  + masc_tag + pn.cross("[Dat][Pl]", ""),
+    pn.cross("idam", "ebhyaḥ")  + masc_tag + pn.cross("[Abl][Pl]", ""),
+    pn.cross("idam", "eṣām")    + masc_tag + pn.cross("[Gen][Pl]", ""),
+    pn.cross("idam", "eṣu")     + masc_tag + pn.cross("[Loc][Pl]", ""),
+    # ── NEUTER ───────────────────────────────────────────────────────────────
+    pn.cross("idam", "idam")    + neut_tag + pn.cross("[Nom][Sg]", ""),
+    pn.cross("idam", "idam")    + neut_tag + pn.cross("[Acc][Sg]", ""),
+    pn.cross("idam", "enat")    + neut_tag + pn.cross("[Acc][Sg]", ""),   # enclitic
+    pn.cross("idam", "anena")   + neut_tag + pn.cross("[Ins][Sg]", ""),
+    pn.cross("idam", "enena")   + neut_tag + pn.cross("[Ins][Sg]", ""),
+    pn.cross("idam", "asmai")   + neut_tag + pn.cross("[Dat][Sg]", ""),
+    pn.cross("idam", "asmāt")   + neut_tag + pn.cross("[Abl][Sg]", ""),
+    pn.cross("idam", "asya")    + neut_tag + pn.cross("[Gen][Sg]", ""),
+    pn.cross("idam", "asmin")   + neut_tag + pn.cross("[Loc][Sg]", ""),
+    pn.cross("idam", "ime")     + neut_tag + pn.cross("[Nom][Du]", ""),
+    pn.cross("idam", "ime")     + neut_tag + pn.cross("[Acc][Du]", ""),
+    pn.cross("idam", "ene")     + neut_tag + pn.cross("[Acc][Du]", ""),   # enclitic
+    pn.cross("idam", "ābhyām")  + neut_tag + pn.cross("[Ins][Du]", ""),
+    pn.cross("idam", "ābhyām")  + neut_tag + pn.cross("[Dat][Du]", ""),
+    pn.cross("idam", "ābhyām")  + neut_tag + pn.cross("[Abl][Du]", ""),
+    pn.cross("idam", "anayoḥ")  + neut_tag + pn.cross("[Gen][Du]", ""),
+    pn.cross("idam", "enayoḥ")  + neut_tag + pn.cross("[Gen][Du]", ""),
+    pn.cross("idam", "anayoḥ")  + neut_tag + pn.cross("[Loc][Du]", ""),
+    pn.cross("idam", "enayoḥ")  + neut_tag + pn.cross("[Loc][Du]", ""),
+    pn.cross("idam", "imāni")   + neut_tag + pn.cross("[Nom][Pl]", ""),
+    pn.cross("idam", "imāni")   + neut_tag + pn.cross("[Acc][Pl]", ""),
+    pn.cross("idam", "enāni")   + neut_tag + pn.cross("[Acc][Pl]", ""),   # enclitic
+    pn.cross("idam", "ebhiḥ")   + neut_tag + pn.cross("[Ins][Pl]", ""),
+    pn.cross("idam", "ebhyaḥ")  + neut_tag + pn.cross("[Dat][Pl]", ""),
+    pn.cross("idam", "ebhyaḥ")  + neut_tag + pn.cross("[Abl][Pl]", ""),
+    pn.cross("idam", "eṣām")    + neut_tag + pn.cross("[Gen][Pl]", ""),
+    pn.cross("idam", "eṣu")     + neut_tag + pn.cross("[Loc][Pl]", ""),
+    # ── FEMININE ─────────────────────────────────────────────────────────────
+    pn.cross("idam", "iyam")    + fem_tag + pn.cross("[Nom][Sg]", ""),
+    pn.cross("idam", "imām")    + fem_tag + pn.cross("[Acc][Sg]", ""),
+    pn.cross("idam", "enām")    + fem_tag + pn.cross("[Acc][Sg]", ""),    # enclitic
+    pn.cross("idam", "anayā")   + fem_tag + pn.cross("[Ins][Sg]", ""),
+    pn.cross("idam", "enayā")   + fem_tag + pn.cross("[Ins][Sg]", ""),    # enclitic
+    pn.cross("idam", "asyai")   + fem_tag + pn.cross("[Dat][Sg]", ""),
+    pn.cross("idam", "asyāḥ")   + fem_tag + pn.cross("[Abl][Sg]", ""),
+    pn.cross("idam", "asyāḥ")   + fem_tag + pn.cross("[Gen][Sg]", ""),
+    pn.cross("idam", "asyām")   + fem_tag + pn.cross("[Loc][Sg]", ""),
+    pn.cross("idam", "ime")     + fem_tag + pn.cross("[Nom][Du]", ""),
+    pn.cross("idam", "ime")     + fem_tag + pn.cross("[Acc][Du]", ""),
+    pn.cross("idam", "ene")     + fem_tag + pn.cross("[Acc][Du]", ""),    # enclitic
+    pn.cross("idam", "ābhyām")  + fem_tag + pn.cross("[Ins][Du]", ""),
+    pn.cross("idam", "ābhyām")  + fem_tag + pn.cross("[Dat][Du]", ""),
+    pn.cross("idam", "ābhyām")  + fem_tag + pn.cross("[Abl][Du]", ""),
+    pn.cross("idam", "anayoḥ")  + fem_tag + pn.cross("[Gen][Du]", ""),
+    pn.cross("idam", "enayoḥ")  + fem_tag + pn.cross("[Gen][Du]", ""),
+    pn.cross("idam", "anayoḥ")  + fem_tag + pn.cross("[Loc][Du]", ""),
+    pn.cross("idam", "enayoḥ")  + fem_tag + pn.cross("[Loc][Du]", ""),
+    pn.cross("idam", "imāḥ")    + fem_tag + pn.cross("[Nom][Pl]", ""),
+    pn.cross("idam", "imāḥ")    + fem_tag + pn.cross("[Acc][Pl]", ""),
+    pn.cross("idam", "enāḥ")    + fem_tag + pn.cross("[Acc][Pl]", ""),    # enclitic
+    pn.cross("idam", "ābhiḥ")   + fem_tag + pn.cross("[Ins][Pl]", ""),
+    pn.cross("idam", "ābhyaḥ")  + fem_tag + pn.cross("[Dat][Pl]", ""),
+    pn.cross("idam", "ābhyaḥ")  + fem_tag + pn.cross("[Abl][Pl]", ""),
+    pn.cross("idam", "āsām")    + fem_tag + pn.cross("[Gen][Pl]", ""),
+    pn.cross("idam", "āsu")     + fem_tag + pn.cross("[Loc][Pl]", ""),
+).optimize()
+
+# =============================================================================
 # UPDATED MASTER PIPELINE COMPILATION
 # =============================================================================
 all_irregular_nouns_paradigm = pn.union(
@@ -423,5 +515,7 @@ all_irregular_nouns_paradigm = pn.union(
     yuvan_paradigm,
     maghavan_paradigm,
     ahan_paradigm,
+    idam_paradigm,
 ).optimize()
+
 

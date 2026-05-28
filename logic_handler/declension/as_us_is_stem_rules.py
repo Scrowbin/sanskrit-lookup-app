@@ -85,6 +85,20 @@ s_base_vowel = pn.union(
     pn.cross("[S_STEM]", ""), pn.cross("[YAS_STEM]", "")
 ) + pn.cross(any_g, "")
 
+# Base that performs s->ṣ retroflexion for is/us stems
+s_base_vowel_ruki = pn.union(
+    pn.cross("is[S_STEM]", "iṣ"),
+    pn.cross("us[S_STEM]", "uṣ"),
+    pn.cross("as[S_STEM]", "as"),
+    pn.cross("yas[YAS_STEM]", "yas"),
+) + pn.cross(any_g, "")
+
+s_base_vowel_ruki_mf = pn.union(
+    pn.cross("is[S_STEM]", "iṣ"),
+    pn.cross("us[S_STEM]", "uṣ"),
+    pn.cross("as[S_STEM]", "as"),
+) + pn.cross(mf_g, "")
+
 s_base_bh = pn.union(
     pn.cross("as[S_STEM]", "o"),  # manas -> mano
     pn.cross("is[S_STEM]", "ir"),  # havis -> havir
@@ -115,28 +129,28 @@ voc_sg_s_mf = pn.union(
 ) + pn.cross("[Voc][Sg]", "")
 
 acc_sg_s_mf = pn.union(
-    pn.cross("[S_STEM]", "") + pn.cross(mf_g, ""), yas_strong_mf
+    s_base_vowel_ruki_mf, yas_strong_mf
 ) + pn.cross("[Acc][Sg]", "am")
 
 nom_du_s_mf = pn.union(
-    pn.cross("[S_STEM]", "") + pn.cross(mf_g, ""), yas_strong_mf
+    s_base_vowel_ruki_mf, yas_strong_mf
 ) + pn.cross("[Nom][Du]", "au")
 acc_du_s_mf = pn.union(
-    pn.cross("[S_STEM]", "") + pn.cross(mf_g, ""), yas_strong_mf
+    s_base_vowel_ruki_mf, yas_strong_mf
 ) + pn.cross("[Acc][Du]", "au")
 voc_du_s_mf = pn.union(
-    pn.cross("[S_STEM]", "") + pn.cross(mf_g, ""), yas_strong_mf
+    s_base_vowel_ruki_mf, yas_strong_mf
 ) + pn.cross("[Voc][Du]", "au")
 
 nom_pl_s_mf = pn.union(
-    pn.cross("[S_STEM]", "") + pn.cross(mf_g, ""), yas_strong_mf
+    s_base_vowel_ruki_mf, yas_strong_mf
 ) + pn.cross("[Nom][Pl]", "as")
 voc_pl_s_mf = pn.union(
-    pn.cross("[S_STEM]", "") + pn.cross(mf_g, ""), yas_strong_mf
+    s_base_vowel_ruki_mf, yas_strong_mf
 ) + pn.cross("[Voc][Pl]", "as")
 
 # Acc Pl is universally weak
-acc_pl_s_mf = s_base_vowel + pn.cross("[Acc][Pl]", "as")
+acc_pl_s_mf = s_base_vowel_ruki + pn.cross("[Acc][Pl]", "as")
 
 
 # --- Neuter Specific Cases ---
@@ -144,9 +158,9 @@ nom_sg_s_n = s_base_vowel + pn.cross("[Nom][Sg]", "")
 acc_sg_s_n = s_base_vowel + pn.cross("[Acc][Sg]", "")
 voc_sg_s_n = s_base_vowel + pn.cross("[Voc][Sg]", "")
 
-nom_du_s_n = s_base_vowel + pn.cross("[Nom][Du]", "ī")
-acc_du_s_n = s_base_vowel + pn.cross("[Acc][Du]", "ī")
-voc_du_s_n = s_base_vowel + pn.cross("[Voc][Du]", "ī")
+nom_du_s_n = s_base_vowel_ruki + pn.cross("[Nom][Du]", "ī")
+acc_du_s_n = s_base_vowel_ruki + pn.cross("[Acc][Du]", "ī")
+voc_du_s_n = s_base_vowel_ruki + pn.cross("[Voc][Du]", "ī")
 
 # Plural base triggers nasal infixation and lengthening
 n_pl_base = pn.union(
@@ -161,26 +175,26 @@ voc_pl_s_n = n_pl_base + pn.cross("[Voc][Pl]", "i")
 
 
 # --- Gender-Blind Oblique Cases (Ins, Dat, Abl, Gen, Loc) ---
-ins_sg_s = s_base_vowel + pn.cross("[Ins][Sg]", "ā")
-dat_sg_s = s_base_vowel + pn.cross("[Dat][Sg]", "e")
-abl_sg_s = s_base_vowel + pn.cross("[Abl][Sg]", "as")
-gen_sg_s = s_base_vowel + pn.cross("[Gen][Sg]", "as")
-loc_sg_s = s_base_vowel + pn.cross("[Loc][Sg]", "i")
+ins_sg_s = s_base_vowel_ruki + pn.cross("[Ins][Sg]", "ā")
+dat_sg_s = s_base_vowel_ruki + pn.cross("[Dat][Sg]", "e")
+abl_sg_s = s_base_vowel_ruki + pn.cross("[Abl][Sg]", "as")
+gen_sg_s = s_base_vowel_ruki + pn.cross("[Gen][Sg]", "as")
+loc_sg_s = s_base_vowel_ruki + pn.cross("[Loc][Sg]", "i")
 
 # These use the modified 'bh' base
 ins_du_s = s_base_bh + pn.cross("[Ins][Du]", "bhyām")
 dat_du_s = s_base_bh + pn.cross("[Dat][Du]", "bhyām")
 abl_du_s = s_base_bh + pn.cross("[Abl][Du]", "bhyām")
 
-gen_du_s = s_base_vowel + pn.cross("[Gen][Du]", "os")
-loc_du_s = s_base_vowel + pn.cross("[Loc][Du]", "os")
+gen_du_s = s_base_vowel_ruki + pn.cross("[Gen][Du]", "os")
+loc_du_s = s_base_vowel_ruki + pn.cross("[Loc][Du]", "os")
 
 # These use the modified 'bh' base
 ins_pl_s = s_base_bh + pn.cross("[Ins][Pl]", "bhis")
 dat_pl_s = s_base_bh + pn.cross("[Dat][Pl]", "bhyas")
 abl_pl_s = s_base_bh + pn.cross("[Abl][Pl]", "bhyas")
 
-gen_pl_s = s_base_vowel + pn.cross("[Gen][Pl]", "ām")
+gen_pl_s = s_base_vowel_ruki + pn.cross("[Gen][Pl]", "ām")
 
 # Locative plural can have visarga (aḥsu/iḥṣu/uḥṣu) or sibilant doubling (assu/iṣṣu/uṣṣu).
 # We generate both options!
