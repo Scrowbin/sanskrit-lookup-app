@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, protocol } = require("electron");
+const { app, BrowserWindow, ipcMain, protocol, Menu } = require("electron");
 const path = require("path");
 
 protocol.registerSchemesAsPrivileged([
@@ -238,9 +238,10 @@ function createWindow() {
     height: 800,
     show: false,
 
+    autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.cjs"),
-      devTools: true, // 👈 TEMPORARILY ALWAYS TRUE FOR DEBUGGING
+      devTools: !app.isPackaged,
       webSecurity: false,
       sandbox: false,
       spellcheck: false,
@@ -267,6 +268,9 @@ function createWindow() {
 // ── App Lifecycle ────────────────────────────────────────────────────────────
 
 app.whenReady().then(async () => {
+  // No File / Edit / View / Window menu in the packaged app.
+  Menu.setApplicationMenu(null);
+
   protocol.registerFileProtocol("app", (request, callback) => {
     let url = request.url.substring(6); // strips 'app://'
     url = url.split("?")[0].split("#")[0]; // remove query strings and hashes

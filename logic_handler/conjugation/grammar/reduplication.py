@@ -103,12 +103,15 @@ class ReduplicationEngine:
             return "su"
         if root_str == "dyut":
             return "di"
+        # vy-initial: samprasāraṇa vi- (vivyathitha), not va-.
+        if root_str.startswith("vy"):
+            return "vi"
 
         if root_str and root_str[0] in ALPHABET.vowels_list:
             phonemes = ALPHABET.parse_phonemes(root_str)
             if root_str[0] == "a" and len(phonemes) > 2 and phonemes[1] not in ALPHABET.vowels_list and phonemes[2] not in ALPHABET.vowels_list:
-                # Pāṇini 7.4.71 (tasmān nuḍ dviḥalaḥ): an augment 'n' is added to the reduplicate 'a'
-                return "an"
+                # Pāṇini 7.4.71 (nuṭ) + 7.4.70 (ādeḥ): ān- before a-initial heavy root (ānakṣa).
+                return "ān"
             elif root_str[0] == "a":
                 # For non-heavy a-initial roots (like aś), the prefix is ā (P. 7.4.70 ata ādeḥ) or an depending on the root.
                 return "ā"
@@ -117,6 +120,9 @@ class ReduplicationEngine:
             elif root_str[0] in ("u", "ū"):
                 return "u"
             elif root_str[0] in ("ṛ", "ṝ"):
+                # Monosyllabic ṛ-roots (ṛj): ar- reduplicant (arjitha), not ā-.
+                if len(phonemes) == 2:
+                    return "ar"
                 return "ā"
             
             import warnings

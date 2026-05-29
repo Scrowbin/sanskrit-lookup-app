@@ -94,7 +94,69 @@ class SanskritConjugator:
     # Internal helpers
     # ──────────────────────────────────────────────────────────────────────────
 
-    @lru_cache(maxsize=2048)
+    @staticmethod
+    def _stem_cache_needs_paradigm_slot(
+        tense: str, class_num: int, root_str: str
+    ) -> bool:
+        """True when stem FST varies by person/number (perfect, impv. 2sg cl.3)."""
+        if tense == "perfect":
+            return True
+        if (
+            tense == "imperative"
+            and class_num == 3
+            and root_str in ("dā", "dhā")
+        ):
+            return True
+        return False
+
+    @lru_cache(maxsize=32768)
+    def _get_stem_cached(
+        self,
+        root_str: str,
+        class_num: int,
+        strength: str,
+        tense: str,
+        derivative: str | None,
+        aorist_type_override: str | None,
+        voice: str,
+    ) -> pn.Fst:
+        """Memoized stem FST for paradigms where only endings vary by person/number."""
+        return self.stems.build(
+            root_str,
+            class_num,
+            strength,
+            tense=tense,
+            derivative=derivative,
+            voice=voice,
+            aorist_type_override=aorist_type_override,
+        )
+
+    @lru_cache(maxsize=8192)
+    def _get_stem_cached_paradigm(
+        self,
+        root_str: str,
+        class_num: int,
+        strength: str,
+        tense: str,
+        derivative: str | None,
+        aorist_type_override: str | None,
+        voice: str,
+        person: str | None,
+        number: str | None,
+    ) -> pn.Fst:
+        """Memoized stem when person/number change the stem (perfect, dehi/dhehi)."""
+        return self.stems.build(
+            root_str,
+            class_num,
+            strength,
+            tense=tense,
+            derivative=derivative,
+            person=person,
+            number=number,
+            voice=voice,
+            aorist_type_override=aorist_type_override,
+        )
+
     def _get_stem(
         self,
         root_str: str,
@@ -107,11 +169,26 @@ class SanskritConjugator:
         person: str | None = None,
         number: str | None = None,
     ) -> pn.Fst:
-        return self.stems.build(
-            root_str, class_num, strength,
-            tense=tense, derivative=derivative,
-            person=person, number=number, voice=voice,
-            aorist_type_override=aorist_type_override,
+        if self._stem_cache_needs_paradigm_slot(tense, class_num, root_str):
+            return self._get_stem_cached_paradigm(
+                root_str,
+                class_num,
+                strength,
+                tense,
+                derivative,
+                aorist_type_override,
+                voice,
+                person,
+                number,
+            )
+        return self._get_stem_cached(
+            root_str,
+            class_num,
+            strength,
+            tense,
+            derivative,
+            aorist_type_override,
+            voice,
         )
 
     def _fetch_endings(
@@ -182,7 +259,7 @@ class SanskritConjugator:
     # Main entry point
     # ──────────────────────────────────────────────────────────────────────────
 
-    @lru_cache(maxsize=4096)
+    @lru_cache(maxsize=65536)
     def conjugate(
         self,
         root_str: str,
@@ -293,15 +370,17 @@ class SanskritConjugator:
             root_str = parts[1]
 
         # ── 0.5 Voice (Pada) Validation Gatekeeper ───────────────────────────
-        # We only strictly validate primary (non-derivative) active/middle requests.
-        if voice != "passive" and derivative is None:
-            root_obj = DHATUPATHA_ANALYZER.get(clean_root_str, class_num)
-            if voice not in root_obj.permitted_voices:
-                allowed = "/".join(root_obj.permitted_voices)
-                raise ValueError(
-                    f"Grammar error: Root '{clean_root_str}' class {class_num} "
-                    f"does not permit '{voice}' voice. Allowed: {allowed}."
-                )
+        # Lakāra-specific sets from verbs_clean.csv (e.g. budh: present active+passive,
+        # future active+middle — not middle in every tense).
+        allowed = DHATUPATHA_ANALYZER.get_permitted_voices(
+            clean_root_str, class_num, tense, derivative
+        )
+        if voice not in allowed:
+            raise ValueError(
+                f"Grammar error: Root '{clean_root_str}' class {class_num} "
+                f"({tense}, {derivative or 'primary'}) does not permit "
+                f"'{voice}' voice. Allowed: {'/'.join(sorted(allowed))}."
+            )
         # ── 1. Resolve morphological features ────────────────────────────────
         # s_or_is dual-dispatch (Whitney §881a): roots like budh that take either
         # the s-aorist or iṣ-aorist need two separate stem+ending pairings.
@@ -348,7 +427,21 @@ class SanskritConjugator:
         if suffix.is_empty:
             combined = stem
         else:
-            combined = stem + pn.accep("+") + suffix.to_fst()
+            # iṣ/is aorist endings attach without '+' so sandhi does not
+            # coalesce stem-final i with initial i (nai+iṣam → *naīṣam).
+            aor_type = (
+                DHATUPATHA_ANALYZER.get_aorist_type(
+                    root_str, class_num, voice=voice
+                )
+                if tense in ("aorist", "injunctive")
+                else ""
+            )
+            if aor_type in ("is", "sis") and suffix.surface.startswith(
+                ("iṣ", "siṣ")
+            ):
+                combined = stem + suffix.to_fst()
+            else:
+                combined = stem + pn.accep("+") + suffix.to_fst()
 
 
         if preverb_str:
@@ -471,15 +564,15 @@ class SanskritConjugator:
         aux_voice = "active" if auxiliary in ("bhū", "as") else voice
         aux_class = valid_aux[auxiliary]
 
-        # 3. Generate the auxiliary (turn off DB to ensure pure generation)
+        # 3. Generate the auxiliary (reduplicated liṭ; √kṛ is never periphrastic itself)
         aux_out = self.conjugate(
-            root_str=auxiliary, 
-            class_num=aux_class, 
-            person=person, 
-            number=number, 
-            voice=aux_voice, 
-            tense="perfect", 
-            use_db=False
+            root_str=auxiliary,
+            class_num=aux_class,
+            person=person,
+            number=number,
+            voice=aux_voice,
+            tense="perfect",
+            use_db=False,
         )
         aux_forms = (
             aux_out if isinstance(aux_out, list) else aux_out.split(" OR ")

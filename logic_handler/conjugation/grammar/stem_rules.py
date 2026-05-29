@@ -120,10 +120,17 @@ class StemBuilder:
         root_str = root_str.strip()
         
         # Pāṇini 6.4.24: Drop penultimate nasal in weak/present system forms
-        if tense in ("present", "imperfect", "imperative", "optative") or derivative == "passive":
+        # (not in causative: añj → añjayati, not *ājayati).
+        if (
+            derivative not in ("causative", "causative_passive")
+            and (
+                tense in ("present", "imperfect", "imperative", "optative")
+                or derivative == "passive"
+            )
+        ):
             nasal_drop_map = {
-                "rañj": "raj", "sañj": "saj", "bhañj": "bhaj", 
-                "añj": "aj", "bandh": "badh", "stambh": "stabh"
+                "rañj": "raj", "sañj": "saj", "bhañj": "bhaj",
+                "añj": "aj", "bandh": "badh", "stambh": "stabh",
             }
             if root_str in nasal_drop_map:
                 root_str = nasal_drop_map[root_str]
@@ -139,7 +146,7 @@ class StemBuilder:
         apply_samp = (
             strength == "[WEAK]"
             and root_obj.takes_samprasarana
-            and tense not in ("present", "imperfect", "imperative", "optative")
+            and tense not in ("present", "imperative", "optative")
         )
 
         if apply_samp or derivative == "passive":
@@ -147,18 +154,20 @@ class StemBuilder:
         # SPECIAL CASE: Causative futures/conditionals (class-10 with future tenses)
         # Pāṇini 6.4.51 + 7.2.3: Causative base + aya + iṣya/sya
         # Must be handled before the normal class-10 handler to avoid hardcoded +aya
-        if (class_num == 10 or derivative == "causative") and tense in ("future", "conditional"):
-            base = self._build_causative_base(root_str)
-            # base includes the "+" at the end, e.g. "bhāv+"
-            # Pāṇini 6.4.48 (ato lopaḥ): The 'a' of 'aya' drops before the vowel 'i' of 'iṣya'
-            fst = base + pn.accep("ay")
-
-            # Regular future/conditional: add +iṣya or +sya
-            root_obj_for_future = DHATUPATHA_ANALYZER.get(root_str, class_num)
-            is_anit = False  # Causatives are typically Seṭ (Whitney 1028)
-            suffix = "+sya" if is_anit else "+iṣya"
-            fst = fst + pn.accep(suffix)
-            return (fst @ self._clean()).optimize()
+        if tense in ("future", "conditional"):
+            if derivative in ("causative", "causative_passive"):
+                use_vriddhi = self._class10_use_vriddhi(
+                    root_str, derivative, tense
+                )
+                base = self._build_causative_base(
+                    root_str, derivative=derivative, use_vriddhi=use_vriddhi
+                )
+                fst = base + pn.accep("ay+iṣya")
+                return (fst @ self._clean()).optimize()
+            if class_num == 10 and derivative is None:
+                # Primary gaṇa-10 (agada / denom in class slot): …ay+iṣya-, not curādi āpayiṣya-
+                fst = self._class10_primary_future_fst(root_str)
+                return (fst @ self._clean()).optimize()
 
         if derivative == "desiderative":
             # Desiderative is a present-system stem in -a (…-ṣa/…-iṣa).
@@ -181,10 +190,12 @@ class StemBuilder:
         elif derivative == "causative_passive":
             # Causative passive stem: causative base + ya
             # (e.g. bhāv+ya -> bhāvye, lambh+ya -> lambhye).
-            base = self._build_causative_base(root_str)
+            base = self._build_causative_base(
+                root_str, derivative="causative_passive", use_vriddhi=True
+            )
             fst = base + pn.accep("ya")
         elif derivative == "passive":
-            fst = self._build_passive(root_str, class_num)
+            fst = self._build_passive(root_str, class_num, tense=tense)
         elif derivative == "aorist_passive_3sg":
             fst = self._build_aorist_passive_3sg(root_str)
         elif derivative == "intensive_middle":
@@ -216,7 +227,15 @@ class StemBuilder:
             if builder is None:
                 raise ValueError(f"Tense '{tense}' not supported.")
             fst = builder(
-                root_str, class_num, strength, tense, person=person, number=number, voice=voice, **kwargs
+                root_str,
+                class_num,
+                strength,
+                tense,
+                derivative=derivative,
+                person=person,
+                number=number,
+                voice=voice,
+                **kwargs,
             )
 
         # Pāṇini 8.2.31 ho ḍhaḥ (h -> ḍh) & 8.2.32 dāder dhātor ghaḥ (d...h -> gh).
@@ -266,6 +285,13 @@ class StemBuilder:
             pn.accep(root_str + "[VRIDDHI]") @ self.vriddhi @ self._clean("[VRIDDHI]")
         )
 
+    def _apply_ruh_strong(self, root_str: str):
+        """Class-1 guh/ruh/duh strong: penultimate u → ū (agūhat), not guṇa o or vr̥ddhi au."""
+        phonemes = ALPHABET.parse_phonemes(root_str)
+        if len(phonemes) >= 2 and phonemes[-2] == "u":
+            return pn.accep(root_str[:-2] + "ū" + phonemes[-1])
+        return self._apply_vriddhi(root_str)
+
     # Pāṇini 7.2.114 (mṛjer vṛddhiḥ): mṛj takes Vṛddhi in causative,
     # overriding the general Guṇa rule for short penultimate ṛ.
     _CAUSATIVE_VRIDDHI_OVERRIDE = frozenset({"mṛj"})
@@ -280,6 +306,8 @@ class StemBuilder:
         """
         if root_str in self._CAUSATIVE_VRIDDHI_OVERRIDE:
             return False  # Force Vṛddhi path
+        if root_str in self._CAUSATIVE_KEEP_R_PENULT:
+            return False  # Keep ṛ, no guṇa/vṛddhi
         phonemes = ALPHABET.parse_phonemes(root_str)
         if not phonemes:
             return False
@@ -291,7 +319,9 @@ class StemBuilder:
 
     # Roots whose ā-final causative uses -y- extension instead of -p-
     # (Whitney §1042: pā-class). pā → pāyayati (not pāpayati).
-    _CAUSATIVE_AY_ROOTS = frozenset({"pā", "nī"})
+    _CAUSATIVE_AY_ROOTS = frozenset(
+        {"pā", "nī", "pyā", "sā", "bhī", "śī", "si", "hū", "śū"}
+    )
 
     # Roots that insert a nasal in the causative (Pāṇini 7.3.36 / Whitney §1042b).
     # labh → lambhayati, rabh → rambhayati.
@@ -305,15 +335,234 @@ class StemBuilder:
     # Roots with medial 'a' that explicitly do NOT take vṛddhi in the causative
     # (Pāṇini 7.3.34 mitāṃ hrasvaḥ / Whitney §1042d). 
     # e.g., gam -> gamaya (not *gāmaya), jan -> janaya.
-    _CAUSATIVE_SHORT_A_ROOTS = frozenset({"gam", "jan", "svan", "kṣam", "vyath", "prath", "mrac", "mrad", "ghat", "vyat", "śrath", "snath", "klam"})
+    _CAUSATIVE_SHORT_A_ROOTS = frozenset({
+        "gam", "jan", "svan", "kṣam", "vyath", "prath", "mrac", "mrad", "ghat", "vyat",
+        "śrath", "snath", "klam", "trap", "tvar", "chur", "gad", "dam", "rac", "rah",
+        "stan", "sthag", "val", "svar", "kvaṇ", "paṇ", "raṇ", "mah", "dhvan", "ślath",
+        "smi",
+    })
+    # Lexical causative stems (before +aya); Whitney / INRIA class-10 causatives.
+    _CAUSATIVE_STEM_OVERRIDES = {
+        "praś": "pracch",
+        "krīḍ": "krīḍāp",
+        "dham": "dhmāp",
+        "śrā": "śrap",
+        "dhū": "dhūn",
+        "prī": "prīṇ",
+        "jāgṛ": "jāgar",
+        "druh": "drār",
+        "drāgh": "dhrāg",
+        "bṛh": "bṛṃh",
+        "radh": "randh",
+        "sañj": "sajj",
+        "hrī": "hrep",
+        "luṇch": "loṭh",
+        "sidh": "sādh",
+        "kṣī": "kṣap",
+        "i": "āpy",
+    }
+    # ṛ-initial perfect: nuṭ reduplicant ān- + guṇa weak/strong grades (Whitney / INRIA).
+    _RIC_PERFECT_NUT_ROOTS = frozenset({"ṛc", "ṛṣ"})
+    _AR_PERFECT_ROOTS = frozenset({"ṛj"})
+    # Class-3 Caṅ: perfect-style reduplicant (ca-, not lengthened ci-/tī-).
+    _CAANG_PERFECT_REDUP_PREFIX = frozenset({"kamp", "budh", "tan"})
+    # Caṅ only: lengthen ci- → cī- for light i-roots (kath, kṛṣ); not all ci- prefixes.
+    _CAANG_LONG_CI_PREFIX_ROOTS = frozenset({"kath", "kṛṣ", "car", "klp"})
+    # Causative imperfect keeps upadhā-vṛddhi (Whitney / INRIA: atānayam, not *atanayam).
+    _CAUSATIVE_KEEP_VRIDDHI_IMPERFECT = frozenset({"tan", "man", "van", "śvan", "stan"})
+    _LUNG_TENSES = frozenset(
+        {"imperfect", "conditional", "pluperfect", "injunctive"}
+    )
+
+    # Class-1 ū/ī-final roots that keep length in middle (knūya-), not guṇa (bhav-).
+    _CLASS1_MIDDLE_LONG_VOWEL_ROOTS = frozenset({"knū"})
+
+    # Class-1 roots with Pāṇini 7.3.78 suppletion (gam→gacch, …).
+    _CLASS1_SUPPLETIVE = frozenset({"gam", "sthā", "pā", "sad", "scand", "vyā"})
     # Lexically conditioned a-aorist bases that follow stable historical alternation.
     _A_AORIST_BASES = {
         "vac": "voc",
         "dṛś": "darś",
         "śru": "śrav",
+        "hu": "ho",  # class-4 active: ahoṣat (not *ahvat)
+    }
+    # Divādi (class 4) middle a-aorist weak stems (samprasāraṇa / grade alternation).
+    _DIVADI_AORIST_WEAK_MIDDLE = {
+        "tyaj": "tyak",
+        "bhaj": "bhak",
+        "bandh": "banddh",
+        "chid": "chitt",
+        "tud": "tutt",
+        "dah": "dagdh",
+        "labh": "labd",
+        "pac": "pak",
+        "rudh": "ruddh",
+        "sidh": "siddh",
+        "vyadh": "viddh",
+        "svap": "supt",
+        "gāh": "gāḍh",
+        "dā": "it",
+        "spṛś": "spṛṣ",
+        "stu": "stut",
+        "khan": "khans",
+        "nakṣ": "nakṣ",
+        "ram": "rams",
     }
 
-    def _build_causative_base(self, root_str: str, class_num: int = 1, derivative: str = None):
+    def _is_causative_derivative(self, derivative) -> bool:
+        return derivative in ("causative", "causative_passive")
+
+    def _class10_use_vriddhi(self, root_str: str, derivative, tense: str) -> bool:
+        """Upadhā-vṛddhi on class-10 bases.
+
+        Causatives: vṛddhi in present/future; **no** upadhā-vṛddhi in luṅ (Whitney §1043),
+        except lexical keepers (tan, man, …).
+        Primary curādi: vṛddhi only in those same lexical imperfect cases.
+        """
+        if tense in self._LUNG_TENSES:
+            if self._is_causative_derivative(derivative):
+                return root_str in self._CAUSATIVE_KEEP_VRIDDHI_IMPERFECT
+            return root_str in self._CAUSATIVE_KEEP_VRIDDHI_IMPERFECT
+        if self._is_causative_derivative(derivative):
+            return True
+        return False
+
+    def _is_class10_a_primary(self, root_str: str, derivative, class_num) -> bool:
+        """Nominal / ā-dhātu in -a (agada): future in -yiṣya-, not curādi -ayiṣya-."""
+        if class_num != 10 or self._is_causative_derivative(derivative):
+            return False
+        phonemes = ALPHABET.parse_phonemes(root_str)
+        return bool(phonemes and phonemes[-1] == "a")
+
+    def _class10_a_primary_base(self, root_str: str):
+        return pn.accep(root_str[:-1] + "+")
+
+    # Class-10 nominal/denominative futures (no Dhātupāṭha curādi row; INRIA -īyiṣya-, etc.)
+    _CLASS10_DENOM_PRIMARY_FUTURE: dict[str, str] = {
+        "asūya": "yiṣya",
+        "mitra": "īyiṣya",
+        "citra": "īyiṣya",
+        "udaka": "īyiṣya",
+        "māṃsa": "īyiṣya",
+        "paryaṅka": "īyiṣya",
+        "prāsāda": "īyiṣya",
+        "prāvāra": "īyiṣya",
+        "rājagava": "īyiṣya",
+        "sajja": "īyiṣya",
+        "taviṣa": "īyiṣya",
+        "śāṇa": "īyiṣya",
+        "kṣīra": "syiṣya",
+        "vatsala": "syiṣya",
+        "bhūsvarga": "āyiṣya",
+        "mahī": "yiṣya_keep",
+        "mī": "eṣya",
+        "ri": "eṣya",
+        "putra": "putra",
+        "vṛṣa": "vṛṣa",
+        "śṛṅga": "śṛṅga",
+    }
+
+    def _class10_primary_future_fst(self, root_str: str):
+        """Primary gaṇa-10 future: curādi …ay+iṣya- or nominal denominative patterns."""
+        denom = self._CLASS10_DENOM_PRIMARY_FUTURE.get(root_str)
+        if denom is not None:
+            return self._class10_denominator_future_fst(root_str, denom)
+        phonemes = ALPHABET.parse_phonemes(root_str)
+        base = root_str[:-1] if phonemes and phonemes[-1] == "a" else root_str
+        return pn.accep(base + "+") + pn.accep("ay+iṣya")
+
+    def _class10_denominator_future_fst(self, root_str: str, pattern: str) -> pn.Fst:
+        if pattern == "yiṣya":
+            return pn.accep(root_str[:-1] + "+") + pn.accep("iṣya")
+        if pattern == "yiṣya_keep":
+            return pn.accep(root_str + "+") + pn.accep("yiṣya")
+        if pattern in ("īyiṣya", "syiṣya", "āyiṣya"):
+            return pn.accep(root_str[:-1] + "+") + pn.accep(pattern)
+        if pattern == "eṣya":
+            return pn.accep(root_str[:-1] + "e+") + pn.accep("iṣya")
+        if pattern == "putra":
+            b = root_str[:-1]
+            return pn.union(
+                pn.accep(b + "s+") + pn.accep("yiṣya"),
+                pn.accep(b + "i+") + pn.accep("yiṣya"),
+                pn.accep(b + "ī+") + pn.accep("yiṣya"),
+            )
+        if pattern == "vṛṣa":
+            b = root_str[:-1]
+            return pn.union(
+                pn.accep(b + "s+") + pn.accep("yiṣya"),
+                pn.accep(b + "ī+") + pn.accep("yiṣya"),
+            )
+        if pattern == "śṛṅga":
+            return pn.accep("śrṅgā+") + pn.accep("yiṣya")
+        phonemes = ALPHABET.parse_phonemes(root_str)
+        base = root_str[:-1] if phonemes and phonemes[-1] == "a" else root_str
+        return pn.accep(base + "+") + pn.accep("ay+iṣya")
+
+    def _class10_primary_peri_fst(self, root_str: str):
+        phonemes = ALPHABET.parse_phonemes(root_str)
+        base = root_str[:-1] if phonemes and phonemes[-1] == "a" else root_str
+        return pn.accep(base + "+") + pn.accep("ay+i")
+
+    def _class10_a_primary_future_fst(self, root_str: str):
+        return self._class10_primary_future_fst(root_str)
+
+    def _class10_a_primary_peri_fst(self, root_str: str):
+        return self._class10_primary_peri_fst(root_str)
+
+    # Causative of ṛ-penultimate roots that keep ṛ (kṛp → kṛpayati, not *karpayati).
+    _CAUSATIVE_KEEP_R_PENULT = frozenset({"kṛp"})
+
+    # Lexical causative bases before +aya (Whitney / INRIA).
+    _CAUSATIVE_BASE_OVERRIDES = {
+        "guh": "gūh",
+        "knū": "knop",
+        "ṛ": "arp",
+        "arth": "arthāp",  # p-increment (Whitney §1048), not plain ā+yaya-
+    }
+
+    # ī/ṝ stems with āy-extension before causative -aya- (klāmay-, jāray-).
+    _CAUSATIVE_ĀY_STEMS = frozenset({"klam", "jṝ"})
+
+    def _build_nominal_class1_future(self, root_str: str):
+        """INRIA nominal stems (class 1): future in -yiṣya- / -āyiṣya-."""
+        if root_str == "am":
+            return pn.union(
+                pn.accep("am+") + pn.accep("īṣya"),
+                pn.accep("am+") + pn.accep("iṣya"),
+            )
+        if root_str == "i":
+            return pn.accep("e+") + pn.accep("iṣya")
+        if root_str.endswith("as"):
+            if root_str == "as":
+                return pn.accep("as+") + pn.accep("iṣya")
+            if len(root_str) >= 6:
+                return pn.accep(root_str[:-2] + "ā+") + pn.accep("yiṣya")
+            return pn.accep(root_str + "y+") + pn.accep("iṣya")
+        if root_str.endswith("i"):
+            return pn.accep(root_str[:-1] + "y+") + pn.accep("iṣya")
+        return None
+
+    def _build_nominal_class1_periphrastic(self, root_str: str):
+        """INRIA nominal stems (class 1): periphrastic future in -yitā- / -āyitā-."""
+        if root_str == "i":
+            return pn.accep("e+") + pn.accep("i")
+        if root_str.endswith("as"):
+            if len(root_str) >= 6:
+                return pn.accep(root_str[:-2] + "ā+") + pn.accep("yi")
+            return pn.accep(root_str + "y+") + pn.accep("i")
+        if root_str.endswith("i"):
+            return pn.accep(root_str[:-1] + "y+") + pn.accep("i")
+        return None
+
+    def _build_causative_base(
+        self,
+        root_str: str,
+        class_num: int = 1,
+        derivative: str = None,
+        *,
+        use_vriddhi: bool = True,
+    ):
         """Return the FST for the causative base (Vṛddhi/Guna + ayadi).
 
         Priority:
@@ -327,14 +576,35 @@ class StemBuilder:
         8. guna-eligible short i/u/ṛ penultimate — Guna + base.
         9. Default — Vṛddhi.
         """
+        # Layer 0: lexical causative bases (guh→gūh, knū→knop, ṛ→arp, …)
+        if root_str in self._CAUSATIVE_BASE_OVERRIDES:
+            return pn.accep(self._CAUSATIVE_BASE_OVERRIDES[root_str] + "+")
+
+        if root_str in self._CAUSATIVE_STEM_OVERRIDES:
+            return pn.accep(self._CAUSATIVE_STEM_OVERRIDES[root_str] + "+")
+
         # Denominative bases (Class 10) ending in 'a' drop their final 'a'
         # before taking the causative/denominative sign (Whitney §1054).
-        # Denominative bases do NOT take internal vowel strengthening (Guṇa/Vṛddhi).
+        # Only for primary curādi/class-10 denominatives — not causative derivative.
         phonemes = ALPHABET.parse_phonemes(root_str)
-        if phonemes and phonemes[-1] == "a":
+        if (
+            phonemes
+            and phonemes[-1] == "a"
+            and derivative not in ("causative", "causative_passive")
+        ):
             root_str = root_str[:-1]
             return pn.accep(root_str + "+")
-            
+
+        # Layer 0b: ā-extension stems (arthāpay-, klāmay-, kṣāyay-)
+        if root_str in self._CAUSATIVE_ĀY_STEMS:
+            if root_str == "klam":
+                return pn.accep("klām+")
+            if root_str == "jṝ":
+                return pn.accep("jār+")
+            if root_str.endswith("ī"):
+                return pn.accep(root_str[:-1] + "āy+")
+            return pn.accep(root_str + "āy+")
+
         # Layer 1: true irregular override (han→ghāt only after removing dā/sthā/pā/krī/labh)
         if root_str in causative_stem_irregulars:
             override = causative_stem_irregulars[root_str]
@@ -366,13 +636,16 @@ class StemBuilder:
         if root_str.endswith("ā"):
             return pn.accep(root_str + "p+")
 
-        # Layer 5: i/ī/u/ū-final vowel roots — drop vowel, use ā + p extension
-        # Whitney §1042: krī → krāpayati (root vowel dropped, ā substituted, +p+aya).
-        # Also ji → jāpayati.
+        # Layer 5: ī/ū-final vowel roots — drop vowel, use āp (krī→krāp, mī→māp, kṣī→kṣāp).
+        if phonemes and phonemes[-1] in ("ī", "ū"):
+            return pn.accep(root_str[:-1] + "āp+")
+
         if root_str in self._CAUSATIVE_AP_ROOTS:
-            # Strip the final vowel and substitute ā, then append p
-            cons_base = root_str[:-1]  # e.g. 'kr' from 'krī', 'j' from 'ji'
+            cons_base = root_str[:-1]
             return pn.accep(cons_base + "āp+")
+
+        # u-penultimate: INRIA causatives use guṇa (kuc→kocaya, budh→bodhaya), not ū-lengthening.
+        # (Former ū-lengthen rule covered duṣ→dūṣ but broke most u-roots in verbs_clean.)
 
         # EXCEPT for specific mit roots (Pāṇini 7.3.34) which do not take vriddhi (e.g., gam -> gamaya).
         if (
@@ -405,21 +678,36 @@ class StemBuilder:
         ):
             return pn.accep(root_str + "+")
 
+        if root_str in self._CAUSATIVE_KEEP_R_PENULT:
+            return pn.accep(root_str + "+")
+
+        if not use_vriddhi:
+            # Luṅ/Lṛṅ/luṭ-lṛṭ of causatives: no upadhā-vṛddhi on the base (Whitney §1043).
+            # e.g. kathayati → akathayat, not *akāthayat.
+            if (
+                phonemes
+                and phonemes[-1] not in vowels
+                and len(vowel_positions) == 1
+                and phonemes[vowel_positions[0]] == "a"
+            ):
+                return pn.accep(root_str + "+")
+            if self._takes_guna_in_causative(root_str):
+                return self._apply_guna(root_str, "[STRONG]") + pn.accep("+")
+
         if self._takes_guna_in_causative(root_str):
             # For short-ṛ penultimate consonant-final roots, class-10 also
             # takes guṇa (ṛ -> ar): kṛś -> karśaya, kṛt -> kartaya.
             base = self._apply_guna(root_str, "[STRONG]")
         else:
-            if class_num == 10 and "a" in root_str:
-                base = pn.accep(root_str)
-            else:
-                base = self._apply_vriddhi(root_str)
+            base = self._apply_vriddhi(root_str)
 
         return base + pn.accep("+")
 
     # ─── Tense-system builders ────────────────────────────────────────────────
 
-    def _build_present_system(self, root_str, class_num, strength, tense, **kwargs):
+    def _build_present_system(
+        self, root_str, class_num, strength, tense, derivative=None, **kwargs
+    ):
         # Specific override for dā/dhā imperative 2sg active (Pāṇini 6.4.119: dehi, dhehi)
         person = kwargs.get("person")
         number = kwargs.get("number")
@@ -433,10 +721,22 @@ class StemBuilder:
         handler = self.class_handlers.get(class_num)
         if handler is None:
             raise ValueError(f"Class {class_num} not supported.")
-        return handler(root_str, strength, **kwargs)
+        return handler(
+            root_str,
+            strength,
+            tense=tense,
+            derivative=derivative,
+            class_num=class_num,
+            **kwargs,
+        )
 
     def _build_future_system(self, root_str, class_num, strength, tense, **kwargs):
         """Future (Lṛṭ) and Conditional (Lṛṅ)."""
+        if class_num == 1 and kwargs.get("derivative") is None:
+            nominal = self._build_nominal_class1_future(root_str)
+            if nominal is not None:
+                return nominal
+
         root_obj = DHATUPATHA_ANALYZER.get(root_str, class_num)
 
         stem = self._apply_guna(root_str, "[STRONG]")
@@ -465,7 +765,10 @@ class StemBuilder:
             return pn.union(stem + pn.accep("+iṣya"), stem + pn.accep("+īṣya"))
 
         if root_obj.takes_optional_future_i:
-            return pn.union(stem + pn.accep("+sya"), stem + pn.accep("+iṣya"))
+            ro = DHATUPATHA_ANALYZER.get(root_str, class_num)
+            if ro.is_vet:
+                return pn.union(stem + pn.accep("+sya"), stem + pn.accep("+iṣya"))
+            return stem + pn.accep("+iṣya")
 
         suffix = "+sya" if is_anit else "+iṣya"
         return stem + pn.accep(suffix)
@@ -475,9 +778,16 @@ class StemBuilder:
     ):
         """Periphrastic Future (Luṭ): stem + (i) + tā/tār/tās endings."""
         derivative = kwargs.get("derivative")
-        if derivative == "causative" or class_num == 10:
-            base = self._build_causative_base(root_str)
+        if class_num == 1 and derivative is None:
+            nominal = self._build_nominal_class1_periphrastic(root_str)
+            if nominal is not None:
+                return nominal
+        if derivative in ("causative", "causative_passive"):
+            use_vriddhi = self._class10_use_vriddhi(root_str, derivative, tense)
+            base = self._build_causative_base(root_str, use_vriddhi=use_vriddhi)
             return base + pn.accep("ayi")
+        if class_num == 10 and derivative is None:
+            return self._class10_primary_peri_fst(root_str)
         if derivative == "desiderative":
             base = self._build_desiderative(root_str, "[STRONG]")
             # Desiderative bases take 'i' augment in periphrastic forms
@@ -503,7 +813,14 @@ class StemBuilder:
             return pn.union(stem + pn.accep("+i"), stem + pn.accep("+ī"))
 
         if root_obj.takes_optional_future_i:
-            return pn.union(stem, stem + pn.accep("+i"))
+            if root_str == "am":
+                return pn.accep("am+") + pn.accep("ī")
+            if root_str == "as":
+                return pn.accep("as+") + pn.accep("i")
+            ro = DHATUPATHA_ANALYZER.get(root_str, class_num)
+            if ro.is_vet:
+                return pn.union(stem, stem + pn.accep("+i"))
+            return stem + pn.accep("+i")
 
         suffix = "" if is_anit else "+i"
         return stem + pn.accep(suffix)
@@ -520,13 +837,16 @@ class StemBuilder:
         valid_aorist_types = {"s", "is", "sa", "sis", "root", "a", "reduplicated", "s_or_is", "s_or_a"}
         root_obj = DHATUPATHA_ANALYZER.get(root_str, class_num)
 
+        if root_str == "nī" and class_num == 4 and voice == "active":
+            return pn.accep("na")
+
         # Paninian-first default: use analyzer-derived type unless an override
         # carries explicit lexical behavior that cannot be inferred.
-        a_type = DHATUPATHA_ANALYZER.get_aorist_type(root_str, class_num)
+        a_type = DHATUPATHA_ANALYZER.get_aorist_type(root_str, class_num, voice=voice)
 
         if forced_aorist_type:
             a_type = forced_aorist_type
-        elif derivative == "causative" or class_num == 10:
+        elif derivative == "causative":
             a_type = "reduplicated"
         elif voice == "middle" and root_obj.aorist_middle_type:
             a_type = root_obj.aorist_middle_type
@@ -615,7 +935,8 @@ class StemBuilder:
         elif a_type == "is":
             return build_is()
         elif a_type == "sa":
-            return pn.accep(root_str) + pn.accep("+sa[SA_AORIST]")
+            base = self._A_AORIST_BASES.get(root_str, root_str)
+            return pn.accep(base) + pn.accep("+sa[SA_AORIST]")
 
         elif a_type == "sis":
             return pn.accep(root_str)
@@ -641,8 +962,30 @@ class StemBuilder:
             if root_str == "sthā" and (derivative == "causative" or class_num == 10):
                 prefix = "ti"
                 base_str = "sthip"
-            else:
+            elif derivative == "causative" or class_num == 10:
                 prefix = self.reduplicator.generate_aorist_prefix(base_str)
+            else:
+                root_obj = DHATUPATHA_ANALYZER.get(root_str, class_num)
+                phonemes = ALPHABET.parse_phonemes(base_str)
+                if root_str in self._CAANG_PERFECT_REDUP_PREFIX:
+                    prefix = self.reduplicator.generate_prefix(base_str)
+                else:
+                    prefix = self.reduplicator.generate_aorist_prefix(base_str)
+                    # Light-root lengthening (cī/tī/dū) is optional; INRIA often has short ci/ti/du.
+                    if prefix.endswith("ī"):
+                        prefix = prefix[:-1] + "i"
+                    elif prefix.endswith("ū"):
+                        prefix = prefix[:-1] + "u"
+                    if (
+                        prefix == "ci"
+                        and root_str in self._CAANG_LONG_CI_PREFIX_ROOTS
+                    ):
+                        prefix = "cī"
+                if root_obj.takes_samprasarana:
+                    pass  # yaj, vac, … — aorist prefix already correct
+                elif phonemes and phonemes[-1] == "i" and not root_obj.takes_samprasarana:
+                    # i-final: epenthetic y (śri → śriy-).
+                    base_str = base_str + "y"
             return pn.accep(prefix) + pn.accep(base_str) + pn.accep("+a")
 
         elif a_type == "a":
@@ -651,6 +994,10 @@ class StemBuilder:
             if voice == "middle" and root_obj.aorist_middle_stem:
                 return pn.accep(root_obj.aorist_middle_stem)
             base = self._A_AORIST_BASES.get(root_str, root_str)
+            if voice == "middle" and class_num == 4:
+                base = self._DIVADI_AORIST_WEAK_MIDDLE.get(root_str, base)
+                # Divādi middle: weak stem + secondary -ta (atyakta), no thematic aorist -a-.
+                return pn.accep(base)
             return pn.accep(base) + pn.accep("+a")
 
         elif a_type == "is":
@@ -764,6 +1111,35 @@ class StemBuilder:
         phonemes = ALPHABET.parse_phonemes(root_str)
         vowels = set(ALPHABET.vowels_list)
 
+        # ṛc/ṛṣ: ān- reduplicant + guṇa in strong, full ṛ-root in weak (ānarca / ānṛca).
+        if root_str in self._RIC_PERFECT_NUT_ROOTS:
+            prefix = "ān"
+            if strength == "[STRONG]":
+                guna_stem = "ar" + "".join(phonemes[1:])
+                return pn.accep(prefix) + pn.accep(guna_stem)
+            return pn.accep(prefix) + pn.accep(root_str)
+
+        # ṛj: ar- reduplicant + bare root (arjitha).
+        if root_str in self._AR_PERFECT_ROOTS:
+            prefix = "ar"
+            if strength == "[STRONG]":
+                return pn.accep(prefix) + pn.accep(root_str[1:])
+            return pn.accep(prefix) + pn.accep(root_str[1:])
+
+        # √i, √ah: vowel-initial reduplicated perfect (iyāya, āttha).
+        if root_str == "i":
+            if strength == "[STRONG]":
+                if person == "3" and number == "sg":
+                    return pn.accep("iyāy")  # +active 3sg -a → iyāya
+                return pn.accep("ī") + pn.accep("ya")
+            return pn.accep("ī") + pn.accep("i")
+        if root_str == "ah":
+            if strength == "[STRONG]":
+                if person == "2" and number == "sg":
+                    return pn.accep("āt")  # +tha → āttha
+                return pn.accep("ā") + pn.accep("th")
+            return pn.accep("ā") + pn.accep("h")
+
         # ── Rule A: ā-final root perfect (Whitney §800) ───────────────────────
         # pā→papā/pap, dā→dadā/dad, sthā→tasthā/tasth, mā→mamā/mam, hā→jahā/jah
         # Strong: prefix + ā-root (keeps ā).
@@ -829,7 +1205,22 @@ class StemBuilder:
             if root_str in _E_GRADE_WEAK_ROOTS:
                 # Whitney §794: e-grade weak stem (a→e, e.g. labh→lebh).
                 e_stem = "".join("e" if ph == "a" else ph for ph in phonemes)
-                return pn.accep(e_stem)
+                return pn.accep(prefix + "+") + pn.accep(e_stem + "[PERF_WEAK]")
+            # Penultimate a → e in weak perfect (cat→cet, dram→drem; tan uses override).
+            root_vowel_idx = next(
+                (i for i, p in enumerate(phonemes) if p in vowels), None
+            )
+            if (
+                root_vowel_idx is not None
+                and phonemes[root_vowel_idx] == "a"
+                and root_vowel_idx == len(phonemes) - 2
+                and root_str not in perfect_stem_overrides
+            ):
+                weak_ph = list(phonemes)
+                weak_ph[root_vowel_idx] = "e"
+                return pn.accep(prefix + "+") + pn.accep(
+                    "".join(weak_ph) + "[PERF_WEAK]"
+                )
             elif root_str in perfect_weak_guna_roots:
                 root_fst = self._apply_guna(root_str, "[STRONG]")
             else:
@@ -869,6 +1260,30 @@ class StemBuilder:
             root_fst = pn.accep(short_root)
         return pn.accep(prefix + "+") + root_fst
 
+    def _desiderative_root_base(self, root_str: str) -> str:
+        """Vowel grades on the root before desiderative -ṣa (Whitney §1028 / INRIA)."""
+        phonemes = ALPHABET.parse_phonemes(root_str)
+        if not phonemes:
+            return root_str
+        last = phonemes[-1]
+        if last == "ā":
+            return "".join(phonemes[:-1]) + "ī"
+        if last == "i":
+            return "".join(phonemes[:-1]) + "ī"
+        if last == "u":
+            return "".join(phonemes[:-1]) + "ū"
+        if last == "ṛ":
+            return "".join(phonemes[:-1]) + "īr"
+        if last == "ṝ":
+            return "".join(phonemes[:-1]) + "ar"
+        out: list[str] = []
+        for i, p in enumerate(phonemes):
+            if p in ("ṛ", "ṝ") and i < len(phonemes) - 1:
+                out.append("ar")
+            else:
+                out.append(p)
+        return "".join(out)
+
     def _build_desiderative(self, root_str, strength):
         """Build the desiderative (Sanadi) stem."""
         if root_str in desiderative_stem_overrides:
@@ -877,26 +1292,11 @@ class StemBuilder:
         prefix = self.reduplicator.generate_desiderative_prefix(root_str)
         is_anit = DHATUPATHA_ANALYZER.get(root_str, 1).is_anit  # P.7.2.10
         suffix = "+sa" if is_anit else "+iṣa"
+        base_str = self._desiderative_root_base(root_str)
 
-        # Whitney §1028b / Pāṇini 7.4.54: final ā → ī before desiderative
-        base_str = root_str
-        phonemes = ALPHABET.parse_phonemes(root_str)
-        if phonemes:
-            last_char = phonemes[-1]
-            if last_char == "ā":
-                base_str = "".join(phonemes[:-1]) + "ī"
-            # Whitney §1028a / Pāṇini 6.4.16 (ajhanagamāṃ sani): final vowels are lengthened
-            elif last_char == "i":
-                base_str = "".join(phonemes[:-1]) + "ī"
-            elif last_char == "u":
-                base_str = "".join(phonemes[:-1]) + "ū"
-            elif last_char == "ṛ":
-                # For ṛ, usually it becomes īr or ūr (P. 7.1.100).
-                # But for now, we leave ṛ to īr/ūr rules if handled elsewhere, or just lengthen to ṝ?
-                # Actually, ṛ -> īr/ūr is handled in irregulars or specific rules.
-                # Let's just lengthen if not handled.
-                pass
-
+        # Block yan-sandhi (ū+ → v+) before seṭ desiderative -ṣa so tuṣṭūṣa stays intact.
+        if suffix == "+iṣa" and base_str.endswith("ū"):
+            return pn.accep(prefix) + pn.accep(base_str) + pn.accep("[DESID_Ū]+iṣa")
         return pn.accep(prefix) + pn.accep(base_str) + pn.accep(suffix)
 
     def _build_desiderative_perfect(self, root_str: str, strength: str) -> pn.Fst:
@@ -915,19 +1315,7 @@ class StemBuilder:
             prefix = self.reduplicator.generate_desiderative_prefix(root_str)
             is_anit = DHATUPATHA_ANALYZER.get(root_str, 1).is_anit  # P.7.2.10
             suffix = "+sa" if is_anit else "+iṣa"
-
-            # Whitney §1028b: final ā → ī
-            base_str = root_str
-            phonemes = ALPHABET.parse_phonemes(root_str)
-            if phonemes:
-                last_char = phonemes[-1]
-                if last_char == "ā":
-                    base_str = "".join(phonemes[:-1]) + "ī"
-                elif last_char == "i":
-                    base_str = "".join(phonemes[:-1]) + "ī"
-                elif last_char == "u":
-                    base_str = "".join(phonemes[:-1]) + "ū"
-
+            base_str = self._desiderative_root_base(root_str)
             bases = [prefix + base_str + suffix]
 
         # Strip trailing 'a' (thematic vowel of the desiderative present stem).
@@ -1005,7 +1393,7 @@ class StemBuilder:
         new_phonemes = before_sv + [sv_vowel] + rest
         return "".join(new_phonemes)
 
-    def _build_passive(self, root_str: str, class_num=None):
+    def _build_passive(self, root_str: str, class_num=None, tense: str = "present", **kwargs):
         """Passive stem with correct long-vowel and Samprasarana handling.
 
         Priority order:
@@ -1018,9 +1406,9 @@ class StemBuilder:
         """
         root_obj = DHATUPATHA_ANALYZER.get(root_str, class_num)
         if class_num == 10:
-            # Preserve class-10 stem behavior (no unintended vrddhi) when
-            # forming class-10 passives from the causative base.
-            base = self._build_causative_base(root_str, class_num=10, derivative="causative")
+            # Curādi primary passive: same base as active (kathaya → kathyata), no upadhā-vṛddhi.
+            use_vriddhi = self._class10_use_vriddhi(root_str, None, tense)
+            base = self._build_causative_base(root_str, class_num=10, use_vriddhi=use_vriddhi)
             return base + pn.accep("ya")
 
         # Layer 1: Explicit override
@@ -1048,9 +1436,11 @@ class StemBuilder:
         # Pāṇini 6.4.48 (ato lopaḥ): final short 'a' drops before 'yak' (passive 'ya')
         # This primarily affects denominative roots like 'yantra', 'dola'.
         stem_str = root_str
-        if phonemes and phonemes[-1] == "a":
+        # Class-4 verbal roots keep final -a for [CLASS4] vr̥ddhi (jan → jānya-).
+        # Final -a drop is for denominative stems only (yantra → yantrya-).
+        if phonemes and phonemes[-1] == "a" and class_num != 4:
             stem_str = root_str[:-1]
-            
+
         fst = pn.accep(stem_str + tag)
         if root_obj.takes_samprasarana:
             fst = pn.accep("[SAMP]") + fst
@@ -1063,16 +1453,35 @@ class StemBuilder:
     # ─── Class builders ───────────────────────────────────────────────────────
 
     def _build_class_1(self, root_str, strength, **kwargs):
-        # Class 1 affix (śap): strong forms take guṇa; weak/middle keep bare root.
+        # Class 1 affix (śap): active takes guṇa + thematic -a-; middle uses guṇa stem only.
         voice = kwargs.get("voice", "active")
+        class_num = kwargs.get("class_num", 1)
+        root_obj = DHATUPATHA_ANALYZER.get(root_str, class_num)
         if strength == "[STRONG]":
-            stem = self._apply_guna(root_str, "[STRONG]")
-        elif voice == "middle" and root_str.endswith(("ū", "ī")):
-            # ū/ī-final roots keep length in middle (knū → knūya-, not *knava-).
-            stem = pn.accep(root_str + strength)
-            return stem + pn.accep("+ya")
-        else:
-            stem = pn.accep(root_str + strength)
+            if root_obj.is_ruh_class:
+                stem = self._apply_ruh_strong(root_str)
+            else:
+                stem = self._apply_guna(root_str, "[STRONG]")
+            return stem + pn.accep("[CLASS1_IRR]+a")
+        if voice == "middle":
+            if (
+                root_str.endswith(("ū", "ī"))
+                and root_str in self._CLASS1_MIDDLE_LONG_VOWEL_ROOTS
+            ):
+                # knū etc.: middle thematic on long vowel (knūya-).
+                return pn.accep(root_str + strength) + pn.accep("+ya")
+            if root_str in self._CLASS1_SUPPLETIVE:
+                # Suppletion + śap (gacche, gacchase, tiṣṭhate, …).
+                return pn.accep(root_str + strength + "[CLASS1_IRR]+a")
+            # ṛ/ṝ in the root: ātmanepada present-system keeps zero-grade ṛ (akṛpata).
+            phonemes = ALPHABET.parse_phonemes(root_str)
+            if "ṛ" in phonemes or "ṝ" in phonemes:
+                return pn.accep(root_str) + pn.accep("+a")
+            if root_obj.is_ruh_class:
+                return self._apply_ruh_strong(root_str) + pn.accep("+a")
+            # bhū, nī, …: guṇa + śap (bhave, bhavase, …).
+            return self._apply_guna(root_str, "[STRONG]") + pn.accep("+a")
+        stem = pn.accep(root_str + strength)
         return stem + pn.accep("[CLASS1_IRR]+a")
 
     def _build_class_2(self, root_str, strength, **kwargs):
@@ -1148,6 +1557,8 @@ class StemBuilder:
         # Whitney §761: jan class-4 → jāya- (final nasal drops, vowel lengthens)
         if root_str == "jan":
             return pn.accep("jā") + pn.accep("+ya")
+        if root_str == "klam":
+            return pn.accep("kl" + "a[CLASS4_VRIDDHI]" + "m[CLASS4]+ya")
         # [CLASS4] triggers i→ī lengthening in MorphologyEngine before +ya
         return pn.accep(root_str + "[CLASS4]") + pn.accep("+ya")
 
@@ -1244,8 +1655,17 @@ class StemBuilder:
         return stem + pn.accep(affix)
 
     def _build_class_9(self, root_str, strength, **kwargs):
+        stem = root_str
+        tense = kwargs.get("tense", "present")
+        root_obj = DHATUPATHA_ANALYZER.get(root_str, 9)
+        if (
+            strength == "[WEAK]"
+            and root_obj.takes_samprasarana
+            and tense not in ("present", "imperative", "optative")
+        ):
+            stem = "[SAMP]" + root_str
         affix = "+nā" if strength == "[STRONG]" else "+nī[CLASS9]"
-        return pn.accep(root_str) + pn.accep(affix)
+        return pn.accep(stem) + pn.accep(affix)
 
     def _build_intensive(self, root_str, strength, voice="middle"):
         """Intensive (yaṅ) stem."""
@@ -1298,13 +1718,32 @@ class StemBuilder:
 
     def _build_class_10(self, root_str, strength, **kwargs):
         """Curādi / Causative."""
-        base = self._build_causative_base(root_str, class_num=10, derivative=kwargs.get("derivative"))
+        tense = kwargs.get("tense", "present")
+        derivative = kwargs.get("derivative")
+        voice = kwargs.get("voice", "active")
+        # Mitāṃ-hrasva / no-vṛddhi roots: compose -aya literally (churaya, not *chauraya).
+        if root_str in self._CAUSATIVE_SHORT_A_ROOTS:
+            return pn.accep(root_str + "aya")
+        if root_str == "i" and voice == "middle":
+            return pn.accep("āpya")
+        use_vriddhi = self._class10_use_vriddhi(root_str, derivative, tense)
+        base = self._build_causative_base(
+            root_str,
+            class_num=10,
+            derivative=derivative,
+            use_vriddhi=use_vriddhi,
+        )
         return base + pn.accep("aya")
 
     def _build_periphrastic_base(self, root_str, class_num, derivative=None):
         """Build the periphrastic perfect base (e.g. coray + ām)."""
         if derivative == "causative" or class_num == 10:
-            base = self._build_causative_base(root_str)
+            use_vriddhi = self._class10_use_vriddhi(
+                root_str, derivative, "perfect"
+            )
+            base = self._build_causative_base(
+                root_str, derivative=derivative, use_vriddhi=use_vriddhi
+            )
             return base + pn.accep("ayām")
         if derivative == "desiderative":
             base = self._build_desiderative(root_str, "[STRONG]")

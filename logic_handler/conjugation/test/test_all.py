@@ -1,4 +1,8 @@
-import sys, io, csv, time
+import argparse
+import sys
+import io
+import csv
+import time
 import os
 from collections import defaultdict
 
@@ -6,7 +10,12 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "g
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
 from conjugate import SanskritConjugator
-from dhatupatha_analyzer import DHATUPATHA_ANALYZER, _CLASS_LOOKUP_ALIASES, to_slp1
+
+INRIA_TO_ENGINE_ROOT = {
+    "dīv": "div",
+}
+
+LEGACY_FAILURE_COLUMNS = frozenset({"Trust_Tier", "Tier_Reason"})
 
 def normalize(form: str) -> str:
     if not form:
@@ -20,57 +29,6 @@ def normalize_root(root: str) -> str:
         return root
     return root.replace("~", "").replace("!", "")
 
-
-def _has_lexical_entry_for_class(root: str, class_num: int) -> bool:
-    if not isinstance(class_num, int):
-        return True
-    candidates = [to_slp1(root)]
-    if candidates[0].startswith("s"):
-        candidates.append("z" + candidates[0][1:])
-    if candidates[0].startswith("n"):
-        candidates.append("R" + candidates[0][1:])
-
-    def _clean(raw: str) -> str:
-        c = raw
-        for pfx in ("qu", "wu", "o~", "Y"):
-            if c.startswith(pfx):
-                c = c[len(pfx):]
-        return c.replace("\\", "").replace("^", "").replace("~", "")
-
-    for entry in DHATUPATHA_ANALYZER._entries_by_class.get(class_num, []):
-        clean = _clean(entry["raw"])
-        for cand in candidates:
-            if clean == cand or (cand.endswith("h") and clean == cand[:-1] + "H"):
-                return True
-            if clean.startswith(cand) or (cand.endswith("h") and clean.startswith(cand[:-1] + "H")):
-                return True
-    return False
-
-
-def _classify_trust_tier(root: str, inria_class, effective_class, derivation: str, error_type: str):
-    if error_type.startswith("Exception"):
-        return ("Tier C", "engine_exception")
-
-    # Denominatives are class-mapped heuristically by design; keep neutral.
-    if derivation == "denominative":
-        return ("Tier A", "denominative_path")
-
-    if isinstance(inria_class, int):
-        if _has_lexical_entry_for_class(root, inria_class):
-            return ("Tier C", "same_class_lexical_exists")
-
-        alias_class = _CLASS_LOOKUP_ALIASES.get((root, inria_class))
-        if alias_class is not None:
-            return ("Tier B", f"explicit_alias_{inria_class}_to_{alias_class}")
-
-        if isinstance(effective_class, int) and effective_class != inria_class and _has_lexical_entry_for_class(root, effective_class):
-            return ("Tier B", f"inria_class_{inria_class}_missing_lexical_{effective_class}_exists")
-
-        for cls in range(1, 11):
-            if cls != inria_class and _has_lexical_entry_for_class(root, cls):
-                return ("Tier B", f"inria_class_{inria_class}_missing_other_class_{cls}_exists")
-
-    return ("Tier A", "no_clear_class_conflict")
 
 def run_full_benchmark(
     csv_file=os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "verbs_clean.csv")),
@@ -118,10 +76,6 @@ def run_full_benchmark(
                 bucket.append(form)
 
     print(f"  Loaded {len(inria_db)} unique derivations in {time.perf_counter() - t_start:.2f}s\n")
-
-    INRIA_TO_ENGINE_ROOT = {
-        "dīv": "div",
-    }
 
     api = SanskritConjugator()
 
@@ -200,28 +154,22 @@ def run_full_benchmark(
                     totals["pass"] += 1
             else:
                 totals["fail"] += 1
-                tier, reason = _classify_trust_tier(root, inria_class, effective_class, derivation, "Mismatch")
                 failed_rows.append({
                     "Root": root, "Class": effective_class, "Derivation": derivation,
                     "Tense": tense, "Voice": voice, "Person": person, "Number": number,
                     "Expected (INRIA)": " OR ".join(expected_forms),
                     "Actual (FST)": " OR ".join(actual_list) if actual_list else "CRASHED",
                     "Error_Type": "Mismatch",
-                    "Trust_Tier": tier,
-                    "Tier_Reason": reason,
                 })
 
         except Exception as e:
             totals["error"] += 1
-            tier, reason = _classify_trust_tier(root, inria_class, effective_class, derivation, f"Exception: {e}")
             failed_rows.append({
                 "Root": root, "Class": effective_class, "Derivation": derivation,
                 "Tense": tense, "Voice": voice, "Person": person, "Number": number,
                 "Expected (INRIA)": " OR ".join(expected_forms),
                 "Actual (FST)": "CRASHED",
                 "Error_Type": f"Exception: {e}",
-                "Trust_Tier": tier,
-                "Tier_Reason": reason,
             })
 
     t_total = time.perf_counter() - t_start
@@ -239,17 +187,6 @@ def run_full_benchmark(
   ⏱  Total time:    {t_total:.1f}s
 {"=" * 52}
 """
-    if failed_rows:
-        tier_counts = defaultdict(int)
-        for row in failed_rows:
-            tier_counts[row.get("Trust_Tier", "Tier C")] += 1
-        summary += (
-            f"Trust Tiers on failures:\n"
-            f"  Tier A (likely acceptable/source-tolerant): {tier_counts['Tier A']}\n"
-            f"  Tier B (likely INRIA/Vidyut class conflict): {tier_counts['Tier B']}\n"
-            f"  Tier C (likely engine bug): {tier_counts['Tier C']}\n"
-            f"{'=' * 52}\n"
-        )
     print(summary)
     
     with open("full_benchmark_summary.txt", "w", encoding="utf-8") as f:
@@ -258,7 +195,13 @@ def run_full_benchmark(
 
     if failed_rows:
         with open(output_report, mode="w", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=["Root", "Class", "Derivation", "Tense", "Voice", "Person", "Number", "Expected (INRIA)", "Actual (FST)", "Error_Type", "Trust_Tier", "Tier_Reason"])
+            writer = csv.DictWriter(
+                f,
+                fieldnames=[
+                    "Root", "Class", "Derivation", "Tense", "Voice",
+                    "Person", "Number", "Expected (INRIA)", "Actual (FST)", "Error_Type",
+                ],
+            )
             writer.writeheader()
             writer.writerows(failed_rows)
         print(f"\nSaved {len(failed_rows)} failures to {output_report}")
@@ -270,5 +213,186 @@ def run_full_benchmark(
             writer.writerows(multiple_expected_rows)
         print(f"Saved {len(multiple_expected_rows)} partial matches to full_correct_multiple_expected.csv")
 
+def _parse_class(class_val):
+    if class_val is None or class_val == "":
+        return None
+    s = str(class_val).strip()
+    if s.isdigit():
+        return int(s)
+    return s
+
+
+def _split_expected(expected_str: str) -> list[str]:
+    if not expected_str:
+        return []
+    return [p.strip() for p in expected_str.split(" OR ")]
+
+
+def _conjugate_row(api, row):
+    """Re-run engine for one failure-row dict; returns (actual_list, error_msg|None)."""
+    root = row["Root"]
+    effective_class = _parse_class(row.get("Class"))
+    derivation = row.get("Derivation") or "primary"
+    tense = row["Tense"]
+    voice = row["Voice"]
+    person = str(row["Person"])
+    number = row["Number"]
+
+    engine_root = INRIA_TO_ENGINE_ROOT.get(root, root)
+    actual = api.conjugate(
+        engine_root,
+        effective_class,
+        person,
+        number,
+        voice=voice,
+        tense=tense,
+        derivative=derivation,
+        use_db=False,
+    )
+    actual_list = actual if isinstance(actual, list) else [actual]
+    return actual_list, None
+
+
+def run_failures_rerun(
+    failures_csv="full_benchmark_failures.csv",
+    output_report=None,
+    fixed_report="full_benchmark_fixed.csv",
+    summary_file="full_benchmark_rerun_summary.txt",
+):
+    """Re-test only rows listed in a prior failures CSV (~30k vs ~160k)."""
+    failures_csv = os.path.abspath(failures_csv)
+    if output_report is None:
+        output_report = failures_csv
+
+    if not os.path.isfile(failures_csv):
+        raise FileNotFoundError(failures_csv)
+
+    print(f"Loading failure cases from {failures_csv}...")
+    t_start = time.perf_counter()
+
+    cases = []
+    with open(failures_csv, encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for raw in reader:
+            row = {k: v for k, v in raw.items() if k not in LEGACY_FAILURE_COLUMNS}
+            cases.append(row)
+
+    print(f"  {len(cases)} cases to re-test\n")
+
+    api = SanskritConjugator()
+    still_failed = []
+    fixed_rows = []
+    totals = {"pass": 0, "fail": 0, "error": 0}
+
+    for i, row in enumerate(cases, 1):
+        if i % 2000 == 0:
+            print(f"  {i}/{len(cases)}...")
+
+        expected_forms = _split_expected(row.get("Expected (INRIA)", ""))
+        try:
+            actual_list, _ = _conjugate_row(api, row)
+            if any(a in expected_forms for a in actual_list):
+                totals["pass"] += 1
+                fixed_rows.append(
+                    {
+                        **row,
+                        "Actual (FST)": " OR ".join(actual_list),
+                        "Previous_Actual": row.get("Actual (FST)", ""),
+                    }
+                )
+            else:
+                totals["fail"] += 1
+                still_failed.append(
+                    {
+                        **row,
+                        "Expected (INRIA)": row.get("Expected (INRIA)", ""),
+                        "Actual (FST)": " OR ".join(actual_list) if actual_list else "",
+                        "Error_Type": "Mismatch",
+                    }
+                )
+        except Exception as e:
+            totals["error"] += 1
+            still_failed.append(
+                {
+                    **row,
+                    "Expected (INRIA)": row.get("Expected (INRIA)", ""),
+                    "Actual (FST)": "CRASHED",
+                    "Error_Type": f"Exception: {e}",
+                }
+            )
+
+    t_total = time.perf_counter() - t_start
+    tested = totals["pass"] + totals["fail"] + totals["error"]
+    prev_n = len(cases)
+    fixed_pct = f"{100 * totals['pass'] / prev_n:.1f}%" if prev_n else "n/a"
+
+    summary = f"""
+{"=" * 52}
+     FAILURES RE-RUN (subset benchmark)
+{"=" * 52}
+  Prior failures:  {prev_n:>6}
+  ✅ Now pass:     {totals['pass']:>6}  ({fixed_pct} of prior fails)
+  ❌ Still fail:   {totals['fail']:>6}
+  💥 Crash:        {totals['error']:>6}
+  ⏱  Total time:   {t_total:.1f}s
+{"=" * 52}
+"""
+    print(summary)
+
+    with open(summary_file, "w", encoding="utf-8") as f:
+        f.write(summary)
+
+    out_fields = [
+        "Root",
+        "Class",
+        "Derivation",
+        "Tense",
+        "Voice",
+        "Person",
+        "Number",
+        "Expected (INRIA)",
+        "Actual (FST)",
+        "Error_Type",
+    ]
+    if still_failed:
+        with open(output_report, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=out_fields, extrasaction="ignore")
+            w.writeheader()
+            w.writerows(still_failed)
+        print(f"Updated {len(still_failed)} failures -> {output_report}")
+    else:
+        print("No remaining failures.")
+
+    if fixed_rows:
+        fixed_fields = list(fixed_rows[0].keys())
+        with open(fixed_report, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=fixed_fields, extrasaction="ignore")
+            w.writeheader()
+            w.writerows(fixed_rows)
+        print(f"Saved {len(fixed_rows)} newly passing rows -> {fixed_report}")
+
+    print(f"Summary -> {summary_file}")
+    return totals
+
+
 if __name__ == "__main__":
-    run_full_benchmark()
+    parser = argparse.ArgumentParser(description="Sanskrit conjugation benchmark")
+    parser.add_argument(
+        "--rerun-failures",
+        metavar="CSV",
+        nargs="?",
+        const="full_benchmark_failures.csv",
+        help="Re-test only rows from a failures CSV (default: full_benchmark_failures.csv)",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        default=None,
+        help="Output failures CSV for --rerun-failures (default: overwrite input)",
+    )
+    args = parser.parse_args()
+
+    if args.rerun_failures is not None:
+        run_failures_rerun(failures_csv=args.rerun_failures, output_report=args.output)
+    else:
+        run_full_benchmark()

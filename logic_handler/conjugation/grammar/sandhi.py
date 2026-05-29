@@ -39,7 +39,17 @@ class SandhiEngine:
 
         # Clean up + boundary and morphological tags that survived
         self.clean_boundaries = pn.cdrewrite(
-            pn.union(pn.cross("+", ""), pn.cross("[CLASS9]", ""), pn.cross("[NO_RUKI]", ""), pn.cross("[RUH_H]", ""), pn.cross("[MRJ]", "")), "", "", self.sig
+            pn.union(
+                pn.cross("+", ""),
+                pn.cross("[CLASS9]", ""),
+                pn.cross("[NO_RUKI]", ""),
+                pn.cross("[RUH_H]", ""),
+                pn.cross("[MRJ]", ""),
+                pn.cross("[DESID_Ū]", ""),
+            ),
+            "",
+            "",
+            self.sig,
         ) @ pn.cdrewrite(
             pn.string_map([
                 ("śāssi", "śāḥsi"),
@@ -144,11 +154,16 @@ class SandhiEngine:
             pn.string_map([("o+", "av"), ("au+", "āv")]),
             "", "y", self.sig
         )
-        self.ayadi = pn.cdrewrite(
-            pn.string_map([
-                ("e+", "ay"), ("o+", "av"), ("ai+", "āy"), ("au+", "āv"),
-            ]),
-            "", ALPHABET.vowels, self.sig
+        # ai+ → āy: exclude right-context i/ī so iṣ/is aorist endings stay (nai+iṣam).
+        _ayadi_ai_right = pn.union(
+            "a", "ā", "u", "ū", "ṛ", "ṝ", "e", "o", "au", "ḥ", "ṃ"
+        )
+        self.ayadi = (
+            pn.cdrewrite(
+                pn.string_map([("e+", "ay"), ("o+", "av"), ("au+", "āv")]),
+                "", ALPHABET.vowels, self.sig
+            )
+            @ pn.cdrewrite(pn.cross("ai+", "āy"), "", _ayadi_ai_right, self.sig)
         )
 
         # Perfect weak yan sandhi (er anekācaḥ asamyogapūrvasya & exceptions)
@@ -177,6 +192,19 @@ class SandhiEngine:
         
         self.clean_perf_weak = pn.cdrewrite(
             pn.cross("[PERF_WEAK]", ""), "", "", self.sig
+        )
+
+        # Seṭ desiderative: lengthened ū/ī stays before iṣ (tuṣṭūṣa, not *tuṣṭviṣa).
+        self.desid_vowel_iṣ = pn.cdrewrite(
+            pn.union(
+                pn.cross("ū[DESID_Ū]+iṣ", "ūṣ"),
+                pn.cross("ī[DESID_Ū]+iṣ", "īṣ"),
+                pn.cross("ū+iṣ", "ūṣ"),
+                pn.cross("ī+iṣ", "īṣ"),
+            ),
+            "",
+            "",
+            self.sig,
         )
 
         # 5. General Yan sandhi (semi-vowelisation before vowel)
@@ -695,6 +723,12 @@ class SandhiEngine:
         # Permitted finals normalization (Whitney §141–150).
         # Devoicing, deaspiration, and specific transformations (c→k, ś→ṭ, ṣ→ṭ)
         # at the end of a word (i.e. before [EOS]).
+        # √gam root aorist 3sg active: agan (Whitney §835; after + boundary merge).
+        self.gam_root_aorist_3sg = pn.cdrewrite(
+            pn.cross("agaman", "agan"),
+            "", "", self.sig
+        )
+
         self.permitted_finals = pn.cdrewrite(
             pn.string_map([
                 ("c", "k"), ("j", "k"),   # Whitney §142 (yuj-class j→k)
@@ -754,6 +788,7 @@ class SandhiEngine:
             ("perfect_yan_simple",   self.perfect_yan_simple),
             ("clean_perf_weak",      self.clean_perf_weak),
             ("savarna",            self.savarna),
+            ("desid_vowel_iṣ",     self.desid_vowel_iṣ),
             ("yan_sandhi",         self.yan_sandhi),
             ("guna_sandhi",        self.guna_sandhi),
         ]
@@ -807,6 +842,7 @@ class SandhiEngine:
             ("retro_post_ruki_dhv",  self.retro_post_ruki_dhv),
             ("nati",                 self.nati),
             ("clean_boundaries",     self.clean_boundaries),
+            ("gam_root_aorist_3sg",  self.gam_root_aorist_3sg),
         ]
 
     # ──────────────────────────────────────────────────────────────────────────
@@ -868,6 +904,7 @@ class SandhiEngine:
                 @ self.perfect_yan_simple
                 @ self.clean_perf_weak
                 @ self.savarna
+                @ self.desid_vowel_iṣ
                 @ self.yan_sandhi
                 @ self.guna_sandhi)
 
@@ -931,7 +968,8 @@ class SandhiEngine:
                 @ self.retro_post_ruki_t
                 @ self.retro_post_ruki_dhv
                 @ self.nati
-                @ self.clean_boundaries)
+                @ self.clean_boundaries
+                @ self.gam_root_aorist_3sg)
 
     def upasarga_phase(self, fst: pn.Fst, debug: bool = False) -> pn.Fst:
         """Apply special prefix-junction sandhi rules (upasargas)."""

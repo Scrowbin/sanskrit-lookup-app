@@ -176,12 +176,12 @@ class SuffixProvider:
                 "[2sg]": _s("as"),  "[2du]": _s("tam"), "[2pl]": _s("ta"),
                 "[1sg]": _s("am"),  "[1du]": _s("va"),  "[1pl]": _s("ma"),
             }
-        # Class 9 (tanādi): weak nī-stem + ā-connective imperfect (akṣubhnāt).
+        # Class 9 (tanādi): weak nī-stem; ā-connective in sg; 2pl keeps nī (…ṇīta).
         if class_num == 9:
             return {
-                "[3sg]": _s("āt"),  "[3du]": _s("atām"), "[3pl]": _s("an"),
-                "[2sg]": _s("āḥ"),  "[2du]": _s("atam"), "[2pl]": _s("ata"),
-                "[1sg]": _s("ām"),  "[1du]": _s("āva"),  "[1pl]": _s("āma"),
+                "[3sg]": _s("āt"),  "[3du]": _s("tām"), "[3pl]": _s("an"),
+                "[2sg]": _s("āḥ"),  "[2du]": _s("tam"), "[2pl]": _s("īta"),
+                "[1sg]": _s("ām"),  "[1du]": _s("va"),  "[1pl]": _s("ma"),
             }
             
         endings = {
@@ -480,7 +480,9 @@ class SuffixProvider:
             aorist_type = forced_type
         else:
             info = aorist_overrides.get(root_str)
-            aorist_type = DHATUPATHA_ANALYZER.get_aorist_type(root_str, class_num)
+            aorist_type = DHATUPATHA_ANALYZER.get_aorist_type(
+                root_str, class_num, voice="active"
+            )
             if info:
                 # Prefer lexical override type only when entry carries lexical
                 # stem behavior (active/middle/middle_type) or explicit dual type.
@@ -499,7 +501,14 @@ class SuffixProvider:
         if aorist_type == "sa":
             return SuffixProvider.get_secondary_active(class_num=1, root_str=root_str, **kwargs) # sa-aorist active is just like a-stem
         if aorist_type == "root":
-            return SuffixProvider.get_secondary_active(class_num=2, root_str=root_str, **kwargs)
+            endings = SuffixProvider.get_secondary_active(
+                class_num=2, root_str=root_str, **kwargs
+            )
+            # Whitney §835: √gam 3sg root aorist is agan (-an, not thematic -at).
+            if root_str == "gam":
+                endings = dict(endings)
+                endings["[3sg]"] = _s("an")
+            return endings
         if aorist_type == "is":
             return {
                 "[3sg]": _s("īt"),    "[3du]": _s("iṣṭām"), "[3pl]": _s("iṣus"),
@@ -532,11 +541,9 @@ class SuffixProvider:
         elif forced_type:
             aorist_type = forced_type
         else:
-            root_obj = DHATUPATHA_ANALYZER.get(root_str, class_num) if root_str else None
-            if root_obj and root_obj.aorist_middle_type:
-                aorist_type = root_obj.aorist_middle_type
-            else:
-                aorist_type = DHATUPATHA_ANALYZER.get_aorist_type(root_str, class_num)
+            aorist_type = DHATUPATHA_ANALYZER.get_aorist_type(
+                root_str, class_num, voice="middle"
+            )
             info = aorist_overrides.get(root_str)
             if info:
                 if "middle_type" in info and info["middle_type"] in valid_aorist_types:

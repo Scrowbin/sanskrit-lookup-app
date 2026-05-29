@@ -125,12 +125,15 @@ class MorphologyEngine:
             _any_cons + pn.accep("[CLASS4]"),
             sig
         )
-        # Short a in class-4 stems (e.g. klam → klāmaya-) takes vrddhi before +ya.
+        # Short penultimate a in select class-4 roots (klam → klāmaya-), not man/jan.
         self.class4_a_vrddhi = pn.cdrewrite(
-            pn.cross("a", "ā"),
+            pn.cross("a[CLASS4_VRIDDHI]", "ā"),
             "",
             ALPHABET.consonants + pn.accep("[CLASS4]"),
             sig,
+        )
+        self.class4_vrddhi_tag_erase = pn.cdrewrite(
+            pn.cross("[CLASS4_VRIDDHI]", ""), "", "", sig
         )
         # ── 2.6. Intensive active ī augment reduction ──────────────────────────
         # Intensive active forms with ī augment (īmi, īṣi, īti) behave as weak (no guna)
@@ -194,11 +197,17 @@ class MorphologyEngine:
         self.class1_suppletion = pn.cdrewrite(
             pn.string_map([
                 ("gam[CLASS1_IRR]", "gacch"),
+                ("gam[WEAK][CLASS1_IRR]", "gacch[WEAK]"),
                 ("sthā[CLASS1_IRR]", "tiṣṭh"),
+                ("sthā[WEAK][CLASS1_IRR]", "tiṣṭh[WEAK]"),
                 ("pā[CLASS1_IRR]", "pib"),
+                ("pā[WEAK][CLASS1_IRR]", "pib[WEAK]"),
                 ("sad[CLASS1_IRR]", "sīd"),
+                ("sad[WEAK][CLASS1_IRR]", "sīd[WEAK]"),
                 ("scand[CLASS1_IRR]", "skand"),
+                ("scand[WEAK][CLASS1_IRR]", "skand[WEAK]"),
                 ("vyā[CLASS1_IRR]", "vyay"),
+                ("vyā[WEAK][CLASS1_IRR]", "vyay[WEAK]"),
             ]),
             "", "", sig
         )
@@ -276,7 +285,6 @@ class MorphologyEngine:
             ALPHABET.vowels,
             sig
         )
-
         # Perfect hu/su 1du/1pl Guna (Whitney §796)
         # juhu+iva[HU_SU] -> juhaviva, suṣu+iva[HU_SU] -> suṣaviva
         self.perfect_u_guna_opt = pn.cdrewrite(
@@ -543,6 +551,7 @@ class MorphologyEngine:
                 ("passive_ncya_simplification", self.passive_ncya_simplification),
                 ("class4_lengthening",       self.class4_lengthening),
                 ("class4_a_vrddhi",          self.class4_a_vrddhi),
+                ("class4_vrddhi_tag_erase",  self.class4_vrddhi_tag_erase),
                 ("caus_pass_erase_with_a",   self.caus_pass_erase_with_a),
                 ("caus_pass_erase",          self.caus_pass_erase),
                 ("class1_suppletion",        self.class1_suppletion),
@@ -609,6 +618,7 @@ class MorphologyEngine:
             @ self.passive_ncya_simplification
             @ self.class4_lengthening
             @ self.class4_a_vrddhi
+            @ self.class4_vrddhi_tag_erase
             @ self.caus_pass_erase_with_a
             @ self.caus_pass_erase
             @ self.class1_suppletion

@@ -4,7 +4,10 @@ from dataclasses import dataclass
 from functools import lru_cache
 
 from alphabet import ALPHABET
-from corpus_lexical_hints import load_adverb_primary_gerund_set_hints
+from corpus_lexical_hints import (
+    load_adverb_primary_gerund_set_hints,
+    normalize_corpus_root,
+)
 
 # ── Transliteration ────────────────────────────────────────────────────────────
 IAST_TO_SLP1 = {
@@ -20,32 +23,12 @@ _SLP1_VOWELS = frozenset('aAiIuUeEoOfFxX')
 # Long vowels that force periphrastic perfect when root-initial
 _PERIPHRASTIC_LONG_VOWELS = frozenset({"ī", "ū", "ṛ", "ṝ", "e", "ai", "o", "au"})
 
-# Pāṇini 6.1.15-16: Roots that undergo Samprasāraṇa (y/v/r → i/u/ṛ) in weak forms.
-_SAMPRASARANA_ROOTS = frozenset({
-    # Yajādi / Vacādi group (6.1.15)
-    "yaj", "vac", "vap", "svap", "vah", "vas", "vad", "ve", "vye", "hve", "śvi",
-    # Grahādi group (6.1.16)
-    "grah", "jyā", "vay", "vyadh", "vaś", "vyac", "vraśc", "prach", "bhrajj"
-})
-
-# After the _SAMPRASARANA_ROOTS set:
-_MRJ_CLASS_ROOTS = frozenset({
-    "mṛj", "sṛj", "bhrajj", "rāj", "bhrāj", "vraj", "majj", "yaj", "prach",
-})
-
-_RUH_CLASS_ROOTS = frozenset({
-    "vah", "sah", "mih", "rih", "guh", "ruh", "nah", "dah", "dih",
-})
-
-_GRASSMANN_ROOTS = frozenset({
-    "duh", "dah", "dih", "druh", "bandh", "bādh", "budh", "dabh",
-})
-
 # Roots that allow optional -iṭ in future/periphrastic-future systems
 # even when the raw marker is not reliably present in source encoding.
 # Kept small and centralized in lexical analysis instead of stem builders.
 _OPTIONAL_FUTURE_I_ROOTS = frozenset({
-    "budh", "nī", "han", "labh", "man", "vid", "stu", "svap", "jan", "rudh", "su",
+    "am", "as", "budh", "nī", "han", "labh", "man", "vid", "stu", "svap", "jan",
+    "rudh", "su",
 })
 
 # Known class-lookup aliases where engine gaṇa usage differs from the
@@ -92,8 +75,12 @@ _AORIST_TYPE_LEXICAL_OVERRIDES: dict[tuple[str, int], str] = {
     ("han", 2): "is",
     ("bhū", 1): "root",
     ("div", 4): "is",
+    ("gam", 1): "root",
     ("gā", 1): "root",
+    ("kṛ", 4): "s",
+    ("kṛṣ", 4): "s",
     ("hu", 3): "s",
+    ("hu", 4): "sa",
     ("jñā", 9): "sis",
     ("kṛ", 1): "root",
     ("kṛ", 8): "s",
@@ -103,6 +90,7 @@ _AORIST_TYPE_LEXICAL_OVERRIDES: dict[tuple[str, int], str] = {
     ("labh", 1): "s",
     ("muc", 6): "s",
     ("nī", 1): "s",
+    ("nī", 4): "is",
     ("sthā", 1): "root",
     ("su", 5): "s",
     ("tan", 8): "s",
@@ -110,6 +98,8 @@ _AORIST_TYPE_LEXICAL_OVERRIDES: dict[tuple[str, int], str] = {
     ("yā", 1): "sis",
     ("dṛś", 1): "a",
     ("śru", 5): "a",
+    ("dhā", 1): "root",
+    ("śā", 1): "root",
 }
 
 # Voice-specific aorist family (mostly middle) that should be resolved in the
@@ -122,6 +112,23 @@ _AORIST_MIDDLE_TYPE_OVERRIDES: dict[str, str] = {
     "dā": "s",
     "dhā": "s",
     "śru": "s",
+    # Divādi (class 4): middle iṣ-aorist where INRIA has -ṣṭa- (not secondary -ata-).
+    "ci": "is",
+    "ji": "is",
+    "cyu": "is",
+    "drā": "is",
+    "hu": "is",
+    "hā": "is",
+    "nī": "is",
+    "stu": "is",
+    "spṛś": "is",
+    "nakṣ": "is",
+    "khan": "is",
+    "ram": "is",
+    "dhvṛ": "is",
+    "vṛ": "is",
+    "mṛ": "is",
+    "smi": "is",
 }
 
 # Lexical middle stems used in weak s-aorist-style formation for select roots.
@@ -132,16 +139,19 @@ _AORIST_MIDDLE_STEM_OVERRIDES: dict[str, str] = {
     "pā": "pe",
     "dā": "di",
     "dhā": "dhi",
+    "yaj": "ij",
 }
 
 # Class-sensitive active aorist stems (root, gaṇa) → stem.
 _AORIST_ACTIVE_STEM_OVERRIDES: dict[tuple[str, int], str] = {
     ("ad", 2): "ghasa",
+    ("gam", 1): "gam",
     ("han", 2): "vadh",
     ("kṛ", 1): "kar",
-    ("kṛ", 4): "kār",
+    ("kṛ", 4): "kṛ",
     ("kṛ", 5): "kār",
     ("kan", 5): "kān",
+    ("nī", 4): "na",  # iṣ-aorist: na+iṣam → anaiṣam (not nai+iṣam)
 }
 
 # Roots that are genuinely Aniṭ but whose CSV entries do NOT have an anudātta
@@ -216,6 +226,16 @@ _KNOWN_UBHAYA_ROOTS = frozenset({
     "dviṣ",  # class 2 — INRIA lists middle paradigm
     "cur",   # class 10 — already handled by class-10 rule but explicit for clarity
 })
+
+# Lakāra groups for fallback when a verbs_clean cell is missing.
+_PRESENT_SYSTEM_TENSES = frozenset(
+    {"present", "imperfect", "optative", "imperative"}
+)
+_ACTIVE_MIDDLE_TENSES = frozenset(
+    {"future", "conditional", "perfect", "pluperfect", "aorist", "injunctive", "subjunctive"}
+)
+_ACTIVE_ONLY_TENSES = frozenset({"benedictive", "periphrastic_future"})
+_INRIA_TENSE_ALIASES = {"pluperfect": "perfect"}
 
 @lru_cache(maxsize=8192)
 def to_slp1(iast_str: str) -> str:
@@ -325,9 +345,14 @@ class DhatupathaAnalyzer:
         self._mw_hom: dict[tuple, str] = {}
         # Primary gerund in adverbs.csv → seṭ (True) / aniṭ (False); see corpus_lexical_hints.
         self._adverb_gerund_set_hint: dict[str, bool] = load_adverb_primary_gerund_set_hints()
+        self._inria_voice_index: dict[tuple[str, int, str, str], frozenset[str]] = {}
+        # (root, class|None): feature name → bool; None class = all gaṇas for that root
+        self._root_features: dict[tuple[str, int | None], dict[str, bool]] = {}
         self._load()
         self._build_indexes()
         self._load_mw_roots()
+        self._load_root_features()
+        self._load_lakara_voice_index()
 
     # ── CSV loader ─────────────────────────────────────────────────────────────
 
@@ -666,6 +691,60 @@ class DhatupathaAnalyzer:
             "is_n_opadesa": is_n,
         }
 
+    def _data_dir(self) -> str:
+        import sys
+
+        if getattr(sys, "frozen", False):
+            return os.path.join(sys._MEIPASS, "data")
+        return os.path.join(os.path.dirname(__file__), "..", "data")
+
+    _ROOT_FEATURE_COLUMNS = ("samprasarana", "mrj", "ruh", "grassmann")
+
+    def _load_root_features(self) -> None:
+        """Load per-root Paninian flags from data/root_features.tsv."""
+        path = os.path.join(self._data_dir(), "root_features.tsv")
+        if not os.path.exists(path):
+            import warnings
+
+            warnings.warn(
+                f"DhatupathaAnalyzer: missing {path}; "
+                "root feature flags default to false",
+                stacklevel=2,
+            )
+            return
+
+        def _flag(cell: str) -> bool:
+            return (cell or "").strip() in ("1", "true", "yes", "y")
+
+        with open(path, "r", encoding="utf-8-sig") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                parts = line.split("\t")
+                if len(parts) < 4:
+                    continue
+                root = (parts[0] or "").strip()
+                if not root or root == "root":
+                    continue
+                class_cell = (parts[1] or "").strip()
+                class_num: int | None = int(class_cell) if class_cell.isdigit() else None
+                row: dict[str, bool] = {}
+                for i, name in enumerate(self._ROOT_FEATURE_COLUMNS):
+                    if len(parts) > 2 + i:
+                        row[name] = _flag(parts[2 + i])
+                key = (root, class_num)
+                merged = self._root_features.setdefault(key, {})
+                merged.update(row)
+
+    def _root_feature(self, root_str: str, class_num: int, name: str) -> bool:
+        """True if root_features.tsv marks *name* for (root, class) or root-wide row."""
+        for key in ((root_str, class_num), (root_str, None)):
+            flags = self._root_features.get(key)
+            if flags and flags.get(name):
+                return True
+        return False
+
     def _mw_voice_lookup(self, root_str: str, class_num: int) -> set:
         """Return the MW-database voice set for (root, class), or empty set if unknown.
 
@@ -714,6 +793,15 @@ class DhatupathaAnalyzer:
             return 'a'
 
         is_anit = self._raw_is_anit(raw)
+
+        # Divādi (class 4): default a-aorist (Whitney §833); overrides above win.
+        if class_num == 4:
+            return 'a'
+
+        # Tudādi (class 3): default reduplicated aorist (Whitney §835).
+        # Before sa-aorist: kṛṣ class 3 is Caṅ in INRIA, not ṣ-aorist.
+        if class_num == 3:
+            return 'reduplicated'
 
         # sa-aorist: aniṭ root ending in ś/ṣ/s/h with penultimate i/u/ṛ
         if is_anit and phonemes:
@@ -777,9 +865,6 @@ class DhatupathaAnalyzer:
 
         mw_voices = self._mw_voice_lookup(root_str, class_num)
 
-        if root_str in _KNOWN_UBHAYA_ROOTS:
-            permitted_voices.update({"active", "middle"})
-
         if not permitted_voices:
             if mw_voices:
                 # MW lexicon fallback
@@ -804,14 +889,14 @@ class DhatupathaAnalyzer:
             aorist_type=self._raw_aorist_type(root_str, class_num, raw, flags),
             takes_periphrastic_perfect=self._check_periphrastic(root_str),
             permitted_voices=permitted_voices,
-            takes_samprasarana=(root_str in _SAMPRASARANA_ROOTS),
+            takes_samprasarana=self._root_feature(root_str, class_num, "samprasarana"),
             takes_optional_future_i=((entry is not None and self._raw_is_vet(raw)) or (root_str in _OPTIONAL_FUTURE_I_ROOTS)),
             aorist_middle_type=_AORIST_MIDDLE_TYPE_OVERRIDES.get(root_str, ""),
             aorist_active_stem=_AORIST_ACTIVE_STEM_OVERRIDES.get((root_str, class_num), ""),
             aorist_middle_stem=_AORIST_MIDDLE_STEM_OVERRIDES.get(root_str, ""),
-            is_mrj_class=(root_str in _MRJ_CLASS_ROOTS),
-            is_ruh_class=(root_str in _RUH_CLASS_ROOTS),
-            is_initial_aspirate=(root_str in _GRASSMANN_ROOTS),
+            is_mrj_class=self._root_feature(root_str, class_num, "mrj"),
+            is_ruh_class=self._root_feature(root_str, class_num, "ruh"),
+            is_initial_aspirate=self._root_feature(root_str, class_num, "grassmann"),
             source_raw=raw if entry else "",
             source_code=(entry.get("code", "") if entry else ""),
             source_meaning=(entry.get("meaning", "") if entry else ""),
@@ -821,39 +906,151 @@ class DhatupathaAnalyzer:
         self._cache[key] = obj
         return obj
 
+    def _load_lakara_voice_index(self) -> None:
+        """Load permitted voices per (root, gaṇa, derivative, tense).
+
+        Primary source: data/lakara_voice_index.tsv (derived from verbs_clean.csv).
+        Fallback: scan verbs_clean.csv if the TSV is missing (dev/regenerate).
+        """
+        import sys
+
+        data_dir = self._data_dir()
+        tsv_path = os.path.join(data_dir, "lakara_voice_index.tsv")
+        index: dict[tuple[str, int, str, str], set[str]] = {}
+
+        if os.path.exists(tsv_path):
+            try:
+                with open(tsv_path, "r", encoding="utf-8-sig") as f:
+                    for row in csv.DictReader(f, delimiter="\t"):
+                        root = (row.get("root") or "").strip()
+                        class_cell = (row.get("class") or "").strip()
+                        deriv = (row.get("derivation") or "primary").strip()
+                        tense = (row.get("tense") or "").strip()
+                        voices_raw = (row.get("voices") or "").strip()
+                        if not root or not class_cell.isdigit() or not tense:
+                            continue
+                        voices = {
+                            v.strip()
+                            for v in voices_raw.split(",")
+                            if v.strip() in ("active", "middle", "passive")
+                        }
+                        if voices:
+                            index[(root, int(class_cell), deriv, tense)] = voices
+            except OSError as e:
+                print(f"DhatupathaAnalyzer: could not load {tsv_path} - {e}")
+        else:
+            csv_path = os.path.join(data_dir, "verbs_clean.csv")
+            stem_class_hint: dict[str, int] = {}
+            deferred: list[tuple[str, str, str, str]] = []
+            try:
+                with open(csv_path, "r", encoding="utf-8-sig") as f:
+                    for row in csv.DictReader(f):
+                        stem = normalize_corpus_root((row.get("stem_iast") or "").strip())
+                        if not stem:
+                            continue
+                        derivation = self._derivation_csv_key(
+                            (row.get("derivation") or "primary").strip() or "primary"
+                        )
+                        tense = (row.get("tense") or "").strip()
+                        voice = (row.get("voice") or "").strip()
+                        if not tense or voice not in ("active", "middle", "passive"):
+                            continue
+                        cls_field = (row.get("class") or "").strip()
+                        class_str = cls_field.split()[0] if cls_field else ""
+                        if not class_str.isdigit():
+                            deferred.append((stem, derivation, tense, voice))
+                            continue
+                        class_num = int(class_str)
+                        stem_class_hint.setdefault(stem, class_num)
+                        key = (stem, class_num, derivation, tense)
+                        index.setdefault(key, set()).add(voice)
+                for stem, derivation, tense, voice in deferred:
+                    class_num = stem_class_hint.get(stem)
+                    if class_num is None:
+                        continue
+                    key = (stem, class_num, derivation, tense)
+                    index.setdefault(key, set()).add(voice)
+            except OSError as e:
+                print(f"DhatupathaAnalyzer: could not load voice index - {e}")
+
+        self._inria_voice_index = {k: frozenset(v) for k, v in index.items()}
+
+    @staticmethod
+    def _derivation_csv_key(derivative: str | None) -> str:
+        if derivative is None or derivative == "primary":
+            return "primary"
+        if derivative in ("causative", "causative_passive"):
+            return "causative"
+        if derivative in ("desiderative", "desiderative_passive"):
+            return "desiderative"
+        if derivative and derivative.startswith("intensive"):
+            return "intensive"
+        return "primary"
+
+    def _voice_template_fallback(
+        self,
+        pada_base: set[str],
+        derivation: str,
+        tense: str,
+    ) -> set[str]:
+        """Whitney/Heritage defaults when verbs_clean has no row for this cell."""
+        if derivation == "intensive":
+            return {"active"}
+        if derivation in ("causative", "desiderative"):
+            if tense in _PRESENT_SYSTEM_TENSES | _ACTIVE_MIDDLE_TENSES | {"periphrastic_future"}:
+                return {"active", "middle", "passive"}
+            if tense in _ACTIVE_ONLY_TENSES:
+                return {"active"}
+            return {"active", "middle", "passive"}
+
+        if tense in _PRESENT_SYSTEM_TENSES:
+            voices: set[str] = set()
+            if "active" in pada_base or not pada_base or pada_base == {"middle"}:
+                voices.add("active")
+            if "middle" in pada_base:
+                voices.add("middle")
+            if "active" in voices or "active" in pada_base or not pada_base:
+                voices.add("passive")
+            return voices or {"active", "passive"}
+
+        if tense in _ACTIVE_MIDDLE_TENSES:
+            voices = {"active"}
+            if "middle" in pada_base:
+                voices.add("middle")
+            return voices
+
+        if tense in _ACTIVE_ONLY_TENSES:
+            return {"active"}
+
+        return set(pada_base) or {"active", "middle"}
+
+    def get_permitted_voices(
+        self,
+        root_str: str,
+        class_num: int,
+        tense: str,
+        derivative: str | None = None,
+    ) -> frozenset[str]:
+        """Voices allowed for this root × gaṇa × derivative × lakāra (INRIA + fallback)."""
+        deriv_key = self._derivation_csv_key(derivative)
+        lookup_tense = _INRIA_TENSE_ALIASES.get(tense, tense)
+        key = (root_str, class_num, deriv_key, lookup_tense)
+        if key in self._inria_voice_index:
+            return self._inria_voice_index[key]
+
+        pada_base = set(self.get(root_str, class_num).permitted_voices)
+        return frozenset(
+            self._voice_template_fallback(pada_base, deriv_key, tense)
+        )
+
     @staticmethod
     def _check_periphrastic(root_str: str) -> bool:
-        """True if the root structurally requires the periphrastic perfect.
+        """True if the root requires periphrastic perfect (kṛ/bhū/as auxiliary).
 
-        1. Polysyllabic roots.
-        2. Vowel-initial roots with a heavy syllable (except a/ā).
-        3. Explicitly mandated Pāṇinian exceptions.
+        INRIA primary paradigms use reduplicated liṭ for almost all roots,
+        including √kṛ (cakāra). Periphrastic liṭ is selected only via
+        feature_resolver._PERIPHRASTIC_DERIVATIVES (causative, denominative).
         """
-        explicit_periphrastic = {"uṣ", "jāgṛ", "cakās", "daridrā", "ay", "day", "ās"}
-        if root_str in explicit_periphrastic:
-            return True
-
-        phonemes = ALPHABET.parse_phonemes(root_str)
-        if not phonemes:
-            return False
-
-        vowel_count = sum(1 for p in phonemes if p in ALPHABET.vowels_list)
-        if vowel_count > 1:
-            return True
-
-        first = phonemes[0]
-        if first in ALPHABET.vowels_list and first not in ("a", "ā"):
-            if first in _PERIPHRASTIC_LONG_VOWELS:
-                return True
-            cons_count = 0
-            for p in phonemes[1:]:
-                if p in ALPHABET.consonants_list:
-                    cons_count += 1
-                else:
-                    break
-            if cons_count >= 2:
-                return True
-
         return False
 
     # ── Legacy helpers ─────────────────────────────────────────────────────────
@@ -867,11 +1064,21 @@ class DhatupathaAnalyzer:
         """Return True if root is Aniṭ (legacy API)."""
         return self.get(root_str, class_num).is_anit
 
-    def get_aorist_type(self, root_str: str, class_num: int) -> str:
-        """Return aorist type string (legacy API)."""
+    def get_aorist_type(
+        self, root_str: str, class_num: int, voice: str = "active"
+    ) -> str:
+        """Return aorist type for the given voice (active vs middle may differ)."""
         if class_num == 10:
             return "reduplicated"
-        return self.get(root_str, class_num).aorist_type
+        obj = self.get(root_str, class_num)
+        if voice == "middle" and obj.aorist_middle_type:
+            return obj.aorist_middle_type
+        if voice == "middle":
+            return obj.aorist_type
+        # Divādi active: INRIA sigmatic (…ākṣīt), not thematic a-aorist -at.
+        if class_num == 4 and (root_str, class_num) not in _AORIST_TYPE_LEXICAL_OVERRIDES:
+            return "s"
+        return obj.aorist_type
 
 
 # Singleton instance

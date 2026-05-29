@@ -31,7 +31,9 @@ _STRENGTH_RULES: list[tuple] = [
     # Perfect / Pluperfect: sg active = strong; everything else = weak
     (lambda r, c, p, n, v, t: t in ("perfect", "pluperfect") and v == "active" and n == "sg", "[STRONG]"),
     (lambda r, c, p, n, v, t: t in ("perfect", "pluperfect"),                                 "[WEAK]"),
-    # Class 9 (tanādi): present-system forms use weak nī-stem (not nā).
+    # Class 9 (tanādi): strong nā only in present active sg and imperative active 3sg.
+    (lambda r, c, p, n, v, t: c == 9 and v == "active" and n == "sg" and t == "present", "[STRONG]"),
+    (lambda r, c, p, n, v, t: c == 9 and v == "active" and p == "3" and n == "sg" and t == "imperative", "[STRONG]"),
     (lambda r, c, p, n, v, t: c == 9 and t in ("present", "imperfect", "imperative", "optative"), "[WEAK]"),
     # Thematic classes: cl 1/10 strong in active; middle keeps weak stem grade.
     (lambda r, c, p, n, v, t: c in (1, 10) and v != "middle",                        "[STRONG]"),
@@ -40,6 +42,8 @@ _STRENGTH_RULES: list[tuple] = [
     (lambda r, c, p, n, v, t: t == "imperative" and p == "1",                         "[STRONG]"),
     # Optative / Benedictive: always weak
     (lambda r, c, p, n, v, t: t in ("optative", "benedictive"),                       "[WEAK]"),
+    # √kṛṣ imperfect middle: guṇa stem (akarṣata), unlike present middle kṛṣate
+    (lambda r, c, p, n, v, t: r == "kṛṣ" and c == 1 and t == "imperfect" and v == "middle", "[STRONG]"),
     # Middle voice: weak (after imperative-1 check)
     (lambda r, c, p, n, v, t: v == "middle",                                          "[WEAK]"),
     # Remaining imperative 2sg: weak
@@ -108,7 +112,6 @@ class MorphologicalFeatureResolver:
             root_obj = DHATUPATHA_ANALYZER.get(root_str, class_num)
             is_periphrastic = (
                 derivative in _PERIPHRASTIC_DERIVATIVES
-                or class_num == 10
                 or root_obj.takes_periphrastic_perfect
             )
 
@@ -119,8 +122,9 @@ class MorphologicalFeatureResolver:
         if derivative == "causative":
             strength = _evaluate_strength(root_str, 10, person, number, voice, tense)
             effective_class = 10
-            # Causative passive uses a dedicated stem in -ya (not -aya).
-            effective_derivative = "causative_passive" if voice == "passive" else None
+            # Keep "causative" tag for active so StemBuilder can distinguish
+            # causative luṅ (vriddhi retained) from primary curādi class-10 roots.
+            effective_derivative = "causative_passive" if voice == "passive" else "causative"
 
         elif derivative == "desiderative":
             strength = "[STRONG]"

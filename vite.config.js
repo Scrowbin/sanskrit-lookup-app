@@ -13,4 +13,18 @@ export default defineConfig({
     }
   ],
   base: "./",
+  build: {
+    sourcemap: false,
+    minify: "esbuild",
+    cssMinify: true,
+    reportCompressedSize: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ["react", "react-dom"],
+          sanscript: ["@indic-transliteration/sanscript"],
+        },
+      },
+    },
+  },
 })

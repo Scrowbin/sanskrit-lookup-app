@@ -42,6 +42,9 @@ from flask_cors import CORS
 _conjugator = None
 _declension_engine = None
 
+# Packaged app uses generative FST only (verbs_clean.csv is ~12 MB and omitted).
+_USE_INRIA_DB = os.environ.get("SANSKRIT_USE_INRIA_DB", "").lower() in ("1", "true", "yes")
+
 
 def _get_conjugator():
     global _conjugator
@@ -104,6 +107,7 @@ def conjugate():
             voice=data.get("voice", "active"),
             tense=data.get("tense", "present"),
             derivative=data.get("derivative", None),
+            use_db=_USE_INRIA_DB,
         )
         # result can be list[str] or str (krdantas block)
         if isinstance(result, str):
@@ -161,6 +165,7 @@ def conjugate_full():
                         voice=voice,
                         tense=tense,
                         derivative=derivative,
+                        use_db=_USE_INRIA_DB,
                     )
                     forms = [result] if isinstance(result, str) else result
                 except Exception as cell_err:
@@ -256,6 +261,7 @@ def conjugate_derivative():
                                 voice=voice,
                                 tense=tense,
                                 derivative=derivative,
+                                use_db=_USE_INRIA_DB,
                             )
                             if isinstance(forms, str):
                                 forms = [forms]
@@ -278,6 +284,7 @@ def conjugate_derivative():
                 number="sg",
                 tense="krdantas",
                 derivative=derivative,
+                use_db=_USE_INRIA_DB,
             )
             result["krdantas"] = krd
         except Exception:

@@ -33,6 +33,8 @@ passive_stem_overrides = {
     # True lexical irregularity (attested), so keep as override.
     "smṛ": "smar",
     "śās": ["śās", "śiṣ"],
+    # ā-dhātus that keep ā before passive -ya- (śāyate, not *śīyate).
+    "śā": "śā",
 }
 
 
@@ -66,7 +68,7 @@ causative_stem_irregulars = {
 
 # ── Perfect 2sg: roots that take bare -tha (not -itha) ───────────────────────
 # INRIA uses -itha for yuj (yuyojitha), so yuj is NOT in this set.
-perfect_bare_tha_roots = {"tan", "man", "labh", "jan", "stu", "śru"}  # jan expects jajantha OR jajñitha, stu expects tuṣṭotha, śru expects śuśrotha
+perfect_bare_tha_roots = {"tan", "man", "labh", "jan", "stu", "śru", "ṛj"}
 
 # ── Perfect weak: roots that use GUNA grade (not bare root) in weak forms ─────
 # For roots in this set, the perfect weak stem = guna(root), not bare root.
@@ -173,9 +175,9 @@ desiderative_stem_overrides = {
     "kṣip": ["cikṣipsa", "cikṣīṣa"],
     # Exceptions that keep 'ā' (Whitney §1028b)
     "sthā": ["tiṣṭhāsa"],
-    "jñā":  ["jijñāsa"],
+    "jñā":  ["jijñāsa", "jñīpsa"],
     "ghrā": ["jighrāsa"],
-    "gā":   ["jigāsa"],
+    "gā":   ["jigīṣa"],
     # Whitney §1028e: nind drops nasal in desiderative → ninitsa (nid+sa, d+s→ts)
     "nind": ["ninitsa"],
     "svap": ["suṣupsa"],
@@ -196,6 +198,32 @@ desiderative_stem_overrides = {
     "sīv":  ["suṣyūṣa"],
     "śī":   ["śiśayiṣa"],
     "smi":  ["sismayiṣa"],
+    "śṝ":   ["śarīṣa"],
+    "grah": ["jighṛkṣa"],
+    "ghas": ["jighatsa"],
+    "bādh": ["ībādhiṣa"],
+    # ū/ṛ desiderative: INRIA śiśvayiṣa-, cit aniṭ cicitsa-, ṛ→īr (adhīrṣa)
+    "śū":   ["śiśvayiṣa"],
+    "pū":   ["pipūṣa"],
+    "hū":   ["juhūṣa"],
+    "cit":  ["cikitsa"],
+    "dhṛ":  ["didhīrṣa"],
+    "pad":  ["pitsa"],
+    "tṝ":   ["titīrṣa"],
+    "van":  ["vivāsa"],
+    "śak":  ["śikṣa"],
+    "pac":  ["pipakṣa"],
+    "hṛ":   ["jihīrṣa"],
+    "nij":  ["nenikṣa"],
+    "pṝ":   ["pupūrṣa"],
+    "mṛ":   ["mumūrṣa"],
+    "vas":  ["vivatsa"],
+    "vṛt":  ["vivṛtsa"],
+    "gup":  ["jugupsa"],
+    "tij":  ["titikṣa"],
+    "rabh": ["ripsa"],
+    "rādh": ["rirādhayiṣa"],
+    "bhaj": ["bhikṣa"],
 }
 
 # ── Intensive (yaṅ) stem overrides ───────────────────────────────────────────

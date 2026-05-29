@@ -1,0 +1,43 @@
+# Paninian root-level features not encoded in vidyut dhatu strings.
+# root: IAST; class: empty = all gaṇas; feature columns: 1 = yes, 0 = no
+root	class	samprasarana	mrj	ruh	grassmann	ref
+yaj		1	1	0	0	P.6.1.15 yajādi; P.8.2.36
+vac		1	0	0	0	P.6.1.15 vacādi
+vap		1	0	0	0	P.6.1.15 vacādi
+svap		1	0	0	0	P.6.1.15 vacādi
+vah		1	0	1	0	P.6.1.15 vacādi; Whitney §222 ruh-class
+vas		1	0	0	0	P.6.1.15 vacādi
+vad		1	0	0	0	P.6.1.15 vacādi
+ve		1	0	0	0	P.6.1.15 vacādi
+vye		1	0	0	0	P.6.1.15 vacādi
+hve		1	0	0	0	P.6.1.15 vacādi
+śvi		1	0	0	0	P.6.1.15 vacādi
+grah		1	0	0	0	P.6.1.16 grahādi
+jyā		1	0	0	0	P.6.1.16 grahādi
+vay		1	0	0	0	P.6.1.16 grahādi
+vyadh		1	0	0	0	P.6.1.16 grahādi
+vaś		1	0	0	0	P.6.1.16 grahādi
+vyac		1	0	0	0	P.6.1.16 grahādi
+vraśc		1	0	0	0	P.6.1.16 grahādi
+prach		1	1	0	0	P.6.1.16 grahādi; P.8.2.36
+bhrajj		1	1	0	0	P.6.1.16; P.8.2.36
+mṛj		0	1	0	0	P.8.2.36
+sṛj		0	1	0	0	P.8.2.36
+rāj		0	1	0	0	P.8.2.36
+bhrāj		0	1	0	0	P.8.2.36
+vraj		0	1	0	0	P.8.2.36
+majj		0	1	0	0	P.8.2.36
+sah		0	0	1	0	Whitney §222 ruh-class
+mih		0	0	1	0	Whitney §222 ruh-class
+rih		0	0	1	0	Whitney §222 ruh-class
+guh		0	0	1	0	Whitney §222 ruh-class
+ruh		0	0	1	0	Whitney §222 ruh-class
+nah		0	0	1	0	Whitney §222 ruh-class
+dah		0	0	1	1	Whitney §222; Whitney §155 Grassmann
+dih		0	0	1	1	Whitney §222; Whitney §155 Grassmann
+duh		0	0	0	1	Whitney §155 Grassmann
+druh		0	0	0	1	Whitney §155 Grassmann
+bandh		0	0	0	1	Whitney §155 Grassmann
+bādh		0	0	0	1	Whitney §155 Grassmann
+budh		0	0	0	1	Whitney §155 Grassmann
+dabh		0	0	0	1	Whitney §155 Grassmann

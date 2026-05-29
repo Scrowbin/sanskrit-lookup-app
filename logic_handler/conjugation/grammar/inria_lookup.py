@@ -13,9 +13,14 @@ class InriaLookup:
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
-            cls._instance._index = {}
-            cls._instance._load()
+            cls._instance._index = None
         return cls._instance
+
+    def _ensure_loaded(self) -> None:
+        if self._index is not None:
+            return
+        self._index = {}
+        self._load()
 
     def _load(self):
         # verbs_clean.csv columns:
@@ -73,6 +78,7 @@ class InriaLookup:
         derivation: str | None,
     ) -> list[str]:
         """Return a list of valid IAST forms from verbs_clean.csv."""
+        self._ensure_loaded()
         if not derivation or derivation == "primary":
             derivation = "primary"
 
