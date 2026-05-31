@@ -42,12 +42,17 @@ class SanskritConjugator:
 
     Caching
     -------
-    Stem FSTs are expensive to build.  ``_stem_cache`` stores them keyed on
-    ``(root_str, class_num, strength, tense, derivative, person, number)``
-    so repeated calls reuse the compiled FST.
+    Stem FSTs are expensive (``StemBuilder.build().optimize()``).  They are
+    memoized without person/number for most tenses; perfect and cl.3 impv.
+    ``dā``/``dhā`` keep a paradigm slot.
 
-    ``conjugate()`` is additionally wrapped with ``lru_cache`` so the final
-    IAST string is returned immediately for warm calls without any FST work.
+  ``_finalize_forms_cached`` memoizes morph → sandhi → surface extraction for
+    a cell.  That helps benchmarks (many cells share stems) and production
+    ``/api/conjugate/full`` (one stem, twelve endings).
+
+    ``conjugate()`` is wrapped with ``lru_cache`` for exact repeat queries
+    (common in UI re-renders).  A single cold ``/api/conjugate`` call still
+    pays full FST cost once; stem/finalize caches matter less there.
     """
 
     def __init__(self):
@@ -241,12 +246,19 @@ class SanskritConjugator:
 
     @staticmethod
     def _extract_forms_fast(fst: pn.Fst) -> set[str]:
-        """Extract output forms with a fast path for deterministic FSTs."""
+        """Extract output forms; prefer O(1) ``string()`` when the FST is single-path."""
         optimized = fst.optimize()
         try:
-            # Probe determinism on output-projected acceptor to avoid
-            # StringFst multi-arc errors on transducers with branching.
             out_acc = pn.project(optimized, "output").optimize()
+        except Exception:
+            return set(optimized.paths().ostrings())
+        try:
+            s = out_acc.string()
+            if s:
+                return {s}
+        except Exception:
+            pass
+        try:
             probe = pn.shortestpath(out_acc, nshortest=2, unique=True).optimize()
             probe_forms = list(probe.paths().ostrings())
             if len(probe_forms) == 1:
@@ -255,9 +267,124 @@ class SanskritConjugator:
             pass
         return set(optimized.paths().ostrings())
 
+    @staticmethod
+    def _combine_stem_suffix(
+        stem: pn.Fst,
+        suffix: Suffix,
+        root_str: str,
+        class_num: int,
+        voice: str,
+        tense: str,
+    ) -> pn.Fst:
+        """Join stem and ending FSTs (aorist ``is``/``sis`` attach without ``+``)."""
+        if suffix.is_empty:
+            return stem
+        aor_type = (
+            DHATUPATHA_ANALYZER.get_aorist_type(root_str, class_num, voice=voice)
+            if tense in ("aorist", "injunctive")
+            else ""
+        )
+        if aor_type in ("is", "sis") and suffix.surface.startswith(("iṣ", "siṣ")):
+            return stem + suffix.to_fst()
+        return stem + pn.accep("+") + suffix.to_fst()
+
+    @lru_cache(maxsize=131072)
+    def _finalize_forms_cached(
+        self,
+        root_str: str,
+        effective_class: int,
+        strength: str,
+        tense: str,
+        derivative_key: str,
+        voice: str,
+        person: str,
+        number: str,
+        preverb_str: str,
+        augment: bool,
+        suffix_surface: str,
+        suffix_tags: tuple[str, ...],
+        aorist_type_override: str,
+    ) -> tuple[str, ...]:
+        """Morph + sandhi + surface extraction for one paradigm cell."""
+        derivative = derivative_key or None
+        stem = self._get_stem(
+            root_str,
+            effective_class,
+            strength,
+            tense,
+            derivative,
+            aorist_type_override=aorist_type_override or None,
+            voice=voice,
+            person=person,
+            number=number,
+        )
+        if augment:
+            stem = pn.accep("[AUG]a+") + stem
+        suffix = Suffix(suffix_surface, frozenset(suffix_tags))
+        combined = self._combine_stem_suffix(
+            stem, suffix, root_str, effective_class, voice, tense
+        )
+        if preverb_str:
+            combined = pn.accep(preverb_str) + combined
+        morph_fst = self.morphology.apply_all(combined)
+        sandhi_fst = self.sandhi.apply_all(morph_fst)
+        forms = self._extract_forms_fast(sandhi_fst)
+        return tuple(sorted(forms))
+
     # ──────────────────────────────────────────────────────────────────────────
     # Main entry point
     # ──────────────────────────────────────────────────────────────────────────
+
+    @staticmethod
+    def _split_preverbs(root_str: str) -> tuple[str, str]:
+        """Return ``(preverb_prefix, bare_root)``; prefix ends with ``+`` when non-empty."""
+        if "+" not in root_str:
+            return "", root_str
+        parts = root_str.rsplit("+", 1)
+        preverbs = parts[0].split("+")
+        if "ā" in preverbs and len(preverbs) > 1:
+            preverbs.remove("ā")
+            preverbs.append("ā")
+        return "+".join(preverbs) + "+", parts[1]
+
+    @staticmethod
+    def _voice_for_tense(voice: str, tense: str) -> str:
+        """Whitney §530: passive aliases to middle where no passive paradigm exists."""
+        if voice == "passive" and tense in {
+            "perfect",
+            "future",
+            "conditional",
+            "benedictive",
+        }:
+            return "middle"
+        if voice == "passive" and tense == "periphrastic_future":
+            raise ValueError(
+                "Impossible combination: voice='passive' tense='periphrastic_future'. "
+                "The periphrastic future has no passive or middle paradigm."
+            )
+        return voice
+
+    @staticmethod
+    def _normalize_class_num(
+        root_str: str,
+        class_num: int | str | None,
+        derivative: str | None,
+    ) -> int:
+        if class_num in (None, "", 0, "0"):
+            clean_root = root_str.rsplit("+", 1)[-1] if "+" in root_str else root_str
+            if (
+                clean_root.endswith("a")
+                or derivative == "causative"
+                or derivative == "denominative"
+            ):
+                return 10
+            return 1
+        if isinstance(class_num, str):
+            if class_num.isdigit():
+                return int(class_num)
+            if class_num == "denom":
+                return 10
+        return int(class_num)
 
     @lru_cache(maxsize=65536)
     def conjugate(
@@ -289,18 +416,7 @@ class SanskritConjugator:
             For ``tense="krdantas"``: a single ``str`` block from the kṛdanta engine.
             Periphrastic perfect returns ``list[str]`` like the main path.
         """
-        # Engine-level class fallback logic
-        if class_num in (None, "", 0, "0"):
-            clean_root = root_str.rsplit("+", 1)[-1] if "+" in root_str else root_str
-            if clean_root.endswith("a") or derivative == "causative" or derivative == "denominative":
-                class_num = 10
-            else:
-                class_num = 1
-        elif isinstance(class_num, str):
-            if class_num.isdigit():
-                class_num = int(class_num)
-            elif class_num == "denom":
-                class_num = 10
+        class_num = self._normalize_class_num(root_str, class_num, derivative)
 
         if tense == "krdantas":
             return self.get_krdantas_block(root_str, class_num, derivative=derivative, use_db=use_db)
@@ -321,6 +437,152 @@ class SanskritConjugator:
                 
         return self._conjugate_internal(root_str, class_num, person, number, voice, tense, derivative, use_db, auxiliary)
 
+    def conjugate_paradigm(
+        self,
+        root_str: str,
+        class_num: int | str | None = None,
+        voice: str = "active",
+        tense: str = "present",
+        derivative: str | None = None,
+        use_db: bool = True,
+        auxiliary: str = "kṛ",
+    ) -> dict[str, list[str]]:
+        """All twelve person/number cells with shared setup (production full paradigm)."""
+        class_num = self._normalize_class_num(root_str, class_num, derivative)
+
+        if tense == "krdantas":
+            block = self.get_krdantas_block(
+                root_str, class_num, derivative=derivative, use_db=use_db
+            )
+            return {"krdantas": [block]}
+
+        if derivative == "intensive":
+            deriv = "intensive_luganta" if voice == "active" else "intensive_anta"
+            return self._conjugate_paradigm_loop(
+                root_str, class_num, voice, tense, deriv, use_db, auxiliary
+            )
+
+        return self._conjugate_paradigm_loop(
+            root_str, class_num, voice, tense, derivative, use_db, auxiliary
+        )
+
+    def _conjugate_paradigm_loop(
+        self,
+        root_str: str,
+        class_num: int,
+        voice: str,
+        tense: str,
+        derivative: str | None,
+        use_db: bool,
+        auxiliary: str,
+    ) -> dict[str, list[str]]:
+        preverb_str, root_str = self._split_preverbs(root_str)
+        clean_root = root_str
+        voice = self._voice_for_tense(voice, tense)
+
+        allowed = DHATUPATHA_ANALYZER.get_permitted_voices(
+            clean_root, class_num, tense, derivative
+        )
+        if voice not in allowed:
+            raise ValueError(
+                f"Grammar error: Root '{clean_root}' class {class_num} "
+                f"({tense}, {derivative or 'primary'}) does not permit "
+                f"'{voice}' voice. Allowed: {'/'.join(sorted(allowed))}."
+            )
+
+        dual_aorist = False
+        if tense in ("aorist", "injunctive"):
+            from irregulars import aorist_overrides
+
+            info = aorist_overrides.get(root_str)
+            dual_aorist = bool(
+                info and info.get("type") and "_or_" in info.get("type", "")
+            )
+
+        paradigm: dict[str, list[str]] = {}
+        for person in ("1", "2", "3"):
+            for number in ("sg", "du", "pl"):
+                key = f"{person}{number}"
+                try:
+                    if dual_aorist:
+                        forms = self._conjugate_aorist_dual(
+                            root_str,
+                            class_num,
+                            person,
+                            number,
+                            voice,
+                            tense,
+                            derivative,
+                            preverb_str,
+                        )
+                    else:
+                        f = self.resolver.resolve(
+                            root_str,
+                            class_num,
+                            person,
+                            number,
+                            voice,
+                            tense,
+                            derivative,
+                        )
+                        if f.is_periphrastic:
+                            forms = self._conjugate_periphrastic_perfect(
+                                root_str,
+                                class_num,
+                                voice,
+                                person,
+                                number,
+                                derivative,
+                                preverb_str,
+                                auxiliary,
+                            )
+                        else:
+                            endings = self._fetch_endings_cached(
+                                f.effective_class,
+                                voice,
+                                tense,
+                                root_str,
+                                f.effective_derivative,
+                            )
+                            tag = f"[{person}{number}]"
+                            if tag not in endings:
+                                raise ValueError(
+                                    f"No ending for {tag} in {tense} {voice}."
+                                )
+                            suffix = endings[tag]
+                            forms = list(
+                                self._finalize_forms_cached(
+                                    root_str,
+                                    f.effective_class,
+                                    f.strength,
+                                    tense,
+                                    f.effective_derivative or "",
+                                    voice,
+                                    person,
+                                    number,
+                                    preverb_str,
+                                    f.augment,
+                                    suffix.surface,
+                                    tuple(sorted(suffix.tags)),
+                                    "",
+                                )
+                            )
+                            if use_db:
+                                db_forms = INRIA_LOOKUP.lookup(
+                                    root_str,
+                                    tense,
+                                    voice,
+                                    person,
+                                    number,
+                                    derivative,
+                                )
+                                if db_forms:
+                                    pass
+                    paradigm[key] = forms
+                except Exception as exc:
+                    paradigm[key] = [f"Error: {exc}"]
+        return paradigm
+
     def _conjugate_internal(
         self,
         root_str: str,
@@ -334,40 +596,9 @@ class SanskritConjugator:
         auxiliary: str = "kṛ",
     ) -> list[str] | str:
         
-        # Whitney §530-531: Outside the present-system, the middle voice doubles as
-        # passive. Auto-alias passive → middle for tenses with no distinct passive
-        # paradigm, rather than raising an error. Periphrastic future is excluded
-        # entirely (no passive or middle paradigm exists for it).
-        _no_distinct_passive = {"perfect", "future", "conditional", "benedictive"}
-        if voice == "passive" and tense in _no_distinct_passive:
-            voice = "middle"  # silent alias per Whitney §530
-        elif voice == "passive" and tense == "periphrastic_future":
-            raise ValueError(
-                "Impossible combination: voice='passive' tense='periphrastic_future'. "
-                "The periphrastic future has no passive or middle paradigm."
-            )
-
-        # ── 0. Parse Preverbs (Upasargas) ────────────────────────────────────
-        preverb_str = ""
+        preverb_str, root_str = self._split_preverbs(root_str)
         clean_root_str = root_str
-        if "+" in root_str:
-            parts = root_str.rsplit("+", 1)
-            preverbs = parts[0].split("+")
-            # 4.1 Upasarga validation
-            from upasargas import is_valid_upasarga
-            for p in preverbs:
-                if not is_valid_upasarga(p):
-                    # Warning or error, but let's just log or accept it for robustness
-                    pass
-            
-            # 4.2 ā-never-first enforcement: if 'ā' is present and not the only prefix,
-            # it should be immediately before the root. We move it to the end of the list.
-            if "ā" in preverbs and len(preverbs) > 1:
-                preverbs.remove("ā")
-                preverbs.append("ā")
-                
-            preverb_str = "+".join(preverbs) + "+"
-            root_str = parts[1]
+        voice = self._voice_for_tense(voice, tense)
 
         # ── 0.5 Voice (Pada) Validation Gatekeeper ───────────────────────────
         # Lakāra-specific sets from verbs_clean.csv (e.g. budh: present active+passive,
@@ -402,20 +633,6 @@ class SanskritConjugator:
                 root_str, class_num, voice, person, number, derivative, preverb_str, auxiliary
             )
 
-        # ── 2. Build / fetch stem FST ─────────────────────────────────────────
-        stem = self._get_stem(
-            root_str, f.effective_class, f.strength, tense,
-            f.effective_derivative, voice=voice, person=person, number=number
-        )
-
-        # ── 3. Augmentation (a- prefix for past tenses) ──────────────────────────────
-        if f.augment:
-            # [AUG] tag allows MorphologyEngine to apply vriddhi coalescence
-            # (a+i→ai, a+u→au) rather than guna (e, o) when the stem is
-            # vowel-initial. Whitney §135 / Pāṇini 6.1.87-89.
-            stem = pn.accep("[AUG]a+") + stem
-
-        # ── 4. Fetch ending and combine ───────────────────────────────────────
         endings = self._fetch_endings_cached(
             f.effective_class, voice, tense, root_str, f.effective_derivative
         )
@@ -424,42 +641,30 @@ class SanskritConjugator:
             raise ValueError(f"No ending for {tag} in {tense} {voice}.")
 
         suffix: Suffix = endings[tag]
-        if suffix.is_empty:
-            combined = stem
-        else:
-            # iṣ/is aorist endings attach without '+' so sandhi does not
-            # coalesce stem-final i with initial i (nai+iṣam → *naīṣam).
-            aor_type = (
-                DHATUPATHA_ANALYZER.get_aorist_type(
-                    root_str, class_num, voice=voice
-                )
-                if tense in ("aorist", "injunctive")
-                else ""
-            )
-            if aor_type in ("is", "sis") and suffix.surface.startswith(
-                ("iṣ", "siṣ")
-            ):
-                combined = stem + suffix.to_fst()
-            else:
-                combined = stem + pn.accep("+") + suffix.to_fst()
-
-
-        if preverb_str:
-            combined = pn.accep(preverb_str) + combined
-
-        # ── 5. Post-processing ────────────────────────────────────────────────
-        morph_fst  = self.morphology.apply_all(combined)
-        sandhi_fst = self.sandhi.apply_all(morph_fst)
-        forms = self._extract_forms_fast(sandhi_fst)
+        forms = self._finalize_forms_cached(
+            root_str,
+            f.effective_class,
+            f.strength,
+            tense,
+            f.effective_derivative or "",
+            voice,
+            person,
+            number,
+            preverb_str,
+            f.augment,
+            suffix.surface,
+            tuple(sorted(suffix.tags)),
+            "",
+        )
 
         if use_db:
-            db_forms = INRIA_LOOKUP.lookup(root_str, tense, voice, person, number, derivative)
+            db_forms = INRIA_LOOKUP.lookup(
+                root_str, tense, voice, person, number, derivative
+            )
             if db_forms:
-                # Add all valid variants from the DB to standardise what we return if we want to match
                 pass
-        
-        # We now return a clean list of unique forms directly
-        return sorted(list(forms))
+
+        return list(forms)
 
     # ──────────────────────────────────────────────────────────────────────────
     # Dual-dispatch aorist (s_or_is)
@@ -495,19 +700,6 @@ class SanskritConjugator:
                 f = self.resolver.resolve(
                     root_str, class_num, person, number, voice, tense, derivative
                 )
-                stem = self._get_stem(
-                    root_str,
-                    f.effective_class,
-                    f.strength,
-                    tense=tense,
-                    derivative=f.effective_derivative,
-                    aorist_type_override=forced_type,
-                    person=person,
-                    number=number,
-                    voice=voice,
-                )
-                if f.augment:
-                    stem = pn.accep("[AUG]a+") + stem
                 endings = self._fetch_endings_cached(
                     f.effective_class,
                     voice,
@@ -520,16 +712,27 @@ class SanskritConjugator:
                 if tag not in endings:
                     continue
                 suffix: Suffix = endings[tag]
-                combined = stem if suffix.is_empty else stem + pn.accep("+") + suffix.to_fst()
-                if preverb_str:
-                    combined = pn.accep(preverb_str) + combined
-                morph_fst = self.morphology.apply_all(combined)
-                sandhi_fst = self.sandhi.apply_all(morph_fst)
-                all_forms.update(self._extract_forms_fast(sandhi_fst))
+                all_forms.update(
+                    self._finalize_forms_cached(
+                        root_str,
+                        f.effective_class,
+                        f.strength,
+                        tense,
+                        f.effective_derivative or "",
+                        voice,
+                        person,
+                        number,
+                        preverb_str,
+                        f.augment,
+                        suffix.surface,
+                        tuple(sorted(suffix.tags)),
+                        forced_type,
+                    )
+                )
             except Exception:
                 pass  # skip if one subtype fails
 
-        return sorted(list(all_forms))
+        return sorted(all_forms)
 
     # ──────────────────────────────────────────────────────────────────────────
     # Periphrastic perfect

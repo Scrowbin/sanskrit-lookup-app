@@ -30,6 +30,91 @@ def normalize_root(root: str) -> str:
     return root.replace("~", "").replace("!", "")
 
 
+def _effective_class(root, inria_class, derivation, root_to_class):
+    if derivation == "denominative":
+        return "denom"
+    if inria_class is not None:
+        return inria_class
+    if root.endswith("a") or derivation == "causative":
+        return 10
+    return root_to_class.get(root, 1)
+
+
+def _paradigm_eligible(tense: str, derivative: str) -> bool:
+    """``conjugate_paradigm`` covers all lakāra rows except kṛdanta blocks."""
+    return tense != "krdantas"
+
+
+def _record_cell_result(
+    totals,
+    failed_rows,
+    multiple_expected_rows,
+    *,
+    root,
+    effective_class,
+    derivation,
+    tense,
+    voice,
+    person,
+    number,
+    expected_forms,
+    actual_list,
+    error_msg=None,
+):
+    if error_msg is not None:
+        totals["error"] += 1
+        failed_rows.append(
+            {
+                "Root": root,
+                "Class": effective_class,
+                "Derivation": derivation,
+                "Tense": tense,
+                "Voice": voice,
+                "Person": person,
+                "Number": number,
+                "Expected (INRIA)": " OR ".join(expected_forms),
+                "Actual (FST)": "CRASHED",
+                "Error_Type": error_msg,
+            }
+        )
+        return
+
+    if any(a in expected_forms for a in actual_list):
+        if len(expected_forms) > 1 and set(expected_forms) != set(actual_list):
+            totals["partial"] += 1
+            multiple_expected_rows.append(
+                {
+                    "Root": root,
+                    "Class": effective_class,
+                    "Derivation": derivation,
+                    "Tense": tense,
+                    "Voice": voice,
+                    "Person": person,
+                    "Number": number,
+                    "Expected (INRIA)": " OR ".join(expected_forms),
+                    "Actual (FST)": " OR ".join(actual_list),
+                }
+            )
+        else:
+            totals["pass"] += 1
+    else:
+        totals["fail"] += 1
+        failed_rows.append(
+            {
+                "Root": root,
+                "Class": effective_class,
+                "Derivation": derivation,
+                "Tense": tense,
+                "Voice": voice,
+                "Person": person,
+                "Number": number,
+                "Expected (INRIA)": " OR ".join(expected_forms),
+                "Actual (FST)": " OR ".join(actual_list) if actual_list else "CRASHED",
+                "Error_Type": "Mismatch",
+            }
+        )
+
+
 def run_full_benchmark(
     csv_file=os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "verbs_clean.csv")),
     output_report="full_benchmark_failures.csv",
@@ -77,6 +162,13 @@ def run_full_benchmark(
 
     print(f"  Loaded {len(inria_db)} unique derivations in {time.perf_counter() - t_start:.2f}s\n")
 
+    # Group by (root, class, tense, voice, derivation) for conjugate_paradigm batches.
+    paradigm_groups = defaultdict(dict)
+    for key, expected_forms in inria_db.items():
+        root, inria_class, tense, voice, person, number, derivation = key
+        gkey = (root, inria_class, tense, voice, derivation)
+        paradigm_groups[gkey][(person, number)] = expected_forms
+
     api = SanskritConjugator()
 
     totals = {
@@ -93,84 +185,171 @@ def run_full_benchmark(
 
     count = 0
     total_keys = len(inria_db)
-    
-    # We will track unsupported ones too
-    UNSUPPORTED_DERIVATIONS = set() 
+    paradigm_batches = 0
+    single_cell_calls = 0
 
-    for key, expected_forms in inria_db.items():
-        root, inria_class, tense, voice, person, number, derivation = key
-        
+    UNSUPPORTED_DERIVATIONS = set()
+
+    def _process_cell(
+        root,
+        inria_class,
+        tense,
+        voice,
+        derivation,
+        person,
+        number,
+        expected_forms,
+        actual_list,
+        error_msg=None,
+    ):
+        nonlocal count
         count += 1
         if count % 1000 == 0:
             print(f"Processed {count}/{total_keys} forms...")
 
-        if max_cases is not None and count > max_cases:
-            break
+        effective_class = _effective_class(
+            root, inria_class, derivation, root_to_class
+        )
+        _record_cell_result(
+            totals,
+            failed_rows,
+            multiple_expected_rows,
+            root=root,
+            effective_class=effective_class,
+            derivation=derivation,
+            tense=tense,
+            voice=voice,
+            person=person,
+            number=number,
+            expected_forms=expected_forms,
+            actual_list=actual_list or [],
+            error_msg=error_msg,
+        )
+
+    for gkey, cells in paradigm_groups.items():
+        root, inria_class, tense, voice, derivation = gkey
 
         if derivation in UNSUPPORTED_DERIVATIONS:
             continue
 
-        try:
-            engine_root = INRIA_TO_ENGINE_ROOT.get(root, root)
-            
-            # Decide effective class
-            if derivation == "denominative":
-                effective_class = "denom"
-            elif inria_class is not None:
-                effective_class = inria_class
-            else:
-                if root.endswith("a") or derivation == "causative":
-                    effective_class = 10
+        if max_cases is not None and count >= max_cases:
+            break
+
+        effective_class = _effective_class(
+            root, inria_class, derivation, root_to_class
+        )
+        engine_root = INRIA_TO_ENGINE_ROOT.get(root, root)
+        call_kwargs = dict(
+            voice=voice,
+            tense=tense,
+            derivative=derivation,
+            use_db=False,
+        )
+
+        use_paradigm = _paradigm_eligible(tense, derivation) and len(cells) >= 2
+
+        if use_paradigm:
+            paradigm_batches += 1
+            try:
+                paradigm = api.conjugate_paradigm(
+                    engine_root, effective_class, **call_kwargs
+                )
+            except Exception as e:
+                err = f"Exception: {e}"
+                for (person, number), expected_forms in cells.items():
+                    if max_cases is not None and count >= max_cases:
+                        break
+                    _process_cell(
+                        root,
+                        inria_class,
+                        tense,
+                        voice,
+                        derivation,
+                        person,
+                        number,
+                        expected_forms,
+                        [],
+                        error_msg=err,
+                    )
+                continue
+
+            for (person, number), expected_forms in cells.items():
+                if max_cases is not None and count >= max_cases:
+                    break
+                key = f"{person}{number}"
+                actual_list = paradigm.get(key, [])
+                if (
+                    len(actual_list) == 1
+                    and isinstance(actual_list[0], str)
+                    and actual_list[0].startswith("Error:")
+                ):
+                    _process_cell(
+                        root,
+                        inria_class,
+                        tense,
+                        voice,
+                        derivation,
+                        person,
+                        number,
+                        expected_forms,
+                        [],
+                        error_msg=actual_list[0],
+                    )
                 else:
-                    effective_class = root_to_class.get(root, 1) # fallback to class 1
+                    _process_cell(
+                        root,
+                        inria_class,
+                        tense,
+                        voice,
+                        derivation,
+                        person,
+                        number,
+                        expected_forms,
+                        actual_list,
+                    )
+        else:
+            for (person, number), expected_forms in cells.items():
+                if max_cases is not None and count >= max_cases:
+                    break
+                single_cell_calls += 1
+                try:
+                    actual = api.conjugate(
+                        engine_root,
+                        effective_class,
+                        person,
+                        number,
+                        **call_kwargs,
+                    )
+                    actual_list = actual if isinstance(actual, list) else [actual]
+                    _process_cell(
+                        root,
+                        inria_class,
+                        tense,
+                        voice,
+                        derivation,
+                        person,
+                        number,
+                        expected_forms,
+                        actual_list,
+                    )
+                except Exception as e:
+                    _process_cell(
+                        root,
+                        inria_class,
+                        tense,
+                        voice,
+                        derivation,
+                        person,
+                        number,
+                        expected_forms,
+                        [],
+                        error_msg=f"Exception: {e}",
+                    )
 
-            call_kwargs = dict(
-                voice=voice,
-                tense=tense,
-                derivative=derivation,
-                use_db=False,
-            )
-            
-            actual = api.conjugate(
-                engine_root,
-                effective_class,
-                person,
-                number,
-                **call_kwargs,
-            )
-
-            actual_list = actual if isinstance(actual, list) else [actual]
-            
-            if any(a in expected_forms for a in actual_list):
-                if len(expected_forms) > 1 and set(expected_forms) != set(actual_list):
-                    totals["partial"] += 1
-                    multiple_expected_rows.append({
-                        "Root": root, "Class": effective_class, "Derivation": derivation,
-                        "Tense": tense, "Voice": voice, "Person": person, "Number": number,
-                        "Expected (INRIA)": " OR ".join(expected_forms),
-                        "Actual (FST)": " OR ".join(actual_list)
-                    })
-                else:
-                    totals["pass"] += 1
-            else:
-                totals["fail"] += 1
-                failed_rows.append({
-                    "Root": root, "Class": effective_class, "Derivation": derivation,
-                    "Tense": tense, "Voice": voice, "Person": person, "Number": number,
-                    "Expected (INRIA)": " OR ".join(expected_forms),
-                    "Actual (FST)": " OR ".join(actual_list) if actual_list else "CRASHED",
-                    "Error_Type": "Mismatch",
-                })
-
-        except Exception as e:
-            totals["error"] += 1
-            failed_rows.append({
-                "Root": root, "Class": effective_class, "Derivation": derivation,
-                "Tense": tense, "Voice": voice, "Person": person, "Number": number,
-                "Expected (INRIA)": " OR ".join(expected_forms),
-                "Actual (FST)": "CRASHED",
-                "Error_Type": f"Exception: {e}",
-            })
+    print(
+        f"  Engine calls: {paradigm_batches} paradigm batch(es), "
+        f"{single_cell_calls} single-cell conjugate(s)\n"
+    )
 
     t_total = time.perf_counter() - t_start
     tested = totals["pass"] + totals["partial"] + totals["fail"] + totals["error"]
@@ -279,47 +458,101 @@ def run_failures_rerun(
 
     print(f"  {len(cases)} cases to re-test\n")
 
+    rerun_groups = defaultdict(list)
+    for row in cases:
+        gkey = (
+            row["Root"],
+            row.get("Class"),
+            row["Tense"],
+            row["Voice"],
+            row.get("Derivation") or "primary",
+        )
+        rerun_groups[gkey].append(row)
+
     api = SanskritConjugator()
     still_failed = []
     fixed_rows = []
     totals = {"pass": 0, "fail": 0, "error": 0}
+    processed = 0
 
-    for i, row in enumerate(cases, 1):
-        if i % 2000 == 0:
-            print(f"  {i}/{len(cases)}...")
+    def _rerun_score_row(row, actual_list, error_msg=None):
+        nonlocal processed
+        processed += 1
+        if processed % 2000 == 0:
+            print(f"  {processed}/{len(cases)}...")
 
         expected_forms = _split_expected(row.get("Expected (INRIA)", ""))
-        try:
-            actual_list, _ = _conjugate_row(api, row)
-            if any(a in expected_forms for a in actual_list):
-                totals["pass"] += 1
-                fixed_rows.append(
-                    {
-                        **row,
-                        "Actual (FST)": " OR ".join(actual_list),
-                        "Previous_Actual": row.get("Actual (FST)", ""),
-                    }
-                )
-            else:
-                totals["fail"] += 1
-                still_failed.append(
-                    {
-                        **row,
-                        "Expected (INRIA)": row.get("Expected (INRIA)", ""),
-                        "Actual (FST)": " OR ".join(actual_list) if actual_list else "",
-                        "Error_Type": "Mismatch",
-                    }
-                )
-        except Exception as e:
+        if error_msg is not None:
             totals["error"] += 1
             still_failed.append(
                 {
                     **row,
                     "Expected (INRIA)": row.get("Expected (INRIA)", ""),
                     "Actual (FST)": "CRASHED",
-                    "Error_Type": f"Exception: {e}",
+                    "Error_Type": error_msg,
                 }
             )
+            return
+
+        if any(a in expected_forms for a in actual_list):
+            totals["pass"] += 1
+            fixed_rows.append(
+                {
+                    **row,
+                    "Actual (FST)": " OR ".join(actual_list),
+                    "Previous_Actual": row.get("Actual (FST)", ""),
+                }
+            )
+        else:
+            totals["fail"] += 1
+            still_failed.append(
+                {
+                    **row,
+                    "Expected (INRIA)": row.get("Expected (INRIA)", ""),
+                    "Actual (FST)": " OR ".join(actual_list) if actual_list else "",
+                    "Error_Type": "Mismatch",
+                }
+            )
+
+    for gkey, group_rows in rerun_groups.items():
+        root, class_raw, tense, voice, derivation = gkey
+        effective_class = _parse_class(class_raw)
+        engine_root = INRIA_TO_ENGINE_ROOT.get(root, root)
+        call_kwargs = dict(
+            voice=voice,
+            tense=tense,
+            derivative=derivation,
+            use_db=False,
+        )
+
+        if _paradigm_eligible(tense, derivation) and len(group_rows) >= 2:
+            try:
+                paradigm = api.conjugate_paradigm(
+                    engine_root, effective_class, **call_kwargs
+                )
+            except Exception as e:
+                for row in group_rows:
+                    _rerun_score_row(row, [], error_msg=f"Exception: {e}")
+                continue
+
+            for row in group_rows:
+                key = f"{row['Person']}{row['Number']}"
+                actual_list = paradigm.get(key, [])
+                if (
+                    len(actual_list) == 1
+                    and isinstance(actual_list[0], str)
+                    and actual_list[0].startswith("Error:")
+                ):
+                    _rerun_score_row(row, [], error_msg=actual_list[0])
+                else:
+                    _rerun_score_row(row, actual_list)
+        else:
+            for row in group_rows:
+                try:
+                    actual_list, _ = _conjugate_row(api, row)
+                    _rerun_score_row(row, actual_list)
+                except Exception as e:
+                    _rerun_score_row(row, [], error_msg=f"Exception: {e}")
 
     t_total = time.perf_counter() - t_start
     tested = totals["pass"] + totals["fail"] + totals["error"]

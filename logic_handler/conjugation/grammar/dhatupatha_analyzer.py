@@ -147,7 +147,7 @@ _AORIST_ACTIVE_STEM_OVERRIDES: dict[tuple[str, int], str] = {
     ("ad", 2): "ghasa",
     ("gam", 1): "gam",
     ("han", 2): "vadh",
-    ("kṛ", 1): "kar",
+    ("kṛ", 1): "kṛ",
     ("kṛ", 4): "kṛ",
     ("kṛ", 5): "kār",
     ("kan", 5): "kān",

@@ -415,16 +415,15 @@ class StemBuilder:
     def _class10_use_vriddhi(self, root_str: str, derivative, tense: str) -> bool:
         """Upadhā-vṛddhi on class-10 bases.
 
-        Causatives: vṛddhi in present/future; **no** upadhā-vṛddhi in luṅ (Whitney §1043),
-        except lexical keepers (tan, man, …).
-        Primary curādi: vṛddhi only in those same lexical imperfect cases.
+        Causatives: vṛddhi in all lakāras including luṅ (INRIA: akāṇayat).
+        Guṇa-only bases (gam, short-a, u-penult) are handled inside
+        ``_build_causative_base`` regardless of this flag.
+        Primary gaṇa-10 in luṅ: only lexical keepers (tan, man, …).
         """
-        if tense in self._LUNG_TENSES:
-            if self._is_causative_derivative(derivative):
-                return root_str in self._CAUSATIVE_KEEP_VRIDDHI_IMPERFECT
-            return root_str in self._CAUSATIVE_KEEP_VRIDDHI_IMPERFECT
         if self._is_causative_derivative(derivative):
             return True
+        if tense in self._LUNG_TENSES:
+            return root_str in self._CAUSATIVE_KEEP_VRIDDHI_IMPERFECT
         return False
 
     def _is_class10_a_primary(self, root_str: str, derivative, class_num) -> bool:
@@ -439,6 +438,11 @@ class StemBuilder:
 
     # Class-10 nominal/denominative futures (no Dhātupāṭha curādi row; INRIA -īyiṣya-, etc.)
     _CLASS10_DENOM_PRIMARY_FUTURE: dict[str, str] = {
+        "agada": "yiṣya",
+        "aśva": "yiṣya",
+        "gadgada": "yiṣya",
+        "putrakāma": "yiṣya",
+        "rathakāma": "yiṣya",
         "asūya": "yiṣya",
         "mitra": "īyiṣya",
         "citra": "īyiṣya",
@@ -468,12 +472,13 @@ class StemBuilder:
         if denom is not None:
             return self._class10_denominator_future_fst(root_str, denom)
         phonemes = ALPHABET.parse_phonemes(root_str)
-        base = root_str[:-1] if phonemes and phonemes[-1] == "a" else root_str
-        return pn.accep(base + "+") + pn.accep("ay+iṣya")
+        if phonemes and phonemes[-1] == "a":
+            return pn.accep(root_str[:-1] + "+") + pn.accep("āyiṣya")
+        return pn.accep(root_str + "+") + pn.accep("ay+iṣya")
 
     def _class10_denominator_future_fst(self, root_str: str, pattern: str) -> pn.Fst:
         if pattern == "yiṣya":
-            return pn.accep(root_str[:-1] + "+") + pn.accep("iṣya")
+            return pn.accep(root_str[:-1] + "+") + pn.accep("yiṣya")
         if pattern == "yiṣya_keep":
             return pn.accep(root_str + "+") + pn.accep("yiṣya")
         if pattern in ("īyiṣya", "syiṣya", "āyiṣya"):
@@ -500,9 +505,18 @@ class StemBuilder:
         return pn.accep(base + "+") + pn.accep("ay+iṣya")
 
     def _class10_primary_peri_fst(self, root_str: str):
+        if root_str in self._CLASS10_DENOM_PRIMARY_FUTURE:
+            pattern = self._CLASS10_DENOM_PRIMARY_FUTURE[root_str]
+            if pattern == "yiṣya":
+                return pn.accep(root_str[:-1] + "+") + pn.accep("y+i")
+            if pattern in ("īyiṣya", "syiṣya", "āyiṣya"):
+                return pn.accep(root_str[:-1] + "+") + pn.accep(
+                    {"īyiṣya": "īy+i", "syiṣya": "sy+i", "āyiṣya": "āy+i"}[pattern]
+                )
         phonemes = ALPHABET.parse_phonemes(root_str)
-        base = root_str[:-1] if phonemes and phonemes[-1] == "a" else root_str
-        return pn.accep(base + "+") + pn.accep("ay+i")
+        if phonemes and phonemes[-1] == "a":
+            return pn.accep(root_str[:-1] + "+") + pn.accep("āy+i")
+        return pn.accep(root_str + "+") + pn.accep("ay+i")
 
     def _class10_a_primary_future_fst(self, root_str: str):
         return self._class10_primary_future_fst(root_str)

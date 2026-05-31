@@ -153,24 +153,14 @@ def conjugate_full():
         tense = data.get("tense", "present")
         derivative = data.get("derivative", None)
 
-        paradigm = {}
-        for person in ("1", "2", "3"):
-            for number in ("sg", "du", "pl"):
-                try:
-                    result = engine.conjugate(
-                        root_str=root,
-                        class_num=class_num,
-                        person=person,
-                        number=number,
-                        voice=voice,
-                        tense=tense,
-                        derivative=derivative,
-                        use_db=_USE_INRIA_DB,
-                    )
-                    forms = [result] if isinstance(result, str) else result
-                except Exception as cell_err:
-                    forms = [f"Error: {cell_err}"]
-                paradigm[f"{person}{number}"] = forms
+        paradigm = engine.conjugate_paradigm(
+            root_str=root,
+            class_num=class_num,
+            voice=voice,
+            tense=tense,
+            derivative=derivative,
+            use_db=_USE_INRIA_DB,
+        )
 
         return jsonify({"paradigm": paradigm, "error": None})
     except Exception as exc:
