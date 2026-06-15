@@ -1,10 +1,10 @@
 import { t } from "@indic-transliteration/sanscript";
 import { INPUT_SCHEMES } from "../constants/transliterationSchemes";
 
-/** Characters allowed in engine IAST roots/stems (plus preverb `+`, CSV markers). */
+/** Single code points that may appear in IAST (engine alphabet). */
 const IAST_CHARS = new Set(
   "aāiīuūṛṝḷḹeēoōṃḥ" +
-    "kkhghṅcchjhñṭṭhḍḍhṇtthdnpypyrllvvśṣs" +
+    "kgṅcjñṭḍṇtdnpbmyrlvśṣsh" +
     "+~!. "
 );
 
@@ -37,7 +37,12 @@ function isLegalIAST(text) {
   for (const ch of normalized) {
     if (!IAST_CHARS.has(ch)) return false;
   }
-  return true;
+  try {
+    const dev = t(normalized, "iast", "devanagari");
+    return /[\u0900-\u097F]/u.test(dev);
+  } catch {
+    return false;
+  }
 }
 
 function hasLatinLetters(text) {
