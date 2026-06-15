@@ -1,7 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { t } from "@indic-transliteration/sanscript";
 import { INPUT_SCHEMES } from "../constants/transliterationSchemes";
 import useSanskritAPI from "../hook/useSanskritAPI";
+import {
+  validateInput,
+  transliteratePreview,
+} from "../utils/transliteration";
 
 // ── Declension table layout ──────────────────────────────────────────────────
 const DECL_CASES = ["Nom", "Acc", "Ins", "Dat", "Abl", "Gen", "Loc", "Voc"];
@@ -84,8 +88,22 @@ export default function LookUp() {
   const [declResult, setDeclResult] = useState(null);
   const [activeTab, setActiveTab] = useState("primary");
   const [showScroll, setShowScroll] = useState(false);
+  const [showInputError, setShowInputError] = useState(false);
 
-  const devanagariDisplay = t(inputValue, inputScheme, "devanagari");
+  const inputValidation = useMemo(
+    () => validateInput(inputValue, inputType, inputScheme),
+    [inputValue, inputType, inputScheme]
+  );
+
+  const devanagariDisplay = transliteratePreview(
+    inputValue,
+    inputType,
+    inputScheme,
+    "devanagari"
+  );
+  const iastDisplay =
+    inputValidation.iast ||
+    transliteratePreview(inputValue, inputType, inputScheme, "iast");
 
   useEffect(() => {
     try {
@@ -130,12 +148,14 @@ export default function LookUp() {
     return forms.map((f) => transliterateForm(f)).join(", ");
   }
 
-  /** Normalise user input to IAST for the API */
-  function toIAST(val) {
-    if (inputType === "Devanagari") {
-      return t(val, "devanagari", "iast");
+  function getValidatedIAST() {
+    const result = validateInput(inputValue, inputType, inputScheme);
+    if (!result.valid) {
+      setShowInputError(true);
+      return null;
     }
-    return t(val, inputScheme, "iast");
+    setShowInputError(false);
+    return result.iast;
   }
 
   // ── Submit handlers ────────────────────────────────────────────────────────
@@ -143,7 +163,7 @@ export default function LookUp() {
   async function handleConjugation(e) {
     e.preventDefault();
     clearError();
-    const root = toIAST(inputValue).trim();
+    const root = getValidatedIAST();
     if (!root) return;
 
     // Reset results to initial loading state
@@ -177,7 +197,7 @@ export default function LookUp() {
   async function handleDeclension(e) {
     e.preventDefault();
     clearError();
-    const stem = toIAST(inputValue).trim();
+    const stem = getValidatedIAST();
     if (!stem) return;
 
     const paradigm = await declense({
@@ -306,6 +326,108 @@ export default function LookUp() {
 
   // ── Shared styles ─────────────────────────────────────────────────────────
   const labelStyles = "text-[11px] uppercase tracking-wide text-neutral-400";
+  const inputInvalid =
+    showInputError && inputValue.trim() && !inputValidation.valid;
+  const inputErrorMessage =
+    inputValue.trim() && !inputValidation.valid ? inputValidation.message : "";
+
+  function handleInputChange(e) {
+    setInputValue(e.target.value);
+    if (showInputError) setShowInputError(false);
+  }
+
+  function renderTransliterationInput(inputId) {
+    return (
+      <>
+        <div className={`space-y-1 ${inputType === "Devanagari" ? "md:col-span-2" : ""}`}>
+          <div className={labelStyles}>Input ({inputType})</div>
+          <input
+            id={inputId}
+            type="text"
+            autoComplete="off"
+            className={`input inset-0 flex items-center text-neutral-100 whitespace-pre ${
+              inputInvalid ? "border-red-500/80 ring-1 ring-red-500/40" : ""
+            }`}
+            value={inputValue}
+            onChange={handleInputChange}
+            placeholder={inputType === "Roman" ? "e.g. bhū" : "e.g. भू"}
+            aria-invalid={inputInvalid || undefined}
+            aria-describedby={inputErrorMessage ? `${inputId}-error` : undefined}
+          />
+          {inputErrorMessage && (
+            <p
+              id={`${inputId}-error`}
+              className="text-xs text-red-400"
+              role="alert"
+            >
+              {inputErrorMessage}
+            </p>
+          )}
+        </div>
+
+        {inputType === "Roman" && (
+          <div className="space-y-1">
+            <div className={labelStyles}>Preview (Devanagari)</div>
+            <input
+              type="text"
+              className="input bg-neutral-900 text-neutral-300 border-neutral-700"
+              readOnly
+              value={devanagariDisplay}
+              tabIndex={-1}
+            />
+          </div>
+        )}
+
+        {inputType === "Devanagari" && (
+          <div className="space-y-1 md:col-span-2">
+            <div className={labelStyles}>Preview (IAST — sent to engine)</div>
+            <input
+              type="text"
+              className="input bg-neutral-900 text-neutral-300 border-neutral-700"
+              readOnly
+              value={iastDisplay}
+              tabIndex={-1}
+            />
+          </div>
+        )}
+
+        <div className="space-y-1">
+          <div className={labelStyles}>Input Script</div>
+          <select
+            className="input"
+            value={inputType}
+            onChange={(e) => {
+              setInputType(e.target.value);
+              setShowInputError(false);
+            }}
+          >
+            <option value="Roman">Roman</option>
+            <option value="Devanagari">Devanagari</option>
+          </select>
+        </div>
+
+        {inputType === "Roman" && (
+          <div className="space-y-1">
+            <div className={labelStyles}>Transliteration Scheme</div>
+            <select
+              className="input"
+              value={inputScheme}
+              onChange={(e) => {
+                setInputScheme(e.target.value);
+                setShowInputError(false);
+              }}
+            >
+              {Object.entries(INPUT_SCHEMES).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+      </>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100 flex justify-center">
@@ -377,51 +499,7 @@ export default function LookUp() {
             <form className="space-y-8 bg-neutral-900/50 p-6 rounded-xl border border-neutral-800" onSubmit={handleConjugation}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                {/* INPUT */}
-                <div className={`space-y-1 ${inputType === "Devanagari" ? "md:col-span-2" : ""}`}>
-                  <div className={labelStyles}>Input ({inputType})</div>
-                  <input
-                    id="verb-text-input"
-                    type="text"
-                    autoComplete="off"
-                    className="input inset-0 flex items-center text-neutral-100 whitespace-pre"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    placeholder={inputType === "Roman" ? "e.g. bhū" : "e.g. भू"}
-                  />
-                </div>
-
-                {inputType === "Roman" && (
-                  <div className="space-y-1">
-                    <div className={labelStyles}>Preview (Devanagari)</div>
-                    <input
-                      type="text"
-                      className="input bg-neutral-900 text-neutral-300 border-neutral-700"
-                      readOnly
-                      value={devanagariDisplay}
-                    />
-                  </div>
-                )}
-
-                {/* INPUT SCHEME */}
-                <div className="space-y-1">
-                  <div className={labelStyles}>Input Script</div>
-                  <select className="input" value={inputType} onChange={(e) => setInputType(e.target.value)}>
-                    <option value="Roman">Roman</option>
-                    <option value="Devanagari">Devanagari</option>
-                  </select>
-                </div>
-
-                {inputType === "Roman" && (
-                  <div className="space-y-1">
-                    <div className={labelStyles}>Transliteration Scheme</div>
-                    <select className="input" value={inputScheme} onChange={(e) => setInputScheme(e.target.value)}>
-                      {Object.entries(INPUT_SCHEMES).map(([value, label]) => (
-                        <option key={value} value={value}>{label}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
+                {renderTransliterationInput("verb-text-input")}
 
                 {/* CLASS (GAṆA) */}
                 <div className="space-y-1">
@@ -452,7 +530,11 @@ export default function LookUp() {
 
               {/* BUTTONS */}
               <div className="flex gap-4 justify-center pt-2">
-                <button type="submit" className="btn-primary min-w-[120px]" disabled={loading}>
+                <button
+                  type="submit"
+                  className="btn-primary min-w-[120px]"
+                  disabled={loading || !inputValue.trim()}
+                >
                   {loading ? (
                     <span className="flex items-center gap-2">
                       <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -471,6 +553,7 @@ export default function LookUp() {
                     setOutputScheme("iast");
                     setGana(1);
                     setConjResults(null);
+                    setShowInputError(false);
                     clearError();
                   }}
                 >
@@ -530,51 +613,7 @@ export default function LookUp() {
             <form className="space-y-8 bg-neutral-900/50 p-6 rounded-xl border border-neutral-800" onSubmit={handleDeclension}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                {/* INPUT */}
-                <div className={`space-y-1 ${inputType === "Devanagari" ? "md:col-span-2" : ""}`}>
-                  <div className={labelStyles}>Input ({inputType})</div>
-                  <input
-                    id="main-text-input"
-                    type="text"
-                    autoComplete="off"
-                    className="input inset-0 flex items-center text-neutral-100 whitespace-pre"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    placeholder={inputType === "Roman" ? "e.g. rāma" : "e.g. राम"}
-                  />
-                </div>
-
-                {inputType === "Roman" && (
-                  <div className="space-y-1">
-                    <div className={labelStyles}>Preview (Devanagari)</div>
-                    <input
-                      type="text"
-                      className="input bg-neutral-900 text-neutral-300 border-neutral-700"
-                      readOnly
-                      value={devanagariDisplay}
-                    />
-                  </div>
-                )}
-
-                {/* INPUT SCHEME */}
-                <div className="space-y-1">
-                  <div className={labelStyles}>Input Script</div>
-                  <select className="input" value={inputType} onChange={(e) => setInputType(e.target.value)}>
-                    <option value="Roman">Roman</option>
-                    <option value="Devanagari">Devanagari</option>
-                  </select>
-                </div>
-
-                {inputType === "Roman" && (
-                  <div className="space-y-1">
-                    <div className={labelStyles}>Transliteration Scheme</div>
-                    <select className="input" value={inputScheme} onChange={(e) => setInputScheme(e.target.value)}>
-                      {Object.entries(INPUT_SCHEMES).map(([value, label]) => (
-                        <option key={value} value={value}>{label}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
+                {renderTransliterationInput("main-text-input")}
 
                 {/* GENDER */}
                 <div className="space-y-1">
@@ -605,7 +644,11 @@ export default function LookUp() {
 
               {/* BUTTONS */}
               <div className="flex gap-4 justify-center pt-2">
-                <button type="submit" className="btn-primary min-w-[120px]" disabled={loading}>
+                <button
+                  type="submit"
+                  className="btn-primary min-w-[120px]"
+                  disabled={loading || !inputValue.trim()}
+                >
                   {loading ? (
                     <span className="flex items-center gap-2">
                       <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -624,6 +667,7 @@ export default function LookUp() {
                     setOutputScheme("iast");
                     setGender("mas");
                     setDeclResult(null);
+                    setShowInputError(false);
                     clearError();
                   }}
                 >
