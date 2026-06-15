@@ -45,7 +45,7 @@ function hasLatinLetters(text) {
 }
 
 function hasDevanagari(text) {
-  return /[\u0900-\u097F\uA8E0-\uA8FF]/.u.test(text);
+  return /[\u0900-\u097F\uA8E0-\uA8FF]/u.test(text);
 }
 
 /**
